@@ -1,11 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
-import type { CellCoord, TerrainCellSnapshot, UnitId, UnitSnapshot, WorldSnapshot } from "@asama/shared";
+import type {
+  BuildingSnapshot,
+  BuildingType,
+  CellCoord,
+  TerrainCellSnapshot,
+  UnitId,
+  UnitSnapshot,
+  WorldSnapshot
+} from "@asama/shared";
 
 interface GameCanvasProps {
   readonly snapshot: WorldSnapshot | null;
+  readonly buildTool: BuildingType | "demolish" | null;
   readonly onSelectUnit: (unitId: UnitId) => void;
   readonly onMoveSelected: (destination: CellCoord) => void;
+  readonly onPlaceBuilding: (buildingType: BuildingType, position: CellCoord) => void;
+  readonly onDemolishBuilding: (position: CellCoord) => void;
 }
 
 interface AssetManifest {
@@ -40,7 +51,14 @@ const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 2;
 const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
 
-export function GameCanvas({ snapshot, onSelectUnit, onMoveSelected }: GameCanvasProps) {
+export function GameCanvas({
+  snapshot,
+  buildTool,
+  onSelectUnit,
+  onMoveSelected,
+  onPlaceBuilding,
+  onDemolishBuilding
+}: GameCanvasProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
   const worldRef = useRef<Container | null>(null);
@@ -49,7 +67,10 @@ export function GameCanvas({ snapshot, onSelectUnit, onMoveSelected }: GameCanva
   const unitLayerRef = useRef<Container | null>(null);
   const lastTerrainKeyRef = useRef<string | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(snapshot);
+  const buildToolRef = useRef<BuildingType | "demolish" | null>(buildTool);
   const onSelectUnitRef = useRef(onSelectUnit);
+  const onPlaceBuildingRef = useRef(onPlaceBuilding);
+  const onDemolishBuildingRef = useRef(onDemolishBuilding);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
   const dragRef = useRef<{
     pointerId: number;
@@ -71,8 +92,20 @@ export function GameCanvas({ snapshot, onSelectUnit, onMoveSelected }: GameCanva
   }, [snapshot]);
 
   useEffect(() => {
+    buildToolRef.current = buildTool;
+  }, [buildTool]);
+
+  useEffect(() => {
     onSelectUnitRef.current = onSelectUnit;
   }, [onSelectUnit]);
+
+  useEffect(() => {
+    onPlaceBuildingRef.current = onPlaceBuilding;
+  }, [onPlaceBuilding]);
+
+  useEffect(() => {
+    onDemolishBuildingRef.current = onDemolishBuilding;
+  }, [onDemolishBuilding]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -177,11 +210,12 @@ export function GameCanvas({ snapshot, onSelectUnit, onMoveSelected }: GameCanva
       assets,
       cameraRef.current,
       cameraVersion,
+      buildTool,
       hoverCell,
       selectedCell,
       localInvalidMoveTarget
     );
-  }, [assets, cameraVersion, hoverCell, localInvalidMoveTarget, ready, selectedCell, snapshot]);
+  }, [assets, buildTool, cameraVersion, hoverCell, localInvalidMoveTarget, ready, selectedCell, snapshot]);
 
   useEffect(() => {
     const app = appRef.current;
@@ -245,6 +279,20 @@ export function GameCanvas({ snapshot, onSelectUnit, onMoveSelected }: GameCanva
           x: event.clientX - rect.left,
           y: event.clientY - rect.top
         };
+        const clickedCell = screenToCell(screenPoint.x, screenPoint.y, cameraRef.current);
+        const activeBuildTool = buildToolRef.current;
+        if (activeBuildTool === "demolish") {
+          setSelectedCell(clickedCell);
+          onDemolishBuildingRef.current(clickedCell);
+          return;
+        }
+
+        if (activeBuildTool !== null) {
+          setSelectedCell(clickedCell);
+          onPlaceBuildingRef.current(activeBuildTool, clickedCell);
+          return;
+        }
+
         const hitUnit = findUnitAtScreenPoint(screenPoint, snapshotRef.current, cameraRef.current);
         if (hitUnit !== null) {
           onSelectUnitRef.current(hitUnit.id);
@@ -252,7 +300,7 @@ export function GameCanvas({ snapshot, onSelectUnit, onMoveSelected }: GameCanva
           return;
         }
 
-        setSelectedCell(screenToCell(screenPoint.x, screenPoint.y, cameraRef.current));
+        setSelectedCell(clickedCell);
       }
     };
 
@@ -275,6 +323,9 @@ export function GameCanvas({ snapshot, onSelectUnit, onMoveSelected }: GameCanva
       event.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const destination = screenToCell(event.clientX - rect.left, event.clientY - rect.top, cameraRef.current);
+      if (buildToolRef.current !== null) {
+        return;
+      }
       const targetCell = getSnapshotCell(snapshotRef.current, destination);
       setSelectedCell(destination);
       if (targetCell === null || !targetCell.passable) {
@@ -317,6 +368,7 @@ function renderScene(
   assets: ReadonlyMap<string, LoadedAsset>,
   camera: CameraState,
   cameraVersion: number,
+  buildTool: BuildingType | "demolish" | null,
   hoverCell: CellCoord | null,
   selectedCell: CellCoord | null,
   localInvalidMoveTarget: CellCoord | null
@@ -349,7 +401,7 @@ function renderScene(
   }
 
   if (selectedCell !== null) {
-    addOverlaySprite(overlayLayer, selectedCell, "overlay.cell.selected", assets);
+    addCellActionPreview(overlayLayer, selectedCell, snapshot, buildTool, assets);
   }
 
   if (hoverCell !== null && isInsideSnapshotMap(hoverCell, snapshot)) {
@@ -360,6 +412,10 @@ function renderScene(
   const invalidMoveTarget = snapshot.invalidMoveTarget ?? localInvalidMoveTarget;
   if (invalidMoveTarget !== null && isInsideSnapshotMap(invalidMoveTarget, snapshot)) {
     addOverlaySprite(overlayLayer, invalidMoveTarget, "overlay.cell.blocked", assets);
+  }
+
+  for (const building of [...snapshot.buildings].sort(compareBuildingsForDraw)) {
+    addBuildingSprite(unitLayer, building, assets);
   }
 
   for (const unit of [...snapshot.units].sort(compareUnitsForDraw)) {
@@ -398,6 +454,41 @@ function addOverlaySprite(
   layer.addChild(sprite);
 }
 
+function addCellActionPreview(
+  layer: Container,
+  cell: CellCoord,
+  snapshot: WorldSnapshot,
+  buildTool: BuildingType | "demolish" | null,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  if (buildTool === null) {
+    addOverlaySprite(layer, cell, "overlay.cell.selected", assets);
+    return;
+  }
+
+  if (buildTool === "demolish") {
+    const hasBuilding = snapshot.buildings.some((building) => sameCell(building.position, cell));
+    addOverlaySprite(layer, cell, hasBuilding ? "overlay.demolish.target" : "overlay.build.invalid", assets);
+    return;
+  }
+
+  const targetCell = getSnapshotCell(snapshot, cell);
+  const occupied = snapshot.buildings.some((building) => sameCell(building.position, cell));
+  const assetId = targetCell !== null && targetCell.passable && !occupied ? "overlay.build.valid" : "overlay.build.invalid";
+  addOverlaySprite(layer, cell, assetId, assets);
+}
+
+function addBuildingSprite(
+  layer: Container,
+  building: BuildingSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  const sprite = createSprite(building.assetId, assets, fallbackAssetIdForBuilding(building));
+  const point = cellToWorld(building.position);
+  sprite.position.set(point.x, point.y);
+  layer.addChild(sprite);
+}
+
 function addUnitSprite(
   layer: Container,
   unit: UnitSnapshot,
@@ -415,8 +506,8 @@ function addUnitSprite(
   layer.addChild(sprite);
 }
 
-function createSprite(assetId: string, assets: ReadonlyMap<string, LoadedAsset>): Sprite {
-  const asset = assets.get(assetId);
+function createSprite(assetId: string, assets: ReadonlyMap<string, LoadedAsset>, fallbackAssetId = "overlay.cell.selected"): Sprite {
+  const asset = assets.get(assetId) ?? assets.get(fallbackAssetId);
   const sprite = new Sprite(asset?.texture ?? Texture.EMPTY);
   sprite.anchor.set(asset?.anchor.x ?? 0.5, asset?.anchor.y ?? 0.5);
   return sprite;
@@ -503,8 +594,21 @@ function compareUnitsForDraw(a: UnitSnapshot, b: UnitSnapshot): number {
   return a.id.localeCompare(b.id);
 }
 
+function compareBuildingsForDraw(a: BuildingSnapshot, b: BuildingSnapshot): number {
+  const ay = a.position.x + a.position.y;
+  const by = b.position.x + b.position.y;
+  if (ay !== by) {
+    return ay - by;
+  }
+  return a.id.localeCompare(b.id);
+}
+
 function isInsideSnapshotMap(cell: CellCoord, snapshot: WorldSnapshot): boolean {
   return cell.x >= 0 && cell.x < snapshot.map.width && cell.y >= 0 && cell.y < snapshot.map.height;
+}
+
+function sameCell(a: CellCoord, b: CellCoord): boolean {
+  return a.x === b.x && a.y === b.y;
 }
 
 function getSnapshotCell(snapshot: WorldSnapshot | null, cell: CellCoord): TerrainCellSnapshot | null {
@@ -513,6 +617,22 @@ function getSnapshotCell(snapshot: WorldSnapshot | null, cell: CellCoord): Terra
   }
 
   return snapshot.map.cells[cell.y * snapshot.map.width + cell.x] ?? null;
+}
+
+function fallbackAssetIdForBuilding(building: BuildingSnapshot): string {
+  if (building.type === "dry_moat") {
+    return "terrain.dirt.base";
+  }
+
+  if (building.type === "water_moat") {
+    return "terrain.water.base";
+  }
+
+  if (building.type === "honmaru") {
+    return "overlay.cell.selected";
+  }
+
+  return "overlay.cell.blocked";
 }
 
 function clamp(value: number, min: number, max: number): number {

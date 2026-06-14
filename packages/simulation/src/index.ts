@@ -1,6 +1,9 @@
 import {
   MAP_HEIGHT,
   MAP_WIDTH,
+  type BuildingId,
+  type BuildingSnapshot,
+  type BuildingType,
   type CellCoord,
   type PlayerCommand,
   type TerrainCellSnapshot,
@@ -28,8 +31,25 @@ interface UnitState {
   movementProgress: number;
 }
 
+interface BuildingDefinition {
+  readonly type: BuildingType;
+  readonly passable: boolean;
+  readonly movementCostModifier: number;
+  readonly assetId: string;
+}
+
+interface BuildingState {
+  readonly id: BuildingId;
+  readonly type: BuildingType;
+  readonly position: CellCoord;
+  readonly passable: boolean;
+  readonly movementCostModifier: number;
+  readonly assetId: string;
+}
+
 export interface WorldState {
   currentTick: number;
+  nextBuildingId: number;
   invalidMoveTarget: CellCoord | null;
   map: {
     width: number;
@@ -37,6 +57,7 @@ export interface WorldState {
     cells: TerrainCellState[];
   };
   units: UnitState[];
+  buildings: BuildingState[];
 }
 
 const ORTHOGONAL_DIRECTIONS: readonly CellCoord[] = [
@@ -45,10 +66,12 @@ const ORTHOGONAL_DIRECTIONS: readonly CellCoord[] = [
   { x: 0, y: 1 },
   { x: 0, y: -1 }
 ];
+const BLOCKED_MOVEMENT_COST = 9999;
 
 export function createInitialWorld(): WorldState {
   return {
     currentTick: 0,
+    nextBuildingId: 1,
     invalidMoveTarget: null,
     map: createInitialMap(),
     units: [
@@ -72,7 +95,8 @@ export function createInitialWorld(): WorldState {
         ticksPerStep: 6,
         movementProgress: 0
       }
-    ]
+    ],
+    buildings: []
   };
 }
 
@@ -115,6 +139,51 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     if (!assignedPath) {
       world.invalidMoveTarget = destination;
       return "No path to that cell";
+    }
+
+    world.invalidMoveTarget = null;
+    return null;
+  }
+
+  if (command.type === "placeBuilding") {
+    const position = clampCell(command.position);
+    const definition = buildingDefinitions[command.buildingType];
+    if (definition === undefined) {
+      return "Unknown building type";
+    }
+
+    if (!canPlaceBuilding(world, position, definition)) {
+      world.invalidMoveTarget = position;
+      return "Cannot place building there";
+    }
+
+    world.buildings.push({
+      id: `building:${world.nextBuildingId}`,
+      type: command.buildingType,
+      position,
+      passable: definition.passable,
+      movementCostModifier: definition.movementCostModifier,
+      assetId: definition.assetId
+    });
+    world.nextBuildingId += 1;
+    world.invalidMoveTarget = null;
+    clearUnitPathsThrough(world, position);
+    return null;
+  }
+
+  if (command.type === "demolishBuilding") {
+    const position = clampCell(command.position);
+    const index = world.buildings.findIndex((building) => sameCell(building.position, position));
+    if (index === -1) {
+      world.invalidMoveTarget = position;
+      return "No building to demolish";
+    }
+
+    const [building] = world.buildings.splice(index, 1);
+    if (building?.type === "honmaru") {
+      world.buildings.splice(index, 0, building);
+      world.invalidMoveTarget = position;
+      return "Honmaru cannot be demolished";
     }
 
     world.invalidMoveTarget = null;
@@ -167,9 +236,55 @@ export function snapshotWorld(world: WorldState): WorldSnapshot {
       path: unit.path,
       selected: unit.selected,
       assetId: unit.assetId
-    }))
+    })),
+    buildings: world.buildings.map(snapshotBuilding)
   };
 }
+
+const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
+  fence: {
+    type: "fence",
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.fence.wood"
+  },
+  wall: {
+    type: "wall",
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.wall.plaster"
+  },
+  gate: {
+    type: "gate",
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.gate.wood.closed"
+  },
+  dry_moat: {
+    type: "dry_moat",
+    passable: true,
+    movementCostModifier: 5,
+    assetId: "building.dry_moat"
+  },
+  water_moat: {
+    type: "water_moat",
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.water_moat"
+  },
+  storehouse: {
+    type: "storehouse",
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.storehouse"
+  },
+  honmaru: {
+    type: "honmaru",
+    passable: true,
+    movementCostModifier: 1,
+    assetId: "building.honmaru.marker"
+  }
+};
 
 function createInitialMap(): WorldState["map"] {
   const cells: TerrainCellState[] = [];
@@ -267,8 +382,7 @@ function findPath(world: WorldState, start: CellCoord, goal: CellCoord): CellCoo
         continue;
       }
 
-      const cell = getCell(world, neighbor);
-      const tentativeG = current.g + cell.movementCost;
+      const tentativeG = current.g + movementCostAt(world, neighbor);
       const known = open.get(neighborKey);
       if (known !== undefined && tentativeG >= known.g) {
         continue;
@@ -327,7 +441,49 @@ function getCell(world: WorldState, coord: CellCoord): TerrainCellState {
 }
 
 function isPassable(world: WorldState, coord: CellCoord): boolean {
-  return isInsideMap(coord) && getCell(world, coord).passable;
+  if (!isInsideMap(coord) || !getCell(world, coord).passable) {
+    return false;
+  }
+
+  const building = getBuildingAt(world, coord);
+  return building?.passable ?? true;
+}
+
+function movementCostAt(world: WorldState, coord: CellCoord): number {
+  const terrainCost = getCell(world, coord).movementCost;
+  const building = getBuildingAt(world, coord);
+  return terrainCost + (building?.movementCostModifier ?? 0);
+}
+
+function canPlaceBuilding(world: WorldState, position: CellCoord, definition: BuildingDefinition): boolean {
+  if (!isInsideMap(position) || getBuildingAt(world, position) !== null) {
+    return false;
+  }
+
+  if (world.units.some((unit) => sameCell(unit.position, position))) {
+    return false;
+  }
+
+  const terrain = getCell(world, position);
+  if (!terrain.passable && definition.type !== "honmaru") {
+    return false;
+  }
+
+  return true;
+}
+
+function getBuildingAt(world: WorldState, coord: CellCoord): BuildingState | null {
+  return world.buildings.find((building) => sameCell(building.position, coord)) ?? null;
+}
+
+function clearUnitPathsThrough(world: WorldState, position: CellCoord): void {
+  for (const unit of world.units) {
+    if (unit.path.some((step) => sameCell(step, position))) {
+      unit.path = [];
+      unit.destination = null;
+      unit.movementProgress = 0;
+    }
+  }
 }
 
 function isInsideMap(coord: CellCoord): boolean {
@@ -348,6 +504,17 @@ function snapshotCell(cell: TerrainCellState): TerrainCellSnapshot {
     movementCost: cell.movementCost,
     passable: cell.passable,
     assetId: cell.assetId
+  };
+}
+
+function snapshotBuilding(building: BuildingState): BuildingSnapshot {
+  return {
+    id: building.id,
+    type: building.type,
+    position: building.position,
+    passable: building.passable,
+    movementCostModifier: building.movementCostModifier,
+    assetId: building.assetId
   };
 }
 

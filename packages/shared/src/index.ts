@@ -5,7 +5,9 @@ export const MAP_HEIGHT = 128;
 
 export type EntityId = string;
 export type UnitId = EntityId;
+export type BuildingId = EntityId;
 export type TerrainType = "grass" | "dirt" | "water" | "stone";
+export type BuildingType = "fence" | "wall" | "gate" | "dry_moat" | "water_moat" | "storehouse" | "honmaru";
 
 export interface CellCoord {
   readonly x: number;
@@ -29,6 +31,15 @@ export interface UnitSnapshot {
   readonly assetId: string;
 }
 
+export interface BuildingSnapshot {
+  readonly id: BuildingId;
+  readonly type: BuildingType;
+  readonly position: CellCoord;
+  readonly passable: boolean;
+  readonly movementCostModifier: number;
+  readonly assetId: string;
+}
+
 export interface WorldSnapshot {
   readonly currentTick: number;
   readonly invalidMoveTarget: CellCoord | null;
@@ -38,6 +49,7 @@ export interface WorldSnapshot {
     readonly cells: readonly TerrainCellSnapshot[];
   };
   readonly units: readonly UnitSnapshot[];
+  readonly buildings: readonly BuildingSnapshot[];
 }
 
 export type PlayerCommand =
@@ -51,6 +63,19 @@ export type PlayerCommand =
       readonly type: "moveUnits";
       readonly unitIds: readonly UnitId[];
       readonly destination: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "placeBuilding";
+      readonly buildingType: BuildingType;
+      readonly position: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "demolishBuilding";
+      readonly position: CellCoord;
       readonly issuedAtTick: number;
       readonly clientSequence: number;
     };

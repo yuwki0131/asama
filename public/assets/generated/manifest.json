@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatedBy": "img-agent",
-  "generatedAt": "2026-06-14T14:12:19.259Z",
+  "generatedAt": "2026-06-14T15:35:50.266Z",
   "assets": [
     {
       "assetId": "terrain.grass.base",
@@ -183,6 +183,116 @@
       "assetId": "overlay.unit.selection-ring",
       "kind": "overlay",
       "file": "generated/overlay-unit-selection-ring.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.fence.wood",
+      "kind": "building",
+      "file": "generated/building-fence-wood.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.wall.plaster",
+      "kind": "building",
+      "file": "generated/building-wall-plaster.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.78
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed",
+      "kind": "building",
+      "file": "generated/building-gate-wood-closed.png",
+      "width": 80,
+      "height": 80,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.78
+      }
+    },
+    {
+      "assetId": "building.dry_moat",
+      "kind": "building",
+      "file": "generated/building-dry-moat.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat",
+      "kind": "building",
+      "file": "generated/building-water-moat.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.storehouse",
+      "kind": "building",
+      "file": "generated/building-storehouse.png",
+      "width": 96,
+      "height": 80,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "building.honmaru.marker",
+      "kind": "building",
+      "file": "generated/building-honmaru-marker.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.build.valid",
+      "kind": "overlay",
+      "file": "generated/overlay-build-valid.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.build.invalid",
+      "kind": "overlay",
+      "file": "generated/overlay-build-invalid.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.demolish.target",
+      "kind": "overlay",
+      "file": "generated/overlay-demolish-target.png",
       "width": 64,
       "height": 32,
       "anchor": {

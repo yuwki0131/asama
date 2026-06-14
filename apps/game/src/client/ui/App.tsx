@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { WorldSnapshot } from "@asama/shared";
+import type { BuildingType, CellCoord, WorldSnapshot } from "@asama/shared";
 import { GameCanvas } from "../renderer/GameCanvas";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 
@@ -8,6 +8,7 @@ export function App() {
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [simulationStatus, setSimulationStatus] = useState("starting");
+  const [buildTool, setBuildTool] = useState<BuildingType | "demolish" | null>(null);
   const selectedUnits = snapshot?.units.filter((unit) => unit.selected) ?? [];
 
   useEffect(() => {
@@ -70,6 +71,31 @@ export function App() {
     [snapshot?.currentTick, snapshot?.units]
   );
 
+  const handlePlaceBuilding = useCallback(
+    (buildingType: BuildingType, position: CellCoord) => {
+      simulationRef.current?.enqueueCommand({
+        type: "placeBuilding",
+        buildingType,
+        position,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
+
+  const handleDemolishBuilding = useCallback(
+    (position: CellCoord) => {
+      simulationRef.current?.enqueueCommand({
+        type: "demolishBuilding",
+        position,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
+
   return (
     <main className="app">
       <header className="topbar">
@@ -91,9 +117,48 @@ export function App() {
           {simulationError === null ? null : <span className="error-text">{simulationError}</span>}
         </div>
       </header>
+      <div className="buildbar">
+        <button className={buildTool === null ? "active" : ""} type="button" onClick={() => setBuildTool(null)}>
+          Select
+        </button>
+        {buildingTools.map((tool) => (
+          <button
+            className={buildTool === tool.type ? "active" : ""}
+            key={tool.type}
+            type="button"
+            onClick={() => setBuildTool(tool.type)}
+          >
+            {tool.label}
+          </button>
+        ))}
+        <button
+          className={buildTool === "demolish" ? "active danger" : "danger"}
+          type="button"
+          onClick={() => setBuildTool("demolish")}
+        >
+          Demolish
+        </button>
+      </div>
       <section className="game-view">
-        <GameCanvas snapshot={snapshot} onSelectUnit={handleSelectUnit} onMoveSelected={handleMoveSelected} />
+        <GameCanvas
+          buildTool={buildTool}
+          snapshot={snapshot}
+          onDemolishBuilding={handleDemolishBuilding}
+          onPlaceBuilding={handlePlaceBuilding}
+          onSelectUnit={handleSelectUnit}
+          onMoveSelected={handleMoveSelected}
+        />
       </section>
     </main>
   );
 }
+
+const buildingTools: readonly { readonly type: BuildingType; readonly label: string }[] = [
+  { type: "fence", label: "Fence" },
+  { type: "wall", label: "Wall" },
+  { type: "gate", label: "Gate" },
+  { type: "dry_moat", label: "Dry Moat" },
+  { type: "water_moat", label: "Water Moat" },
+  { type: "storehouse", label: "Storehouse" },
+  { type: "honmaru", label: "Honmaru" }
+];

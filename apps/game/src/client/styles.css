@@ -19,7 +19,7 @@ button {
 
 .app {
   display: grid;
-  grid-template-rows: 48px 1fr;
+  grid-template-rows: 48px 42px 1fr;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -49,6 +49,41 @@ button {
 
 .error-text {
   color: #ff8f7e;
+}
+
+.buildbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid #343a40;
+  background: #1b1f25;
+  overflow-x: auto;
+}
+
+.buildbar button {
+  min-width: 72px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #46515c;
+  border-radius: 4px;
+  background: #252b32;
+  color: #f4efe6;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.buildbar button.active {
+  border-color: #f0c86a;
+  background: #3d3524;
+}
+
+.buildbar button.danger {
+  border-color: #70423d;
+}
+
+.buildbar button.danger.active {
+  background: #4a2926;
 }
 
 .game-view {
