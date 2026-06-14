@@ -1,0 +1,54 @@
+export const SIM_TICKS_PER_SECOND = 20;
+export const SNAPSHOTS_PER_SECOND = 10;
+export const MAP_WIDTH = 128;
+export const MAP_HEIGHT = 128;
+
+export type EntityId = string;
+export type UnitId = EntityId;
+
+export interface CellCoord {
+  readonly x: number;
+  readonly y: number;
+}
+
+export interface UnitSnapshot {
+  readonly id: UnitId;
+  readonly position: CellCoord;
+  readonly selected: boolean;
+}
+
+export interface WorldSnapshot {
+  readonly currentTick: number;
+  readonly map: {
+    readonly width: number;
+    readonly height: number;
+  };
+  readonly units: readonly UnitSnapshot[];
+}
+
+export type PlayerCommand =
+  | {
+      readonly type: "selectUnits";
+      readonly unitIds: readonly UnitId[];
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "moveUnits";
+      readonly unitIds: readonly UnitId[];
+      readonly destination: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    };
+
+export type MainToWorkerMessage =
+  | { readonly type: "init" }
+  | { readonly type: "setSpeed"; readonly speed: 0 | 1 | 2 | 4 }
+  | { readonly type: "enqueueCommand"; readonly command: PlayerCommand }
+  | { readonly type: "requestSnapshot" };
+
+export type WorkerToMainMessage =
+  | { readonly type: "ready"; readonly snapshot: WorldSnapshot }
+  | { readonly type: "snapshot"; readonly snapshot: WorldSnapshot }
+  | { readonly type: "commandRejected"; readonly reason: string }
+  | { readonly type: "error"; readonly message: string };

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "WebWorker"],
+    "outDir": "dist/types",
+    "rootDir": ".",
+    "types": ["vite/client"]
+  },
+  "references": [
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/simulation" },
+    { "path": "../../packages/content" }
+  ],
+  "include": ["src", "vite.config.ts"]
+}
