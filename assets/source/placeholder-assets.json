@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "assetId": "terrain.grass.placeholder",
+      "kind": "terrain",
+      "output": "terrain-grass.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#3f5b38",
+      "stroke": "#263823",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "terrain.dirt.placeholder",
+      "kind": "terrain",
+      "output": "terrain-dirt.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#795f3a",
+      "stroke": "#4a3925",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "unit.ashigaru.placeholder",
+      "kind": "unit",
+      "output": "unit-ashigaru.png",
+      "width": 48,
+      "height": 48,
+      "fill": "#d9ded0",
+      "stroke": "#252525",
+      "accent": "#6b2f2f",
+      "anchor": { "x": 0.5, "y": 0.78 }
+    },
+    {
+      "assetId": "building.storehouse.placeholder",
+      "kind": "building",
+      "output": "building-storehouse.png",
+      "width": 96,
+      "height": 80,
+      "fill": "#9b7a4a",
+      "stroke": "#473322",
+      "accent": "#3c4650",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "overlay.selection.placeholder",
+      "kind": "overlay",
+      "output": "overlay-selection.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#f0c86a",
+      "stroke": "#f0c86a",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    }
+  ]
+}

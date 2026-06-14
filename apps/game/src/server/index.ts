@@ -21,7 +21,7 @@ server.get("/api/saves", async () => {
   await ensureSaveDirs();
   const groups = await Promise.all(["manual", "autosave", "quicksave"].map(async (group) => ({
     group,
-    files: await readdir(join(savesDir, group))
+    files: (await readdir(join(savesDir, group))).filter((file) => file.endsWith(".jcastle"))
   })));
   return { groups };
 });

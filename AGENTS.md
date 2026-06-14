@@ -23,6 +23,9 @@ Use pnpm workspaces from the repository root.
 - `pnpm test`: run Vitest across packages.
 - `pnpm run typecheck`: run TypeScript checks.
 - `pnpm run build`: build all workspace packages and the game client.
+- `pnpm run generate:assets`: generate placeholder PNG assets and a manifest.
+- `pnpm run validate:assets`: validate generated asset manifest and PNG dimensions.
+- `pnpm run clean:assets`: remove generated placeholder assets.
 
 ## Coding Style & Naming Conventions
 
@@ -31,6 +34,8 @@ Use TypeScript for implementation. Keep simulation code independent of React, Pi
 Use stable IDs for content and entities. Display names are not identifiers. Planned content definitions should use JSONC during development and validated typed data at runtime.
 
 Markdown should be concise, use descriptive headings, and avoid locking unresolved balance values into permanent rules.
+
+Generated image files under `public/assets/placeholders/` should not be hand-edited. Update `assets/source/placeholder-assets.json` and rerun asset generation.
 
 ## Testing Guidelines
 

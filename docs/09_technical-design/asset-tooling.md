@@ -44,6 +44,38 @@ MVP前半では次を優先します。
 3. ユニットの向きと選択状態が分かるプレースホルダー
 4. オーバーレイ
 
+初期CLIは `packages/asset-tools` に置きます。
+
+```text
+pnpm run generate:assets
+pnpm run validate:assets
+pnpm run clean:assets
+```
+
+`generate:assets` は `assets/source/placeholder-assets.json` を読み、`public/assets/placeholders/` にPNGプレースホルダーと `manifest.json` を生成します。実装初期はSharpでSVGテンプレートをPNG化し、正式アセット導入前でも描画・マニフェスト参照・差し替え手順を検証できるようにします。
+
+`validate:assets` は manifest の `assetId` 重複、参照ファイルの存在、PNGの実寸を検証します。
+
+`clean:assets` は生成済みの `public/assets/placeholders/` を削除します。
+
+生成物はビルド成果物として扱い、手編集しません。変更が必要な場合は `assets/source/placeholder-assets.json` を更新して再生成します。
+
+## アプリケーションとの契約
+
+アプリケーション側は、初期段階では次のmanifestを読むだけでアセットを解決します。
+
+```text
+public/assets/placeholders/manifest.json
+```
+
+manifestの各要素:
+
+- `assetId`: コンテンツ定義や描画コードが参照する安定ID
+- `kind`: `terrain`、`unit`、`building`、`overlay`
+- `file`: `public/assets/` からの相対パス
+- `width` / `height`: PNGの実寸
+- `anchor`: 描画基準点
+
 ## 検証
 
 アセット検証で確認する項目:
