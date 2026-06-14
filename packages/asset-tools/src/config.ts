@@ -61,15 +61,21 @@ function parseAsset(value: unknown, index: number, seen: Set<string>): Placehold
     }
   };
 
+  const withOptionalFields: PlaceholderAssetSpec = {
+    ...spec,
+    ...(asset.pattern === undefined ? {} : { pattern: asset.pattern }),
+    ...(asset.direction === undefined ? {} : { direction: asset.direction })
+  };
+
   if (asset.accent !== undefined) {
     assertString(asset.accent, `assets[${index}].accent`);
     return {
-      ...spec,
+      ...withOptionalFields,
       accent: asset.accent
     };
   }
 
-  return spec;
+  return withOptionalFields;
 }
 
 function assertString(value: unknown, label: string): asserts value is string {

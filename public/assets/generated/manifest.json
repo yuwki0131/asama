@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "generatedBy": "img-agent",
+  "generatedAt": "2026-06-14T14:12:19.259Z",
+  "assets": [
+    {
+      "assetId": "terrain.grass.base",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-base.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.base",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-base.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.water.base",
+      "kind": "terrain",
+      "file": "generated/terrain-water-base.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.stone.base",
+      "kind": "terrain",
+      "file": "generated/terrain-stone-base.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.variant.1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-variant-1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.variant.1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-variant-1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-ashigaru-idle-south.png",
+      "width": 48,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.move.south",
+      "kind": "unit",
+      "file": "generated/unit-ashigaru-move-south.png",
+      "width": 48,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.north",
+      "kind": "unit",
+      "file": "generated/unit-ashigaru-idle-north.png",
+      "width": 48,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.east",
+      "kind": "unit",
+      "file": "generated/unit-ashigaru-idle-east.png",
+      "width": 48,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.west",
+      "kind": "unit",
+      "file": "generated/unit-ashigaru-idle-west.png",
+      "width": 48,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "overlay.cell.hover",
+      "kind": "overlay",
+      "file": "generated/overlay-cell-hover.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.cell.selected",
+      "kind": "overlay",
+      "file": "generated/overlay-cell-selected.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.move.destination",
+      "kind": "overlay",
+      "file": "generated/overlay-move-destination.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.path.step",
+      "kind": "overlay",
+      "file": "generated/overlay-path-step.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.cell.blocked",
+      "kind": "overlay",
+      "file": "generated/overlay-cell-blocked.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.unit.selection-ring",
+      "kind": "overlay",
+      "file": "generated/overlay-unit-selection-ring.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  ]
+}

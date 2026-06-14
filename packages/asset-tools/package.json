@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "generate:placeholders": "tsx src/index.ts generate-placeholders",
+    "generate:main2img": "tsx src/index.ts generate-main2img",
     "validate:manifest": "tsx src/index.ts validate-manifest",
+    "validate:generated": "tsx src/index.ts validate-manifest generated",
     "clean": "tsx src/index.ts clean",
     "test": "vitest run --passWithNoTests",
     "lint": "tsc -p tsconfig.json --noEmit",

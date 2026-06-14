@@ -5,23 +5,37 @@ export const MAP_HEIGHT = 128;
 
 export type EntityId = string;
 export type UnitId = EntityId;
+export type TerrainType = "grass" | "dirt" | "water" | "stone";
 
 export interface CellCoord {
   readonly x: number;
   readonly y: number;
 }
 
+export interface TerrainCellSnapshot {
+  readonly coord: CellCoord;
+  readonly terrain: TerrainType;
+  readonly movementCost: number;
+  readonly passable: boolean;
+  readonly assetId: string;
+}
+
 export interface UnitSnapshot {
   readonly id: UnitId;
   readonly position: CellCoord;
+  readonly destination: CellCoord | null;
+  readonly path: readonly CellCoord[];
   readonly selected: boolean;
+  readonly assetId: string;
 }
 
 export interface WorldSnapshot {
   readonly currentTick: number;
+  readonly invalidMoveTarget: CellCoord | null;
   readonly map: {
     readonly width: number;
     readonly height: number;
+    readonly cells: readonly TerrainCellSnapshot[];
   };
   readonly units: readonly UnitSnapshot[];
 }

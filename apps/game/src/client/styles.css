@@ -47,6 +47,10 @@ button {
   color: #d7d0c6;
 }
 
+.error-text {
+  color: #ff8f7e;
+}
+
 .game-view {
   position: relative;
   min-height: 0;

@@ -9,6 +9,8 @@
     "build": "pnpm -r build",
     "generate:assets": "pnpm --filter @asama/asset-tools generate:placeholders",
     "validate:assets": "pnpm --filter @asama/asset-tools validate:manifest",
+    "generate:main2img": "pnpm --filter @asama/asset-tools generate:main2img",
+    "validate:generated-assets": "pnpm --filter @asama/asset-tools validate:generated",
     "clean:assets": "pnpm --filter @asama/asset-tools clean",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",

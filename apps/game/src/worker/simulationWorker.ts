@@ -24,7 +24,10 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
   }
 
   if (message.type === "enqueueCommand") {
-    applyCommand(world, message.command);
+    const rejectionReason = applyCommand(world, message.command);
+    if (rejectionReason !== null) {
+      post({ type: "commandRejected", reason: rejectionReason });
+    }
     post({ type: "snapshot", snapshot: snapshotWorld(world) });
     return;
   }
@@ -54,6 +57,7 @@ function loop(now: number): void {
   setTimeout(() => loop(performance.now()), 16);
 }
 
+post({ type: "ready", snapshot: snapshotWorld(world) });
 loop(performance.now());
 
 function post(message: WorkerToMainMessage): void {

@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "assetId": "terrain.grass.base",
+      "kind": "terrain",
+      "output": "terrain-grass-base.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#3f5b38",
+      "stroke": "#263823",
+      "pattern": "base",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "terrain.dirt.base",
+      "kind": "terrain",
+      "output": "terrain-dirt-base.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#7a633e",
+      "stroke": "#4a3925",
+      "pattern": "rough",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "terrain.water.base",
+      "kind": "terrain",
+      "output": "terrain-water-base.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#2f6573",
+      "stroke": "#1e404b",
+      "pattern": "water",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "terrain.stone.base",
+      "kind": "terrain",
+      "output": "terrain-stone-base.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#6a6b62",
+      "stroke": "#3f413c",
+      "pattern": "stone",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "terrain.grass.variant.1",
+      "kind": "terrain",
+      "output": "terrain-grass-variant-1.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#496640",
+      "stroke": "#263823",
+      "pattern": "base",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "terrain.dirt.variant.1",
+      "kind": "terrain",
+      "output": "terrain-dirt-variant-1.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#846a42",
+      "stroke": "#4a3925",
+      "pattern": "rough",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.south",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-south.png",
+      "width": 48,
+      "height": 64,
+      "fill": "#d7d2bd",
+      "stroke": "#252525",
+      "accent": "#7a2f2c",
+      "direction": "south",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "unit.ashigaru.move.south",
+      "kind": "unit",
+      "output": "unit-ashigaru-move-south.png",
+      "width": 48,
+      "height": 64,
+      "fill": "#d7d2bd",
+      "stroke": "#252525",
+      "accent": "#7a2f2c",
+      "direction": "south",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.north",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-north.png",
+      "width": 48,
+      "height": 64,
+      "fill": "#c9c1a8",
+      "stroke": "#252525",
+      "accent": "#5f2a28",
+      "direction": "north",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.east",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-east.png",
+      "width": 48,
+      "height": 64,
+      "fill": "#d7d2bd",
+      "stroke": "#252525",
+      "accent": "#7a2f2c",
+      "direction": "east",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.west",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-west.png",
+      "width": 48,
+      "height": 64,
+      "fill": "#d7d2bd",
+      "stroke": "#252525",
+      "accent": "#7a2f2c",
+      "direction": "west",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "overlay.cell.hover",
+      "kind": "overlay",
+      "output": "overlay-cell-hover.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#d7f0ff",
+      "stroke": "#9bd8ff",
+      "pattern": "hover",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "overlay.cell.selected",
+      "kind": "overlay",
+      "output": "overlay-cell-selected.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#f0c86a",
+      "stroke": "#f0c86a",
+      "pattern": "selected",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "overlay.move.destination",
+      "kind": "overlay",
+      "output": "overlay-move-destination.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#f0c86a",
+      "stroke": "#f0c86a",
+      "pattern": "destination",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "overlay.path.step",
+      "kind": "overlay",
+      "output": "overlay-path-step.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#f0e0a2",
+      "stroke": "#f0c86a",
+      "pattern": "path",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "overlay.cell.blocked",
+      "kind": "overlay",
+      "output": "overlay-cell-blocked.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#cc3a32",
+      "stroke": "#cc3a32",
+      "pattern": "blocked",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "overlay.unit.selection-ring",
+      "kind": "overlay",
+      "output": "overlay-unit-selection-ring.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#f0c86a",
+      "stroke": "#f0c86a",
+      "pattern": "ring",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    }
+  ]
+}

@@ -12,6 +12,8 @@ export interface PlaceholderAssetSpec {
   readonly fill: string;
   readonly stroke: string;
   readonly accent?: string;
+  readonly pattern?: "base" | "rough" | "water" | "stone" | "hover" | "selected" | "destination" | "path" | "blocked" | "ring";
+  readonly direction?: "north" | "south" | "east" | "west";
   readonly anchor: AssetAnchor;
 }
 
