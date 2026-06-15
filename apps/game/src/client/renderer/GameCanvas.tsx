@@ -474,7 +474,10 @@ function addCellActionPreview(
 
   const targetCell = getSnapshotCell(snapshot, cell);
   const occupied = snapshot.buildings.some((building) => sameCell(building.position, cell));
-  const assetId = targetCell !== null && targetCell.passable && !occupied ? "overlay.build.valid" : "overlay.build.invalid";
+  const assetId =
+    targetCell !== null && !occupied && (targetCell.passable || isBridgeBuildTool(buildTool))
+      ? "overlay.build.valid"
+      : "overlay.build.invalid";
   addOverlaySprite(layer, cell, assetId, assets);
 }
 
@@ -776,6 +779,10 @@ function buildingGroundOffsetY(building: BuildingSnapshot): number {
   }
 
   return 7;
+}
+
+function isBridgeBuildTool(buildTool: BuildingType): boolean {
+  return buildTool === "earth_bridge" || buildTool === "wood_bridge";
 }
 
 function clamp(value: number, min: number, max: number): number {

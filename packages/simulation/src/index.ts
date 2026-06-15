@@ -75,6 +75,10 @@ export interface WorldState {
   buildings: BuildingState[];
 }
 
+interface SnapshotOptions {
+  readonly includeMapCells?: boolean;
+}
+
 const ORTHOGONAL_DIRECTIONS: readonly CellCoord[] = [
   { x: 1, y: 0 },
   { x: -1, y: 0 },
@@ -84,7 +88,7 @@ const ORTHOGONAL_DIRECTIONS: readonly CellCoord[] = [
 const BLOCKED_MOVEMENT_COST = 9999;
 
 export function createInitialWorld(): WorldState {
-  return {
+  const world: WorldState = {
     currentTick: 0,
     nextBuildingId: 1,
     invalidMoveTarget: null,
@@ -113,6 +117,9 @@ export function createInitialWorld(): WorldState {
     ],
     buildings: []
   };
+
+  seedInitialBuildings(world);
+  return world;
 }
 
 export function applyCommand(world: WorldState, command: PlayerCommand): string | null {
@@ -242,14 +249,16 @@ export function updateWorld(world: WorldState): void {
   world.currentTick += 1;
 }
 
-export function snapshotWorld(world: WorldState): WorldSnapshot {
+export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}): WorldSnapshot {
+  const includeMapCells = options.includeMapCells ?? true;
+
   return {
     currentTick: world.currentTick,
     invalidMoveTarget: world.invalidMoveTarget,
     map: {
       width: world.map.width,
       height: world.map.height,
-      cells: world.map.cells.map(snapshotCell)
+      cells: includeMapCells ? world.map.cells.map(snapshotCell) : []
     },
     units: world.units.map((unit) => ({
       id: unit.id,
@@ -272,6 +281,46 @@ const threeCellXFootprint: readonly CellCoord[] = [
   { x: 0, y: 0 },
   { x: 1, y: 0 },
   { x: 2, y: 0 }
+];
+
+const initialBuildingPlacements: readonly { readonly type: BuildingType; readonly position: CellCoord }[] = [
+  { type: "honmaru", position: { x: 62, y: 59 } },
+  { type: "tenshu", position: { x: 63, y: 58 } },
+  { type: "storehouse", position: { x: 59, y: 61 } },
+  { type: "market", position: { x: 57, y: 64 } },
+  { type: "barracks", position: { x: 60, y: 66 } },
+  { type: "samurai_residence", position: { x: 69, y: 61 } },
+  { type: "town_block", position: { x: 70, y: 64 } },
+  { type: "farm", position: { x: 57, y: 68 } },
+  { type: "farm", position: { x: 58, y: 68 } },
+  { type: "farm", position: { x: 59, y: 68 } },
+  { type: "farm", position: { x: 57, y: 69 } },
+  { type: "farm", position: { x: 58, y: 69 } },
+  { type: "farm", position: { x: 59, y: 69 } },
+  { type: "road", position: { x: 61, y: 64 } },
+  { type: "road", position: { x: 62, y: 64 } },
+  { type: "road", position: { x: 63, y: 64 } },
+  { type: "road", position: { x: 64, y: 65 } },
+  { type: "road", position: { x: 65, y: 65 } },
+  { type: "road", position: { x: 67, y: 65 } },
+  { type: "fence", position: { x: 61, y: 56 } },
+  { type: "fence", position: { x: 62, y: 56 } },
+  { type: "fence", position: { x: 63, y: 56 } },
+  { type: "fence", position: { x: 64, y: 56 } },
+  { type: "wall", position: { x: 66, y: 56 } },
+  { type: "wall", position: { x: 67, y: 56 } },
+  { type: "wall", position: { x: 68, y: 56 } },
+  { type: "gate", position: { x: 65, y: 56 } },
+  { type: "gate_wide_2", position: { x: 61, y: 70 } },
+  { type: "gate_wide_3", position: { x: 65, y: 70 } },
+  { type: "dry_moat", position: { x: 72, y: 58 } },
+  { type: "dry_moat", position: { x: 72, y: 59 } },
+  { type: "dry_moat", position: { x: 72, y: 60 } },
+  { type: "water_moat", position: { x: 74, y: 58 } },
+  { type: "water_moat", position: { x: 74, y: 59 } },
+  { type: "water_moat", position: { x: 74, y: 60 } },
+  { type: "earth_bridge", position: { x: 61, y: 44 } },
+  { type: "wood_bridge", position: { x: 62, y: 45 } }
 ];
 
 const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
@@ -612,12 +661,17 @@ function getCell(world: WorldState, coord: CellCoord): TerrainCellState {
 }
 
 function isPassable(world: WorldState, coord: CellCoord): boolean {
-  if (!isInsideMap(coord) || !getCell(world, coord).passable) {
+  if (!isInsideMap(coord)) {
     return false;
   }
 
+  const cell = getCell(world, coord);
   const building = getBuildingAt(world, coord);
-  return building?.passable ?? true;
+  if (building !== null) {
+    return building.passable && (cell.passable || isBridge(building.type));
+  }
+
+  return cell.passable;
 }
 
 function movementCostAt(world: WorldState, coord: CellCoord): number {
@@ -629,6 +683,45 @@ function movementCostAt(world: WorldState, coord: CellCoord): number {
 function canPlaceBuilding(world: WorldState, position: CellCoord, definition: BuildingDefinition): boolean {
   const footprint = absoluteFootprint(position, definition.footprint);
   return footprint.every((cell) => canPlaceOnCell(world, cell, definition));
+}
+
+function seedInitialBuildings(world: WorldState): void {
+  for (const placement of initialBuildingPlacements) {
+    const definition = buildingDefinitions[placement.type];
+    if (definition === undefined) {
+      throw new Error(`Unknown initial building type: ${placement.type}`);
+    }
+
+    if (!canPlaceBuilding(world, placement.position, definition)) {
+      throw new Error(`Cannot place initial building ${placement.type} at ${placement.position.x},${placement.position.y}`);
+    }
+
+    world.buildings.push(createBuildingState(world, placement.type, placement.position, definition));
+    world.nextBuildingId += 1;
+  }
+}
+
+function createBuildingState(
+  world: WorldState,
+  type: BuildingType,
+  position: CellCoord,
+  definition: BuildingDefinition
+): BuildingState {
+  return {
+    id: `building:${world.nextBuildingId}`,
+    owner: "player",
+    type,
+    category: definition.category,
+    position,
+    footprint: absoluteFootprint(position, definition.footprint),
+    hp: definition.maxHp,
+    maxHp: definition.maxHp,
+    lifecycleState: "intact",
+    gateState: definition.gateState,
+    passable: definition.passable,
+    movementCostModifier: definition.movementCostModifier,
+    assetId: definition.assetId
+  };
 }
 
 function getBuildingAt(world: WorldState, coord: CellCoord): BuildingState | null {

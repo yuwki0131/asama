@@ -14,7 +14,8 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
 
   if (message.type === "init") {
     world = createInitialWorld();
-    post({ type: "ready", snapshot: snapshotWorld(world) });
+    lastSnapshotTick = world.currentTick;
+    post({ type: "ready", snapshot: snapshotWorld(world, { includeMapCells: true }) });
     return;
   }
 
@@ -28,12 +29,12 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
     if (rejectionReason !== null) {
       post({ type: "commandRejected", reason: rejectionReason });
     }
-    post({ type: "snapshot", snapshot: snapshotWorld(world) });
+    post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: false }) });
     return;
   }
 
   if (message.type === "requestSnapshot") {
-    post({ type: "snapshot", snapshot: snapshotWorld(world) });
+    post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: false }) });
   }
 });
 
@@ -51,13 +52,12 @@ function loop(now: number): void {
 
   if (world.currentTick - lastSnapshotTick >= snapshotIntervalTicks) {
     lastSnapshotTick = world.currentTick;
-    post({ type: "snapshot", snapshot: snapshotWorld(world) });
+    post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: false }) });
   }
 
   setTimeout(() => loop(performance.now()), 16);
 }
 
-post({ type: "ready", snapshot: snapshotWorld(world) });
 loop(performance.now());
 
 function post(message: WorkerToMainMessage): void {

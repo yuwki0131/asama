@@ -18,12 +18,15 @@ export function createSimulationClient(): SimulationClient {
   });
   const listeners = new Set<SnapshotListener>();
   const errorListeners = new Set<ErrorListener>();
+  let cachedMapCells: WorldSnapshot["map"]["cells"] | null = null;
 
   worker.addEventListener("message", (event: MessageEvent<WorkerToMainMessage>) => {
     const message = event.data;
     if (message.type === "ready" || message.type === "snapshot") {
+      const snapshot = hydrateSnapshotMap(message.snapshot, cachedMapCells);
+      cachedMapCells = snapshot.map.cells;
       for (const listener of listeners) {
-        listener(message.snapshot);
+        listener(snapshot);
       }
       return;
     }
@@ -71,6 +74,20 @@ export function createSimulationClient(): SimulationClient {
       worker.terminate();
       listeners.clear();
       errorListeners.clear();
+    }
+  };
+}
+
+function hydrateSnapshotMap(snapshot: WorldSnapshot, cachedMapCells: WorldSnapshot["map"]["cells"] | null): WorldSnapshot {
+  if (snapshot.map.cells.length > 0) {
+    return snapshot;
+  }
+
+  return {
+    ...snapshot,
+    map: {
+      ...snapshot.map,
+      cells: cachedMapCells ?? []
     }
   };
 }
