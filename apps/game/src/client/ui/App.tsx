@@ -3,6 +3,10 @@ import type { BuildingType, CellCoord, WorldSnapshot } from "@asama/shared";
 import { GameCanvas } from "../renderer/GameCanvas";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 
+const DEBUG_STATUS_PANEL_ENABLED =
+  import.meta.env.VITE_DEBUG_STATUS_PANEL === "true" ||
+  (import.meta.env.DEV && import.meta.env.VITE_DEBUG_STATUS_PANEL !== "false");
+
 export function App() {
   const simulationRef = useRef<SimulationClient | null>(null);
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
@@ -148,17 +152,113 @@ export function App() {
           onSelectUnit={handleSelectUnit}
           onMoveSelected={handleMoveSelected}
         />
+        {DEBUG_STATUS_PANEL_ENABLED ? (
+          <DebugStatusPanel
+            buildTool={buildTool}
+            selectedUnits={selectedUnits}
+            simulationError={simulationError}
+            simulationStatus={simulationStatus}
+            snapshot={snapshot}
+          />
+        ) : null}
       </section>
     </main>
   );
 }
 
+interface DebugStatusPanelProps {
+  readonly buildTool: BuildingType | "demolish" | null;
+  readonly selectedUnits: NonNullable<WorldSnapshot["units"]>;
+  readonly simulationError: string | null;
+  readonly simulationStatus: string;
+  readonly snapshot: WorldSnapshot | null;
+}
+
+function DebugStatusPanel({
+  buildTool,
+  selectedUnits,
+  simulationError,
+  simulationStatus,
+  snapshot
+}: DebugStatusPanelProps) {
+  const buildingCounts = buildingTypeCounts(snapshot);
+  const selectedUnit = selectedUnits[0] ?? null;
+  const invalidMoveTarget = snapshot?.invalidMoveTarget ?? null;
+
+  return (
+    <aside className="debug-status-panel" aria-label="Debug status">
+      <div className="debug-status-header">
+        <span>Debug Status</span>
+        <span className="debug-status-flag">VITE_DEBUG_STATUS_PANEL</span>
+      </div>
+      <dl className="debug-status-grid">
+        <DebugRow label="flag" value="on" />
+        <DebugRow label="sim" value={simulationStatus} />
+        <DebugRow label="tick" value={String(snapshot?.currentTick ?? 0)} />
+        <DebugRow label="map" value={`${snapshot?.map.width ?? 128}x${snapshot?.map.height ?? 128}`} />
+        <DebugRow label="tool" value={buildTool ?? "select"} />
+        <DebugRow label="units" value={String(snapshot?.units.length ?? 0)} />
+        <DebugRow label="selected" value={String(selectedUnits.length)} />
+        <DebugRow label="selected id" value={selectedUnit?.id ?? "-"} />
+        <DebugRow
+          label="selected pos"
+          value={selectedUnit === null ? "-" : `${selectedUnit.position.x},${selectedUnit.position.y}`}
+        />
+        <DebugRow label="path len" value={String(selectedUnit?.path.length ?? 0)} />
+        <DebugRow
+          label="invalid target"
+          value={invalidMoveTarget === null ? "-" : `${invalidMoveTarget.x},${invalidMoveTarget.y}`}
+        />
+        <DebugRow label="buildings" value={String(snapshot?.buildings.length ?? 0)} />
+        <DebugRow label="types" value={buildingCounts} />
+        <DebugRow label="error" value={simulationError ?? "-"} />
+      </dl>
+    </aside>
+  );
+}
+
+function DebugRow({ label, value }: { readonly label: string; readonly value: string }) {
+  return (
+    <>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </>
+  );
+}
+
+function buildingTypeCounts(snapshot: WorldSnapshot | null): string {
+  if (snapshot === null || snapshot.buildings.length === 0) {
+    return "-";
+  }
+
+  const counts = new Map<BuildingType, number>();
+  for (const building of snapshot.buildings) {
+    counts.set(building.type, (counts.get(building.type) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([type, count]) => `${type}:${count}`)
+    .join(", ");
+}
+
 const buildingTools: readonly { readonly type: BuildingType; readonly label: string }[] = [
   { type: "fence", label: "Fence" },
   { type: "wall", label: "Wall" },
-  { type: "gate", label: "Gate" },
+  { type: "gate", label: "Gate 1" },
+  { type: "gate_wide_2", label: "Gate 2" },
+  { type: "gate_wide_3", label: "Gate 3" },
   { type: "dry_moat", label: "Dry Moat" },
   { type: "water_moat", label: "Water Moat" },
+  { type: "road", label: "Road" },
+  { type: "earth_bridge", label: "Earth Bridge" },
+  { type: "wood_bridge", label: "Wood Bridge" },
+  { type: "farm", label: "Farm" },
   { type: "storehouse", label: "Storehouse" },
-  { type: "honmaru", label: "Honmaru" }
+  { type: "market", label: "Market" },
+  { type: "barracks", label: "Barracks" },
+  { type: "samurai_residence", label: "Samurai House" },
+  { type: "town_block", label: "Town Block" },
+  { type: "honmaru", label: "Honmaru" },
+  { type: "tenshu", label: "Tenshu" }
 ];

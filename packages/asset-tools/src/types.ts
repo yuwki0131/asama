@@ -20,6 +20,20 @@ export interface PlaceholderAssetSpec {
     | "fence"
     | "wall"
     | "gate"
+    | "wide-gate"
+    | "market"
+    | "barracks"
+    | "samurai-residence"
+    | "town-block"
+    | "farm"
+    | "road"
+    | "earth-bridge"
+    | "wood-bridge"
+    | "tenshu"
+    | "connected-fence"
+    | "connected-wall"
+    | "connected-dry-moat"
+    | "connected-water-moat"
     | "dry-moat"
     | "water-moat"
     | "storehouse"
@@ -34,6 +48,7 @@ export interface PlaceholderAssetSpec {
     | "build-invalid"
     | "demolish";
   readonly direction?: "north" | "south" | "east" | "west";
+  readonly connectionMask?: string;
   readonly anchor: AssetAnchor;
 }
 

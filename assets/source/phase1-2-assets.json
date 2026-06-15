@@ -229,6 +229,30 @@
       "anchor": { "x": 0.5, "y": 0.78 }
     },
     {
+      "assetId": "building.gate.wood.closed.width2",
+      "kind": "building",
+      "output": "building-gate-wood-closed-width2.png",
+      "width": 128,
+      "height": 80,
+      "fill": "#8a5a34",
+      "stroke": "#2f2116",
+      "accent": "#3c4650",
+      "pattern": "wide-gate",
+      "anchor": { "x": 0.5, "y": 0.78 }
+    },
+    {
+      "assetId": "building.gate.wood.closed.width3",
+      "kind": "building",
+      "output": "building-gate-wood-closed-width3.png",
+      "width": 192,
+      "height": 80,
+      "fill": "#8a5a34",
+      "stroke": "#2f2116",
+      "accent": "#3c4650",
+      "pattern": "wide-gate",
+      "anchor": { "x": 0.5, "y": 0.78 }
+    },
+    {
       "assetId": "building.dry_moat",
       "kind": "building",
       "output": "building-dry-moat.png",
@@ -263,6 +287,99 @@
       "anchor": { "x": 0.5, "y": 0.82 }
     },
     {
+      "assetId": "building.market",
+      "kind": "building",
+      "output": "building-market.png",
+      "width": 96,
+      "height": 80,
+      "fill": "#b4874d",
+      "stroke": "#473322",
+      "accent": "#b94b3f",
+      "pattern": "market",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "building.barracks",
+      "kind": "building",
+      "output": "building-barracks.png",
+      "width": 96,
+      "height": 80,
+      "fill": "#927247",
+      "stroke": "#3e2d1f",
+      "accent": "#46515c",
+      "pattern": "barracks",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "building.samurai_residence",
+      "kind": "building",
+      "output": "building-samurai-residence.png",
+      "width": 96,
+      "height": 80,
+      "fill": "#a47b49",
+      "stroke": "#3f2e20",
+      "accent": "#4f5962",
+      "pattern": "samurai-residence",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "building.town_block",
+      "kind": "building",
+      "output": "building-town-block.png",
+      "width": 96,
+      "height": 80,
+      "fill": "#ad8350",
+      "stroke": "#463221",
+      "accent": "#4d5962",
+      "pattern": "town-block",
+      "anchor": { "x": 0.5, "y": 0.82 }
+    },
+    {
+      "assetId": "building.farm",
+      "kind": "building",
+      "output": "building-farm.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#8b7240",
+      "stroke": "#4d3b22",
+      "accent": "#d8bd75",
+      "pattern": "farm",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "building.road",
+      "kind": "building",
+      "output": "building-road.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#766044",
+      "stroke": "#4a3925",
+      "pattern": "road",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "building.earth_bridge",
+      "kind": "building",
+      "output": "building-earth-bridge.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#8a6840",
+      "stroke": "#4a3925",
+      "pattern": "earth-bridge",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "building.wood_bridge",
+      "kind": "building",
+      "output": "building-wood-bridge.png",
+      "width": 64,
+      "height": 32,
+      "fill": "#8a5f35",
+      "stroke": "#2f2116",
+      "pattern": "wood-bridge",
+      "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
       "assetId": "building.honmaru.marker",
       "kind": "building",
       "output": "building-honmaru-marker.png",
@@ -273,6 +390,18 @@
       "accent": "#b7352b",
       "pattern": "honmaru",
       "anchor": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "assetId": "building.tenshu.test",
+      "kind": "building",
+      "output": "building-tenshu-test.png",
+      "width": 112,
+      "height": 104,
+      "fill": "#ddd8c8",
+      "stroke": "#332f29",
+      "accent": "#323b44",
+      "pattern": "tenshu",
+      "anchor": { "x": 0.5, "y": 0.88 }
     },
     {
       "assetId": "overlay.build.valid",

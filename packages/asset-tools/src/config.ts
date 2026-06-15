@@ -64,7 +64,8 @@ function parseAsset(value: unknown, index: number, seen: Set<string>): Placehold
   const withOptionalFields: PlaceholderAssetSpec = {
     ...spec,
     ...(asset.pattern === undefined ? {} : { pattern: asset.pattern }),
-    ...(asset.direction === undefined ? {} : { direction: asset.direction })
+    ...(asset.direction === undefined ? {} : { direction: asset.direction }),
+    ...(asset.connectionMask === undefined ? {} : { connectionMask: asset.connectionMask })
   };
 
   if (asset.accent !== undefined) {

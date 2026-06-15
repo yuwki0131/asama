@@ -483,9 +483,9 @@ function addBuildingSprite(
   building: BuildingSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>
 ): void {
-  const sprite = createSprite(building.assetId, assets, fallbackAssetIdForBuilding(building));
-  const point = cellToWorld(building.position);
-  sprite.position.set(point.x, point.y);
+  const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
+  const point = buildingRenderPoint(building);
+  sprite.position.set(point.x, point.y + buildingGroundOffsetY(building));
   layer.addChild(sprite);
 }
 
@@ -513,10 +513,47 @@ function createSprite(assetId: string, assets: ReadonlyMap<string, LoadedAsset>,
   return sprite;
 }
 
+function createSpriteFromCandidates(assetIds: readonly string[], assets: ReadonlyMap<string, LoadedAsset>): Sprite {
+  for (const assetId of assetIds) {
+    const asset = assets.get(assetId);
+    if (asset !== undefined) {
+      const sprite = new Sprite(asset.texture);
+      sprite.anchor.set(asset.anchor.x, asset.anchor.y);
+      return sprite;
+    }
+  }
+
+  const sprite = new Sprite(Texture.EMPTY);
+  sprite.anchor.set(0.5, 0.5);
+  return sprite;
+}
+
 function cellToWorld(cell: CellCoord): CellCoord {
   return {
     x: (cell.x - cell.y) * (TILE_WIDTH / 2),
     y: (cell.x + cell.y) * (TILE_HEIGHT / 2)
+  };
+}
+
+function buildingRenderPoint(building: BuildingSnapshot): CellCoord {
+  if (building.footprint.length === 0) {
+    return cellToWorld(building.position);
+  }
+
+  const total = building.footprint.reduce(
+    (accumulator, cell) => {
+      const point = cellToWorld(cell);
+      return {
+        x: accumulator.x + point.x,
+        y: accumulator.y + point.y
+      };
+    },
+    { x: 0, y: 0 }
+  );
+
+  return {
+    x: total.x / building.footprint.length,
+    y: total.y / building.footprint.length
   };
 }
 
@@ -619,7 +656,83 @@ function getSnapshotCell(snapshot: WorldSnapshot | null, cell: CellCoord): Terra
   return snapshot.map.cells[cell.y * snapshot.map.width + cell.x] ?? null;
 }
 
-function fallbackAssetIdForBuilding(building: BuildingSnapshot): string {
+function buildingAssetCandidates(building: BuildingSnapshot): readonly string[] {
+  return [building.assetId, baseBuildingAssetId(building), finalBuildingFallbackAssetId(building)];
+}
+
+function baseBuildingAssetId(building: BuildingSnapshot): string {
+  if (building.type === "fence") {
+    return "building.fence.wood";
+  }
+
+  if (building.type === "wall") {
+    return "building.wall.plaster";
+  }
+
+  if (building.type === "gate") {
+    return "building.gate.wood.closed";
+  }
+
+  if (building.type === "gate_wide_2") {
+    return "building.gate.wood.closed.width2";
+  }
+
+  if (building.type === "gate_wide_3") {
+    return "building.gate.wood.closed.width3";
+  }
+
+  if (building.type === "dry_moat") {
+    return "building.dry_moat";
+  }
+
+  if (building.type === "water_moat") {
+    return "building.water_moat";
+  }
+
+  if (building.type === "storehouse") {
+    return "building.storehouse";
+  }
+
+  if (building.type === "market") {
+    return "building.market";
+  }
+
+  if (building.type === "barracks") {
+    return "building.barracks";
+  }
+
+  if (building.type === "samurai_residence") {
+    return "building.samurai_residence";
+  }
+
+  if (building.type === "town_block") {
+    return "building.town_block";
+  }
+
+  if (building.type === "farm") {
+    return "building.farm";
+  }
+
+  if (building.type === "road") {
+    return "building.road";
+  }
+
+  if (building.type === "earth_bridge") {
+    return "building.earth_bridge";
+  }
+
+  if (building.type === "wood_bridge") {
+    return "building.wood_bridge";
+  }
+
+  if (building.type === "tenshu") {
+    return "building.tenshu.test";
+  }
+
+  return "building.honmaru.marker";
+}
+
+function finalBuildingFallbackAssetId(building: BuildingSnapshot): string {
   if (building.type === "dry_moat") {
     return "terrain.dirt.base";
   }
@@ -633,6 +746,36 @@ function fallbackAssetIdForBuilding(building: BuildingSnapshot): string {
   }
 
   return "overlay.cell.blocked";
+}
+
+function buildingGroundOffsetY(building: BuildingSnapshot): number {
+  if (
+    building.type === "dry_moat" ||
+    building.type === "water_moat" ||
+    building.type === "honmaru" ||
+    building.type === "farm" ||
+    building.type === "road" ||
+    building.type === "earth_bridge" ||
+    building.type === "wood_bridge"
+  ) {
+    return 0;
+  }
+
+  if (building.type === "tenshu") {
+    return 10;
+  }
+
+  if (
+    building.type === "storehouse" ||
+    building.type === "market" ||
+    building.type === "barracks" ||
+    building.type === "samurai_residence" ||
+    building.type === "town_block"
+  ) {
+    return 9;
+  }
+
+  return 7;
 }
 
 function clamp(value: number, min: number, max: number): number {
