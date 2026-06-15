@@ -47,4 +47,16 @@ function validateAssetShape(asset: GeneratedAsset): void {
   if (!Number.isFinite(asset.width) || !Number.isFinite(asset.height)) {
     throw new Error(`Manifest asset has invalid dimensions: ${asset.assetId}`);
   }
+
+  if (
+    asset.anchor === undefined ||
+    !Number.isFinite(asset.anchor.x) ||
+    !Number.isFinite(asset.anchor.y) ||
+    asset.anchor.x < 0 ||
+    asset.anchor.x > 1 ||
+    asset.anchor.y < 0 ||
+    asset.anchor.y > 1
+  ) {
+    throw new Error(`Manifest asset has invalid anchor: ${asset.assetId}`);
+  }
 }

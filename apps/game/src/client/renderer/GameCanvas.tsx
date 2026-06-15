@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
+import { Application, Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type {
   BuildingSnapshot,
   BuildingType,
   CellCoord,
+  EntityId,
   TerrainCellSnapshot,
   UnitId,
   UnitSnapshot,
@@ -14,6 +15,7 @@ interface GameCanvasProps {
   readonly snapshot: WorldSnapshot | null;
   readonly buildTool: BuildingType | "demolish" | null;
   readonly onSelectUnit: (unitId: UnitId) => void;
+  readonly onAttackTarget: (targetId: EntityId) => void;
   readonly onMoveSelected: (destination: CellCoord) => void;
   readonly onPlaceBuilding: (buildingType: BuildingType, position: CellCoord) => void;
   readonly onDemolishBuilding: (position: CellCoord) => void;
@@ -55,6 +57,7 @@ export function GameCanvas({
   snapshot,
   buildTool,
   onSelectUnit,
+  onAttackTarget,
   onMoveSelected,
   onPlaceBuilding,
   onDemolishBuilding
@@ -69,6 +72,7 @@ export function GameCanvas({
   const snapshotRef = useRef<WorldSnapshot | null>(snapshot);
   const buildToolRef = useRef<BuildingType | "demolish" | null>(buildTool);
   const onSelectUnitRef = useRef(onSelectUnit);
+  const onAttackTargetRef = useRef(onAttackTarget);
   const onPlaceBuildingRef = useRef(onPlaceBuilding);
   const onDemolishBuildingRef = useRef(onDemolishBuilding);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
@@ -98,6 +102,10 @@ export function GameCanvas({
   useEffect(() => {
     onSelectUnitRef.current = onSelectUnit;
   }, [onSelectUnit]);
+
+  useEffect(() => {
+    onAttackTargetRef.current = onAttackTarget;
+  }, [onAttackTarget]);
 
   useEffect(() => {
     onPlaceBuildingRef.current = onPlaceBuilding;
@@ -322,13 +330,35 @@ export function GameCanvas({
     const handleContextMenu = (event: MouseEvent) => {
       event.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      const destination = screenToCell(event.clientX - rect.left, event.clientY - rect.top, cameraRef.current);
+      const screenPoint = {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+      const destination = screenToCell(screenPoint.x, screenPoint.y, cameraRef.current);
       if (buildToolRef.current !== null) {
         return;
       }
+
+      const snapshot = snapshotRef.current;
+      const hitUnit = findUnitAtScreenPoint(screenPoint, snapshot, cameraRef.current);
+      if (hitUnit !== null && hitUnit.owner === "enemy") {
+        setSelectedCell(hitUnit.position);
+        setLocalInvalidMoveTarget(null);
+        onAttackTargetRef.current(hitUnit.id);
+        return;
+      }
+
+      const hitBuilding = findBuildingAtCell(destination, snapshot);
+      if (hitBuilding !== null && hitBuilding.owner === "enemy") {
+        setSelectedCell(destination);
+        setLocalInvalidMoveTarget(null);
+        onAttackTargetRef.current(hitBuilding.id);
+        return;
+      }
+
       const targetCell = getSnapshotCell(snapshotRef.current, destination);
       setSelectedCell(destination);
-      if (targetCell === null || !targetCell.passable) {
+      if (targetCell === null || !isSnapshotPassable(snapshot, destination)) {
         setLocalInvalidMoveTarget(destination);
         return;
       }
@@ -489,6 +519,9 @@ function addBuildingSprite(
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
   const point = buildingRenderPoint(building);
   sprite.position.set(point.x, point.y + buildingGroundOffsetY(building));
+  if (building.owner === "enemy") {
+    sprite.tint = 0xffaaa0;
+  }
   layer.addChild(sprite);
 }
 
@@ -506,7 +539,30 @@ function addUnitSprite(
   const sprite = createSprite(unit.assetId, assets);
   const point = cellToWorld(unit.position);
   sprite.position.set(point.x, point.y + UNIT_GROUND_OFFSET_Y);
+  if (unit.owner === "enemy") {
+    sprite.tint = 0xff9f8f;
+  }
   layer.addChild(sprite);
+
+  addUnitHealthBar(layer, unit, point);
+}
+
+function addUnitHealthBar(layer: Container, unit: UnitSnapshot, point: CellCoord): void {
+  if (unit.hp >= unit.maxHp) {
+    return;
+  }
+
+  const width = 28;
+  const height = 4;
+  const ratio = clamp(unit.hp / unit.maxHp, 0, 1);
+  const bar = new Graphics();
+  bar.rect(-width / 2, -46, width, height).fill({ color: 0x211d18, alpha: 0.9 });
+  bar.rect(-width / 2 + 1, -45, (width - 2) * ratio, height - 2).fill({
+    color: unit.owner === "enemy" ? 0xd85a4a : 0x58d99a,
+    alpha: 0.95
+  });
+  bar.position.set(point.x, point.y + UNIT_GROUND_OFFSET_Y);
+  layer.addChild(bar);
 }
 
 function createSprite(assetId: string, assets: ReadonlyMap<string, LoadedAsset>, fallbackAssetId = "overlay.cell.selected"): Sprite {
@@ -657,6 +713,24 @@ function getSnapshotCell(snapshot: WorldSnapshot | null, cell: CellCoord): Terra
   }
 
   return snapshot.map.cells[cell.y * snapshot.map.width + cell.x] ?? null;
+}
+
+function findBuildingAtCell(cell: CellCoord, snapshot: WorldSnapshot | null): BuildingSnapshot | null {
+  return snapshot?.buildings.find((building) => building.footprint.some((footprintCell) => sameCell(footprintCell, cell))) ?? null;
+}
+
+function isSnapshotPassable(snapshot: WorldSnapshot | null, cell: CellCoord): boolean {
+  const terrain = getSnapshotCell(snapshot, cell);
+  if (terrain === null) {
+    return false;
+  }
+
+  const building = findBuildingAtCell(cell, snapshot);
+  if (building !== null) {
+    return building.passable && (terrain.passable || building.type === "earth_bridge" || building.type === "wood_bridge");
+  }
+
+  return terrain.passable;
 }
 
 function buildingAssetCandidates(building: BuildingSnapshot): readonly string[] {

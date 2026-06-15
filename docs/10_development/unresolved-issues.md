@@ -41,6 +41,10 @@
 - A*ライブラリ利用有無
 - アトラス形式
 - マップエディタの実装時期
+- production asset pipelineで固定するBlenderバージョン
+- production asset pipelineの正式render spec名とcamera名
+- raster importのカテゴリ別sharpen/trim既定値
+- atlas paddingとbleed対策の最終値
 
 ## 仕様上の注意
 

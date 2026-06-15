@@ -1,0 +1,2305 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "assetId": "terrain.grass.base",
+      "kind": "terrain",
+      "output": "terrain-grass-base.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-grass-base.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.base",
+      "kind": "terrain",
+      "output": "terrain-dirt-base.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-dirt-base.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.base",
+      "kind": "terrain",
+      "output": "terrain-water-base.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-water-base.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.base",
+      "kind": "terrain",
+      "output": "terrain-stone-base.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-stone-base.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.variant.1",
+      "kind": "terrain",
+      "output": "terrain-grass-variant-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-grass-variant-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.variant.1",
+      "kind": "terrain",
+      "output": "terrain-dirt-variant-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-dirt-variant-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.south",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.move.south",
+      "kind": "unit",
+      "output": "unit-ashigaru-move-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-move-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.north",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-north.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-north.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.east",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-east.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-east.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "unit.ashigaru.idle.west",
+      "kind": "unit",
+      "output": "unit-ashigaru-idle-west.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-west.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "building.storehouse",
+      "kind": "building",
+      "output": "building-storehouse.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-storehouse.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 80,
+        "anchorX": 48,
+        "anchorY": 65.6
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.market",
+      "kind": "building",
+      "output": "building-market.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-market.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 80,
+        "anchorX": 48,
+        "anchorY": 65.6
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.barracks",
+      "kind": "building",
+      "output": "building-barracks.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-barracks.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 80,
+        "anchorX": 48,
+        "anchorY": 65.6
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.samurai_residence",
+      "kind": "building",
+      "output": "building-samurai-residence.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-samurai-residence.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 80,
+        "anchorX": 48,
+        "anchorY": 65.6
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.town_block",
+      "kind": "building",
+      "output": "building-town-block.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-town-block.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 80,
+        "anchorX": 48,
+        "anchorY": 65.6
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.tenshu.test",
+      "kind": "building",
+      "output": "building-tenshu-test.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-tenshu-test.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 112,
+        "canvasHeight": 104,
+        "anchorX": 56,
+        "anchorY": 91.52
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm",
+      "kind": "building",
+      "output": "building-farm.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-farm.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.road",
+      "kind": "building",
+      "output": "building-road.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-road.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge",
+      "kind": "building",
+      "output": "building-earth-bridge.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-earth-bridge.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge",
+      "kind": "building",
+      "output": "building-wood-bridge.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-wood-bridge.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood",
+      "kind": "building",
+      "output": "building-fence-wood.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-fence-wood.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster",
+      "kind": "building",
+      "output": "building-wall-plaster.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-wall-plaster.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed",
+      "kind": "building",
+      "output": "building-gate-wood-closed.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-gate-wood-closed.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 80,
+        "canvasHeight": 80,
+        "anchorX": 40,
+        "anchorY": 62.4
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.width2",
+      "kind": "building",
+      "output": "building-gate-wood-closed-width2.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-gate-wood-closed-width2.png"
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 1,
+        "canvasWidth": 128,
+        "canvasHeight": 80,
+        "anchorX": 64,
+        "anchorY": 62.4
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.width3",
+      "kind": "building",
+      "output": "building-gate-wood-closed-width3.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-gate-wood-closed-width3.png"
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 192,
+        "canvasHeight": 80,
+        "anchorX": 96,
+        "anchorY": 62.4
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat",
+      "kind": "building",
+      "output": "building-dry-moat.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-dry-moat.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat",
+      "kind": "building",
+      "output": "building-water-moat.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-1/building-water-moat.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0000",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0001",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0010",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0011",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0100",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0101",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0110",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0111",
+      "kind": "building",
+      "output": "building-fence-wood-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1000",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1001",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1010",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1011",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1100",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1101",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1110",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1111",
+      "kind": "building",
+      "output": "building-fence-wood-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0000",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0001",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0010",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0011",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0100",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0101",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0110",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0111",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1000",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1001",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1011",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1100",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1101",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1110",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1111",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56.16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0000",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0001",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0010",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0011",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0100",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0110",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0111",
+      "kind": "building",
+      "output": "building-dry-moat-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1000",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1001",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1011",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1100",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1101",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1110",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1111",
+      "kind": "building",
+      "output": "building-dry-moat-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0000",
+      "kind": "building",
+      "output": "building-water-moat-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0001",
+      "kind": "building",
+      "output": "building-water-moat-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0010",
+      "kind": "building",
+      "output": "building-water-moat-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0011",
+      "kind": "building",
+      "output": "building-water-moat-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0100",
+      "kind": "building",
+      "output": "building-water-moat-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101",
+      "kind": "building",
+      "output": "building-water-moat-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0110",
+      "kind": "building",
+      "output": "building-water-moat-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0111",
+      "kind": "building",
+      "output": "building-water-moat-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1000",
+      "kind": "building",
+      "output": "building-water-moat-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1001",
+      "kind": "building",
+      "output": "building-water-moat-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010",
+      "kind": "building",
+      "output": "building-water-moat-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1011",
+      "kind": "building",
+      "output": "building-water-moat-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1100",
+      "kind": "building",
+      "output": "building-water-moat-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1101",
+      "kind": "building",
+      "output": "building-water-moat-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1110",
+      "kind": "building",
+      "output": "building-water-moat-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1111",
+      "kind": "building",
+      "output": "building-water-moat-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    }
+  ]
+}

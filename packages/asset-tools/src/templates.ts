@@ -1,5 +1,7 @@
 import type { PlaceholderAssetSpec } from "./types";
 
+// Placeholder/debug renderer only. Production buildings, terrain, units, and vegetation
+// should enter through the Blender or approved raster pipeline.
 export function renderPlaceholderSvg(asset: PlaceholderAssetSpec): string {
   if (asset.kind === "terrain") {
     return svg(asset.width, asset.height, terrainTile(asset));

@@ -4,17 +4,54 @@ import process from "node:process";
 import { generateGeneratedAssets } from "./generateGeneratedAssets";
 import { generatePlaceholders } from "./generatePlaceholders";
 import { readManifest, validateManifest } from "./manifest";
+import {
+  buildAtlas,
+  importRasterAssets,
+  postprocessProductionAssets,
+  renderBlenderAssets,
+  validateProductionAssetDefinitions
+} from "./productionPipeline";
 import { generatedManifestPath, generatedOutputDir, placeholderManifestPath, placeholderOutputDir, publicAssetsDir } from "./paths";
 
 const command = process.argv[2];
 
 try {
-  if (command === "generate-placeholders") {
+  if (command === "generate-placeholders" || command === "assets:generate:placeholder") {
     const manifest = await generatePlaceholders();
     console.log(`Generated ${manifest.assets.length} placeholder assets.`);
   } else if (command === "generate-main2img") {
     const manifest = await generateGeneratedAssets();
     console.log(`Generated ${manifest.assets.length} requested assets.`);
+  } else if (command === "assets:render:blender") {
+    const plan = await renderBlenderAssets({ mock: process.argv.includes("--mock") });
+    if (plan.length === 0) {
+      console.log("No Blender production assets configured.");
+    } else {
+      console.log(plan.join("\n"));
+    }
+  } else if (command === "assets:import:raster") {
+    const count = await importRasterAssets();
+    console.log(`Imported ${count} raster production assets.`);
+  } else if (command === "assets:postprocess") {
+    const count = await postprocessProductionAssets();
+    console.log(`Postprocessed ${count} production assets.`);
+  } else if (command === "assets:atlas") {
+    await buildAtlas();
+    console.log("Wrote atlas plan.");
+  } else if (command === "assets:validate") {
+    await validateProductionAssetDefinitions();
+    const manifest = await readManifest(generatedManifestPath);
+    await validateManifest(manifest, publicAssetsDir);
+    console.log(`Validated production definitions and ${manifest.assets.length} generated assets.`);
+  } else if (command === "assets:all") {
+    await generatePlaceholders();
+    await generateGeneratedAssets();
+    await postprocessProductionAssets();
+    await buildAtlas();
+    await validateProductionAssetDefinitions();
+    const manifest = await readManifest(generatedManifestPath);
+    await validateManifest(manifest, publicAssetsDir);
+    console.log(`Completed asset pipeline; validated ${manifest.assets.length} generated assets.`);
   } else if (command === "validate-manifest") {
     const manifestPath = process.argv[3] === "generated" ? generatedManifestPath : placeholderManifestPath;
     const manifest = await readManifest(manifestPath);
@@ -25,7 +62,9 @@ try {
     await rm(generatedOutputDir, { recursive: true, force: true });
     console.log("Removed generated assets.");
   } else {
-    console.error("Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|validate:manifest|clean>");
+    console.error(
+      "Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|assets:generate:placeholder|assets:render:blender|assets:import:raster|assets:postprocess|assets:atlas|assets:validate|assets:all|validate:manifest|clean>"
+    );
     process.exitCode = 1;
   }
 } catch (error) {

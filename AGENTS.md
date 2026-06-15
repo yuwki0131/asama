@@ -57,3 +57,70 @@ Pull requests should include:
 ## Agent-Specific Instructions
 
 Respect the document priority in `docs/README.md`. If a specification is unresolved, parameterize the implementation and update `docs/10_development/unresolved-issues.md` rather than making a hidden permanent decision.
+
+
+## AGENTS.md追記本文
+
+```md
+## Production Asset Policy
+
+Before modifying asset definitions, asset generation, generated PNGs,
+PixiJS sprite rendering, or files under `packages/asset-tools/`, read:
+
+- `docs/05_map-and-art/art-direction.md`
+- `docs/05_map-and-art/asset-pipeline.md`
+- the relevant request under `requests/main2img/`
+
+The TypeScript/SVG asset generator is a placeholder and debug asset
+pipeline. Do not extend SVG templates as the primary way to create
+production buildings, terrain, trees, vegetation, units, or vehicles.
+
+Production assets must enter through the Blender or approved raster
+pipeline while preserving:
+
+- asset IDs
+- logical footprints
+- PNG canvas sizes
+- anchors
+- transparency
+- runtime manifest compatibility
+- validation
+- reproducibility
+
+The game runtime must not depend on whether an asset originated from
+procedural SVG, Blender, hand-authored raster art, or an approved
+AI-assisted raster source.
+
+For production-art migration work, follow:
+
+- `requests/main2img/2026-06-15-production-art-pipeline-migration.md`
+
+Do not silently convert unresolved visual or historical decisions into
+hard-coded permanent behavior. Parameterize them and record them in
+`docs/10_development/unresolved-issues.md`.
+```
+
+---
+
+## 推奨配置
+
+```text
+AGENTS.md
+
+docs/05_map-and-art/
+├── art-direction.md
+├── asset-pipeline.md
+└── references/
+    └── target-gameplay-screen.png
+
+requests/main2img/
+└── 2026-06-15-production-art-pipeline-migration.md
+```
+
+Codexへの通常の依頼は次の形で十分です。
+
+```text
+AGENTS.mdと以下の依頼書を読んで実装してください。
+
+requests/main2img/2026-06-15-production-art-pipeline-migration.md
+```

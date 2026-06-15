@@ -7,6 +7,7 @@ export type EntityId = string;
 export type UnitId = EntityId;
 export type BuildingId = EntityId;
 export type OwnerId = "player" | "enemy" | "neutral";
+export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer";
 export type TerrainType = "grass" | "dirt" | "water" | "stone";
 export type BuildingType =
   | "fence"
@@ -46,10 +47,19 @@ export interface TerrainCellSnapshot {
 
 export interface UnitSnapshot {
   readonly id: UnitId;
+  readonly owner: OwnerId;
+  readonly type: UnitType;
   readonly position: CellCoord;
   readonly destination: CellCoord | null;
   readonly path: readonly CellCoord[];
   readonly selected: boolean;
+  readonly hp: number;
+  readonly maxHp: number;
+  readonly attackDamage: number;
+  readonly attackRange: number;
+  readonly attackCooldownTicks: number;
+  readonly attackCooldownRemaining: number;
+  readonly targetId: EntityId | null;
   readonly assetId: string;
 }
 
@@ -92,6 +102,13 @@ export type PlayerCommand =
       readonly type: "moveUnits";
       readonly unitIds: readonly UnitId[];
       readonly destination: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "attackTarget";
+      readonly unitIds: readonly UnitId[];
+      readonly targetId: EntityId;
       readonly issuedAtTick: number;
       readonly clientSequence: number;
     }

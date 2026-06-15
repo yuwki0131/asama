@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { BuildingType, CellCoord, WorldSnapshot } from "@asama/shared";
+import type { BuildingType, CellCoord, EntityId, WorldSnapshot } from "@asama/shared";
 import { GameCanvas } from "../renderer/GameCanvas";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 
@@ -68,6 +68,24 @@ export function App() {
         type: "moveUnits",
         unitIds: selectedIds,
         destination,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick, snapshot?.units]
+  );
+
+  const handleAttackTarget = useCallback(
+    (targetId: EntityId) => {
+      const selectedIds = snapshot?.units.filter((unit) => unit.selected).map((unit) => unit.id) ?? [];
+      if (selectedIds.length === 0) {
+        return;
+      }
+
+      simulationRef.current?.enqueueCommand({
+        type: "attackTarget",
+        unitIds: selectedIds,
+        targetId,
         issuedAtTick: snapshot?.currentTick ?? 0,
         clientSequence: Date.now()
       });
@@ -150,6 +168,7 @@ export function App() {
           onDemolishBuilding={handleDemolishBuilding}
           onPlaceBuilding={handlePlaceBuilding}
           onSelectUnit={handleSelectUnit}
+          onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}
         />
         {DEBUG_STATUS_PANEL_ENABLED ? (
@@ -200,6 +219,10 @@ function DebugStatusPanel({
         <DebugRow label="units" value={String(snapshot?.units.length ?? 0)} />
         <DebugRow label="selected" value={String(selectedUnits.length)} />
         <DebugRow label="selected id" value={selectedUnit?.id ?? "-"} />
+        <DebugRow label="selected owner" value={selectedUnit?.owner ?? "-"} />
+        <DebugRow label="selected type" value={selectedUnit?.type ?? "-"} />
+        <DebugRow label="selected hp" value={selectedUnit === null ? "-" : `${selectedUnit.hp}/${selectedUnit.maxHp}`} />
+        <DebugRow label="target id" value={selectedUnit?.targetId ?? "-"} />
         <DebugRow
           label="selected pos"
           value={selectedUnit === null ? "-" : `${selectedUnit.position.x},${selectedUnit.position.y}`}

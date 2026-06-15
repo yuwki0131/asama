@@ -3,9 +3,11 @@ export interface AssetAnchor {
   readonly y: number;
 }
 
+export type AssetKind = "terrain" | "unit" | "building" | "overlay";
+
 export interface PlaceholderAssetSpec {
   readonly assetId: string;
-  readonly kind: "terrain" | "unit" | "building" | "overlay";
+  readonly kind: AssetKind;
   readonly output: string;
   readonly width: number;
   readonly height: number;
@@ -59,7 +61,7 @@ export interface PlaceholderAssetConfig {
 
 export interface GeneratedAsset {
   readonly assetId: string;
-  readonly kind: PlaceholderAssetSpec["kind"];
+  readonly kind: AssetKind;
   readonly file: string;
   readonly width: number;
   readonly height: number;
@@ -71,4 +73,91 @@ export interface AssetManifest {
   readonly generatedBy: string;
   readonly generatedAt: string;
   readonly assets: readonly GeneratedAsset[];
+}
+
+export type AssetSource =
+  | {
+      readonly type: "procedural-svg";
+      readonly pattern: string;
+    }
+  | {
+      readonly type: "blender";
+      readonly scene: string;
+      readonly collection?: string;
+      readonly renderSpec: string;
+    }
+  | {
+      readonly type: "raster";
+      readonly file: string;
+    };
+
+export interface AssetGeometry {
+  readonly footprintWidth: number;
+  readonly footprintHeight: number;
+  readonly canvasWidth: number;
+  readonly canvasHeight: number;
+  readonly anchorX: number;
+  readonly anchorY: number;
+}
+
+export interface ProductionAssetSpec {
+  readonly assetId: string;
+  readonly kind: AssetKind;
+  readonly output: string;
+  readonly source: AssetSource;
+  readonly geometry: AssetGeometry;
+  readonly category?: RasterPostprocessCategory;
+  readonly postprocess?: ProductionPostprocessSpec;
+  readonly variants?: readonly string[];
+}
+
+export interface ProductionAssetConfig {
+  readonly version: number;
+  readonly assets: readonly ProductionAssetSpec[];
+}
+
+export type RasterPostprocessCategory = "terrain" | "building" | "unit" | "vegetation" | "effect";
+
+export interface RasterImportSpec {
+  readonly sourceFile: string;
+  readonly outputFile: string;
+  readonly canvasWidth: number;
+  readonly canvasHeight: number;
+  readonly anchorX: number;
+  readonly anchorY: number;
+  readonly trim: boolean;
+  readonly resizeMode: "contain" | "cover" | "exact";
+  readonly category: RasterPostprocessCategory;
+  readonly sharpen?: {
+    readonly sigma: number;
+  };
+}
+
+export interface ProductionPostprocessSpec {
+  readonly trim?: boolean;
+  readonly resizeMode?: RasterImportSpec["resizeMode"];
+  readonly sharpen?: {
+    readonly sigma: number;
+  };
+}
+
+export interface BlenderRenderSpec {
+  readonly scene: string;
+  readonly collection?: string;
+  readonly camera?: string;
+  readonly outputDirectory: string;
+  readonly resolution: {
+    readonly width: number;
+    readonly height: number;
+  };
+  readonly transparentBackground: boolean;
+  readonly frame?: number;
+  readonly direction?: string;
+  readonly animation?: string;
+  readonly renderSeed?: number;
+  readonly renderSpec: string;
+}
+
+export interface AtlasBuildSpec {
+  readonly padding: number;
 }

@@ -7,12 +7,14 @@ import {
   type BuildingSnapshot,
   type BuildingType,
   type CellCoord,
+  type EntityId,
   type GateState,
   type OwnerId,
   type PlayerCommand,
   type TerrainCellSnapshot,
   type TerrainType,
   type UnitId,
+  type UnitType,
   type WorldSnapshot
 } from "@asama/shared";
 
@@ -26,13 +28,33 @@ interface TerrainCellState {
 
 interface UnitState {
   readonly id: UnitId;
+  readonly owner: OwnerId;
+  readonly type: UnitType;
   position: CellCoord;
   destination: CellCoord | null;
   path: CellCoord[];
   selected: boolean;
+  hp: number;
+  readonly maxHp: number;
+  readonly attackDamage: number;
+  readonly attackRange: number;
+  readonly attackCooldownTicks: number;
+  attackCooldownRemaining: number;
+  targetId: EntityId | null;
+  attackTargetId: EntityId | null;
   readonly assetId: string;
   readonly ticksPerStep: number;
   movementProgress: number;
+}
+
+interface UnitDefinition {
+  readonly type: UnitType;
+  readonly maxHp: number;
+  readonly attackDamage: number;
+  readonly attackRange: number;
+  readonly attackCooldownTicks: number;
+  readonly ticksPerStep: number;
+  readonly assetId: string;
 }
 
 interface BuildingDefinition {
@@ -62,6 +84,13 @@ interface BuildingState {
   readonly assetId: string;
 }
 
+interface AttackTarget {
+  readonly id: EntityId;
+  readonly owner: OwnerId;
+  readonly position: CellCoord;
+  hp: number;
+}
+
 export interface WorldState {
   currentTick: number;
   nextBuildingId: number;
@@ -87,6 +116,36 @@ const ORTHOGONAL_DIRECTIONS: readonly CellCoord[] = [
 ];
 const BLOCKED_MOVEMENT_COST = 9999;
 
+const unitDefinitions: Record<UnitType, UnitDefinition> = {
+  spear_ashigaru: {
+    type: "spear_ashigaru",
+    maxHp: 100,
+    attackDamage: 14,
+    attackRange: 1,
+    attackCooldownTicks: Math.round(1.3 * 20),
+    ticksPerStep: 6,
+    assetId: "unit.ashigaru.idle.south"
+  },
+  sword_ashigaru: {
+    type: "sword_ashigaru",
+    maxHp: 110,
+    attackDamage: 18,
+    attackRange: 1,
+    attackCooldownTicks: Math.round(1.1 * 20),
+    ticksPerStep: 6,
+    assetId: "unit.ashigaru.idle.east"
+  },
+  archer: {
+    type: "archer",
+    maxHp: 70,
+    attackDamage: 12,
+    attackRange: 8,
+    attackCooldownTicks: Math.round(1.6 * 20),
+    ticksPerStep: 7,
+    assetId: "unit.ashigaru.idle.west"
+  }
+};
+
 export function createInitialWorld(): WorldState {
   const world: WorldState = {
     currentTick: 0,
@@ -94,26 +153,10 @@ export function createInitialWorld(): WorldState {
     invalidMoveTarget: null,
     map: createInitialMap(),
     units: [
-      {
-        id: "unit:ashigaru:1",
-        position: { x: 64, y: 64 },
-        destination: null,
-        path: [],
-        selected: false,
-        assetId: "unit.ashigaru.idle.south",
-        ticksPerStep: 6,
-        movementProgress: 0
-      },
-      {
-        id: "unit:ashigaru:2",
-        position: { x: 66, y: 64 },
-        destination: null,
-        path: [],
-        selected: false,
-        assetId: "unit.ashigaru.idle.east",
-        ticksPerStep: 6,
-        movementProgress: 0
-      }
+      createUnit("unit:ashigaru:1", "player", "spear_ashigaru", { x: 64, y: 64 }),
+      createUnit("unit:ashigaru:2", "player", "sword_ashigaru", { x: 66, y: 64 }),
+      createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 67, y: 64 }),
+      createUnit("unit:enemy:2", "enemy", "archer", { x: 72, y: 66 })
     ],
     buildings: []
   };
@@ -155,12 +198,41 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       unit.destination = path.length > 0 ? destination : null;
       unit.path = path;
       unit.movementProgress = 0;
+      unit.attackTargetId = null;
       assignedPath = true;
     }
 
     if (!assignedPath) {
       world.invalidMoveTarget = destination;
       return "No path to that cell";
+    }
+
+    world.invalidMoveTarget = null;
+    return null;
+  }
+
+  if (command.type === "attackTarget") {
+    const target = getAttackTarget(world, command.targetId);
+    if (target === null) {
+      return "No attack target";
+    }
+
+    let assignedTarget = false;
+    for (const unit of world.units) {
+      if (!command.unitIds.includes(unit.id) || !areEnemies(unit.owner, target.owner)) {
+        continue;
+      }
+
+      unit.attackTargetId = target.id;
+      unit.targetId = target.id;
+      unit.destination = null;
+      unit.path = [];
+      unit.movementProgress = 0;
+      assignedTarget = true;
+    }
+
+    if (!assignedTarget) {
+      return "No unit can attack that target";
     }
 
     world.invalidMoveTarget = null;
@@ -246,6 +318,7 @@ export function updateWorld(world: WorldState): void {
     }
   }
 
+  updateCombat(world);
   world.currentTick += 1;
 }
 
@@ -262,10 +335,19 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
     },
     units: world.units.map((unit) => ({
       id: unit.id,
+      owner: unit.owner,
+      type: unit.type,
       position: unit.position,
       destination: unit.destination,
       path: unit.path,
       selected: unit.selected,
+      hp: unit.hp,
+      maxHp: unit.maxHp,
+      attackDamage: unit.attackDamage,
+      attackRange: unit.attackRange,
+      attackCooldownTicks: unit.attackCooldownTicks,
+      attackCooldownRemaining: unit.attackCooldownRemaining,
+      targetId: unit.targetId,
       assetId: unit.assetId
     })),
     buildings: world.buildings.map((building) => snapshotBuilding(world, building))
@@ -283,7 +365,11 @@ const threeCellXFootprint: readonly CellCoord[] = [
   { x: 2, y: 0 }
 ];
 
-const initialBuildingPlacements: readonly { readonly type: BuildingType; readonly position: CellCoord }[] = [
+const initialBuildingPlacements: readonly {
+  readonly type: BuildingType;
+  readonly position: CellCoord;
+  readonly owner?: OwnerId;
+}[] = [
   { type: "honmaru", position: { x: 62, y: 59 } },
   { type: "tenshu", position: { x: 63, y: 58 } },
   { type: "storehouse", position: { x: 59, y: 61 } },
@@ -320,7 +406,8 @@ const initialBuildingPlacements: readonly { readonly type: BuildingType; readonl
   { type: "water_moat", position: { x: 74, y: 59 } },
   { type: "water_moat", position: { x: 74, y: 60 } },
   { type: "earth_bridge", position: { x: 61, y: 44 } },
-  { type: "wood_bridge", position: { x: 62, y: 45 } }
+  { type: "wood_bridge", position: { x: 62, y: 45 } },
+  { type: "gate", position: { x: 73, y: 65 }, owner: "enemy" }
 ];
 
 const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
@@ -566,6 +653,171 @@ function terrainAssetId(terrain: TerrainType, coord: CellCoord): string {
   return `terrain.${terrain}.base`;
 }
 
+function createUnit(id: UnitId, owner: OwnerId, type: UnitType, position: CellCoord): UnitState {
+  const definition = unitDefinitions[type];
+  return {
+    id,
+    owner,
+    type,
+    position,
+    destination: null,
+    path: [],
+    selected: false,
+    hp: definition.maxHp,
+    maxHp: definition.maxHp,
+    attackDamage: definition.attackDamage,
+    attackRange: definition.attackRange,
+    attackCooldownTicks: definition.attackCooldownTicks,
+    attackCooldownRemaining: 0,
+    targetId: null,
+    attackTargetId: null,
+    assetId: definition.assetId,
+    ticksPerStep: definition.ticksPerStep,
+    movementProgress: 0
+  };
+}
+
+function updateCombat(world: WorldState): void {
+  for (const unit of world.units) {
+    unit.targetId = null;
+    if (unit.attackCooldownRemaining > 0) {
+      unit.attackCooldownRemaining -= 1;
+    }
+  }
+
+  updateAttackMovement(world);
+
+  for (const unit of world.units) {
+    if (unit.hp <= 0 || unit.attackCooldownRemaining > 0) {
+      continue;
+    }
+
+    const target = unit.attackTargetId === null ? nearestEnemyInRange(world, unit) : attackTargetInRange(world, unit);
+    if (target === null) {
+      continue;
+    }
+
+    target.hp -= damageAgainst(unit);
+    unit.targetId = target.id;
+    unit.attackCooldownRemaining = unit.attackCooldownTicks;
+  }
+
+  removeDeadEntities(world);
+}
+
+function updateAttackMovement(world: WorldState): void {
+  for (const unit of world.units) {
+    if (unit.attackTargetId === null || unit.hp <= 0) {
+      continue;
+    }
+
+    const target = getAttackTarget(world, unit.attackTargetId);
+    if (target === null || !areEnemies(unit.owner, target.owner)) {
+      unit.attackTargetId = null;
+      unit.targetId = null;
+      unit.path = [];
+      unit.destination = null;
+      unit.movementProgress = 0;
+      continue;
+    }
+
+    unit.targetId = target.id;
+    if (manhattan(unit.position, target.position) <= unit.attackRange) {
+      unit.path = [];
+      unit.destination = null;
+      unit.movementProgress = 0;
+      continue;
+    }
+
+    if (unit.path.length === 0) {
+      const path = findPathToAttackRange(world, unit.position, target.position, unit.attackRange);
+      unit.path = path;
+      unit.destination = path.at(-1) ?? null;
+      unit.movementProgress = 0;
+    }
+  }
+}
+
+function attackTargetInRange(world: WorldState, attacker: UnitState): AttackTarget | null {
+  if (attacker.attackTargetId === null) {
+    return null;
+  }
+
+  const target = getAttackTarget(world, attacker.attackTargetId);
+  if (target === null || !areEnemies(attacker.owner, target.owner)) {
+    attacker.attackTargetId = null;
+    return null;
+  }
+
+  return manhattan(attacker.position, target.position) <= attacker.attackRange ? target : null;
+}
+
+function nearestEnemyInRange(world: WorldState, attacker: UnitState): AttackTarget | null {
+  let nearest: AttackTarget | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+
+  for (const candidate of world.units) {
+    if (candidate.hp <= 0 || !areEnemies(attacker.owner, candidate.owner)) {
+      continue;
+    }
+
+    const distance = manhattan(attacker.position, candidate.position);
+    if (distance <= attacker.attackRange && distance < nearestDistance) {
+      nearest = candidate;
+      nearestDistance = distance;
+    }
+  }
+
+  return nearest;
+}
+
+function getAttackTarget(world: WorldState, targetId: EntityId): AttackTarget | null {
+  const unit = world.units.find((candidate) => candidate.id === targetId && candidate.hp > 0);
+  if (unit !== undefined) {
+    return unit;
+  }
+
+  const building = world.buildings.find(
+    (candidate) => candidate.id === targetId && candidate.lifecycleState === "intact" && candidate.hp > 0
+  );
+  return building ?? null;
+}
+
+function areEnemies(a: OwnerId, b: OwnerId): boolean {
+  return a !== b && a !== "neutral" && b !== "neutral";
+}
+
+function damageAgainst(attacker: UnitState): number {
+  let multiplier = 1;
+
+  return Math.max(1, Math.round(attacker.attackDamage * multiplier));
+}
+
+function removeDeadEntities(world: WorldState): void {
+  const deadUnitIds = new Set(world.units.filter((unit) => unit.hp <= 0).map((unit) => unit.id));
+  const deadBuildingIds = new Set(world.buildings.filter((building) => building.hp <= 0).map((building) => building.id));
+  if (deadUnitIds.size === 0 && deadBuildingIds.size === 0) {
+    return;
+  }
+
+  world.units = world.units.filter((unit) => unit.hp > 0);
+  world.buildings = world.buildings.filter((building) => building.hp > 0);
+  for (const unit of world.units) {
+    if (unit.targetId !== null && (deadUnitIds.has(unit.targetId) || deadBuildingIds.has(unit.targetId))) {
+      unit.targetId = null;
+    }
+    if (
+      unit.attackTargetId !== null &&
+      (deadUnitIds.has(unit.attackTargetId) || deadBuildingIds.has(unit.attackTargetId))
+    ) {
+      unit.attackTargetId = null;
+      unit.destination = null;
+      unit.path = [];
+      unit.movementProgress = 0;
+    }
+  }
+}
+
 function findPath(world: WorldState, start: CellCoord, goal: CellCoord): CellCoord[] {
   if (sameCell(start, goal)) {
     return [];
@@ -622,6 +874,36 @@ function findPath(world: WorldState, start: CellCoord, goal: CellCoord): CellCoo
   return [];
 }
 
+function findPathToAttackRange(world: WorldState, start: CellCoord, target: CellCoord, range: number): CellCoord[] {
+  const candidates: CellCoord[] = [];
+  for (let y = Math.max(0, target.y - range); y <= Math.min(MAP_HEIGHT - 1, target.y + range); y += 1) {
+    for (let x = Math.max(0, target.x - range); x <= Math.min(MAP_WIDTH - 1, target.x + range); x += 1) {
+      const candidate = { x, y };
+      if (manhattan(candidate, target) <= range && isPassable(world, candidate)) {
+        candidates.push(candidate);
+      }
+    }
+  }
+
+  candidates.sort((a, b) => {
+    const distanceA = manhattan(start, a);
+    const distanceB = manhattan(start, b);
+    if (distanceA !== distanceB) {
+      return distanceA - distanceB;
+    }
+    return cellKey(a).localeCompare(cellKey(b));
+  });
+
+  for (const candidate of candidates) {
+    const path = findPath(world, start, candidate);
+    if (path.length > 0 || sameCell(start, candidate)) {
+      return path;
+    }
+  }
+
+  return [];
+}
+
 interface PathNode {
   readonly coord: CellCoord;
   readonly g: number;
@@ -665,6 +947,10 @@ function isPassable(world: WorldState, coord: CellCoord): boolean {
     return false;
   }
 
+  if (getUnitAt(world, coord) !== null) {
+    return false;
+  }
+
   const cell = getCell(world, coord);
   const building = getBuildingAt(world, coord);
   if (building !== null) {
@@ -678,6 +964,10 @@ function movementCostAt(world: WorldState, coord: CellCoord): number {
   const terrainCost = getCell(world, coord).movementCost;
   const building = getBuildingAt(world, coord);
   return terrainCost + (building?.movementCostModifier ?? 0);
+}
+
+function getUnitAt(world: WorldState, coord: CellCoord): UnitState | null {
+  return world.units.find((unit) => unit.hp > 0 && sameCell(unit.position, coord)) ?? null;
 }
 
 function canPlaceBuilding(world: WorldState, position: CellCoord, definition: BuildingDefinition): boolean {
@@ -696,7 +986,7 @@ function seedInitialBuildings(world: WorldState): void {
       throw new Error(`Cannot place initial building ${placement.type} at ${placement.position.x},${placement.position.y}`);
     }
 
-    world.buildings.push(createBuildingState(world, placement.type, placement.position, definition));
+    world.buildings.push(createBuildingState(world, placement.type, placement.position, definition, placement.owner ?? "player"));
     world.nextBuildingId += 1;
   }
 }
@@ -705,11 +995,12 @@ function createBuildingState(
   world: WorldState,
   type: BuildingType,
   position: CellCoord,
-  definition: BuildingDefinition
+  definition: BuildingDefinition,
+  owner: OwnerId
 ): BuildingState {
   return {
     id: `building:${world.nextBuildingId}`,
-    owner: "player",
+    owner,
     type,
     category: definition.category,
     position,
