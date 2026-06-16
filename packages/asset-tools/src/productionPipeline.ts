@@ -1,10 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
 import { blenderPlanLines, defaultBlenderRenderScript, validateBlenderAssetInputs } from "./blenderAdapter";
+import { readManifest } from "./manifest";
 import { readProductionAssetConfig } from "./productionConfig";
 import { importRasterAsset } from "./postprocess";
 import {
   atlasOutputDir,
+  generatedManifestPath,
   generatedOutputDir,
   intermediateAssetsDir,
   productionConfigPath,
@@ -15,10 +17,35 @@ import type { AtlasBuildSpec, GeneratedAsset, ProductionAssetSpec, RasterImportS
 export async function importRasterAssets(): Promise<number> {
   const config = await readProductionAssetConfig(productionConfigPath);
   const rasterAssets = config.assets.filter((asset) => asset.source.type === "raster");
+  await mkdir(generatedOutputDir, { recursive: true });
   for (const asset of rasterAssets) {
     await importRasterAsset(toRasterImportSpec(asset));
   }
+  const existingManifest = await readExistingGeneratedManifest();
+  const productionAssets = config.assets.map(toGeneratedAsset);
+  const productionIds = new Set(productionAssets.map((asset) => asset.assetId));
+  const mergedAssets = [
+    ...existingManifest.assets.filter((asset) => !productionIds.has(asset.assetId)),
+    ...productionAssets
+  ];
+  await writeFile(
+    generatedManifestPath,
+    `${JSON.stringify(
+      { version: 1, generatedBy: "@asama/asset-tools production", assets: mergedAssets },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
   return rasterAssets.length;
+}
+
+async function readExistingGeneratedManifest(): Promise<{ readonly assets: readonly GeneratedAsset[] }> {
+  try {
+    return await readManifest(generatedManifestPath);
+  } catch {
+    return { assets: [] };
+  }
 }
 
 export async function renderBlenderAssets(options: { readonly mock?: boolean } = {}): Promise<readonly string[]> {

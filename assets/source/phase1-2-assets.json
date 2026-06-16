@@ -214,7 +214,7 @@
       "stroke": "#3f3a31",
       "accent": "#59616a",
       "pattern": "wall",
-      "anchor": { "x": 0.5, "y": 0.78 }
+      "anchor": { "x": 0.5, "y": 0.7777777778 }
     },
     {
       "assetId": "building.gate.wood.closed",
@@ -226,7 +226,7 @@
       "stroke": "#2f2116",
       "accent": "#3c4650",
       "pattern": "gate",
-      "anchor": { "x": 0.5, "y": 0.78 }
+      "anchor": { "x": 0.5, "y": 0.7625 }
     },
     {
       "assetId": "building.gate.wood.closed.width2",
@@ -238,7 +238,7 @@
       "stroke": "#2f2116",
       "accent": "#3c4650",
       "pattern": "wide-gate",
-      "anchor": { "x": 0.5, "y": 0.78 }
+      "anchor": { "x": 0.5, "y": 0.9125 }
     },
     {
       "assetId": "building.gate.wood.closed.width3",
@@ -250,7 +250,7 @@
       "stroke": "#2f2116",
       "accent": "#3c4650",
       "pattern": "wide-gate",
-      "anchor": { "x": 0.5, "y": 0.78 }
+      "anchor": { "x": 0.5, "y": 0.9125 }
     },
     {
       "assetId": "building.dry_moat",
@@ -284,7 +284,7 @@
       "stroke": "#473322",
       "accent": "#3c4650",
       "pattern": "storehouse",
-      "anchor": { "x": 0.5, "y": 0.8615384615 }
+      "anchor": { "x": 0.5, "y": 0.7807692308 }
     },
     {
       "assetId": "building.market",
@@ -296,7 +296,7 @@
       "stroke": "#473322",
       "accent": "#b94b3f",
       "pattern": "market",
-      "anchor": { "x": 0.5, "y": 0.8428571429 }
+      "anchor": { "x": 0.5, "y": 0.7 }
     },
     {
       "assetId": "building.barracks",
@@ -308,7 +308,7 @@
       "stroke": "#3e2d1f",
       "accent": "#46515c",
       "pattern": "barracks",
-      "anchor": { "x": 0.5, "y": 0.8428571429 }
+      "anchor": { "x": 0.5, "y": 0.75 }
     },
     {
       "assetId": "building.samurai_residence",
@@ -320,7 +320,7 @@
       "stroke": "#3f2e20",
       "accent": "#4f5962",
       "pattern": "samurai-residence",
-      "anchor": { "x": 0.5, "y": 0.8555555556 }
+      "anchor": { "x": 0.5, "y": 0.7583333333 }
     },
     {
       "assetId": "building.town_block",
@@ -332,14 +332,14 @@
       "stroke": "#463221",
       "accent": "#4d5962",
       "pattern": "town-block",
-      "anchor": { "x": 0.5, "y": 0.8476190476 }
+      "anchor": { "x": 0.5, "y": 0.8047619048 }
     },
     {
       "assetId": "building.farm",
       "kind": "building",
       "output": "building-farm.png",
-      "width": 64,
-      "height": 32,
+      "width": 256,
+      "height": 128,
       "fill": "#8b7240",
       "stroke": "#4d3b22",
       "accent": "#d8bd75",
@@ -401,7 +401,7 @@
       "stroke": "#332f29",
       "accent": "#323b44",
       "pattern": "tenshu",
-      "anchor": { "x": 0.5, "y": 0.8769230769 }
+      "anchor": { "x": 0.5, "y": 0.8269230769 }
     },
     {
       "assetId": "overlay.build.valid",

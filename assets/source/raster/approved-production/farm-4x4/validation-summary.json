@@ -1,0 +1,26 @@
+[
+  {
+    "id": "building.farm",
+    "file": "building-farm-4x4.png",
+    "canvas": "256x128",
+    "anchor": "128,64",
+    "footprint": "4x4",
+    "validation": {
+      "width": 256,
+      "height": 128,
+      "alphaBoundsGt10": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 255,
+        "maxY": 127
+      },
+      "opaquePixels": 16640,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+]

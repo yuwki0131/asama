@@ -1,4 +1,12 @@
 import type { PlaceholderAssetSpec } from "./types";
+import {
+  connectedGeometry,
+  connectedMaskDirections,
+  connectedSegments,
+  groundCenter,
+  type ConnectedSpriteGeometry,
+  type Point
+} from "./connectedGeometry";
 
 // Placeholder/debug renderer only. Production buildings, terrain, units, and vegetation
 // should enter through the Blender or approved raster pipeline.
@@ -188,25 +196,16 @@ function fenceBuilding(asset: PlaceholderAssetSpec): string {
 }
 
 function connectedFenceBuilding(asset: PlaceholderAssetSpec): string {
-  const mask = parseMask(asset.connectionMask);
-  const center = { x: 32, y: 34 };
-  const points: Record<Direction, Point> = {
-    n: { x: 52, y: 24 },
-    e: { x: 52, y: 44 },
-    s: { x: 12, y: 44 },
-    w: { x: 12, y: 24 }
-  };
-  const dirs = connectedDirs(mask);
-  const active: Direction[] = dirs;
-  const rails = active
-    .map((dir) => rail(center, points[dir], asset.stroke, asset.fill, 5, 3))
-    .join("\n");
-  const posts = uniquePoints([center, ...active.map((dir) => points[dir])])
-    .map((point) => fencePost(point.x, point.y, asset.stroke, asset.fill))
-    .join("\n");
-  return `<ellipse cx="32" cy="50" rx="25" ry="7" fill="rgba(0,0,0,0.24)"/>
-<polygon points="32,22 58,35 32,50 6,35" fill="rgba(90,67,40,0.13)" stroke="rgba(36,28,18,0.28)" stroke-width="1"/>
-${rails}
+  const geometry = connectedAssetGeometry(asset);
+  const mask = asset.connectionMask ?? "0000";
+  const segments = connectedSegments(mask, geometry);
+  const directions = connectedMaskDirections(mask);
+  const bindings = segments.map((segment) => fenceBinding(segment[0], segment[1], asset.stroke, asset.fill)).join("\n");
+  const posts = fencePostsForSegments(segments, directions.length).map((point) => defensiveFencePost(point, asset.stroke, asset.fill)).join("\n");
+  const shadows = segments.map((segment) => structureShadow(segment[0], segment[1], 5)).join("\n");
+
+  return `${shadows}
+${bindings}
 ${posts}`;
 }
 
@@ -223,25 +222,18 @@ function wallBuilding(asset: PlaceholderAssetSpec): string {
 }
 
 function connectedWallBuilding(asset: PlaceholderAssetSpec): string {
-  const mask = parseMask(asset.connectionMask);
-  const center = { x: 32, y: 42 };
-  const points: Record<Direction, Point> = {
-    n: { x: 54, y: 30 },
-    e: { x: 54, y: 54 },
-    s: { x: 10, y: 54 },
-    w: { x: 10, y: 30 }
-  };
-  const dirs = connectedDirs(mask);
-  const active: Direction[] = dirs;
-  const segments = active
-    .map((dir) => wallSegment(center, points[dir], asset.fill, asset.stroke, asset.accent ?? "#59616a"))
-    .join("\n");
-  const cap = `<polygon points="22,38 32,32 42,38 42,48 32,54 22,48" fill="${asset.fill}" stroke="${asset.stroke}" stroke-width="1.6"/>
-<path d="M23 48 L32 54 L41 48" fill="none" stroke="rgba(35,28,21,0.48)" stroke-width="2.2" stroke-linejoin="round"/>
-<polygon points="20,36 32,29 44,36 32,44" fill="${asset.accent ?? "#59616a"}" stroke="${asset.stroke}" stroke-width="1.5"/>`;
-  return `<ellipse cx="32" cy="59" rx="28" ry="7" fill="rgba(0,0,0,0.27)"/>
-${segments}
-${cap}`;
+  const geometry = connectedAssetGeometry(asset);
+  const mask = asset.connectionMask ?? "0000";
+  const directions = connectedMaskDirections(mask);
+  const segments = connectedSegments(mask, geometry);
+  const roof = asset.accent ?? "#59616a";
+  const shadows = segments.map((segment) => structureShadow(segment[0], segment[1], 7)).join("\n");
+  const walls = segments.map((segment) => continuousWallSegment(segment[0], segment[1], asset.fill, asset.stroke, roof)).join("\n");
+  const joint = directions.length >= 3 ? wallJoint(groundCenter(geometry), asset.fill, asset.stroke, roof) : "";
+
+  return `${shadows}
+${walls}
+${joint}`;
 }
 
 function gateBuilding(asset: PlaceholderAssetSpec): string {
@@ -515,11 +507,6 @@ function svg(width: number, height: number, body: string): string {
 
 type Direction = "n" | "e" | "s" | "w";
 
-interface Point {
-  readonly x: number;
-  readonly y: number;
-}
-
 function parseMask(mask = "0000"): Record<Direction, boolean> {
   return {
     n: mask[0] === "1",
@@ -583,4 +570,85 @@ function moatPath(from: Point, to: Point): string {
 
 function points(values: Point[]): string {
   return values.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" ");
+}
+
+function connectedAssetGeometry(asset: PlaceholderAssetSpec): ConnectedSpriteGeometry {
+  return connectedGeometry(asset.width, asset.height, asset.anchor.x * asset.width, asset.anchor.y * asset.height);
+}
+
+function structureShadow(from: Point, to: Point, width: number): string {
+  return `<path d="M${from.x} ${from.y + 4} L${to.x} ${to.y + 4}" fill="none" stroke="rgba(0,0,0,0.24)" stroke-width="${width}" stroke-linecap="round"/>`;
+}
+
+function fenceBinding(from: Point, to: Point, stroke: string, fill: string): string {
+  return `<path d="M${from.x} ${from.y - 10} L${to.x} ${to.y - 10}" fill="none" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M${from.x} ${from.y - 10.8} L${to.x} ${to.y - 10.8}" fill="none" stroke="${fill}" stroke-width="1.15" stroke-linecap="round" opacity="0.82"/>`;
+}
+
+function fencePostsForSegments(segments: readonly [Point, Point][], directionCount: number): Point[] {
+  if (directionCount === 0) {
+    return interpolateSegmentPosts(segments[0] ?? [{ x: 22, y: 48 }, { x: 42, y: 48 }], [0, 0.5, 1]);
+  }
+
+  if (directionCount === 2 && segments.length === 1) {
+    const segment = segments[0];
+    if (segment !== undefined) {
+      return interpolateSegmentPosts(segment, [0.05, 0.28, 0.72, 0.95]);
+    }
+  }
+
+  const points = segments.flatMap((segment) => interpolateSegmentPosts(segment, [0.18, 0.62, 0.94]));
+  return uniquePoints(points);
+}
+
+function interpolateSegmentPosts(segment: readonly [Point, Point], positions: readonly number[]): Point[] {
+  const [from, to] = segment;
+  return positions.map((position, index) => ({
+    x: from.x + (to.x - from.x) * position,
+    y: from.y + (to.y - from.y) * position + (index % 2 === 0 ? 0 : -1)
+  }));
+}
+
+function defensiveFencePost(point: Point, stroke: string, fill: string): string {
+  const x = round(point.x);
+  const y = round(point.y);
+  const height = 17 + ((Math.round(x + y) % 3) - 1);
+  return `<path d="M${x + 1} ${y + 2} L${x + 2} ${y + 5}" stroke="rgba(0,0,0,0.20)" stroke-width="3" stroke-linecap="round"/>
+<path d="M${x} ${y - height} L${x} ${y + 2}" stroke="${stroke}" stroke-width="4" stroke-linecap="round"/>
+<path d="M${x} ${y - height + 1} L${x} ${y + 1}" stroke="${fill}" stroke-width="2" stroke-linecap="round"/>
+<path d="M${x - 3} ${y - height + 2} L${x} ${y - height - 3} L${x + 3} ${y - height + 2}" fill="${fill}" stroke="${stroke}" stroke-width="0.8"/>`;
+}
+
+function continuousWallSegment(from: Point, to: Point, fill: string, stroke: string, roof: string): string {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const nx = (-dy / length) * 4.5;
+  const ny = (dx / length) * 4.5;
+  const lowerOffset = 12;
+  const roofLift = 15;
+  const wallTopA = { x: from.x + nx, y: from.y + ny - roofLift };
+  const wallTopB = { x: to.x + nx, y: to.y + ny - roofLift };
+  const wallTopC = { x: to.x - nx, y: to.y - ny - roofLift + 2 };
+  const wallTopD = { x: from.x - nx, y: from.y - ny - roofLift + 2 };
+  const wallBaseA = { x: from.x - nx, y: from.y - ny + lowerOffset };
+  const wallBaseB = { x: to.x - nx, y: to.y - ny + lowerOffset };
+  const capA = { x: from.x + nx * 1.25, y: from.y + ny * 1.25 - roofLift - 5 };
+  const capB = { x: to.x + nx * 1.25, y: to.y + ny * 1.25 - roofLift - 5 };
+  const capC = { x: to.x - nx * 1.25, y: to.y - ny * 1.25 - roofLift + 2 };
+  const capD = { x: from.x - nx * 1.25, y: from.y - ny * 1.25 + 2 - roofLift };
+  return `<polygon points="${points([wallTopA, wallTopB, wallBaseB, wallBaseA])}" fill="${fill}" stroke="${stroke}" stroke-width="1.25"/>
+<path d="M${wallBaseA.x} ${wallBaseA.y} L${wallBaseB.x} ${wallBaseB.y}" stroke="rgba(40,33,25,0.38)" stroke-width="2" stroke-linecap="round"/>
+<path d="M${wallTopD.x} ${wallTopD.y} L${wallTopC.x} ${wallTopC.y}" stroke="rgba(255,255,255,0.28)" stroke-width="1" stroke-linecap="round"/>
+<polygon points="${points([capA, capB, capC, capD])}" fill="${roof}" stroke="${stroke}" stroke-width="1.15"/>
+<path d="M${capD.x} ${capD.y} L${capC.x} ${capC.y}" stroke="rgba(255,255,255,0.18)" stroke-width="0.9" stroke-linecap="round"/>`;
+}
+
+function wallJoint(center: Point, fill: string, stroke: string, roof: string): string {
+  return `<rect x="${center.x - 3}" y="${center.y - 24}" width="6" height="28" fill="${fill}" stroke="${stroke}" stroke-width="1"/>
+<path d="M${center.x - 5} ${center.y - 25} L${center.x} ${center.y - 29} L${center.x + 5} ${center.y - 25}" fill="${roof}" stroke="${stroke}" stroke-width="1"/>`;
+}
+
+function round(value: number): number {
+  return Math.round(value * 10) / 10;
 }

@@ -61,3 +61,23 @@ The generator treats each active bit as a segment from the tile center toward th
 
 - Wall and fence use compact 1x1 canvases, so very long diagonal lines will still show per-cell rhythm. This is inherent to the current connected-tile model.
 - The preview does not include real gate sprites, but wall and fence heights were kept close to the current compact gate source.
+
+## 2026-06-17 Connected Fence/Wall Rendering Fix
+
+Updated fence and wall connected sprites to use the shared socket geometry contract instead of a center-hub drawing model.
+
+- Socket order: `N,E,S,W`.
+- Fence anchor: `32,48` for base and all 16 connected masks.
+- Wall anchor: `32,56` for base and all 16 connected masks.
+- Straight masks now draw as a single socket-to-socket segment.
+- Corner, end, T, and cross masks use the same socket endpoints.
+- Cell-wide ellipse shadows and diamond ground boards were removed from fence/wall connected sprites.
+- Runtime manifest anchors are regenerated from production definitions during `assets:import:raster`.
+
+Visual review outputs:
+
+- `artifacts/connected-structures/fence-masks.png`
+- `artifacts/connected-structures/wall-masks.png`
+- `artifacts/connected-structures/fence-runs.png`
+- `artifacts/connected-structures/wall-runs.png`
+- `artifacts/connected-structures/gate-connections.png`

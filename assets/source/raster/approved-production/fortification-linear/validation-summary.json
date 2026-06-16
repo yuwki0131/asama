@@ -10,12 +10,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 2,
-        "minY": 23,
-        "maxX": 63,
-        "maxY": 58
+        "minX": 18,
+        "minY": 26,
+        "maxX": 45,
+        "maxY": 54
       },
-      "opaquePixels": 1277,
+      "opaquePixels": 484,
       "cornerAlpha": [
         0,
         0,
@@ -35,12 +35,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 2,
-        "minY": 23,
-        "maxX": 63,
-        "maxY": 58
+        "minX": 18,
+        "minY": 26,
+        "maxX": 45,
+        "maxY": 54
       },
-      "opaquePixels": 1277,
+      "opaquePixels": 484,
       "cornerAlpha": [
         0,
         0,
@@ -60,12 +60,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 22,
-        "maxX": 61,
-        "maxY": 58
+        "minX": 13,
+        "minY": 20,
+        "maxX": 34,
+        "maxY": 54
       },
-      "opaquePixels": 1341,
+      "opaquePixels": 449,
       "cornerAlpha": [
         0,
         0,
@@ -85,12 +85,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 1,
-        "minY": 22,
-        "maxX": 62,
+        "minX": 13,
+        "minY": 28,
+        "maxX": 34,
         "maxY": 62
       },
-      "opaquePixels": 946,
+      "opaquePixels": 454,
       "cornerAlpha": [
         0,
         0,
@@ -110,12 +110,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 22,
-        "maxX": 63,
+        "minX": 13,
+        "minY": 20,
+        "maxX": 34,
         "maxY": 62
       },
-      "opaquePixels": 1361,
+      "opaquePixels": 620,
       "cornerAlpha": [
         0,
         0,
@@ -135,12 +135,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 22,
-        "maxX": 63,
-        "maxY": 58
+        "minX": 29,
+        "minY": 29,
+        "maxX": 50,
+        "maxY": 62
       },
-      "opaquePixels": 1313,
+      "opaquePixels": 446,
       "cornerAlpha": [
         0,
         0,
@@ -160,12 +160,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 22,
-        "maxX": 63,
-        "maxY": 58
+        "minX": 13,
+        "minY": 20,
+        "maxX": 50,
+        "maxY": 62
       },
-      "opaquePixels": 1743,
+      "opaquePixels": 678,
       "cornerAlpha": [
         0,
         0,
@@ -185,12 +185,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 3,
-        "minY": 22,
-        "maxX": 63,
+        "minX": 13,
+        "minY": 28,
+        "maxX": 50,
         "maxY": 62
       },
-      "opaquePixels": 1338,
+      "opaquePixels": 865,
       "cornerAlpha": [
         0,
         0,
@@ -210,12 +210,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 22,
-        "maxX": 63,
+        "minX": 13,
+        "minY": 20,
+        "maxX": 50,
         "maxY": 62
       },
-      "opaquePixels": 1773,
+      "opaquePixels": 1029,
       "cornerAlpha": [
         0,
         0,
@@ -235,12 +235,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 4,
-        "maxX": 62,
-        "maxY": 58
+        "minX": 29,
+        "minY": 20,
+        "maxX": 50,
+        "maxY": 54
       },
-      "opaquePixels": 1051,
+      "opaquePixels": 445,
       "cornerAlpha": [
         0,
         0,
@@ -260,12 +260,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 4,
-        "maxX": 62,
-        "maxY": 58
+        "minX": 13,
+        "minY": 20,
+        "maxX": 50,
+        "maxY": 54
       },
-      "opaquePixels": 1473,
+      "opaquePixels": 861,
       "cornerAlpha": [
         0,
         0,
@@ -285,12 +285,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 6,
-        "minY": 4,
-        "maxX": 63,
+        "minX": 13,
+        "minY": 21,
+        "maxX": 50,
         "maxY": 62
       },
-      "opaquePixels": 1067,
+      "opaquePixels": 689,
       "cornerAlpha": [
         0,
         0,
@@ -310,12 +310,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 4,
-        "maxX": 61,
+        "minX": 13,
+        "minY": 20,
+        "maxX": 50,
         "maxY": 62
       },
-      "opaquePixels": 1498,
+      "opaquePixels": 1028,
       "cornerAlpha": [
         0,
         0,
@@ -335,12 +335,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 1,
-        "minY": 4,
-        "maxX": 63,
-        "maxY": 58
+        "minX": 29,
+        "minY": 20,
+        "maxX": 50,
+        "maxY": 62
       },
-      "opaquePixels": 1432,
+      "opaquePixels": 617,
       "cornerAlpha": [
         0,
         0,
@@ -360,12 +360,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 4,
-        "maxX": 63,
-        "maxY": 58
+        "minX": 13,
+        "minY": 20,
+        "maxX": 50,
+        "maxY": 62
       },
-      "opaquePixels": 1854,
+      "opaquePixels": 1029,
       "cornerAlpha": [
         0,
         0,
@@ -385,12 +385,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 2,
-        "minY": 4,
-        "maxX": 63,
+        "minX": 13,
+        "minY": 20,
+        "maxX": 50,
         "maxY": 62
       },
-      "opaquePixels": 1463,
+      "opaquePixels": 1034,
       "cornerAlpha": [
         0,
         0,
@@ -410,12 +410,12 @@
       "width": 64,
       "height": 64,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 4,
-        "maxX": 63,
+        "minX": 13,
+        "minY": 20,
+        "maxX": 50,
         "maxY": 62
       },
-      "opaquePixels": 1878,
+      "opaquePixels": 1195,
       "cornerAlpha": [
         0,
         0,
@@ -428,19 +428,19 @@
     "id": "building.wall.plaster",
     "file": "building-wall-plaster.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": null,
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 1,
-        "minY": 15,
-        "maxX": 62,
+        "minX": 18,
+        "minY": 36,
+        "maxX": 45,
         "maxY": 64
       },
-      "opaquePixels": 2030,
+      "opaquePixels": 644,
       "cornerAlpha": [
         0,
         0,
@@ -453,19 +453,19 @@
     "id": "building.wall.plaster.connected.0000",
     "file": "building-wall-plaster-connected-0000.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0000",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 1,
-        "minY": 15,
-        "maxX": 62,
+        "minX": 18,
+        "minY": 36,
+        "maxX": 45,
         "maxY": 64
       },
-      "opaquePixels": 2030,
+      "opaquePixels": 644,
       "cornerAlpha": [
         0,
         0,
@@ -478,19 +478,19 @@
     "id": "building.wall.plaster.connected.0001",
     "file": "building-wall-plaster-connected-0001.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0001",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 15,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 35,
+        "maxY": 71
       },
-      "opaquePixels": 2136,
+      "opaquePixels": 885,
       "cornerAlpha": [
         0,
         0,
@@ -503,19 +503,19 @@
     "id": "building.wall.plaster.connected.0010",
     "file": "building-wall-plaster-connected-0010.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0010",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 15,
-        "maxX": 62,
-        "maxY": 64
+        "minX": 12,
+        "minY": 30,
+        "maxX": 35,
+        "maxY": 71
       },
-      "opaquePixels": 1324,
+      "opaquePixels": 786,
       "cornerAlpha": [
         0,
         0,
@@ -528,19 +528,19 @@
     "id": "building.wall.plaster.connected.0011",
     "file": "building-wall-plaster-connected-0011.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0011",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 15,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 35,
+        "maxY": 71
       },
-      "opaquePixels": 2156,
+      "opaquePixels": 984,
       "cornerAlpha": [
         0,
         0,
@@ -553,19 +553,19 @@
     "id": "building.wall.plaster.connected.0100",
     "file": "building-wall-plaster-connected-0100.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0100",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 3,
-        "minY": 15,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 28,
+        "minY": 37,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2139,
+      "opaquePixels": 531,
       "cornerAlpha": [
         0,
         0,
@@ -578,19 +578,19 @@
     "id": "building.wall.plaster.connected.0101",
     "file": "building-wall-plaster-connected-0101.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0101",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 15,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2975,
+      "opaquePixels": 1521,
       "cornerAlpha": [
         0,
         0,
@@ -603,19 +603,19 @@
     "id": "building.wall.plaster.connected.0110",
     "file": "building-wall-plaster-connected-0110.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0110",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 3,
-        "minY": 15,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 30,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2148,
+      "opaquePixels": 1206,
       "cornerAlpha": [
         0,
         0,
@@ -628,19 +628,19 @@
     "id": "building.wall.plaster.connected.0111",
     "file": "building-wall-plaster-connected-0111.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "0111",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 15,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2971,
+      "opaquePixels": 1415,
       "cornerAlpha": [
         0,
         0,
@@ -653,19 +653,19 @@
     "id": "building.wall.plaster.connected.1000",
     "file": "building-wall-plaster-connected-1000.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1000",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 2,
-        "minY": 0,
-        "maxX": 63,
+        "minX": 28,
+        "minY": 29,
+        "maxX": 51,
         "maxY": 64
       },
-      "opaquePixels": 1534,
+      "opaquePixels": 534,
       "cornerAlpha": [
         0,
         0,
@@ -678,19 +678,19 @@
     "id": "building.wall.plaster.connected.1001",
     "file": "building-wall-plaster-connected-1001.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1001",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 0,
-        "maxX": 60,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2340,
+      "opaquePixels": 1316,
       "cornerAlpha": [
         0,
         0,
@@ -703,19 +703,19 @@
     "id": "building.wall.plaster.connected.1010",
     "file": "building-wall-plaster-connected-1010.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1010",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 1,
-        "minY": 0,
-        "maxX": 60,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 1574,
+      "opaquePixels": 1521,
       "cornerAlpha": [
         0,
         0,
@@ -728,19 +728,19 @@
     "id": "building.wall.plaster.connected.1011",
     "file": "building-wall-plaster-connected-1011.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1011",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 0,
-        "maxX": 61,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2359,
+      "opaquePixels": 1426,
       "cornerAlpha": [
         0,
         0,
@@ -753,19 +753,19 @@
     "id": "building.wall.plaster.connected.1100",
     "file": "building-wall-plaster-connected-1100.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1100",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 0,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 28,
+        "minY": 29,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2355,
+      "opaquePixels": 749,
       "cornerAlpha": [
         0,
         0,
@@ -778,19 +778,19 @@
     "id": "building.wall.plaster.connected.1101",
     "file": "building-wall-plaster-connected-1101.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1101",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 0,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 3149,
+      "opaquePixels": 1510,
       "cornerAlpha": [
         0,
         0,
@@ -803,19 +803,19 @@
     "id": "building.wall.plaster.connected.1110",
     "file": "building-wall-plaster-connected-1110.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1110",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 3,
-        "minY": 0,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 26,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 2353,
+      "opaquePixels": 1450,
       "cornerAlpha": [
         0,
         0,
@@ -828,19 +828,19 @@
     "id": "building.wall.plaster.connected.1111",
     "file": "building-wall-plaster-connected-1111.png",
     "canvas": "64x72",
-    "anchor": "32,56.16",
+    "anchor": "32,56",
     "footprint": "1x1",
     "mask": "1111",
     "validation": {
       "width": 64,
       "height": 72,
       "alphaBoundsGt10": {
-        "minX": 0,
-        "minY": 0,
-        "maxX": 63,
-        "maxY": 64
+        "minX": 12,
+        "minY": 22,
+        "maxX": 51,
+        "maxY": 71
       },
-      "opaquePixels": 3147,
+      "opaquePixels": 1597,
       "cornerAlpha": [
         0,
         0,

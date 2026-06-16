@@ -290,7 +290,7 @@
         "canvasWidth": 320,
         "canvasHeight": 260,
         "anchorX": 160,
-        "anchorY": 224
+        "anchorY": 203
       },
       "category": "building",
       "postprocess": {
@@ -315,7 +315,7 @@
         "canvasWidth": 420,
         "canvasHeight": 280,
         "anchorX": 210,
-        "anchorY": 236
+        "anchorY": 196
       },
       "category": "building",
       "postprocess": {
@@ -340,7 +340,7 @@
         "canvasWidth": 420,
         "canvasHeight": 280,
         "anchorX": 210,
-        "anchorY": 236
+        "anchorY": 210
       },
       "category": "building",
       "postprocess": {
@@ -365,7 +365,7 @@
         "canvasWidth": 460,
         "canvasHeight": 360,
         "anchorX": 230,
-        "anchorY": 308
+        "anchorY": 273
       },
       "category": "building",
       "postprocess": {
@@ -390,7 +390,7 @@
         "canvasWidth": 640,
         "canvasHeight": 420,
         "anchorX": 320,
-        "anchorY": 356
+        "anchorY": 338
       },
       "category": "building",
       "postprocess": {
@@ -415,7 +415,7 @@
         "canvasWidth": 640,
         "canvasHeight": 520,
         "anchorX": 320,
-        "anchorY": 456
+        "anchorY": 430
       },
       "category": "building",
       "postprocess": {
@@ -432,15 +432,15 @@
       "output": "building-farm.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-02-buildings/building-farm.png"
+        "file": "assets/source/raster/approved-production/farm-4x4/building-farm-4x4.png"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 64,
-        "canvasHeight": 32,
-        "anchorX": 32,
-        "anchorY": 16
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
       },
       "category": "building",
       "postprocess": {
@@ -565,7 +565,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -590,7 +590,7 @@
         "canvasWidth": 80,
         "canvasHeight": 80,
         "anchorX": 40,
-        "anchorY": 62.4
+        "anchorY": 61
       },
       "category": "building",
       "postprocess": {
@@ -615,7 +615,7 @@
         "canvasWidth": 128,
         "canvasHeight": 80,
         "anchorX": 64,
-        "anchorY": 62.4
+        "anchorY": 73
       },
       "category": "building",
       "postprocess": {
@@ -640,7 +640,7 @@
         "canvasWidth": 192,
         "canvasHeight": 80,
         "anchorX": 96,
-        "anchorY": 62.4
+        "anchorY": 73
       },
       "category": "building",
       "postprocess": {
@@ -1115,7 +1115,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1140,7 +1140,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1165,7 +1165,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1190,7 +1190,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1215,7 +1215,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1240,7 +1240,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1265,7 +1265,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1290,7 +1290,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1315,7 +1315,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1340,7 +1340,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1365,7 +1365,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1390,7 +1390,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1415,7 +1415,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1440,7 +1440,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1465,7 +1465,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {
@@ -1490,7 +1490,7 @@
         "canvasWidth": 64,
         "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 56.16
+        "anchorY": 56
       },
       "category": "building",
       "postprocess": {

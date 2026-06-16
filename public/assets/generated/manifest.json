@@ -1,8 +1,117 @@
 {
   "version": 1,
-  "generatedBy": "img-agent",
-  "generatedAt": "2026-06-16T16:39:28.908Z",
+  "generatedBy": "@asama/asset-tools production",
   "assets": [
+    {
+      "assetId": "overlay.cell.hover",
+      "kind": "overlay",
+      "file": "generated/overlay-cell-hover.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.cell.selected",
+      "kind": "overlay",
+      "file": "generated/overlay-cell-selected.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.move.destination",
+      "kind": "overlay",
+      "file": "generated/overlay-move-destination.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.path.step",
+      "kind": "overlay",
+      "file": "generated/overlay-path-step.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.cell.blocked",
+      "kind": "overlay",
+      "file": "generated/overlay-cell-blocked.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.unit.selection-ring",
+      "kind": "overlay",
+      "file": "generated/overlay-unit-selection-ring.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.marker",
+      "kind": "building",
+      "file": "generated/building-honmaru-marker.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.build.valid",
+      "kind": "overlay",
+      "file": "generated/overlay-build-valid.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.build.invalid",
+      "kind": "overlay",
+      "file": "generated/overlay-build-invalid.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "overlay.demolish.target",
+      "kind": "overlay",
+      "file": "generated/overlay-demolish-target.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     {
       "assetId": "terrain.grass.base",
       "kind": "terrain",
@@ -125,149 +234,6 @@
       }
     },
     {
-      "assetId": "overlay.cell.hover",
-      "kind": "overlay",
-      "file": "generated/overlay-cell-hover.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "overlay.cell.selected",
-      "kind": "overlay",
-      "file": "generated/overlay-cell-selected.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "overlay.move.destination",
-      "kind": "overlay",
-      "file": "generated/overlay-move-destination.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "overlay.path.step",
-      "kind": "overlay",
-      "file": "generated/overlay-path-step.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "overlay.cell.blocked",
-      "kind": "overlay",
-      "file": "generated/overlay-cell-blocked.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "overlay.unit.selection-ring",
-      "kind": "overlay",
-      "file": "generated/overlay-unit-selection-ring.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.fence.wood",
-      "kind": "building",
-      "file": "generated/building-fence-wood.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.wall.plaster",
-      "kind": "building",
-      "file": "generated/building-wall-plaster.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.78
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed",
-      "kind": "building",
-      "file": "generated/building-gate-wood-closed.png",
-      "width": 80,
-      "height": 80,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.78
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.width2",
-      "kind": "building",
-      "file": "generated/building-gate-wood-closed-width2.png",
-      "width": 128,
-      "height": 80,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.78
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.width3",
-      "kind": "building",
-      "file": "generated/building-gate-wood-closed-width3.png",
-      "width": 192,
-      "height": 80,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.78
-      }
-    },
-    {
-      "assetId": "building.dry_moat",
-      "kind": "building",
-      "file": "generated/building-dry-moat.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat",
-      "kind": "building",
-      "file": "generated/building-water-moat.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
       "assetId": "building.storehouse",
       "kind": "building",
       "file": "generated/building-storehouse.png",
@@ -275,7 +241,7 @@
       "height": 260,
       "anchor": {
         "x": 0.5,
-        "y": 0.8615384615
+        "y": 0.7807692307692308
       }
     },
     {
@@ -286,7 +252,7 @@
       "height": 280,
       "anchor": {
         "x": 0.5,
-        "y": 0.8428571429
+        "y": 0.7
       }
     },
     {
@@ -297,7 +263,7 @@
       "height": 280,
       "anchor": {
         "x": 0.5,
-        "y": 0.8428571429
+        "y": 0.75
       }
     },
     {
@@ -308,7 +274,7 @@
       "height": 360,
       "anchor": {
         "x": 0.5,
-        "y": 0.8555555556
+        "y": 0.7583333333333333
       }
     },
     {
@@ -319,15 +285,26 @@
       "height": 420,
       "anchor": {
         "x": 0.5,
-        "y": 0.8476190476
+        "y": 0.8047619047619048
+      }
+    },
+    {
+      "assetId": "building.tenshu.test",
+      "kind": "building",
+      "file": "generated/building-tenshu-test.png",
+      "width": 640,
+      "height": 520,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8269230769230769
       }
     },
     {
       "assetId": "building.farm",
       "kind": "building",
       "file": "generated/building-farm.png",
-      "width": 64,
-      "height": 32,
+      "width": 256,
+      "height": 128,
       "anchor": {
         "x": 0.5,
         "y": 0.5
@@ -367,31 +344,64 @@
       }
     },
     {
-      "assetId": "building.honmaru.marker",
+      "assetId": "building.fence.wood",
       "kind": "building",
-      "file": "generated/building-honmaru-marker.png",
+      "file": "generated/building-fence-wood.png",
       "width": 64,
-      "height": 32,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.75
       }
     },
     {
-      "assetId": "building.tenshu.test",
+      "assetId": "building.wall.plaster",
       "kind": "building",
-      "file": "generated/building-tenshu-test.png",
-      "width": 640,
-      "height": 520,
+      "file": "generated/building-wall-plaster.png",
+      "width": 64,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.8769230769
+        "y": 0.7777777777777778
       }
     },
     {
-      "assetId": "overlay.build.valid",
-      "kind": "overlay",
-      "file": "generated/overlay-build-valid.png",
+      "assetId": "building.gate.wood.closed",
+      "kind": "building",
+      "file": "generated/building-gate-wood-closed.png",
+      "width": 80,
+      "height": 80,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7625
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.width2",
+      "kind": "building",
+      "file": "generated/building-gate-wood-closed-width2.png",
+      "width": 128,
+      "height": 80,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9125
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.width3",
+      "kind": "building",
+      "file": "generated/building-gate-wood-closed-width3.png",
+      "width": 192,
+      "height": 80,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9125
+      }
+    },
+    {
+      "assetId": "building.dry_moat",
+      "kind": "building",
+      "file": "generated/building-dry-moat.png",
       "width": 64,
       "height": 32,
       "anchor": {
@@ -400,20 +410,9 @@
       }
     },
     {
-      "assetId": "overlay.build.invalid",
-      "kind": "overlay",
-      "file": "generated/overlay-build-invalid.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "overlay.demolish.target",
-      "kind": "overlay",
-      "file": "generated/overlay-demolish-target.png",
+      "assetId": "building.water_moat",
+      "kind": "building",
+      "file": "generated/building-water-moat.png",
       "width": 64,
       "height": 32,
       "anchor": {
@@ -605,7 +604,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -616,7 +615,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -627,7 +626,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -638,7 +637,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -649,7 +648,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -660,7 +659,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -671,7 +670,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -682,7 +681,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -693,7 +692,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -704,7 +703,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -715,7 +714,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -726,7 +725,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -737,7 +736,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -748,7 +747,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -759,7 +758,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {
@@ -770,7 +769,7 @@
       "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.78
+        "y": 0.7777777777777778
       }
     },
     {

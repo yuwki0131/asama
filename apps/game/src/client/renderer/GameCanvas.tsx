@@ -66,7 +66,7 @@ const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
   barracks: rectangleFootprint(6, 4),
   samurai_residence: rectangleFootprint(6, 6),
   town_block: rectangleFootprint(8, 8),
-  farm: rectangleFootprint(1, 1),
+  farm: rectangleFootprint(4, 4),
   road: rectangleFootprint(1, 1),
   earth_bridge: rectangleFootprint(1, 1),
   wood_bridge: rectangleFootprint(1, 1),
@@ -575,7 +575,7 @@ function addBuildingSprite(
 ): void {
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
   const point = buildingRenderPoint(building);
-  sprite.position.set(point.x, point.y + buildingGroundOffsetY(building));
+  sprite.position.set(point.x, point.y);
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
   }
@@ -656,6 +656,10 @@ function buildingRenderPoint(building: BuildingSnapshot): CellCoord {
     return cellToWorld(building.position);
   }
 
+  if (!isGroundPlaneBuilding(building.type)) {
+    return buildingFootprintBottomPoint(building);
+  }
+
   const total = building.footprint.reduce(
     (accumulator, cell) => {
       const point = cellToWorld(cell);
@@ -671,6 +675,46 @@ function buildingRenderPoint(building: BuildingSnapshot): CellCoord {
     x: total.x / building.footprint.length,
     y: total.y / building.footprint.length
   };
+}
+
+function buildingFootprintBottomPoint(building: BuildingSnapshot): CellCoord {
+  const bottomCells = building.footprint.reduce(
+    (accumulator, cell) => {
+      const point = cellToWorld(cell);
+      if (point.y > accumulator.y) {
+        return { y: point.y, cells: [{ cell, point }] };
+      }
+
+      if (point.y === accumulator.y) {
+        return { y: accumulator.y, cells: [...accumulator.cells, { cell, point }] };
+      }
+
+      return accumulator;
+    },
+    { y: Number.NEGATIVE_INFINITY, cells: [] as { readonly cell: CellCoord; readonly point: CellCoord }[] }
+  );
+
+  if (bottomCells.cells.length === 0) {
+    return cellToWorld(building.position);
+  }
+
+  const x = bottomCells.cells.reduce((sum, item) => sum + item.point.x, 0) / bottomCells.cells.length;
+  return {
+    x,
+    y: bottomCells.y + TILE_HEIGHT / 2
+  };
+}
+
+function isGroundPlaneBuilding(buildingType: BuildingType): boolean {
+  return (
+    buildingType === "dry_moat" ||
+    buildingType === "water_moat" ||
+    buildingType === "honmaru" ||
+    buildingType === "farm" ||
+    buildingType === "road" ||
+    buildingType === "earth_bridge" ||
+    buildingType === "wood_bridge"
+  );
 }
 
 function screenToWorld(x: number, y: number, camera: CameraState): CellCoord {
@@ -901,44 +945,6 @@ function finalBuildingFallbackAssetId(building: BuildingSnapshot): string {
   }
 
   return "overlay.cell.blocked";
-}
-
-function buildingGroundOffsetY(building: BuildingSnapshot): number {
-  if (
-    building.type === "dry_moat" ||
-    building.type === "water_moat" ||
-    building.type === "honmaru" ||
-    building.type === "farm" ||
-    building.type === "road" ||
-    building.type === "earth_bridge" ||
-    building.type === "wood_bridge"
-  ) {
-    return 0;
-  }
-
-  if (building.type === "fence") {
-    return 4;
-  }
-
-  if (building.type === "wall") {
-    return 5;
-  }
-
-  if (building.type === "tenshu") {
-    return 0;
-  }
-
-  if (
-    building.type === "storehouse" ||
-    building.type === "market" ||
-    building.type === "barracks" ||
-    building.type === "samurai_residence" ||
-    building.type === "town_block"
-  ) {
-    return 0;
-  }
-
-  return 7;
 }
 
 function isBridgeBuildTool(buildTool: BuildingType): boolean {

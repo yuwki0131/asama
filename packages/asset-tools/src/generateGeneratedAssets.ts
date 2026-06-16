@@ -60,7 +60,7 @@ function connectedConstructionAssets(): PlaceholderAssetSpec[] {
       fill: "#ded9c5",
       stroke: "#3f3a31",
       accent: "#59616a",
-      anchor: { x: 0.5, y: 0.78 }
+      anchor: { x: 0.5, y: 0.7777777778 }
     },
     {
       prefix: "building.dry_moat.connected",

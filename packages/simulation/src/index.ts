@@ -380,6 +380,7 @@ const marketFootprint = rectangularFootprint(6, 4);
 const barracksFootprint = rectangularFootprint(6, 4);
 const samuraiResidenceFootprint = rectangularFootprint(6, 6);
 const townBlockFootprint = rectangularFootprint(8, 8);
+const farmFootprint = rectangularFootprint(4, 4);
 const tenshuFootprint = rectangularFootprint(8, 8);
 
 const initialBuildingPlacements: readonly {
@@ -395,13 +396,7 @@ const initialBuildingPlacements: readonly {
   { type: "samurai_residence", position: { x: 68, y: 55 } },
   { type: "town_block", position: { x: 70, y: 64 } },
   { type: "farm", position: { x: 50, y: 72 } },
-  { type: "farm", position: { x: 51, y: 72 } },
-  { type: "farm", position: { x: 52, y: 72 } },
-  { type: "farm", position: { x: 53, y: 72 } },
-  { type: "farm", position: { x: 50, y: 73 } },
-  { type: "farm", position: { x: 51, y: 73 } },
-  { type: "farm", position: { x: 52, y: 73 } },
-  { type: "farm", position: { x: 53, y: 73 } },
+  { type: "farm", position: { x: 55, y: 72 } },
   { type: "road", position: { x: 61, y: 64 } },
   { type: "road", position: { x: 62, y: 64 } },
   { type: "road", position: { x: 63, y: 64 } },
@@ -555,7 +550,7 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     type: "farm",
     category: "economy",
     maxHp: 80,
-    footprint: oneCellFootprint,
+    footprint: farmFootprint,
     passable: true,
     movementCostModifier: 2,
     assetId: "building.farm",
