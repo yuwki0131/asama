@@ -153,10 +153,10 @@ export function createInitialWorld(): WorldState {
     invalidMoveTarget: null,
     map: createInitialMap(),
     units: [
-      createUnit("unit:ashigaru:1", "player", "spear_ashigaru", { x: 64, y: 64 }),
-      createUnit("unit:ashigaru:2", "player", "sword_ashigaru", { x: 66, y: 64 }),
-      createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 67, y: 64 }),
-      createUnit("unit:enemy:2", "enemy", "archer", { x: 72, y: 66 })
+      createUnit("unit:ashigaru:1", "player", "spear_ashigaru", { x: 45, y: 68 }),
+      createUnit("unit:ashigaru:2", "player", "sword_ashigaru", { x: 46, y: 68 }),
+      createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 86, y: 66 }),
+      createUnit("unit:enemy:2", "enemy", "archer", { x: 87, y: 66 })
     ],
     buildings: []
   };
@@ -365,49 +365,69 @@ const threeCellXFootprint: readonly CellCoord[] = [
   { x: 2, y: 0 }
 ];
 
+function rectangularFootprint(width: number, height: number): readonly CellCoord[] {
+  const footprint: CellCoord[] = [];
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      footprint.push({ x, y });
+    }
+  }
+  return footprint;
+}
+
+const storehouseFootprint = rectangularFootprint(4, 4);
+const marketFootprint = rectangularFootprint(6, 4);
+const barracksFootprint = rectangularFootprint(6, 4);
+const samuraiResidenceFootprint = rectangularFootprint(6, 6);
+const townBlockFootprint = rectangularFootprint(8, 8);
+const tenshuFootprint = rectangularFootprint(8, 8);
+
 const initialBuildingPlacements: readonly {
   readonly type: BuildingType;
   readonly position: CellCoord;
   readonly owner?: OwnerId;
 }[] = [
-  { type: "honmaru", position: { x: 62, y: 59 } },
-  { type: "tenshu", position: { x: 63, y: 58 } },
-  { type: "storehouse", position: { x: 59, y: 61 } },
-  { type: "market", position: { x: 57, y: 64 } },
+  { type: "tenshu", position: { x: 54, y: 54 } },
+  { type: "honmaru", position: { x: 62, y: 58 } },
+  { type: "storehouse", position: { x: 47, y: 62 } },
+  { type: "market", position: { x: 52, y: 66 } },
   { type: "barracks", position: { x: 60, y: 66 } },
-  { type: "samurai_residence", position: { x: 69, y: 61 } },
+  { type: "samurai_residence", position: { x: 68, y: 55 } },
   { type: "town_block", position: { x: 70, y: 64 } },
-  { type: "farm", position: { x: 57, y: 68 } },
-  { type: "farm", position: { x: 58, y: 68 } },
-  { type: "farm", position: { x: 59, y: 68 } },
-  { type: "farm", position: { x: 57, y: 69 } },
-  { type: "farm", position: { x: 58, y: 69 } },
-  { type: "farm", position: { x: 59, y: 69 } },
+  { type: "farm", position: { x: 50, y: 72 } },
+  { type: "farm", position: { x: 51, y: 72 } },
+  { type: "farm", position: { x: 52, y: 72 } },
+  { type: "farm", position: { x: 53, y: 72 } },
+  { type: "farm", position: { x: 50, y: 73 } },
+  { type: "farm", position: { x: 51, y: 73 } },
+  { type: "farm", position: { x: 52, y: 73 } },
+  { type: "farm", position: { x: 53, y: 73 } },
   { type: "road", position: { x: 61, y: 64 } },
   { type: "road", position: { x: 62, y: 64 } },
   { type: "road", position: { x: 63, y: 64 } },
   { type: "road", position: { x: 64, y: 65 } },
   { type: "road", position: { x: 65, y: 65 } },
   { type: "road", position: { x: 67, y: 65 } },
-  { type: "fence", position: { x: 61, y: 56 } },
-  { type: "fence", position: { x: 62, y: 56 } },
-  { type: "fence", position: { x: 63, y: 56 } },
-  { type: "fence", position: { x: 64, y: 56 } },
-  { type: "wall", position: { x: 66, y: 56 } },
-  { type: "wall", position: { x: 67, y: 56 } },
-  { type: "wall", position: { x: 68, y: 56 } },
-  { type: "gate", position: { x: 65, y: 56 } },
-  { type: "gate_wide_2", position: { x: 61, y: 70 } },
-  { type: "gate_wide_3", position: { x: 65, y: 70 } },
-  { type: "dry_moat", position: { x: 72, y: 58 } },
-  { type: "dry_moat", position: { x: 72, y: 59 } },
-  { type: "dry_moat", position: { x: 72, y: 60 } },
-  { type: "water_moat", position: { x: 74, y: 58 } },
-  { type: "water_moat", position: { x: 74, y: 59 } },
-  { type: "water_moat", position: { x: 74, y: 60 } },
+  { type: "fence", position: { x: 52, y: 50 } },
+  { type: "fence", position: { x: 53, y: 50 } },
+  { type: "fence", position: { x: 54, y: 50 } },
+  { type: "fence", position: { x: 55, y: 50 } },
+  { type: "wall", position: { x: 56, y: 50 } },
+  { type: "wall", position: { x: 57, y: 50 } },
+  { type: "wall", position: { x: 58, y: 50 } },
+  { type: "wall", position: { x: 59, y: 50 } },
+  { type: "gate", position: { x: 60, y: 50 } },
+  { type: "gate_wide_2", position: { x: 60, y: 74 } },
+  { type: "gate_wide_3", position: { x: 64, y: 74 } },
+  { type: "dry_moat", position: { x: 80, y: 58 } },
+  { type: "dry_moat", position: { x: 80, y: 59 } },
+  { type: "dry_moat", position: { x: 80, y: 60 } },
+  { type: "water_moat", position: { x: 82, y: 58 } },
+  { type: "water_moat", position: { x: 82, y: 59 } },
+  { type: "water_moat", position: { x: 82, y: 60 } },
   { type: "earth_bridge", position: { x: 61, y: 44 } },
   { type: "wood_bridge", position: { x: 62, y: 45 } },
-  { type: "gate", position: { x: 73, y: 65 }, owner: "enemy" }
+  { type: "gate", position: { x: 84, y: 65 }, owner: "enemy" }
 ];
 
 const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
@@ -485,7 +505,7 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     type: "storehouse",
     category: "economy",
     maxHp: 180,
-    footprint: oneCellFootprint,
+    footprint: storehouseFootprint,
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.storehouse",
@@ -495,7 +515,7 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     type: "market",
     category: "economy",
     maxHp: 160,
-    footprint: oneCellFootprint,
+    footprint: marketFootprint,
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.market",
@@ -505,7 +525,7 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     type: "barracks",
     category: "military",
     maxHp: 220,
-    footprint: oneCellFootprint,
+    footprint: barracksFootprint,
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.barracks",
@@ -515,7 +535,7 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     type: "samurai_residence",
     category: "residential",
     maxHp: 190,
-    footprint: oneCellFootprint,
+    footprint: samuraiResidenceFootprint,
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.samurai_residence",
@@ -525,7 +545,7 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     type: "town_block",
     category: "residential",
     maxHp: 150,
-    footprint: oneCellFootprint,
+    footprint: townBlockFootprint,
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.town_block",
@@ -585,7 +605,7 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     type: "tenshu",
     category: "objective",
     maxHp: 9999,
-    footprint: oneCellFootprint,
+    footprint: tenshuFootprint,
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.tenshu.test",
@@ -1138,9 +1158,29 @@ function connectionMask(world: WorldState, building: BuildingState): string {
     .map((direction) =>
       connectsTo(building, getBuildingAt(world, { x: building.position.x + direction.x, y: building.position.y + direction.y }))
         ? "1"
+        : connectsToAdjacentGateFootprint(world, building, direction)
+        ? "1"
         : "0"
     )
     .join("");
+}
+
+function connectsToAdjacentGateFootprint(world: WorldState, building: BuildingState, direction: CellCoord): boolean {
+  if (building.type !== "fence" && building.type !== "wall") {
+    return false;
+  }
+
+  return world.buildings.some(
+    (neighbor) =>
+      neighbor.lifecycleState === "intact" &&
+      isGate(neighbor.type) &&
+      neighbor.footprint.some((cell) =>
+        sameCell(cell, {
+          x: building.position.x + direction.x,
+          y: building.position.y + direction.y
+        })
+      )
+  );
 }
 
 function connectsTo(building: BuildingState, neighbor: BuildingState | null): boolean {

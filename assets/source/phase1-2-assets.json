@@ -278,61 +278,61 @@
       "assetId": "building.storehouse",
       "kind": "building",
       "output": "building-storehouse.png",
-      "width": 96,
-      "height": 80,
+      "width": 320,
+      "height": 260,
       "fill": "#9b7a4a",
       "stroke": "#473322",
       "accent": "#3c4650",
       "pattern": "storehouse",
-      "anchor": { "x": 0.5, "y": 0.82 }
+      "anchor": { "x": 0.5, "y": 0.8615384615 }
     },
     {
       "assetId": "building.market",
       "kind": "building",
       "output": "building-market.png",
-      "width": 96,
-      "height": 80,
+      "width": 420,
+      "height": 280,
       "fill": "#b4874d",
       "stroke": "#473322",
       "accent": "#b94b3f",
       "pattern": "market",
-      "anchor": { "x": 0.5, "y": 0.82 }
+      "anchor": { "x": 0.5, "y": 0.8428571429 }
     },
     {
       "assetId": "building.barracks",
       "kind": "building",
       "output": "building-barracks.png",
-      "width": 96,
-      "height": 80,
+      "width": 420,
+      "height": 280,
       "fill": "#927247",
       "stroke": "#3e2d1f",
       "accent": "#46515c",
       "pattern": "barracks",
-      "anchor": { "x": 0.5, "y": 0.82 }
+      "anchor": { "x": 0.5, "y": 0.8428571429 }
     },
     {
       "assetId": "building.samurai_residence",
       "kind": "building",
       "output": "building-samurai-residence.png",
-      "width": 96,
-      "height": 80,
+      "width": 460,
+      "height": 360,
       "fill": "#a47b49",
       "stroke": "#3f2e20",
       "accent": "#4f5962",
       "pattern": "samurai-residence",
-      "anchor": { "x": 0.5, "y": 0.82 }
+      "anchor": { "x": 0.5, "y": 0.8555555556 }
     },
     {
       "assetId": "building.town_block",
       "kind": "building",
       "output": "building-town-block.png",
-      "width": 96,
-      "height": 80,
+      "width": 640,
+      "height": 420,
       "fill": "#ad8350",
       "stroke": "#463221",
       "accent": "#4d5962",
       "pattern": "town-block",
-      "anchor": { "x": 0.5, "y": 0.82 }
+      "anchor": { "x": 0.5, "y": 0.8476190476 }
     },
     {
       "assetId": "building.farm",
@@ -395,13 +395,13 @@
       "assetId": "building.tenshu.test",
       "kind": "building",
       "output": "building-tenshu-test.png",
-      "width": 112,
-      "height": 104,
+      "width": 640,
+      "height": 520,
       "fill": "#ddd8c8",
       "stroke": "#332f29",
       "accent": "#323b44",
       "pattern": "tenshu",
-      "anchor": { "x": 0.5, "y": 0.88 }
+      "anchor": { "x": 0.5, "y": 0.8769230769 }
     },
     {
       "assetId": "overlay.build.valid",

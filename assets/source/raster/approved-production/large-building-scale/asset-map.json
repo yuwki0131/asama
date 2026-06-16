@@ -1,0 +1,242 @@
+[
+  {
+    "id": "building.tenshu.large",
+    "file": "building-tenshu-large.png",
+    "canvas": {
+      "width": 640,
+      "height": 520
+    },
+    "anchor": {
+      "x": 320,
+      "y": 456
+    },
+    "footprint": "8x8",
+    "note": "8x8 landmark Japanese castle tenshu",
+    "raw": "assets/source/raster/approved-production/large-building-scale/raw/building-tenshu-large.raw.png",
+    "cutout": "assets/source/raster/approved-production/large-building-scale/cutout/building-tenshu-large.cutout.png",
+    "placed": {
+      "left": 60,
+      "top": 11,
+      "resizedW": 521,
+      "resizedH": 445,
+      "bottomPad": 64
+    },
+    "validation": {
+      "width": 640,
+      "height": 520,
+      "alphaBoundsGt10": {
+        "minX": 104,
+        "minY": 11,
+        "maxX": 580,
+        "maxY": 430
+      },
+      "opaquePixels": 109557,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.town_block.large",
+    "file": "building-town-block-large.png",
+    "canvas": {
+      "width": 640,
+      "height": 420
+    },
+    "anchor": {
+      "x": 320,
+      "y": 356
+    },
+    "footprint": "8x8",
+    "note": "8x8 machiya town district",
+    "raw": "assets/source/raster/approved-production/large-building-scale/raw/building-town-block-large.raw.png",
+    "cutout": "assets/source/raster/approved-production/large-building-scale/cutout/building-town-block-large.cutout.png",
+    "placed": {
+      "left": 53,
+      "top": 16,
+      "resizedW": 535,
+      "resizedH": 340,
+      "bottomPad": 64
+    },
+    "validation": {
+      "width": 640,
+      "height": 420,
+      "alphaBoundsGt10": {
+        "minX": 69,
+        "minY": 16,
+        "maxX": 587,
+        "maxY": 338
+      },
+      "opaquePixels": 90998,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.storehouse.large",
+    "file": "building-storehouse-large.png",
+    "canvas": {
+      "width": 320,
+      "height": 260
+    },
+    "anchor": {
+      "x": 160,
+      "y": 224
+    },
+    "footprint": "4x4",
+    "note": "4x4 kura storehouse compound",
+    "raw": "assets/source/raster/approved-production/large-building-scale/raw/building-storehouse-large.raw.png",
+    "cutout": "assets/source/raster/approved-production/large-building-scale/cutout/building-storehouse-large.cutout.png",
+    "placed": {
+      "left": 27,
+      "top": 14,
+      "resizedW": 267,
+      "resizedH": 210,
+      "bottomPad": 36
+    },
+    "validation": {
+      "width": 320,
+      "height": 260,
+      "alphaBoundsGt10": {
+        "minX": 41,
+        "minY": 14,
+        "maxX": 293,
+        "maxY": 203
+      },
+      "opaquePixels": 26822,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.market.large",
+    "file": "building-market-large.png",
+    "canvas": {
+      "width": 420,
+      "height": 280
+    },
+    "anchor": {
+      "x": 210,
+      "y": 236
+    },
+    "footprint": "6x4",
+    "note": "6x4 marketplace compound",
+    "raw": "assets/source/raster/approved-production/large-building-scale/raw/building-market-large.raw.png",
+    "cutout": "assets/source/raster/approved-production/large-building-scale/cutout/building-market-large.cutout.png",
+    "placed": {
+      "left": 33,
+      "top": 16,
+      "resizedW": 355,
+      "resizedH": 220,
+      "bottomPad": 44
+    },
+    "validation": {
+      "width": 420,
+      "height": 280,
+      "alphaBoundsGt10": {
+        "minX": 48,
+        "minY": 16,
+        "maxX": 387,
+        "maxY": 196
+      },
+      "opaquePixels": 39580,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.barracks.large",
+    "file": "building-barracks-large.png",
+    "canvas": {
+      "width": 420,
+      "height": 280
+    },
+    "anchor": {
+      "x": 210,
+      "y": 236
+    },
+    "footprint": "6x4",
+    "note": "6x4 ashigaru barracks and training yard",
+    "raw": "assets/source/raster/approved-production/large-building-scale/raw/building-barracks-large.raw.png",
+    "cutout": "assets/source/raster/approved-production/large-building-scale/cutout/building-barracks-large.cutout.png",
+    "placed": {
+      "left": 34,
+      "top": 16,
+      "resizedW": 352,
+      "resizedH": 220,
+      "bottomPad": 44
+    },
+    "validation": {
+      "width": 420,
+      "height": 280,
+      "alphaBoundsGt10": {
+        "minX": 51,
+        "minY": 16,
+        "maxX": 385,
+        "maxY": 210
+      },
+      "opaquePixels": 39401,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.samurai_residence.large",
+    "file": "building-samurai-residence-large.png",
+    "canvas": {
+      "width": 460,
+      "height": 360
+    },
+    "anchor": {
+      "x": 230,
+      "y": 308
+    },
+    "footprint": "6x6",
+    "note": "6x6 buke-yashiki residence compound",
+    "raw": "assets/source/raster/approved-production/large-building-scale/raw/building-samurai-residence-large.raw.png",
+    "cutout": "assets/source/raster/approved-production/large-building-scale/cutout/building-samurai-residence-large.cutout.png",
+    "placed": {
+      "left": 32,
+      "top": 18,
+      "resizedW": 397,
+      "resizedH": 290,
+      "bottomPad": 52
+    },
+    "validation": {
+      "width": 460,
+      "height": 360,
+      "alphaBoundsGt10": {
+        "minX": 45,
+        "minY": 18,
+        "maxX": 428,
+        "maxY": 273
+      },
+      "opaquePixels": 56651,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+]

@@ -282,15 +282,15 @@
       "output": "building-storehouse.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-01-corrections/building-storehouse.png"
+        "file": "assets/source/raster/approved-production/large-building-scale/building-storehouse-large.png"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 80,
-        "anchorX": 48,
-        "anchorY": 65.6
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 320,
+        "canvasHeight": 260,
+        "anchorX": 160,
+        "anchorY": 224
       },
       "category": "building",
       "postprocess": {
@@ -307,15 +307,15 @@
       "output": "building-market.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-02-buildings/building-market.png"
+        "file": "assets/source/raster/approved-production/large-building-scale/building-market-large.png"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 80,
-        "anchorX": 48,
-        "anchorY": 65.6
+        "footprintWidth": 6,
+        "footprintHeight": 4,
+        "canvasWidth": 420,
+        "canvasHeight": 280,
+        "anchorX": 210,
+        "anchorY": 236
       },
       "category": "building",
       "postprocess": {
@@ -332,15 +332,15 @@
       "output": "building-barracks.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-02-buildings/building-barracks.png"
+        "file": "assets/source/raster/approved-production/large-building-scale/building-barracks-large.png"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 80,
-        "anchorX": 48,
-        "anchorY": 65.6
+        "footprintWidth": 6,
+        "footprintHeight": 4,
+        "canvasWidth": 420,
+        "canvasHeight": 280,
+        "anchorX": 210,
+        "anchorY": 236
       },
       "category": "building",
       "postprocess": {
@@ -357,15 +357,15 @@
       "output": "building-samurai-residence.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-02-buildings/building-samurai-residence.png"
+        "file": "assets/source/raster/approved-production/large-building-scale/building-samurai-residence-large.png"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 80,
-        "anchorX": 48,
-        "anchorY": 65.6
+        "footprintWidth": 6,
+        "footprintHeight": 6,
+        "canvasWidth": 460,
+        "canvasHeight": 360,
+        "anchorX": 230,
+        "anchorY": 308
       },
       "category": "building",
       "postprocess": {
@@ -382,15 +382,15 @@
       "output": "building-town-block.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-02-buildings/building-town-block.png"
+        "file": "assets/source/raster/approved-production/large-building-scale/building-town-block-large.png"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 80,
-        "anchorX": 48,
-        "anchorY": 65.6
+        "footprintWidth": 8,
+        "footprintHeight": 8,
+        "canvasWidth": 640,
+        "canvasHeight": 420,
+        "anchorX": 320,
+        "anchorY": 356
       },
       "category": "building",
       "postprocess": {
@@ -407,15 +407,15 @@
       "output": "building-tenshu-test.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-02-buildings/building-tenshu-test.png"
+        "file": "assets/source/raster/approved-production/large-building-scale/building-tenshu-large.png"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 112,
-        "canvasHeight": 104,
-        "anchorX": 56,
-        "anchorY": 91.52
+        "footprintWidth": 8,
+        "footprintHeight": 8,
+        "canvasWidth": 640,
+        "canvasHeight": 520,
+        "anchorX": 320,
+        "anchorY": 456
       },
       "category": "building",
       "postprocess": {
@@ -532,7 +532,7 @@
       "output": "building-fence-wood.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-fence-wood.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -557,7 +557,7 @@
       "output": "building-wall-plaster.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-wall-plaster.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -657,7 +657,7 @@
       "output": "building-dry-moat.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-dry-moat.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -682,7 +682,7 @@
       "output": "building-water-moat.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-water-moat.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -707,7 +707,7 @@
       "output": "building-fence-wood-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -732,7 +732,7 @@
       "output": "building-fence-wood-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -757,7 +757,7 @@
       "output": "building-fence-wood-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -782,7 +782,7 @@
       "output": "building-fence-wood-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -807,7 +807,7 @@
       "output": "building-fence-wood-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -832,7 +832,7 @@
       "output": "building-fence-wood-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -857,7 +857,7 @@
       "output": "building-fence-wood-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -882,7 +882,7 @@
       "output": "building-fence-wood-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-0111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -907,7 +907,7 @@
       "output": "building-fence-wood-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -932,7 +932,7 @@
       "output": "building-fence-wood-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -957,7 +957,7 @@
       "output": "building-fence-wood-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -982,7 +982,7 @@
       "output": "building-fence-wood-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1007,7 +1007,7 @@
       "output": "building-fence-wood-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1032,7 +1032,7 @@
       "output": "building-fence-wood-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1057,7 +1057,7 @@
       "output": "building-fence-wood-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1082,7 +1082,7 @@
       "output": "building-fence-wood-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-fence-wood-connected-1111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1107,7 +1107,7 @@
       "output": "building-wall-plaster-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1132,7 +1132,7 @@
       "output": "building-wall-plaster-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1157,7 +1157,7 @@
       "output": "building-wall-plaster-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1182,7 +1182,7 @@
       "output": "building-wall-plaster-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1207,7 +1207,7 @@
       "output": "building-wall-plaster-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1232,7 +1232,7 @@
       "output": "building-wall-plaster-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1257,7 +1257,7 @@
       "output": "building-wall-plaster-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1282,7 +1282,7 @@
       "output": "building-wall-plaster-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-0111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1307,7 +1307,7 @@
       "output": "building-wall-plaster-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1332,7 +1332,7 @@
       "output": "building-wall-plaster-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1357,7 +1357,7 @@
       "output": "building-wall-plaster-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1382,7 +1382,7 @@
       "output": "building-wall-plaster-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1407,7 +1407,7 @@
       "output": "building-wall-plaster-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1432,7 +1432,7 @@
       "output": "building-wall-plaster-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1457,7 +1457,7 @@
       "output": "building-wall-plaster-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1482,7 +1482,7 @@
       "output": "building-wall-plaster-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-wall-plaster-connected-1111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1507,7 +1507,7 @@
       "output": "building-dry-moat-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1532,7 +1532,7 @@
       "output": "building-dry-moat-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1557,7 +1557,7 @@
       "output": "building-dry-moat-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1582,7 +1582,7 @@
       "output": "building-dry-moat-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1607,7 +1607,7 @@
       "output": "building-dry-moat-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1632,7 +1632,7 @@
       "output": "building-dry-moat-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1657,7 +1657,7 @@
       "output": "building-dry-moat-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1682,7 +1682,7 @@
       "output": "building-dry-moat-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-0111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1707,7 +1707,7 @@
       "output": "building-dry-moat-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1732,7 +1732,7 @@
       "output": "building-dry-moat-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1757,7 +1757,7 @@
       "output": "building-dry-moat-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1782,7 +1782,7 @@
       "output": "building-dry-moat-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1807,7 +1807,7 @@
       "output": "building-dry-moat-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1832,7 +1832,7 @@
       "output": "building-dry-moat-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1857,7 +1857,7 @@
       "output": "building-dry-moat-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1882,7 +1882,7 @@
       "output": "building-dry-moat-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-dry-moat-connected-1111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1907,7 +1907,7 @@
       "output": "building-water-moat-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1932,7 +1932,7 @@
       "output": "building-water-moat-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1957,7 +1957,7 @@
       "output": "building-water-moat-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1982,7 +1982,7 @@
       "output": "building-water-moat-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2007,7 +2007,7 @@
       "output": "building-water-moat-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2032,7 +2032,7 @@
       "output": "building-water-moat-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2057,7 +2057,7 @@
       "output": "building-water-moat-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2082,7 +2082,7 @@
       "output": "building-water-moat-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-0111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2107,7 +2107,7 @@
       "output": "building-water-moat-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1000.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2132,7 +2132,7 @@
       "output": "building-water-moat-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1001.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2157,7 +2157,7 @@
       "output": "building-water-moat-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1010.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2182,7 +2182,7 @@
       "output": "building-water-moat-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1011.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2207,7 +2207,7 @@
       "output": "building-water-moat-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1100.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2232,7 +2232,7 @@
       "output": "building-water-moat-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1101.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2257,7 +2257,7 @@
       "output": "building-water-moat-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1110.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2282,7 +2282,7 @@
       "output": "building-water-moat-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-2-connected/building-water-moat-connected-1111.png"
+        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,

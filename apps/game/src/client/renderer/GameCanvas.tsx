@@ -53,6 +53,26 @@ const TERRAIN_UNDERLAY_PADDING = 1.25;
 const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 2;
 const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
+const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
+  fence: rectangleFootprint(1, 1),
+  wall: rectangleFootprint(1, 1),
+  gate: rectangleFootprint(1, 1),
+  gate_wide_2: rectangleFootprint(2, 1),
+  gate_wide_3: rectangleFootprint(3, 1),
+  dry_moat: rectangleFootprint(1, 1),
+  water_moat: rectangleFootprint(1, 1),
+  storehouse: rectangleFootprint(4, 4),
+  market: rectangleFootprint(6, 4),
+  barracks: rectangleFootprint(6, 4),
+  samurai_residence: rectangleFootprint(6, 6),
+  town_block: rectangleFootprint(8, 8),
+  farm: rectangleFootprint(1, 1),
+  road: rectangleFootprint(1, 1),
+  earth_bridge: rectangleFootprint(1, 1),
+  wood_bridge: rectangleFootprint(1, 1),
+  honmaru: rectangleFootprint(1, 1),
+  tenshu: rectangleFootprint(8, 8)
+};
 
 export function GameCanvas({
   snapshot,
@@ -534,18 +554,18 @@ function addCellActionPreview(
   }
 
   if (buildTool === "demolish") {
-    const hasBuilding = snapshot.buildings.some((building) => sameCell(building.position, cell));
+    const hasBuilding = findBuildingAtCell(cell, snapshot) !== null;
     addOverlaySprite(layer, cell, hasBuilding ? "overlay.demolish.target" : "overlay.build.invalid", assets);
     return;
   }
 
-  const targetCell = getSnapshotCell(snapshot, cell);
-  const occupied = snapshot.buildings.some((building) => sameCell(building.position, cell));
-  const assetId =
-    targetCell !== null && !occupied && (targetCell.passable || isBridgeBuildTool(buildTool))
-      ? "overlay.build.valid"
-      : "overlay.build.invalid";
-  addOverlaySprite(layer, cell, assetId, assets);
+  const footprint = buildingPreviewFootprint(buildTool, cell);
+  const canPlace = footprint.every((footprintCell) => canPreviewPlaceBuildingCell(snapshot, footprintCell, buildTool));
+  for (const footprintCell of footprint) {
+    if (isInsideSnapshotMap(footprintCell, snapshot)) {
+      addOverlaySprite(layer, footprintCell, canPlace ? "overlay.build.valid" : "overlay.build.invalid", assets);
+    }
+  }
 }
 
 function addBuildingSprite(
@@ -555,8 +575,6 @@ function addBuildingSprite(
 ): void {
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
   const point = buildingRenderPoint(building);
-  const scale = buildingVisualScale(building);
-  sprite.scale.set(scale);
   sprite.position.set(point.x, point.y + buildingGroundOffsetY(building));
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
@@ -772,6 +790,27 @@ function isSnapshotPassable(snapshot: WorldSnapshot | null, cell: CellCoord): bo
   return terrain.passable;
 }
 
+function canPreviewPlaceBuildingCell(snapshot: WorldSnapshot, cell: CellCoord, buildTool: BuildingType): boolean {
+  const terrain = getSnapshotCell(snapshot, cell);
+  if (terrain === null || findBuildingAtCell(cell, snapshot) !== null) {
+    return false;
+  }
+
+  const unitAtCell = snapshot.units.some((unit) => sameCell(unit.position, cell));
+  if (unitAtCell) {
+    return false;
+  }
+
+  return terrain.passable || isBridgeBuildTool(buildTool);
+}
+
+function buildingPreviewFootprint(buildingType: BuildingType, position: CellCoord): readonly CellCoord[] {
+  return BUILDING_FOOTPRINTS[buildingType].map((offset) => ({
+    x: position.x + offset.x,
+    y: position.y + offset.y
+  }));
+}
+
 function buildingAssetCandidates(building: BuildingSnapshot): readonly string[] {
   return [building.assetId, baseBuildingAssetId(building), finalBuildingFallbackAssetId(building)];
 }
@@ -877,8 +916,16 @@ function buildingGroundOffsetY(building: BuildingSnapshot): number {
     return 0;
   }
 
+  if (building.type === "fence") {
+    return 4;
+  }
+
+  if (building.type === "wall") {
+    return 5;
+  }
+
   if (building.type === "tenshu") {
-    return 16;
+    return 0;
   }
 
   if (
@@ -888,34 +935,24 @@ function buildingGroundOffsetY(building: BuildingSnapshot): number {
     building.type === "samurai_residence" ||
     building.type === "town_block"
   ) {
-    return 12;
+    return 0;
   }
 
   return 7;
 }
 
-function buildingVisualScale(building: BuildingSnapshot): number {
-  if (building.type === "tenshu") {
-    return 1.38;
-  }
-
-  if (building.type === "storehouse") {
-    return 1.22;
-  }
-
-  if (building.type === "market" || building.type === "barracks") {
-    return 1.25;
-  }
-
-  if (building.type === "samurai_residence" || building.type === "town_block") {
-    return 1.18;
-  }
-
-  return 1;
-}
-
 function isBridgeBuildTool(buildTool: BuildingType): boolean {
   return buildTool === "earth_bridge" || buildTool === "wood_bridge";
+}
+
+function rectangleFootprint(width: number, height: number): readonly CellCoord[] {
+  const footprint: CellCoord[] = [];
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      footprint.push({ x, y });
+    }
+  }
+  return footprint;
 }
 
 function clamp(value: number, min: number, max: number): number {

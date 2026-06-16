@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatedBy": "img-agent",
-  "generatedAt": "2026-06-15T14:57:18.719Z",
+  "generatedAt": "2026-06-16T16:39:28.908Z",
   "assets": [
     {
       "assetId": "terrain.grass.base",
@@ -271,55 +271,55 @@
       "assetId": "building.storehouse",
       "kind": "building",
       "file": "generated/building-storehouse.png",
-      "width": 96,
-      "height": 80,
+      "width": 320,
+      "height": 260,
       "anchor": {
         "x": 0.5,
-        "y": 0.82
+        "y": 0.8615384615
       }
     },
     {
       "assetId": "building.market",
       "kind": "building",
       "file": "generated/building-market.png",
-      "width": 96,
-      "height": 80,
+      "width": 420,
+      "height": 280,
       "anchor": {
         "x": 0.5,
-        "y": 0.82
+        "y": 0.8428571429
       }
     },
     {
       "assetId": "building.barracks",
       "kind": "building",
       "file": "generated/building-barracks.png",
-      "width": 96,
-      "height": 80,
+      "width": 420,
+      "height": 280,
       "anchor": {
         "x": 0.5,
-        "y": 0.82
+        "y": 0.8428571429
       }
     },
     {
       "assetId": "building.samurai_residence",
       "kind": "building",
       "file": "generated/building-samurai-residence.png",
-      "width": 96,
-      "height": 80,
+      "width": 460,
+      "height": 360,
       "anchor": {
         "x": 0.5,
-        "y": 0.82
+        "y": 0.8555555556
       }
     },
     {
       "assetId": "building.town_block",
       "kind": "building",
       "file": "generated/building-town-block.png",
-      "width": 96,
-      "height": 80,
+      "width": 640,
+      "height": 420,
       "anchor": {
         "x": 0.5,
-        "y": 0.82
+        "y": 0.8476190476
       }
     },
     {
@@ -381,11 +381,11 @@
       "assetId": "building.tenshu.test",
       "kind": "building",
       "file": "generated/building-tenshu-test.png",
-      "width": 112,
-      "height": 104,
+      "width": 640,
+      "height": 520,
       "anchor": {
         "x": 0.5,
-        "y": 0.88
+        "y": 0.8769230769
       }
     },
     {

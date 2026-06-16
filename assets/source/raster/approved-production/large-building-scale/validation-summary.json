@@ -1,0 +1,146 @@
+[
+  {
+    "id": "building.tenshu.large",
+    "file": "building-tenshu-large.png",
+    "canvas": "640x520",
+    "anchor": "320,456",
+    "footprint": "8x8",
+    "validation": {
+      "width": 640,
+      "height": 520,
+      "alphaBoundsGt10": {
+        "minX": 104,
+        "minY": 11,
+        "maxX": 580,
+        "maxY": 430
+      },
+      "opaquePixels": 109557,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.town_block.large",
+    "file": "building-town-block-large.png",
+    "canvas": "640x420",
+    "anchor": "320,356",
+    "footprint": "8x8",
+    "validation": {
+      "width": 640,
+      "height": 420,
+      "alphaBoundsGt10": {
+        "minX": 69,
+        "minY": 16,
+        "maxX": 587,
+        "maxY": 338
+      },
+      "opaquePixels": 90998,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.storehouse.large",
+    "file": "building-storehouse-large.png",
+    "canvas": "320x260",
+    "anchor": "160,224",
+    "footprint": "4x4",
+    "validation": {
+      "width": 320,
+      "height": 260,
+      "alphaBoundsGt10": {
+        "minX": 41,
+        "minY": 14,
+        "maxX": 293,
+        "maxY": 203
+      },
+      "opaquePixels": 26822,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.market.large",
+    "file": "building-market-large.png",
+    "canvas": "420x280",
+    "anchor": "210,236",
+    "footprint": "6x4",
+    "validation": {
+      "width": 420,
+      "height": 280,
+      "alphaBoundsGt10": {
+        "minX": 48,
+        "minY": 16,
+        "maxX": 387,
+        "maxY": 196
+      },
+      "opaquePixels": 39580,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.barracks.large",
+    "file": "building-barracks-large.png",
+    "canvas": "420x280",
+    "anchor": "210,236",
+    "footprint": "6x4",
+    "validation": {
+      "width": 420,
+      "height": 280,
+      "alphaBoundsGt10": {
+        "minX": 51,
+        "minY": 16,
+        "maxX": 385,
+        "maxY": 210
+      },
+      "opaquePixels": 39401,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.samurai_residence.large",
+    "file": "building-samurai-residence-large.png",
+    "canvas": "460x360",
+    "anchor": "230,308",
+    "footprint": "6x6",
+    "validation": {
+      "width": 460,
+      "height": 360,
+      "alphaBoundsGt10": {
+        "minX": 45,
+        "minY": 18,
+        "maxX": 428,
+        "maxY": 273
+      },
+      "opaquePixels": 56651,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+]
