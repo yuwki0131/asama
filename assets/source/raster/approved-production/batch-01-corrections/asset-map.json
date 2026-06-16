@@ -1,0 +1,43 @@
+[
+  {
+    "id": "building.storehouse",
+    "file": "building-storehouse.png",
+    "w": 96,
+    "h": 80,
+    "ax": 48,
+    "ay": 65.6,
+    "fp": "1x1",
+    "source": "assets/source/raster/approved-production/batch-01/building-storehouse.png",
+    "fitW": 0.88,
+    "fitH": 0.92
+  },
+  {
+    "id": "building.gate.wood.closed",
+    "file": "building-gate-wood-closed.png",
+    "w": 80,
+    "h": 80,
+    "ax": 40,
+    "ay": 62.4,
+    "fp": "1x1",
+    "source": "assets/source/raster/approved-production/batch-01/building-gate-wood-closed.png",
+    "fitW": 0.92,
+    "fitH": 0.88
+  },
+  {
+    "id": "terrain.grass.base",
+    "file": "terrain-grass-base.png",
+    "w": 64,
+    "h": 32,
+    "ax": 32,
+    "ay": 16,
+    "fp": "1x1",
+    "source": "terrain seam correction raster",
+    "alphaBoundsGt10": {
+      "minX": 0,
+      "minY": 0,
+      "maxX": 63,
+      "maxY": 31
+    },
+    "tilingPreview": "terrain-grass-tiling-preview.png"
+  }
+]

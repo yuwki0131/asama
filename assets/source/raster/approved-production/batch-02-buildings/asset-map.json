@@ -1,0 +1,218 @@
+[
+  {
+    "id": "building.market",
+    "file": "building-market.png",
+    "w": 96,
+    "h": 80,
+    "ax": 48,
+    "ay": 65.6,
+    "footprint": "1x1",
+    "note": "merchant market with stalls and goods",
+    "raw": "assets/source/raster/approved-production/batch-02-buildings/raw/building-market.raw.png",
+    "cutout": "assets/source/raster/approved-production/batch-02-buildings/cutout/building-market.cutout.png",
+    "placed": {
+      "left": 4,
+      "top": 16,
+      "resizedW": 88,
+      "resizedH": 52,
+      "bottomPad": 12
+    },
+    "validation": {
+      "width": 96,
+      "height": 80,
+      "alphaBoundsGt10": {
+        "minX": 18,
+        "minY": 16,
+        "maxX": 91,
+        "maxY": 61
+      },
+      "opaquePixels": 2265,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.barracks",
+    "file": "building-barracks.png",
+    "w": 96,
+    "h": 80,
+    "ax": 48,
+    "ay": 65.6,
+    "footprint": "1x1",
+    "note": "ashigaru barracks with weapon racks",
+    "raw": "assets/source/raster/approved-production/batch-02-buildings/raw/building-barracks.raw.png",
+    "cutout": "assets/source/raster/approved-production/batch-02-buildings/cutout/building-barracks.cutout.png",
+    "placed": {
+      "left": 4,
+      "top": 13,
+      "resizedW": 88,
+      "resizedH": 55,
+      "bottomPad": 12
+    },
+    "validation": {
+      "width": 96,
+      "height": 80,
+      "alphaBoundsGt10": {
+        "minX": 24,
+        "minY": 13,
+        "maxX": 91,
+        "maxY": 60
+      },
+      "opaquePixels": 2215,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.samurai_residence",
+    "file": "building-samurai-residence.png",
+    "w": 96,
+    "h": 80,
+    "ax": 48,
+    "ay": 65.6,
+    "footprint": "1x1",
+    "note": "buke-yashiki samurai residence",
+    "raw": "assets/source/raster/approved-production/batch-02-buildings/raw/building-samurai-residence.raw.png",
+    "cutout": "assets/source/raster/approved-production/batch-02-buildings/cutout/building-samurai-residence.cutout.png",
+    "placed": {
+      "left": 3,
+      "top": 13,
+      "resizedW": 90,
+      "resizedH": 55,
+      "bottomPad": 12
+    },
+    "validation": {
+      "width": 96,
+      "height": 80,
+      "alphaBoundsGt10": {
+        "minX": 21,
+        "minY": 13,
+        "maxX": 92,
+        "maxY": 61
+      },
+      "opaquePixels": 2112,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.town_block",
+    "file": "building-town-block.png",
+    "w": 96,
+    "h": 80,
+    "ax": 48,
+    "ay": 65.6,
+    "footprint": "1x1",
+    "note": "machiya row town block",
+    "raw": "assets/source/raster/approved-production/batch-02-buildings/raw/building-town-block.raw.png",
+    "cutout": "assets/source/raster/approved-production/batch-02-buildings/cutout/building-town-block.cutout.png",
+    "placed": {
+      "left": 2,
+      "top": 12,
+      "resizedW": 92,
+      "resizedH": 56,
+      "bottomPad": 12
+    },
+    "validation": {
+      "width": 96,
+      "height": 80,
+      "alphaBoundsGt10": {
+        "minX": 29,
+        "minY": 12,
+        "maxX": 93,
+        "maxY": 56
+      },
+      "opaquePixels": 2108,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.tenshu.test",
+    "file": "building-tenshu-test.png",
+    "w": 112,
+    "h": 104,
+    "ax": 56,
+    "ay": 91.52,
+    "footprint": "1x1",
+    "note": "compact early Japanese castle keep",
+    "raw": "assets/source/raster/approved-production/batch-02-buildings/raw/building-tenshu-test.raw.png",
+    "cutout": "assets/source/raster/approved-production/batch-02-buildings/cutout/building-tenshu-test.cutout.png",
+    "placed": {
+      "left": 5,
+      "top": 19,
+      "resizedW": 102,
+      "resizedH": 75,
+      "bottomPad": 10
+    },
+    "validation": {
+      "width": 112,
+      "height": 104,
+      "alphaBoundsGt10": {
+        "minX": 46,
+        "minY": 19,
+        "maxX": 106,
+        "maxY": 90
+      },
+      "opaquePixels": 2733,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.farm",
+    "file": "building-farm.png",
+    "w": 64,
+    "h": 32,
+    "ax": 32,
+    "ay": 16,
+    "footprint": "1x1",
+    "note": "wet rice paddy field tile",
+    "raw": "assets/source/raster/approved-production/batch-02-buildings/raw/building-farm.raw.png",
+    "cutout": "assets/source/raster/approved-production/batch-02-buildings/cutout/building-farm.cutout.png",
+    "placed": {
+      "left": 4,
+      "top": 1,
+      "resizedW": 56,
+      "resizedH": 31,
+      "bottomPad": 0
+    },
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 12,
+        "minY": 1,
+        "maxX": 59,
+        "maxY": 26
+      },
+      "opaquePixels": 699,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+]

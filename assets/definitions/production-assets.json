@@ -7,7 +7,7 @@
       "output": "terrain-grass-base.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-grass-base.png"
+        "file": "assets/source/raster/approved-production/batch-01-corrections/terrain-grass-base.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -282,7 +282,7 @@
       "output": "building-storehouse.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-storehouse.png"
+        "file": "assets/source/raster/approved-production/batch-01-corrections/building-storehouse.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -297,7 +297,7 @@
         "trim": false,
         "resizeMode": "exact",
         "sharpen": {
-          "sigma": 0.4
+          "sigma": 0.35
         }
       }
     },
@@ -307,7 +307,7 @@
       "output": "building-market.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-market.png"
+        "file": "assets/source/raster/approved-production/batch-02-buildings/building-market.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -332,7 +332,7 @@
       "output": "building-barracks.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-barracks.png"
+        "file": "assets/source/raster/approved-production/batch-02-buildings/building-barracks.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -357,7 +357,7 @@
       "output": "building-samurai-residence.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-samurai-residence.png"
+        "file": "assets/source/raster/approved-production/batch-02-buildings/building-samurai-residence.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -382,7 +382,7 @@
       "output": "building-town-block.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-town-block.png"
+        "file": "assets/source/raster/approved-production/batch-02-buildings/building-town-block.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -407,7 +407,7 @@
       "output": "building-tenshu-test.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-tenshu-test.png"
+        "file": "assets/source/raster/approved-production/batch-02-buildings/building-tenshu-test.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -432,7 +432,7 @@
       "output": "building-farm.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-farm.png"
+        "file": "assets/source/raster/approved-production/batch-02-buildings/building-farm.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -457,7 +457,7 @@
       "output": "building-road.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-road.png"
+        "file": "assets/source/raster/approved-production/batch-01/building-road-dirt.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -472,7 +472,7 @@
         "trim": false,
         "resizeMode": "exact",
         "sharpen": {
-          "sigma": 0.4
+          "sigma": 0.35
         }
       }
     },
@@ -582,7 +582,7 @@
       "output": "building-gate-wood-closed.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-gate-wood-closed.png"
+        "file": "assets/source/raster/approved-production/batch-01-corrections/building-gate-wood-closed.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -597,7 +597,7 @@
         "trim": false,
         "resizeMode": "exact",
         "sharpen": {
-          "sigma": 0.4
+          "sigma": 0.35
         }
       }
     },

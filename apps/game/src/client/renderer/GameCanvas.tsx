@@ -49,6 +49,7 @@ interface CameraState {
 const TILE_WIDTH = 64;
 const TILE_HEIGHT = 32;
 const UNIT_GROUND_OFFSET_Y = 0;
+const TERRAIN_UNDERLAY_PADDING = 1.25;
 const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 2;
 const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
@@ -415,8 +416,11 @@ function renderScene(
   const terrainKey = `${cameraVersion}:${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}`;
   if (lastTerrainKeyRef.current !== terrainKey) {
     terrainLayer.removeChildren();
+    const terrainUnderlay = new Graphics();
+    terrainLayer.addChild(terrainUnderlay);
     for (const cell of snapshot.map.cells) {
       if (isVisibleCell(cell.coord, camera, app.screen.width, app.screen.height)) {
+        addTerrainUnderlay(terrainUnderlay, cell);
         addTerrainSprite(terrainLayer, cell, assets);
       }
     }
@@ -454,9 +458,42 @@ function renderScene(
 }
 
 function addTerrainSprite(layer: Container, cell: TerrainCellSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
+  const point = cellToWorld(cell.coord);
   const sprite = createSprite(cell.assetId, assets);
-  sprite.position.copyFrom(cellToWorld(cell.coord));
+  sprite.position.copyFrom(point);
   layer.addChild(sprite);
+}
+
+function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot): void {
+  const point = cellToWorld(cell.coord);
+  const halfWidth = TILE_WIDTH / 2 + TERRAIN_UNDERLAY_PADDING;
+  const halfHeight = TILE_HEIGHT / 2 + TERRAIN_UNDERLAY_PADDING / 2;
+
+  graphics
+    .poly([
+      point.x,
+      point.y - halfHeight,
+      point.x + halfWidth,
+      point.y,
+      point.x,
+      point.y + halfHeight,
+      point.x - halfWidth,
+      point.y
+    ])
+    .fill({ color: terrainUnderlayColor(cell.terrain), alpha: 1 });
+}
+
+function terrainUnderlayColor(terrain: TerrainCellSnapshot["terrain"]): number {
+  if (terrain === "dirt") {
+    return 0x745a35;
+  }
+  if (terrain === "water") {
+    return 0x2e7e8e;
+  }
+  if (terrain === "stone") {
+    return 0x68706a;
+  }
+  return 0x63753a;
 }
 
 function addPathSprites(layer: Container, unit: UnitSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
@@ -518,6 +555,8 @@ function addBuildingSprite(
 ): void {
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
   const point = buildingRenderPoint(building);
+  const scale = buildingVisualScale(building);
+  sprite.scale.set(scale);
   sprite.position.set(point.x, point.y + buildingGroundOffsetY(building));
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
@@ -839,7 +878,7 @@ function buildingGroundOffsetY(building: BuildingSnapshot): number {
   }
 
   if (building.type === "tenshu") {
-    return 10;
+    return 16;
   }
 
   if (
@@ -849,10 +888,30 @@ function buildingGroundOffsetY(building: BuildingSnapshot): number {
     building.type === "samurai_residence" ||
     building.type === "town_block"
   ) {
-    return 9;
+    return 12;
   }
 
   return 7;
+}
+
+function buildingVisualScale(building: BuildingSnapshot): number {
+  if (building.type === "tenshu") {
+    return 1.38;
+  }
+
+  if (building.type === "storehouse") {
+    return 1.22;
+  }
+
+  if (building.type === "market" || building.type === "barracks") {
+    return 1.25;
+  }
+
+  if (building.type === "samurai_residence" || building.type === "town_block") {
+    return 1.18;
+  }
+
+  return 1;
 }
 
 function isBridgeBuildTool(buildTool: BuildingType): boolean {

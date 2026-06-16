@@ -1,0 +1,44 @@
+[
+  {
+    "file": "building-market.png",
+    "width": 96,
+    "height": 80,
+    "alphaBoundsGt10": "18,16-91,61",
+    "opaquePixels": 2265
+  },
+  {
+    "file": "building-barracks.png",
+    "width": 96,
+    "height": 80,
+    "alphaBoundsGt10": "24,13-91,60",
+    "opaquePixels": 2215
+  },
+  {
+    "file": "building-samurai-residence.png",
+    "width": 96,
+    "height": 80,
+    "alphaBoundsGt10": "21,13-92,61",
+    "opaquePixels": 2112
+  },
+  {
+    "file": "building-town-block.png",
+    "width": 96,
+    "height": 80,
+    "alphaBoundsGt10": "29,12-93,56",
+    "opaquePixels": 2108
+  },
+  {
+    "file": "building-tenshu-test.png",
+    "width": 112,
+    "height": 104,
+    "alphaBoundsGt10": "46,19-106,90",
+    "opaquePixels": 2733
+  },
+  {
+    "file": "building-farm.png",
+    "width": 64,
+    "height": 32,
+    "alphaBoundsGt10": "12,1-59,26",
+    "opaquePixels": 699
+  }
+]

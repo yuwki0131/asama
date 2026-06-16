@@ -1,0 +1,123 @@
+[
+  {
+    "id": "terrain.grass.base",
+    "file": "terrain-grass-base.png",
+    "w": 64,
+    "h": 32,
+    "ax": 32,
+    "ay": 16,
+    "fp": "1x1",
+    "fit": 0.98,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a3016daa6308191a199f2a2e894e5e9.png"
+  },
+  {
+    "id": "building.road",
+    "file": "building-road-dirt.png",
+    "w": 64,
+    "h": 32,
+    "ax": 32,
+    "ay": 16,
+    "fp": "1x1",
+    "fit": 0.98,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a30171130788191ac36e5ad4d0c0b00.png"
+  },
+  {
+    "id": "vegetation.forest.cluster.01",
+    "file": "vegetation-forest-cluster-01.png",
+    "w": 192,
+    "h": 160,
+    "ax": 96,
+    "ay": 136,
+    "fp": "2x2",
+    "fit": 0.9,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a301737b3b481918babe8a18642ba95.png"
+  },
+  {
+    "id": "building.storehouse",
+    "file": "building-storehouse.png",
+    "w": 192,
+    "h": 160,
+    "ax": 96,
+    "ay": 136,
+    "fp": "2x2",
+    "fit": 0.9,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a30177c9f948191bc3dbea04b578933.png"
+  },
+  {
+    "id": "building.gate.wood.closed",
+    "file": "building-gate-wood-closed.png",
+    "w": 192,
+    "h": 176,
+    "ax": 96,
+    "ay": 152,
+    "fp": "2x1",
+    "fit": 0.9,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a3017cbd8fc8191b6150aa1fba3356c.png"
+  },
+  {
+    "id": "building.yagura.small.normal",
+    "file": "building-yagura-small-normal.png",
+    "w": 224,
+    "h": 208,
+    "ax": 112,
+    "ay": 184,
+    "fp": "2x2",
+    "fit": 0.9,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a301aabaa5c8191ba524974c8ea05a0.png"
+  },
+  {
+    "id": "building.yagura.small.occupied-cutaway",
+    "file": "building-yagura-small-occupied-cutaway.png",
+    "w": 224,
+    "h": 208,
+    "ax": 112,
+    "ay": 184,
+    "fp": "2x2",
+    "fit": 0.9,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a301afc2c888191ba320937ddfdd6fd.png"
+  },
+  {
+    "id": "unit.ashigaru.spear.idle.ne",
+    "file": "unit-ashigaru-spear-idle-ne.png",
+    "w": 64,
+    "h": 80,
+    "ax": 32,
+    "ay": 68,
+    "fp": "1x1",
+    "fit": 0.88,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a30187f0b008191bd9b01ab5505be49.png"
+  },
+  {
+    "id": "unit.ashigaru.spear.walk.ne",
+    "file": "unit-ashigaru-spear-walk-ne.png",
+    "w": 64,
+    "h": 80,
+    "ax": 32,
+    "ay": 68,
+    "fp": "1x1",
+    "fit": 0.88,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a3018bf2e788191adf436ce3cfc67d3.png"
+  },
+  {
+    "id": "unit.engineer.idle.ne",
+    "file": "unit-engineer-idle-ne.png",
+    "w": 64,
+    "h": 80,
+    "ax": 32,
+    "ay": 68,
+    "fp": "1x1",
+    "fit": 0.88,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a30190328488191b11210773d1f59ec.png"
+  },
+  {
+    "id": "unit.supply-cart.idle.ne",
+    "file": "unit-supply-cart-idle-ne.png",
+    "w": 112,
+    "h": 88,
+    "ax": 56,
+    "ay": 72,
+    "fp": "1x1",
+    "fit": 0.9,
+    "source": "/home/yuwki0131/.codex/generated_images/019ec4e6-7f19-78d3-b711-7015ac92be38/ig_0328f14fff58e5a9016a30194831548191b484c934464268b8.png"
+  }
+]
