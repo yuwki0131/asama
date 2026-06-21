@@ -1,0 +1,1712 @@
+[
+  {
+    "id": "building.dry_moat.connected.0000",
+    "file": "building-dry-moat-connected-0000.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0000"
+  },
+  {
+    "id": "building.dry_moat.connected.0001",
+    "file": "building-dry-moat-connected-0001.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0001"
+  },
+  {
+    "id": "building.dry_moat.connected.0010",
+    "file": "building-dry-moat-connected-0010.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0010"
+  },
+  {
+    "id": "building.dry_moat.connected.0011",
+    "file": "building-dry-moat-connected-0011.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0011"
+  },
+  {
+    "id": "building.dry_moat.connected.0100",
+    "file": "building-dry-moat-connected-0100.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0100"
+  },
+  {
+    "id": "building.dry_moat.connected.0101",
+    "file": "building-dry-moat-connected-0101.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0101"
+  },
+  {
+    "id": "building.dry_moat.connected.0110",
+    "file": "building-dry-moat-connected-0110.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0110"
+  },
+  {
+    "id": "building.dry_moat.connected.0111",
+    "file": "building-dry-moat-connected-0111.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0111"
+  },
+  {
+    "id": "building.dry_moat.connected.1000",
+    "file": "building-dry-moat-connected-1000.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1000"
+  },
+  {
+    "id": "building.dry_moat.connected.1001",
+    "file": "building-dry-moat-connected-1001.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1001"
+  },
+  {
+    "id": "building.dry_moat.connected.1010",
+    "file": "building-dry-moat-connected-1010.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1010"
+  },
+  {
+    "id": "building.dry_moat.connected.1011",
+    "file": "building-dry-moat-connected-1011.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1011"
+  },
+  {
+    "id": "building.dry_moat.connected.1100",
+    "file": "building-dry-moat-connected-1100.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1100"
+  },
+  {
+    "id": "building.dry_moat.connected.1101",
+    "file": "building-dry-moat-connected-1101.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1101"
+  },
+  {
+    "id": "building.dry_moat.connected.1110",
+    "file": "building-dry-moat-connected-1110.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1110"
+  },
+  {
+    "id": "building.dry_moat.connected.1111",
+    "file": "building-dry-moat-connected-1111.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1111"
+  },
+  {
+    "id": "building.water_moat.connected.0000",
+    "file": "building-water-moat-connected-0000.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0000"
+  },
+  {
+    "id": "building.water_moat.connected.0001",
+    "file": "building-water-moat-connected-0001.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0001"
+  },
+  {
+    "id": "building.water_moat.connected.0010",
+    "file": "building-water-moat-connected-0010.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0010"
+  },
+  {
+    "id": "building.water_moat.connected.0011",
+    "file": "building-water-moat-connected-0011.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0011"
+  },
+  {
+    "id": "building.water_moat.connected.0100",
+    "file": "building-water-moat-connected-0100.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0100"
+  },
+  {
+    "id": "building.water_moat.connected.0101",
+    "file": "building-water-moat-connected-0101.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0101"
+  },
+  {
+    "id": "building.water_moat.connected.0110",
+    "file": "building-water-moat-connected-0110.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0110"
+  },
+  {
+    "id": "building.water_moat.connected.0111",
+    "file": "building-water-moat-connected-0111.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0111"
+  },
+  {
+    "id": "building.water_moat.connected.1000",
+    "file": "building-water-moat-connected-1000.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1000"
+  },
+  {
+    "id": "building.water_moat.connected.1001",
+    "file": "building-water-moat-connected-1001.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1001"
+  },
+  {
+    "id": "building.water_moat.connected.1010",
+    "file": "building-water-moat-connected-1010.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1010"
+  },
+  {
+    "id": "building.water_moat.connected.1011",
+    "file": "building-water-moat-connected-1011.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1011"
+  },
+  {
+    "id": "building.water_moat.connected.1100",
+    "file": "building-water-moat-connected-1100.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1100"
+  },
+  {
+    "id": "building.water_moat.connected.1101",
+    "file": "building-water-moat-connected-1101.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1101"
+  },
+  {
+    "id": "building.water_moat.connected.1110",
+    "file": "building-water-moat-connected-1110.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1110"
+  },
+  {
+    "id": "building.water_moat.connected.1111",
+    "file": "building-water-moat-connected-1111.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1111"
+  },
+  {
+    "id": "terrain.grass.connected.0000",
+    "file": "terrain-grass-connected-0000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0000"
+  },
+  {
+    "id": "terrain.grass.connected.0001",
+    "file": "terrain-grass-connected-0001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0001"
+  },
+  {
+    "id": "terrain.grass.connected.0010",
+    "file": "terrain-grass-connected-0010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0010"
+  },
+  {
+    "id": "terrain.grass.connected.0011",
+    "file": "terrain-grass-connected-0011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0011"
+  },
+  {
+    "id": "terrain.grass.connected.0100",
+    "file": "terrain-grass-connected-0100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0100"
+  },
+  {
+    "id": "terrain.grass.connected.0101",
+    "file": "terrain-grass-connected-0101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0101"
+  },
+  {
+    "id": "terrain.grass.connected.0110",
+    "file": "terrain-grass-connected-0110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0110"
+  },
+  {
+    "id": "terrain.grass.connected.0111",
+    "file": "terrain-grass-connected-0111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0111"
+  },
+  {
+    "id": "terrain.grass.connected.1000",
+    "file": "terrain-grass-connected-1000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1000"
+  },
+  {
+    "id": "terrain.grass.connected.1001",
+    "file": "terrain-grass-connected-1001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1001"
+  },
+  {
+    "id": "terrain.grass.connected.1010",
+    "file": "terrain-grass-connected-1010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1010"
+  },
+  {
+    "id": "terrain.grass.connected.1011",
+    "file": "terrain-grass-connected-1011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1011"
+  },
+  {
+    "id": "terrain.grass.connected.1100",
+    "file": "terrain-grass-connected-1100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1100"
+  },
+  {
+    "id": "terrain.grass.connected.1101",
+    "file": "terrain-grass-connected-1101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1101"
+  },
+  {
+    "id": "terrain.grass.connected.1110",
+    "file": "terrain-grass-connected-1110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1110"
+  },
+  {
+    "id": "terrain.grass.connected.1111",
+    "file": "terrain-grass-connected-1111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1111"
+  },
+  {
+    "id": "terrain.dirt.connected.0000",
+    "file": "terrain-dirt-connected-0000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0000"
+  },
+  {
+    "id": "terrain.dirt.connected.0001",
+    "file": "terrain-dirt-connected-0001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0001"
+  },
+  {
+    "id": "terrain.dirt.connected.0010",
+    "file": "terrain-dirt-connected-0010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0010"
+  },
+  {
+    "id": "terrain.dirt.connected.0011",
+    "file": "terrain-dirt-connected-0011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0011"
+  },
+  {
+    "id": "terrain.dirt.connected.0100",
+    "file": "terrain-dirt-connected-0100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0100"
+  },
+  {
+    "id": "terrain.dirt.connected.0101",
+    "file": "terrain-dirt-connected-0101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0101"
+  },
+  {
+    "id": "terrain.dirt.connected.0110",
+    "file": "terrain-dirt-connected-0110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0110"
+  },
+  {
+    "id": "terrain.dirt.connected.0111",
+    "file": "terrain-dirt-connected-0111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0111"
+  },
+  {
+    "id": "terrain.dirt.connected.1000",
+    "file": "terrain-dirt-connected-1000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1000"
+  },
+  {
+    "id": "terrain.dirt.connected.1001",
+    "file": "terrain-dirt-connected-1001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1001"
+  },
+  {
+    "id": "terrain.dirt.connected.1010",
+    "file": "terrain-dirt-connected-1010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1010"
+  },
+  {
+    "id": "terrain.dirt.connected.1011",
+    "file": "terrain-dirt-connected-1011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1011"
+  },
+  {
+    "id": "terrain.dirt.connected.1100",
+    "file": "terrain-dirt-connected-1100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1100"
+  },
+  {
+    "id": "terrain.dirt.connected.1101",
+    "file": "terrain-dirt-connected-1101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1101"
+  },
+  {
+    "id": "terrain.dirt.connected.1110",
+    "file": "terrain-dirt-connected-1110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1110"
+  },
+  {
+    "id": "terrain.dirt.connected.1111",
+    "file": "terrain-dirt-connected-1111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1111"
+  },
+  {
+    "id": "terrain.water.connected.0000",
+    "file": "terrain-water-connected-0000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0000"
+  },
+  {
+    "id": "terrain.water.connected.0001",
+    "file": "terrain-water-connected-0001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0001"
+  },
+  {
+    "id": "terrain.water.connected.0010",
+    "file": "terrain-water-connected-0010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0010"
+  },
+  {
+    "id": "terrain.water.connected.0011",
+    "file": "terrain-water-connected-0011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0011"
+  },
+  {
+    "id": "terrain.water.connected.0100",
+    "file": "terrain-water-connected-0100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0100"
+  },
+  {
+    "id": "terrain.water.connected.0101",
+    "file": "terrain-water-connected-0101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0101"
+  },
+  {
+    "id": "terrain.water.connected.0110",
+    "file": "terrain-water-connected-0110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0110"
+  },
+  {
+    "id": "terrain.water.connected.0111",
+    "file": "terrain-water-connected-0111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0111"
+  },
+  {
+    "id": "terrain.water.connected.1000",
+    "file": "terrain-water-connected-1000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1000"
+  },
+  {
+    "id": "terrain.water.connected.1001",
+    "file": "terrain-water-connected-1001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1001"
+  },
+  {
+    "id": "terrain.water.connected.1010",
+    "file": "terrain-water-connected-1010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1010"
+  },
+  {
+    "id": "terrain.water.connected.1011",
+    "file": "terrain-water-connected-1011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1011"
+  },
+  {
+    "id": "terrain.water.connected.1100",
+    "file": "terrain-water-connected-1100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1100"
+  },
+  {
+    "id": "terrain.water.connected.1101",
+    "file": "terrain-water-connected-1101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1101"
+  },
+  {
+    "id": "terrain.water.connected.1110",
+    "file": "terrain-water-connected-1110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1110"
+  },
+  {
+    "id": "terrain.water.connected.1111",
+    "file": "terrain-water-connected-1111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1111"
+  },
+  {
+    "id": "terrain.stone.connected.0000",
+    "file": "terrain-stone-connected-0000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0000"
+  },
+  {
+    "id": "terrain.stone.connected.0001",
+    "file": "terrain-stone-connected-0001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0001"
+  },
+  {
+    "id": "terrain.stone.connected.0010",
+    "file": "terrain-stone-connected-0010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0010"
+  },
+  {
+    "id": "terrain.stone.connected.0011",
+    "file": "terrain-stone-connected-0011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0011"
+  },
+  {
+    "id": "terrain.stone.connected.0100",
+    "file": "terrain-stone-connected-0100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0100"
+  },
+  {
+    "id": "terrain.stone.connected.0101",
+    "file": "terrain-stone-connected-0101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0101"
+  },
+  {
+    "id": "terrain.stone.connected.0110",
+    "file": "terrain-stone-connected-0110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0110"
+  },
+  {
+    "id": "terrain.stone.connected.0111",
+    "file": "terrain-stone-connected-0111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0111"
+  },
+  {
+    "id": "terrain.stone.connected.1000",
+    "file": "terrain-stone-connected-1000.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1000"
+  },
+  {
+    "id": "terrain.stone.connected.1001",
+    "file": "terrain-stone-connected-1001.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1001"
+  },
+  {
+    "id": "terrain.stone.connected.1010",
+    "file": "terrain-stone-connected-1010.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1010"
+  },
+  {
+    "id": "terrain.stone.connected.1011",
+    "file": "terrain-stone-connected-1011.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1011"
+  },
+  {
+    "id": "terrain.stone.connected.1100",
+    "file": "terrain-stone-connected-1100.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1100"
+  },
+  {
+    "id": "terrain.stone.connected.1101",
+    "file": "terrain-stone-connected-1101.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1101"
+  },
+  {
+    "id": "terrain.stone.connected.1110",
+    "file": "terrain-stone-connected-1110.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1110"
+  },
+  {
+    "id": "terrain.stone.connected.1111",
+    "file": "terrain-stone-connected-1111.png",
+    "kind": "terrain",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1111"
+  },
+  {
+    "id": "building.road.connected.0000",
+    "file": "building-road-connected-0000.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0000"
+  },
+  {
+    "id": "building.road.connected.0001",
+    "file": "building-road-connected-0001.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0001"
+  },
+  {
+    "id": "building.road.connected.0010",
+    "file": "building-road-connected-0010.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0010"
+  },
+  {
+    "id": "building.road.connected.0011",
+    "file": "building-road-connected-0011.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0011"
+  },
+  {
+    "id": "building.road.connected.0100",
+    "file": "building-road-connected-0100.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0100"
+  },
+  {
+    "id": "building.road.connected.0101",
+    "file": "building-road-connected-0101.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0101"
+  },
+  {
+    "id": "building.road.connected.0110",
+    "file": "building-road-connected-0110.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0110"
+  },
+  {
+    "id": "building.road.connected.0111",
+    "file": "building-road-connected-0111.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "0111"
+  },
+  {
+    "id": "building.road.connected.1000",
+    "file": "building-road-connected-1000.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1000"
+  },
+  {
+    "id": "building.road.connected.1001",
+    "file": "building-road-connected-1001.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1001"
+  },
+  {
+    "id": "building.road.connected.1010",
+    "file": "building-road-connected-1010.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1010"
+  },
+  {
+    "id": "building.road.connected.1011",
+    "file": "building-road-connected-1011.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1011"
+  },
+  {
+    "id": "building.road.connected.1100",
+    "file": "building-road-connected-1100.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1100"
+  },
+  {
+    "id": "building.road.connected.1101",
+    "file": "building-road-connected-1101.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1101"
+  },
+  {
+    "id": "building.road.connected.1110",
+    "file": "building-road-connected-1110.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1110"
+  },
+  {
+    "id": "building.road.connected.1111",
+    "file": "building-road-connected-1111.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": "1111"
+  },
+  {
+    "id": "building.dry_moat",
+    "file": "building-dry-moat-connected.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": null
+  },
+  {
+    "id": "building.water_moat",
+    "file": "building-water-moat-connected.png",
+    "kind": "building",
+    "canvas": {
+      "width": 64,
+      "height": 32
+    },
+    "anchor": {
+      "x": 32,
+      "y": 16
+    },
+    "footprint": "1x1",
+    "mask": null
+  }
+]

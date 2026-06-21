@@ -17,6 +17,7 @@
     "assets:postprocess": "pnpm --filter @asama/asset-tools assets:postprocess",
     "assets:atlas": "pnpm --filter @asama/asset-tools assets:atlas",
     "assets:validate": "pnpm --filter @asama/asset-tools assets:validate",
+    "assets:audit:production": "pnpm --filter @asama/asset-tools assets:audit:production",
     "assets:all": "pnpm --filter @asama/asset-tools assets:all",
     "clean:assets": "pnpm --filter @asama/asset-tools clean",
     "test": "pnpm -r test",

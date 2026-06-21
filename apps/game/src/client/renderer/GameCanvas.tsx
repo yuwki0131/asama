@@ -49,7 +49,9 @@ interface CameraState {
 const TILE_WIDTH = 64;
 const TILE_HEIGHT = 32;
 const UNIT_GROUND_OFFSET_Y = 0;
-const TERRAIN_UNDERLAY_PADDING = 1.25;
+const TERRAIN_UNDERLAY_PADDING = 0.5;
+const LEGACY_WALL_HEIGHT = 72;
+const LEGACY_GATE_HEIGHT = 80;
 const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 2;
 const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
@@ -59,6 +61,9 @@ const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
   gate: rectangleFootprint(1, 1),
   gate_wide_2: rectangleFootprint(2, 1),
   gate_wide_3: rectangleFootprint(3, 1),
+  gate_ne_sw: rectangleFootprint(1, 1),
+  gate_wide_2_ne_sw: rectangleFootprint(1, 2),
+  gate_wide_3_ne_sw: rectangleFootprint(1, 3),
   dry_moat: rectangleFootprint(1, 1),
   water_moat: rectangleFootprint(1, 1),
   storehouse: rectangleFootprint(4, 4),
@@ -479,9 +484,21 @@ function renderScene(
 
 function addTerrainSprite(layer: Container, cell: TerrainCellSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
   const point = cellToWorld(cell.coord);
-  const sprite = createSprite(cell.assetId, assets);
+  const sprite = createSpriteFromCandidates([cell.assetId, terrainFallbackAssetId(cell)], assets);
   sprite.position.copyFrom(point);
   layer.addChild(sprite);
+}
+
+function terrainFallbackAssetId(cell: TerrainCellSnapshot): string {
+  if (cell.terrain === "grass" && (cell.coord.x * 17 + cell.coord.y * 31) % 7 === 0) {
+    return "terrain.grass.variant.1";
+  }
+
+  if (cell.terrain === "dirt" && (cell.coord.x + cell.coord.y) % 3 === 0) {
+    return "terrain.dirt.variant.1";
+  }
+
+  return `terrain.${cell.terrain}.base`;
 }
 
 function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot): void {
@@ -500,20 +517,7 @@ function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot): void
       point.x - halfWidth,
       point.y
     ])
-    .fill({ color: terrainUnderlayColor(cell.terrain), alpha: 1 });
-}
-
-function terrainUnderlayColor(terrain: TerrainCellSnapshot["terrain"]): number {
-  if (terrain === "dirt") {
-    return 0x745a35;
-  }
-  if (terrain === "water") {
-    return 0x2e7e8e;
-  }
-  if (terrain === "stone") {
-    return 0x68706a;
-  }
-  return 0x63753a;
+    .fill({ color: 0x63753a, alpha: 1 });
 }
 
 function addPathSprites(layer: Container, unit: UnitSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
@@ -573,13 +577,35 @@ function addBuildingSprite(
   building: BuildingSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>
 ): void {
+  const hasDedicatedAsset = assets.has(building.assetId);
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
   const point = buildingRenderPoint(building);
-  sprite.position.set(point.x, point.y);
+  const scale = legacyFortificationScale(building, sprite);
+  const direction = !hasDedicatedAsset && isNeSwGateType(building.type) ? -1 : 1;
+  sprite.scale.set(scale.x * direction, scale.y);
+  sprite.position.set(
+    point.x,
+    point.y - sprite.texture.height * (1 - sprite.anchor.y) * (scale.y - 1)
+  );
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
   }
   layer.addChild(sprite);
+}
+
+function legacyFortificationScale(
+  building: BuildingSnapshot,
+  sprite: Sprite
+): { readonly x: number; readonly y: number } {
+  if (building.type === "wall" && sprite.texture.height <= LEGACY_WALL_HEIGHT) {
+    return { x: 1, y: 1.35 };
+  }
+
+  if (isGateType(building.type) && sprite.texture.height <= LEGACY_GATE_HEIGHT) {
+    return { x: 1.12, y: 1.2 };
+  }
+
+  return { x: 1, y: 1 };
 }
 
 function addUnitSprite(
@@ -880,6 +906,18 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.gate.wood.closed.width3";
   }
 
+  if (building.type === "gate_ne_sw") {
+    return "building.gate.wood.closed";
+  }
+
+  if (building.type === "gate_wide_2_ne_sw") {
+    return "building.gate.wood.closed.width2";
+  }
+
+  if (building.type === "gate_wide_3_ne_sw") {
+    return "building.gate.wood.closed.width3";
+  }
+
   if (building.type === "dry_moat") {
     return "building.dry_moat";
   }
@@ -949,6 +987,23 @@ function finalBuildingFallbackAssetId(building: BuildingSnapshot): string {
 
 function isBridgeBuildTool(buildTool: BuildingType): boolean {
   return buildTool === "earth_bridge" || buildTool === "wood_bridge";
+}
+
+function isNeSwGateType(buildingType: BuildingType): boolean {
+  return (
+    buildingType === "gate_ne_sw" ||
+    buildingType === "gate_wide_2_ne_sw" ||
+    buildingType === "gate_wide_3_ne_sw"
+  );
+}
+
+function isGateType(buildingType: BuildingType): boolean {
+  return (
+    buildingType === "gate" ||
+    buildingType === "gate_wide_2" ||
+    buildingType === "gate_wide_3" ||
+    isNeSwGateType(buildingType)
+  );
 }
 
 function rectangleFootprint(width: number, height: number): readonly CellCoord[] {

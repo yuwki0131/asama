@@ -97,6 +97,12 @@ assets-dist/
 - 歩兵1種
 - 小型天守1種
 
+現在のruntime production移行状況は次を参照します。
+
+```text
+docs/05_map-and-art/production-asset-status.md
+```
+
 ## 再現性
 
 - seed固定

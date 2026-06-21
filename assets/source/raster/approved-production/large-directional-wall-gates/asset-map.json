@@ -1,0 +1,699 @@
+[
+  {
+    "id": "building.wall.plaster",
+    "file": "building-wall-plaster.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": null
+  },
+  {
+    "id": "building.wall.plaster.connected.0000",
+    "file": "building-wall-plaster-connected-0000.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0000"
+  },
+  {
+    "id": "building.wall.plaster.connected.0001",
+    "file": "building-wall-plaster-connected-0001.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0001"
+  },
+  {
+    "id": "building.wall.plaster.connected.0010",
+    "file": "building-wall-plaster-connected-0010.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0010"
+  },
+  {
+    "id": "building.wall.plaster.connected.0011",
+    "file": "building-wall-plaster-connected-0011.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0011"
+  },
+  {
+    "id": "building.wall.plaster.connected.0100",
+    "file": "building-wall-plaster-connected-0100.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0100"
+  },
+  {
+    "id": "building.wall.plaster.connected.0101",
+    "file": "building-wall-plaster-connected-0101.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0101"
+  },
+  {
+    "id": "building.wall.plaster.connected.0110",
+    "file": "building-wall-plaster-connected-0110.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0110"
+  },
+  {
+    "id": "building.wall.plaster.connected.0111",
+    "file": "building-wall-plaster-connected-0111.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0111"
+  },
+  {
+    "id": "building.wall.plaster.connected.1000",
+    "file": "building-wall-plaster-connected-1000.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1000"
+  },
+  {
+    "id": "building.wall.plaster.connected.1001",
+    "file": "building-wall-plaster-connected-1001.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1001"
+  },
+  {
+    "id": "building.wall.plaster.connected.1010",
+    "file": "building-wall-plaster-connected-1010.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1010"
+  },
+  {
+    "id": "building.wall.plaster.connected.1011",
+    "file": "building-wall-plaster-connected-1011.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1011"
+  },
+  {
+    "id": "building.wall.plaster.connected.1100",
+    "file": "building-wall-plaster-connected-1100.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1100"
+  },
+  {
+    "id": "building.wall.plaster.connected.1101",
+    "file": "building-wall-plaster-connected-1101.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1101"
+  },
+  {
+    "id": "building.wall.plaster.connected.1110",
+    "file": "building-wall-plaster-connected-1110.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1110"
+  },
+  {
+    "id": "building.wall.plaster.connected.1111",
+    "file": "building-wall-plaster-connected-1111.png",
+    "canvas": {
+      "width": 64,
+      "height": 96
+    },
+    "anchor": {
+      "x": 32,
+      "y": 80
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1111"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0000",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0000.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0000"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0100",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0100.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0100"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0001",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0001.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0001"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0101",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0101.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0101"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0000",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0000.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "mask": "0000"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0100",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0100.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "mask": "0100"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0001",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0001.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "mask": "0001"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0101",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0101.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "mask": "0101"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0000",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0000.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 3,
+      "height": 1
+    },
+    "mask": "0000"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0100",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0100.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 3,
+      "height": 1
+    },
+    "mask": "0100"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0001",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0001.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 3,
+      "height": 1
+    },
+    "mask": "0001"
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0101",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0101.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 3,
+      "height": 1
+    },
+    "mask": "0101"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.0000",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-0000.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0000"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.1000",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-1000.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1000"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.0010",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-0010.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "0010"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.1010",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-1010.png",
+    "canvas": {
+      "width": 96,
+      "height": 112
+    },
+    "anchor": {
+      "x": 48,
+      "y": 104
+    },
+    "footprint": {
+      "width": 1,
+      "height": 1
+    },
+    "mask": "1010"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.0000",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-0000.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 1,
+      "height": 2
+    },
+    "mask": "0000"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.1000",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-1000.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 1,
+      "height": 2
+    },
+    "mask": "1000"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.0010",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-0010.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 1,
+      "height": 2
+    },
+    "mask": "0010"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.1010",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-1010.png",
+    "canvas": {
+      "width": 160,
+      "height": 120
+    },
+    "anchor": {
+      "x": 80,
+      "y": 112
+    },
+    "footprint": {
+      "width": 1,
+      "height": 2
+    },
+    "mask": "1010"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.0000",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-0000.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 1,
+      "height": 3
+    },
+    "mask": "0000"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.1000",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-1000.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 1,
+      "height": 3
+    },
+    "mask": "1000"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.0010",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-0010.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 1,
+      "height": 3
+    },
+    "mask": "0010"
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.1010",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-1010.png",
+    "canvas": {
+      "width": 224,
+      "height": 128
+    },
+    "anchor": {
+      "x": 112,
+      "y": 120
+    },
+    "footprint": {
+      "width": 1,
+      "height": 3
+    },
+    "mask": "1010"
+  }
+]

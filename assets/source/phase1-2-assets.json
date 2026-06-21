@@ -68,9 +68,9 @@
       "anchor": { "x": 0.5, "y": 0.5 }
     },
     {
-      "assetId": "unit.ashigaru.idle.south",
+      "assetId": "unit.spear_ashigaru.idle.south",
       "kind": "unit",
-      "output": "unit-ashigaru-idle-south.png",
+      "output": "unit-spear-ashigaru-idle-south.png",
       "width": 48,
       "height": 64,
       "fill": "#d7d2bd",
@@ -80,51 +80,27 @@
       "anchor": { "x": 0.5, "y": 0.82 }
     },
     {
-      "assetId": "unit.ashigaru.move.south",
+      "assetId": "unit.sword_ashigaru.idle.south",
       "kind": "unit",
-      "output": "unit-ashigaru-move-south.png",
+      "output": "unit-sword-ashigaru-idle-south.png",
       "width": 48,
       "height": 64,
       "fill": "#d7d2bd",
       "stroke": "#252525",
-      "accent": "#7a2f2c",
+      "accent": "#365c78",
       "direction": "south",
       "anchor": { "x": 0.5, "y": 0.82 }
     },
     {
-      "assetId": "unit.ashigaru.idle.north",
+      "assetId": "unit.archer.idle.south",
       "kind": "unit",
-      "output": "unit-ashigaru-idle-north.png",
+      "output": "unit-archer-idle-south.png",
       "width": 48,
       "height": 64,
       "fill": "#c9c1a8",
       "stroke": "#252525",
-      "accent": "#5f2a28",
-      "direction": "north",
-      "anchor": { "x": 0.5, "y": 0.82 }
-    },
-    {
-      "assetId": "unit.ashigaru.idle.east",
-      "kind": "unit",
-      "output": "unit-ashigaru-idle-east.png",
-      "width": 48,
-      "height": 64,
-      "fill": "#d7d2bd",
-      "stroke": "#252525",
-      "accent": "#7a2f2c",
-      "direction": "east",
-      "anchor": { "x": 0.5, "y": 0.82 }
-    },
-    {
-      "assetId": "unit.ashigaru.idle.west",
-      "kind": "unit",
-      "output": "unit-ashigaru-idle-west.png",
-      "width": 48,
-      "height": 64,
-      "fill": "#d7d2bd",
-      "stroke": "#252525",
-      "accent": "#7a2f2c",
-      "direction": "west",
+      "accent": "#6a5630",
+      "direction": "south",
       "anchor": { "x": 0.5, "y": 0.82 }
     },
     {

@@ -32,7 +32,7 @@
       "output": "terrain-dirt-base.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-dirt-base.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/terrain-dirt-base.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -57,7 +57,7 @@
       "output": "terrain-water-base.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-water-base.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/terrain-water-base.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -82,7 +82,7 @@
       "output": "terrain-stone-base.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-stone-base.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/terrain-stone-base.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -107,7 +107,7 @@
       "output": "terrain-grass-variant-1.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-grass-variant-1.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/terrain-grass-variant-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -132,7 +132,7 @@
       "output": "terrain-dirt-variant-1.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/terrain-dirt-variant-1.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/terrain-dirt-variant-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -152,12 +152,12 @@
       }
     },
     {
-      "assetId": "unit.ashigaru.idle.south",
+      "assetId": "unit.spear_ashigaru.idle.south",
       "kind": "unit",
-      "output": "unit-ashigaru-idle-south.png",
+      "output": "unit-spear-ashigaru-idle-south.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-south.png"
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/unit-spear-ashigaru-idle-south.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -177,12 +177,12 @@
       }
     },
     {
-      "assetId": "unit.ashigaru.move.south",
+      "assetId": "unit.sword_ashigaru.idle.south",
       "kind": "unit",
-      "output": "unit-ashigaru-move-south.png",
+      "output": "unit-sword-ashigaru-idle-south.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-move-south.png"
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/unit-sword-ashigaru-idle-south.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -202,62 +202,12 @@
       }
     },
     {
-      "assetId": "unit.ashigaru.idle.north",
+      "assetId": "unit.archer.idle.south",
       "kind": "unit",
-      "output": "unit-ashigaru-idle-north.png",
+      "output": "unit-archer-idle-south.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-north.png"
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 48,
-        "canvasHeight": 64,
-        "anchorX": 24,
-        "anchorY": 52.48
-      },
-      "category": "unit",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.45
-        }
-      }
-    },
-    {
-      "assetId": "unit.ashigaru.idle.east",
-      "kind": "unit",
-      "output": "unit-ashigaru-idle-east.png",
-      "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-east.png"
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 48,
-        "canvasHeight": 64,
-        "anchorX": 24,
-        "anchorY": 52.48
-      },
-      "category": "unit",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.45
-        }
-      }
-    },
-    {
-      "assetId": "unit.ashigaru.idle.west",
-      "kind": "unit",
-      "output": "unit-ashigaru-idle-west.png",
-      "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/unit-ashigaru-idle-west.png"
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/unit-archer-idle-south.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -432,7 +382,7 @@
       "output": "building-farm.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/farm-4x4/building-farm-4x4.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-farm.png"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -482,7 +432,7 @@
       "output": "building-earth-bridge.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-earth-bridge.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-earth-bridge.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -507,7 +457,7 @@
       "output": "building-wood-bridge.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-wood-bridge.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-wood-bridge.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -532,7 +482,7 @@
       "output": "building-fence-wood.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -557,15 +507,15 @@
       "output": "building-wall-plaster.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -607,7 +557,7 @@
       "output": "building-gate-wood-closed-width2.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-gate-wood-closed-width2.png"
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/building-gate-wood-closed-width2.png"
       },
       "geometry": {
         "footprintWidth": 2,
@@ -632,7 +582,7 @@
       "output": "building-gate-wood-closed-width3.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-ai/production/batch-1/building-gate-wood-closed-width3.png"
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/building-gate-wood-closed-width3.png"
       },
       "geometry": {
         "footprintWidth": 3,
@@ -657,7 +607,7 @@
       "output": "building-dry-moat.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -682,7 +632,7 @@
       "output": "building-water-moat.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -707,7 +657,7 @@
       "output": "building-fence-wood-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0000.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -732,7 +682,7 @@
       "output": "building-fence-wood-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0001.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -757,7 +707,7 @@
       "output": "building-fence-wood-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0010.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -782,7 +732,7 @@
       "output": "building-fence-wood-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0011.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -807,7 +757,7 @@
       "output": "building-fence-wood-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0100.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -832,7 +782,7 @@
       "output": "building-fence-wood-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0101.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -857,7 +807,7 @@
       "output": "building-fence-wood-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0110.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -882,7 +832,7 @@
       "output": "building-fence-wood-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-0111.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -907,7 +857,7 @@
       "output": "building-fence-wood-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1000.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -932,7 +882,7 @@
       "output": "building-fence-wood-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1001.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -957,7 +907,7 @@
       "output": "building-fence-wood-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1010.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -982,7 +932,7 @@
       "output": "building-fence-wood-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1011.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1007,7 +957,7 @@
       "output": "building-fence-wood-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1100.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1032,7 +982,7 @@
       "output": "building-fence-wood-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1101.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1057,7 +1007,7 @@
       "output": "building-fence-wood-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1110.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1082,7 +1032,7 @@
       "output": "building-fence-wood-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-fence-wood-connected-1111.png"
+        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1107,15 +1057,15 @@
       "output": "building-wall-plaster-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0000.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1132,15 +1082,15 @@
       "output": "building-wall-plaster-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0001.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1157,15 +1107,15 @@
       "output": "building-wall-plaster-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0010.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1182,15 +1132,15 @@
       "output": "building-wall-plaster-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0011.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1207,15 +1157,15 @@
       "output": "building-wall-plaster-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0100.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1232,15 +1182,15 @@
       "output": "building-wall-plaster-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0101.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1257,15 +1207,15 @@
       "output": "building-wall-plaster-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0110.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1282,15 +1232,15 @@
       "output": "building-wall-plaster-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-0111.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1307,15 +1257,15 @@
       "output": "building-wall-plaster-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1000.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1332,15 +1282,15 @@
       "output": "building-wall-plaster-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1001.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1357,15 +1307,15 @@
       "output": "building-wall-plaster-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1010.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1382,15 +1332,15 @@
       "output": "building-wall-plaster-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1011.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1407,15 +1357,15 @@
       "output": "building-wall-plaster-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1100.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1432,15 +1382,15 @@
       "output": "building-wall-plaster-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1101.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1457,15 +1407,15 @@
       "output": "building-wall-plaster-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1110.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1482,15 +1432,15 @@
       "output": "building-wall-plaster-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-wall-plaster-connected-1111.png"
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 72,
+        "canvasHeight": 96,
         "anchorX": 32,
-        "anchorY": 56
+        "anchorY": 80
       },
       "category": "building",
       "postprocess": {
@@ -1507,7 +1457,7 @@
       "output": "building-dry-moat-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0000.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1532,7 +1482,7 @@
       "output": "building-dry-moat-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0001.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1557,7 +1507,7 @@
       "output": "building-dry-moat-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0010.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1582,7 +1532,7 @@
       "output": "building-dry-moat-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0011.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1607,7 +1557,7 @@
       "output": "building-dry-moat-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0100.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1632,7 +1582,7 @@
       "output": "building-dry-moat-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0101.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1657,7 +1607,7 @@
       "output": "building-dry-moat-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0110.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1682,7 +1632,7 @@
       "output": "building-dry-moat-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-0111.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1707,7 +1657,7 @@
       "output": "building-dry-moat-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1000.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1732,7 +1682,7 @@
       "output": "building-dry-moat-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1001.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1757,7 +1707,7 @@
       "output": "building-dry-moat-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1010.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1782,7 +1732,7 @@
       "output": "building-dry-moat-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1011.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1807,7 +1757,7 @@
       "output": "building-dry-moat-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1100.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1832,7 +1782,7 @@
       "output": "building-dry-moat-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1101.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1857,7 +1807,7 @@
       "output": "building-dry-moat-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1110.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1882,7 +1832,7 @@
       "output": "building-dry-moat-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-dry-moat-connected-1111.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1907,7 +1857,7 @@
       "output": "building-water-moat-connected-0000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0000.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1932,7 +1882,7 @@
       "output": "building-water-moat-connected-0001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0001.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1957,7 +1907,7 @@
       "output": "building-water-moat-connected-0010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0010.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1982,7 +1932,7 @@
       "output": "building-water-moat-connected-0011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0011.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2007,7 +1957,7 @@
       "output": "building-water-moat-connected-0100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0100.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2032,7 +1982,7 @@
       "output": "building-water-moat-connected-0101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0101.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2057,7 +2007,7 @@
       "output": "building-water-moat-connected-0110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0110.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2082,7 +2032,7 @@
       "output": "building-water-moat-connected-0111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-0111.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2107,7 +2057,7 @@
       "output": "building-water-moat-connected-1000.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1000.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1000.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2132,7 +2082,7 @@
       "output": "building-water-moat-connected-1001.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1001.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1001.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2157,7 +2107,7 @@
       "output": "building-water-moat-connected-1010.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1010.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1010.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2182,7 +2132,7 @@
       "output": "building-water-moat-connected-1011.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1011.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1011.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2207,7 +2157,7 @@
       "output": "building-water-moat-connected-1100.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1100.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1100.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2232,7 +2182,7 @@
       "output": "building-water-moat-connected-1101.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1101.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1101.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2257,7 +2207,7 @@
       "output": "building-water-moat-connected-1110.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1110.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1110.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2282,7 +2232,7 @@
       "output": "building-water-moat-connected-1111.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/approved-production/fortification-linear/building-water-moat-connected-1111.png"
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1111.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2291,6 +2241,2606 @@
         "canvasHeight": 32,
         "anchorX": 32,
         "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0000",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0001",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0010",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0011",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0100",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0101",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0110",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0111",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1000",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1001",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1010",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1011",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1100",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1101",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1110",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1111",
+      "kind": "terrain",
+      "output": "terrain-grass-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-grass-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0000",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0001",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0010",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0011",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0100",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0101",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0110",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0111",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1000",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1001",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1010",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1011",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1100",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1101",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1110",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1111",
+      "kind": "terrain",
+      "output": "terrain-dirt-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-dirt-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0000",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0001",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0010",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0011",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0100",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0101",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0110",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.0111",
+      "kind": "terrain",
+      "output": "terrain-water-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1000",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1001",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1010",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1011",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1100",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1101",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1110",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.connected.1111",
+      "kind": "terrain",
+      "output": "terrain-water-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-water-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0000",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0001",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0010",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0011",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0100",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0101",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0110",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.0111",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1000",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1001",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1010",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1011",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1100",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1101",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1110",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.stone.connected.1111",
+      "kind": "terrain",
+      "output": "terrain-stone-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/terrain-stone-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0000",
+      "kind": "building",
+      "output": "building-road-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0001",
+      "kind": "building",
+      "output": "building-road-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0010",
+      "kind": "building",
+      "output": "building-road-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0011",
+      "kind": "building",
+      "output": "building-road-connected-0011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0100",
+      "kind": "building",
+      "output": "building-road-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0101",
+      "kind": "building",
+      "output": "building-road-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0110",
+      "kind": "building",
+      "output": "building-road-connected-0110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0111",
+      "kind": "building",
+      "output": "building-road-connected-0111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1000",
+      "kind": "building",
+      "output": "building-road-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1001",
+      "kind": "building",
+      "output": "building-road-connected-1001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010",
+      "kind": "building",
+      "output": "building-road-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1011",
+      "kind": "building",
+      "output": "building-road-connected-1011.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1011.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1100",
+      "kind": "building",
+      "output": "building-road-connected-1100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1101",
+      "kind": "building",
+      "output": "building-road-connected-1101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1110",
+      "kind": "building",
+      "output": "building-road-connected-1110.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1110.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1111",
+      "kind": "building",
+      "output": "building-road-connected-1111.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1111.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width1-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0100",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width1-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0001",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width1-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0101",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width1-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width2.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width2-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 1,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width2.connected.0100",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width2-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 1,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width2.connected.0001",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width2-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 1,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width2.connected.0101",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width2-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 1,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width3-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width3.connected.0100",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width3-connected-0100.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0100.png"
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width3.connected.0001",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width3-connected-0001.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0001.png"
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.width3.connected.0101",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-width3-connected-0101.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0101.png"
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width1-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.1000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width1-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.0010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width1-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.1010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width1-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width2.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width2-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width2.connected.1000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width2-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width2.connected.0010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width2-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width2.connected.1010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width2-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width3-connected-0000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-0000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width3.connected.1000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width3-connected-1000.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-1000.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width3.connected.0010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width3-connected-0010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-0010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width3.connected.1010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-width3-connected-1010.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-1010.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
       },
       "category": "building",
       "postprocess": {

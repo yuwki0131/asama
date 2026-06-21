@@ -1,0 +1,104 @@
+[
+  {
+    "id": "building.tenshu.medium",
+    "file": "building-tenshu-medium.png",
+    "canvas": {
+      "width": 192,
+      "height": 176
+    },
+    "anchor": {
+      "x": 96,
+      "y": 156
+    },
+    "footprint": {
+      "width": 2,
+      "height": 2
+    },
+    "source": "../large-building-scale/building-tenshu-large.png"
+  },
+  {
+    "id": "building.storehouse.large",
+    "file": "building-storehouse-large.png",
+    "canvas": {
+      "width": 128,
+      "height": 112
+    },
+    "anchor": {
+      "x": 64,
+      "y": 94
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "source": "../large-building-scale/building-storehouse-large.png"
+  },
+  {
+    "id": "building.market.large",
+    "file": "building-market-large.png",
+    "canvas": {
+      "width": 144,
+      "height": 112
+    },
+    "anchor": {
+      "x": 72,
+      "y": 94
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "source": "../large-building-scale/building-market-large.png"
+  },
+  {
+    "id": "building.barracks.large",
+    "file": "building-barracks-large.png",
+    "canvas": {
+      "width": 144,
+      "height": 112
+    },
+    "anchor": {
+      "x": 72,
+      "y": 94
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "source": "../large-building-scale/building-barracks-large.png"
+  },
+  {
+    "id": "building.samurai_residence.large",
+    "file": "building-samurai-residence-large.png",
+    "canvas": {
+      "width": 144,
+      "height": 112
+    },
+    "anchor": {
+      "x": 72,
+      "y": 94
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "source": "../large-building-scale/building-samurai-residence-large.png"
+  },
+  {
+    "id": "building.town_block.large",
+    "file": "building-town-block-large.png",
+    "canvas": {
+      "width": 144,
+      "height": 112
+    },
+    "anchor": {
+      "x": 72,
+      "y": 94
+    },
+    "footprint": {
+      "width": 2,
+      "height": 1
+    },
+    "source": "../large-building-scale/building-town-block-large.png"
+  }
+]

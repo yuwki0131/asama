@@ -4,6 +4,7 @@ import process from "node:process";
 import { generateGeneratedAssets } from "./generateGeneratedAssets";
 import { generatePlaceholders } from "./generatePlaceholders";
 import { readManifest, validateManifest } from "./manifest";
+import { auditProductionArt } from "./productionArtAudit";
 import {
   buildAtlas,
   importRasterAssets,
@@ -43,6 +44,16 @@ try {
     const manifest = await readManifest(generatedManifestPath);
     await validateManifest(manifest, publicAssetsDir);
     console.log(`Validated production definitions and ${manifest.assets.length} generated assets.`);
+  } else if (command === "assets:audit:production") {
+    const findings = await auditProductionArt();
+    if (findings.length === 0) {
+      console.log("Production art audit passed; no candidate/mock runtime assets remain.");
+    } else {
+      for (const finding of findings) {
+        console.error(`${finding.assetId}: ${finding.reason} (${finding.source})`);
+      }
+      throw new Error(`Production art audit failed; ${findings.length} candidate/mock runtime assets remain.`);
+    }
   } else if (command === "assets:all") {
     await generatePlaceholders();
     await generateGeneratedAssets();
@@ -63,7 +74,7 @@ try {
     console.log("Removed generated assets.");
   } else {
     console.error(
-      "Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|assets:generate:placeholder|assets:render:blender|assets:import:raster|assets:postprocess|assets:atlas|assets:validate|assets:all|validate:manifest|clean>"
+      "Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|assets:generate:placeholder|assets:render:blender|assets:import:raster|assets:postprocess|assets:atlas|assets:validate|assets:audit:production|assets:all|validate:manifest|clean>"
     );
     process.exitCode = 1;
   }

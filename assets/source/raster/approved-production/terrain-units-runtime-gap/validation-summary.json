@@ -1,0 +1,290 @@
+[
+  {
+    "id": "terrain.dirt.base",
+    "file": "terrain-dirt-base.png",
+    "canvas": "64x32",
+    "anchor": "32,16",
+    "footprint": "1x1",
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 63,
+        "maxY": 31
+      },
+      "opaquePixels": 1088,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "terrain.water.base",
+    "file": "terrain-water-base.png",
+    "canvas": "64x32",
+    "anchor": "32,16",
+    "footprint": "1x1",
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 63,
+        "maxY": 31
+      },
+      "opaquePixels": 1088,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "terrain.stone.base",
+    "file": "terrain-stone-base.png",
+    "canvas": "64x32",
+    "anchor": "32,16",
+    "footprint": "1x1",
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 63,
+        "maxY": 31
+      },
+      "opaquePixels": 1088,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "terrain.grass.variant.1",
+    "file": "terrain-grass-variant-1.png",
+    "canvas": "64x32",
+    "anchor": "32,16",
+    "footprint": "1x1",
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 63,
+        "maxY": 31
+      },
+      "opaquePixels": 1088,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "terrain.dirt.variant.1",
+    "file": "terrain-dirt-variant-1.png",
+    "canvas": "64x32",
+    "anchor": "32,16",
+    "footprint": "1x1",
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 63,
+        "maxY": 31
+      },
+      "opaquePixels": 1088,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "unit.spear_ashigaru.idle.south",
+    "file": "unit-spear-ashigaru-idle-south.png",
+    "canvas": "48x64",
+    "anchor": "24,52.48",
+    "footprint": "1x1",
+    "validation": {
+      "width": 48,
+      "height": 64,
+      "alphaBoundsGt10": {
+        "minX": 15,
+        "minY": 10,
+        "maxX": 42,
+        "maxY": 52
+      },
+      "opaquePixels": 415,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "unit.sword_ashigaru.idle.south",
+    "file": "unit-sword-ashigaru-idle-south.png",
+    "canvas": "48x64",
+    "anchor": "24,52.48",
+    "footprint": "1x1",
+    "validation": {
+      "width": 48,
+      "height": 64,
+      "alphaBoundsGt10": {
+        "minX": 17,
+        "minY": 7,
+        "maxX": 42,
+        "maxY": 52
+      },
+      "opaquePixels": 464,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "unit.archer.idle.south",
+    "file": "unit-archer-idle-south.png",
+    "canvas": "48x64",
+    "anchor": "24,52.48",
+    "footprint": "1x1",
+    "validation": {
+      "width": 48,
+      "height": 64,
+      "alphaBoundsGt10": {
+        "minX": 18,
+        "minY": 4,
+        "maxX": 40,
+        "maxY": 52
+      },
+      "opaquePixels": 606,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.gate.wood.closed.width2",
+    "file": "building-gate-wood-closed-width2.png",
+    "canvas": "128x80",
+    "anchor": "64,73",
+    "footprint": "2x1",
+    "validation": {
+      "width": 128,
+      "height": 80,
+      "alphaBoundsGt10": {
+        "minX": 43,
+        "minY": 15,
+        "maxX": 108,
+        "maxY": 72
+      },
+      "opaquePixels": 2248,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.gate.wood.closed.width3",
+    "file": "building-gate-wood-closed-width3.png",
+    "canvas": "192x80",
+    "anchor": "96,73",
+    "footprint": "3x1",
+    "validation": {
+      "width": 192,
+      "height": 80,
+      "alphaBoundsGt10": {
+        "minX": 48,
+        "minY": 16,
+        "maxX": 170,
+        "maxY": 72
+      },
+      "opaquePixels": 4499,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.earth_bridge",
+    "file": "building-earth-bridge.png",
+    "canvas": "64x32",
+    "anchor": "32,16",
+    "footprint": "1x1",
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 1,
+        "minY": 0,
+        "maxX": 63,
+        "maxY": 31
+      },
+      "opaquePixels": 1047,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "building.wood_bridge",
+    "file": "building-wood-bridge.png",
+    "canvas": "64x32",
+    "anchor": "32,16",
+    "footprint": "1x1",
+    "validation": {
+      "width": 64,
+      "height": 32,
+      "alphaBoundsGt10": {
+        "minX": 3,
+        "minY": 0,
+        "maxX": 63,
+        "maxY": 30
+      },
+      "opaquePixels": 984,
+      "cornerAlpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+]

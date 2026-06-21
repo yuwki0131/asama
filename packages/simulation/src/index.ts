@@ -124,7 +124,7 @@ const unitDefinitions: Record<UnitType, UnitDefinition> = {
     attackRange: 1,
     attackCooldownTicks: Math.round(1.3 * 20),
     ticksPerStep: 6,
-    assetId: "unit.ashigaru.idle.south"
+    assetId: "unit.spear_ashigaru.idle.south"
   },
   sword_ashigaru: {
     type: "sword_ashigaru",
@@ -133,7 +133,7 @@ const unitDefinitions: Record<UnitType, UnitDefinition> = {
     attackRange: 1,
     attackCooldownTicks: Math.round(1.1 * 20),
     ticksPerStep: 6,
-    assetId: "unit.ashigaru.idle.east"
+    assetId: "unit.sword_ashigaru.idle.south"
   },
   archer: {
     type: "archer",
@@ -142,7 +142,7 @@ const unitDefinitions: Record<UnitType, UnitDefinition> = {
     attackRange: 8,
     attackCooldownTicks: Math.round(1.6 * 20),
     ticksPerStep: 7,
-    assetId: "unit.ashigaru.idle.west"
+    assetId: "unit.archer.idle.south"
   }
 };
 
@@ -364,6 +364,15 @@ const threeCellXFootprint: readonly CellCoord[] = [
   { x: 1, y: 0 },
   { x: 2, y: 0 }
 ];
+const twoCellYFootprint: readonly CellCoord[] = [
+  { x: 0, y: 0 },
+  { x: 0, y: 1 }
+];
+const threeCellYFootprint: readonly CellCoord[] = [
+  { x: 0, y: 0 },
+  { x: 0, y: 1 },
+  { x: 0, y: 2 }
+];
 
 function rectangularFootprint(width: number, height: number): readonly CellCoord[] {
   const footprint: CellCoord[] = [];
@@ -474,6 +483,36 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.gate.wood.closed.width3",
+    gateState: "closed"
+  },
+  gate_ne_sw: {
+    type: "gate_ne_sw",
+    category: "castle",
+    maxHp: 220,
+    footprint: oneCellFootprint,
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.gate.wood.closed.ne_sw",
+    gateState: "closed"
+  },
+  gate_wide_2_ne_sw: {
+    type: "gate_wide_2_ne_sw",
+    category: "castle",
+    maxHp: 320,
+    footprint: twoCellYFootprint,
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.gate.wood.closed.ne_sw.width2",
+    gateState: "closed"
+  },
+  gate_wide_3_ne_sw: {
+    type: "gate_wide_3_ne_sw",
+    category: "castle",
+    maxHp: 420,
+    footprint: threeCellYFootprint,
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.gate.wood.closed.ne_sw.width3",
     gateState: "closed"
   },
   dry_moat: {
@@ -609,18 +648,21 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
 };
 
 function createInitialMap(): WorldState["map"] {
-  const cells: TerrainCellState[] = [];
+  const baseCells: TerrainCellState[] = [];
 
   for (let y = 0; y < MAP_HEIGHT; y += 1) {
     for (let x = 0; x < MAP_WIDTH; x += 1) {
-      cells.push(createTerrainCell({ x, y }));
+      baseCells.push(createTerrainCell({ x, y }));
     }
   }
 
   return {
     width: MAP_WIDTH,
     height: MAP_HEIGHT,
-    cells
+    cells: baseCells.map((cell) => ({
+      ...cell,
+      assetId: connectedTerrainAssetId(baseCells, MAP_WIDTH, MAP_HEIGHT, cell)
+    }))
   };
 }
 
@@ -666,6 +708,27 @@ function terrainAssetId(terrain: TerrainType, coord: CellCoord): string {
   }
 
   return `terrain.${terrain}.base`;
+}
+
+function connectedTerrainAssetId(
+  cells: readonly TerrainCellState[],
+  width: number,
+  height: number,
+  cell: TerrainCellState
+): string {
+  const mask = cardinalDirections
+    .map((direction) => {
+      const x = cell.coord.x + direction.x;
+      const y = cell.coord.y + direction.y;
+      if (x < 0 || y < 0 || x >= width || y >= height) {
+        return "0";
+      }
+
+      return cells[y * width + x]?.terrain === cell.terrain ? "1" : "0";
+    })
+    .join("");
+
+  return `terrain.${cell.terrain}.connected.${mask}`;
 }
 
 function createUnit(id: UnitId, owner: OwnerId, type: UnitType, position: CellCoord): UnitState {
@@ -1112,6 +1175,10 @@ function snapshotBuilding(world: WorldState, building: BuildingState): BuildingS
 }
 
 function connectedBuildingAssetId(world: WorldState, building: BuildingState): string {
+  if (isGate(building.type)) {
+    return connectedGateAssetId(world, building);
+  }
+
   const family = connectedAssetFamily(building.type);
   if (family === null) {
     return building.assetId;
@@ -1119,6 +1186,22 @@ function connectedBuildingAssetId(world: WorldState, building: BuildingState): s
 
   const mask = connectionMask(world, building);
   return `${family}.connected.${mask}`;
+}
+
+function connectedGateAssetId(world: WorldState, gate: BuildingState): string {
+  const orientation = isNeSwGate(gate.type) ? "ne_sw" : "nw_se";
+  const width = gate.footprint.length;
+  return `building.gate.wood.closed.${orientation}.width${width}.connected.${gateConnectionMask(world, gate)}`;
+}
+
+function gateConnectionMask(world: WorldState, gate: BuildingState): string {
+  const endpointCells = gateEndpointNeighborCells(gate);
+  return cardinalDirections
+    .map((_, index) => {
+      const endpoint = endpointCells[index];
+      return endpoint != null && getBuildingAt(world, endpoint)?.type === "wall" ? "1" : "0";
+    })
+    .join("");
 }
 
 function connectedAssetFamily(type: BuildingType): string | null {
@@ -1138,18 +1221,15 @@ function connectedAssetFamily(type: BuildingType): string | null {
     return "building.water_moat";
   }
 
+  if (type === "road") {
+    return "building.road";
+  }
+
   return null;
 }
 
 function connectionMask(world: WorldState, building: BuildingState): string {
-  const directions = [
-    { x: 0, y: -1 },
-    { x: 1, y: 0 },
-    { x: 0, y: 1 },
-    { x: -1, y: 0 }
-  ];
-
-  return directions
+  return cardinalDirections
     .map((direction) =>
       connectsTo(building, getBuildingAt(world, { x: building.position.x + direction.x, y: building.position.y + direction.y }))
         ? "1"
@@ -1165,17 +1245,41 @@ function connectsToAdjacentGateFootprint(world: WorldState, building: BuildingSt
     return false;
   }
 
-  return world.buildings.some(
-    (neighbor) =>
-      neighbor.lifecycleState === "intact" &&
-      isGate(neighbor.type) &&
-      neighbor.footprint.some((cell) =>
-        sameCell(cell, {
-          x: building.position.x + direction.x,
-          y: building.position.y + direction.y
-        })
-      )
-  );
+  const target = {
+    x: building.position.x + direction.x,
+    y: building.position.y + direction.y
+  };
+  return world.buildings.some((neighbor) => {
+    if (neighbor.lifecycleState !== "intact" || !isGate(neighbor.type)) {
+      return false;
+    }
+
+    return gateEndpointNeighborCells(neighbor).some(
+      (endpoint) => endpoint !== null && sameCell(endpoint, building.position) && neighbor.footprint.some((cell) => sameCell(cell, target))
+    );
+  });
+}
+
+function gateEndpointNeighborCells(gate: BuildingState): readonly (CellCoord | null)[] {
+  if (isNeSwGate(gate.type)) {
+    const minY = Math.min(...gate.footprint.map((cell) => cell.y));
+    const maxY = Math.max(...gate.footprint.map((cell) => cell.y));
+    return [
+      { x: gate.position.x, y: minY - 1 },
+      null,
+      { x: gate.position.x, y: maxY + 1 },
+      null
+    ];
+  }
+
+  const minX = Math.min(...gate.footprint.map((cell) => cell.x));
+  const maxX = Math.max(...gate.footprint.map((cell) => cell.x));
+  return [
+    null,
+    { x: maxX + 1, y: gate.position.y },
+    null,
+    { x: minX - 1, y: gate.position.y }
+  ];
 }
 
 function connectsTo(building: BuildingState, neighbor: BuildingState | null): boolean {
@@ -1184,18 +1288,39 @@ function connectsTo(building: BuildingState, neighbor: BuildingState | null): bo
   }
 
   if (building.type === "fence") {
-    return neighbor.type === "fence" || isGate(neighbor.type);
+    return neighbor.type === "fence";
   }
 
   if (building.type === "wall") {
-    return neighbor.type === "wall" || isGate(neighbor.type);
+    return neighbor.type === "wall";
   }
 
-  return building.type === neighbor.type && (building.type === "dry_moat" || building.type === "water_moat");
+  return (
+    building.type === neighbor.type &&
+    (building.type === "dry_moat" || building.type === "water_moat" || building.type === "road")
+  );
 }
 
+const cardinalDirections: readonly CellCoord[] = [
+  { x: 0, y: -1 },
+  { x: 1, y: 0 },
+  { x: 0, y: 1 },
+  { x: -1, y: 0 }
+];
+
 function isGate(type: BuildingType): boolean {
-  return type === "gate" || type === "gate_wide_2" || type === "gate_wide_3";
+  return (
+    type === "gate" ||
+    type === "gate_wide_2" ||
+    type === "gate_wide_3" ||
+    type === "gate_ne_sw" ||
+    type === "gate_wide_2_ne_sw" ||
+    type === "gate_wide_3_ne_sw"
+  );
+}
+
+function isNeSwGate(type: BuildingType): boolean {
+  return type === "gate_ne_sw" || type === "gate_wide_2_ne_sw" || type === "gate_wide_3_ne_sw";
 }
 
 function isBridge(type: BuildingType): boolean {

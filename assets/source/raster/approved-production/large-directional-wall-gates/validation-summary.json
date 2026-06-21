@@ -1,0 +1,576 @@
+[
+  {
+    "id": "building.wall.plaster",
+    "file": "building-wall-plaster.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "a16cc03374583ace20b6e498d1b60752b7e615641f0c86e2987caf4beb1ff97c",
+    "requestedMask": null,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0000",
+    "file": "building-wall-plaster-connected-0000.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "55dda6208764f7c139d70890931ec4f829aee055148c88237683640b4ca984ee",
+    "requestedMask": "0000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0001",
+    "file": "building-wall-plaster-connected-0001.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "c7da2871cf6bba6c6b8f68d2131d008e551d784754b6ec151025777e18a43b7a",
+    "requestedMask": "0001",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0010",
+    "file": "building-wall-plaster-connected-0010.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "995020e18470f14d3a701bb9be99ed79ac6f83be2d1b4556b3eddab8feb8b731",
+    "requestedMask": "0010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0011",
+    "file": "building-wall-plaster-connected-0011.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "cdd07beb4f257c8bba2fdf58cdfc7de1ef4f9b7ea1b9f4b4177002318507359d",
+    "requestedMask": "0011",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0100",
+    "file": "building-wall-plaster-connected-0100.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "944400b4325329f96504a2394e24ba191b993f4216b23fc037a55df791a1b557",
+    "requestedMask": "0100",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0101",
+    "file": "building-wall-plaster-connected-0101.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "a16cc03374583ace20b6e498d1b60752b7e615641f0c86e2987caf4beb1ff97c",
+    "requestedMask": "0101",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0110",
+    "file": "building-wall-plaster-connected-0110.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "d3772096adc18a7bc9ee486b99e70f3a865dc23b122e5fb5cfa8579980a92f65",
+    "requestedMask": "0110",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.0111",
+    "file": "building-wall-plaster-connected-0111.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "dc35d9ec9c64284fbeae85a7a9b49215cd237813c22bdd5c813f3e6af4adb84e",
+    "requestedMask": "0111",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1000",
+    "file": "building-wall-plaster-connected-1000.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "aa05dd9634673a4d7e442c975a38f72f208f21809206d5901605cc954e59a132",
+    "requestedMask": "1000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1001",
+    "file": "building-wall-plaster-connected-1001.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "323083496c4c9c691202b1223a03853d12760f46942ae62a426f282331e1a6d1",
+    "requestedMask": "1001",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1010",
+    "file": "building-wall-plaster-connected-1010.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "5fef30984113b3bc68e43c82fd6954ffcafb43f07756338b3def3d01d3ffeb77",
+    "requestedMask": "1010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1011",
+    "file": "building-wall-plaster-connected-1011.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "7cd1737c09b998d2e4ce8e8898131a04101b8325fc4e08b13bc22b03d86c5671",
+    "requestedMask": "1011",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1100",
+    "file": "building-wall-plaster-connected-1100.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "1f50259e623355a16ce739528d85bf339df5205fecb27e16509ffad9847712f0",
+    "requestedMask": "1100",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1101",
+    "file": "building-wall-plaster-connected-1101.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "d3df3e77da9744cbc71b2ecf136f3e04c6b93ef287fe1b99f22883f103c626c1",
+    "requestedMask": "1101",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1110",
+    "file": "building-wall-plaster-connected-1110.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "cd508a6f84da3cae8625862ddc43411994021b0759468d052c361ade709cab0a",
+    "requestedMask": "1110",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.wall.plaster.connected.1111",
+    "file": "building-wall-plaster-connected-1111.png",
+    "width": 64,
+    "height": 96,
+    "sha256": "cd5e5e8068fc92ac6230f03acbd6d27042f9b9811bb738c512b3a1765014e70d",
+    "requestedMask": "1111",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0000",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0000.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "18bc3ccc76f74e448ad1854808334835518be35b4a276975fd14cbc3e00c8ab5",
+    "requestedMask": "0000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0100",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0100.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "3db49926bc5e61fe33a1328d4ef599d27a50a92e17d57c5eace70f2a3f4716c5",
+    "requestedMask": "0100",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0001",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0001.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "42a853e49aa25cb7b05d8bfef312d60c67eeb6b7b6f888487ea1694d2338dc0d",
+    "requestedMask": "0001",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width1.connected.0101",
+    "file": "building-gate-wood-closed-nw-se-width1-connected-0101.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "5401e35acefbcb01926b88bf72c4ad85133e9f5d668289e4482e05d08def2b45",
+    "requestedMask": "0101",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0000",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0000.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "d01f98bc6dbb087c2c92ab37a82f2b3187834bb79ff14a0cf85fec4a7023ad7b",
+    "requestedMask": "0000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0100",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0100.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "57604f03072e1c9488d7eb3f652ddb4a72d9c1bdef715e1235fa7a4fca4c5172",
+    "requestedMask": "0100",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0001",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0001.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "efdcced2c00b12548ea7a884725c24f7c0ce35846287bc9ebb7ea9751f92543c",
+    "requestedMask": "0001",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width2.connected.0101",
+    "file": "building-gate-wood-closed-nw-se-width2-connected-0101.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "bb72d7cb945f3902793c73a9df40de4073ab0cfcb22d7c486fd30afcdbed79e9",
+    "requestedMask": "0101",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0000",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0000.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "100f39b6dc79154d5ef4439f05452efffef9882dd1f634622eb658b36d54fe9c",
+    "requestedMask": "0000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0100",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0100.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "c55723dc4cb815e72d5951978019f209b63a99948ead7f2fdaa9e1bcf40fa3eb",
+    "requestedMask": "0100",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0001",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0001.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "8026393a00e97dc049835af8a8a35ade560040fefd8bcbe13f4ae5eca8fba3ed",
+    "requestedMask": "0001",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.nw_se.width3.connected.0101",
+    "file": "building-gate-wood-closed-nw-se-width3-connected-0101.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "b7f7b0e7935cc847782799464208213548967e5d0ce9a372a694f23835158eae",
+    "requestedMask": "0101",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.0000",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-0000.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "307230299402132116f4de8a3c0d6695206727dcc5eea2d700f3c7bbc6db1056",
+    "requestedMask": "0000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.1000",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-1000.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "80d0d89a10b71695387d545761fc1eefa5d4764efecb07276761e3cb16b7ce0d",
+    "requestedMask": "1000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.0010",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-0010.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "15dd036bc7be7b6c4f1dac0e46282f4c32355d9d141794d6ff760bb36a6da419",
+    "requestedMask": "0010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width1.connected.1010",
+    "file": "building-gate-wood-closed-ne-sw-width1-connected-1010.png",
+    "width": 96,
+    "height": 112,
+    "sha256": "d9edbfa62cb6a1f471530540cc2780ed86c46bbdcac00cd8e87edd38edbd5241",
+    "requestedMask": "1010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.0000",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-0000.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "9c09377fada3cb8e86b8eeefc6bf9d49d1feb34f1f00ca43e9306167f405a896",
+    "requestedMask": "0000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.1000",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-1000.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "5271ae65e12a7e8369a18d21e2a5d4b40e92def88d31f5f0151face84ce5cc89",
+    "requestedMask": "1000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.0010",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-0010.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "19fab3a906a2f52e34345e153158152f928975a8afe5b992820ab8aebf9af12a",
+    "requestedMask": "0010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width2.connected.1010",
+    "file": "building-gate-wood-closed-ne-sw-width2-connected-1010.png",
+    "width": 160,
+    "height": 120,
+    "sha256": "a4947359cb6a06a87e4a78cb0516a21ac07dbad960e39e8808d38976c78f9133",
+    "requestedMask": "1010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.0000",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-0000.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "bf6f99e8b83e5666351754d90b1d53ce0382850bd0c3058cff5c8a3fa063fde3",
+    "requestedMask": "0000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.1000",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-1000.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "30943461a16dd303f25152199b1f471c0fb2f5bcaa4766aa3ea302946513706f",
+    "requestedMask": "1000",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.0010",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-0010.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "91ef8e98653b4224378e8f6f426239e4355a39c12a0d654d10d0fb1b917bded7",
+    "requestedMask": "0010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.gate.wood.closed.ne_sw.width3.connected.1010",
+    "file": "building-gate-wood-closed-ne-sw-width3-connected-1010.png",
+    "width": 224,
+    "height": 128,
+    "sha256": "171c33d207f2c40fce126b3c8e1bf840faaf5496cf012b843bed6fc2bfe1431e",
+    "requestedMask": "1010",
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+]

@@ -85,4 +85,61 @@ describe("connected building asset masks", () => {
     expect(buildingAt(world, { x: 49, y: 50 }).assetId).toBe("building.wall.plaster.connected.0100");
     expect(buildingAt(world, { x: 53, y: 50 }).assetId).toBe("building.wall.plaster.connected.0001");
   });
+
+  it("gives NW-SE gates independent wall connections on their two endpoints", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "gate_wide_2", { x: 40, y: 40 });
+    place(world, "wall", { x: 39, y: 40 });
+
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe(
+      "building.gate.wood.closed.nw_se.width2.connected.0001"
+    );
+
+    place(world, "wall", { x: 42, y: 40 });
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe(
+      "building.gate.wood.closed.nw_se.width2.connected.0101"
+    );
+  });
+
+  it("uses Y footprints and N-S wall endpoints for NE-SW gates", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "gate_wide_3_ne_sw", { x: 70, y: 70 });
+    place(world, "wall", { x: 70, y: 69 });
+    place(world, "wall", { x: 70, y: 73 });
+
+    const gate = buildingAt(world, { x: 70, y: 71 });
+    expect(gate.footprint).toEqual([
+      { x: 70, y: 70 },
+      { x: 70, y: 71 },
+      { x: 70, y: 72 }
+    ]);
+    expect(gate.assetId).toBe("building.gate.wood.closed.ne_sw.width3.connected.1010");
+    expect(buildingAt(world, { x: 70, y: 69 }).assetId).toBe("building.wall.plaster.connected.0010");
+    expect(buildingAt(world, { x: 70, y: 73 }).assetId).toBe("building.wall.plaster.connected.1000");
+  });
+
+  it("does not connect walls to the side face of a wide gate", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "gate_wide_3", { x: 80, y: 80 });
+    place(world, "wall", { x: 81, y: 79 });
+
+    expect(buildingAt(world, { x: 81, y: 79 }).assetId).toBe("building.wall.plaster.connected.0000");
+    expect(buildingAt(world, { x: 80, y: 80 }).assetId).toBe(
+      "building.gate.wood.closed.nw_se.width3.connected.0000"
+    );
+  });
+
+  it("computes connected masks for road surfaces", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "road", { x: 60, y: 60 });
+    place(world, "road", { x: 60, y: 59 });
+    place(world, "road", { x: 61, y: 60 });
+    place(world, "road", { x: 60, y: 61 });
+
+    expect(buildingAt(world, { x: 60, y: 60 }).assetId).toBe("building.road.connected.1110");
+  });
 });

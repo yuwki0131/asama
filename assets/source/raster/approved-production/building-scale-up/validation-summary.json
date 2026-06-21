@@ -1,0 +1,80 @@
+[
+  {
+    "id": "building.tenshu.medium",
+    "file": "building-tenshu-medium.png",
+    "width": 192,
+    "height": 176,
+    "hasAlpha": true,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.storehouse.large",
+    "file": "building-storehouse-large.png",
+    "width": 128,
+    "height": 112,
+    "hasAlpha": true,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.market.large",
+    "file": "building-market-large.png",
+    "width": 144,
+    "height": 112,
+    "hasAlpha": true,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.barracks.large",
+    "file": "building-barracks-large.png",
+    "width": 144,
+    "height": 112,
+    "hasAlpha": true,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.samurai_residence.large",
+    "file": "building-samurai-residence-large.png",
+    "width": 144,
+    "height": 112,
+    "hasAlpha": true,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "building.town_block.large",
+    "file": "building-town-block-large.png",
+    "width": 144,
+    "height": 112,
+    "hasAlpha": true,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+]
