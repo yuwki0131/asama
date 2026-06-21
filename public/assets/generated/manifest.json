@@ -223,6 +223,17 @@
       }
     },
     {
+      "assetId": "building.yagura.small.normal",
+      "kind": "building",
+      "file": "generated/building-yagura-small-normal.png",
+      "width": 224,
+      "height": 208,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8798076923076923
+      }
+    },
+    {
       "assetId": "building.market",
       "kind": "building",
       "file": "generated/building-market.png",

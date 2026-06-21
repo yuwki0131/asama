@@ -4,7 +4,7 @@
     "file": "building-wall-plaster.png",
     "width": 64,
     "height": 96,
-    "sha256": "a16cc03374583ace20b6e498d1b60752b7e615641f0c86e2987caf4beb1ff97c",
+    "sha256": "ab38fdd7f812bb3092a532e59258e8b00d34e243d8397d07a7b6c0e2d264bc98",
     "requestedMask": null,
     "cornerAlpha": [
       0,
@@ -18,7 +18,7 @@
     "file": "building-wall-plaster-connected-0000.png",
     "width": 64,
     "height": 96,
-    "sha256": "55dda6208764f7c139d70890931ec4f829aee055148c88237683640b4ca984ee",
+    "sha256": "5a797ed7383f78442c58025dc7ed0186cc4ccace7c7246293964f49290910966",
     "requestedMask": "0000",
     "cornerAlpha": [
       0,
@@ -32,7 +32,7 @@
     "file": "building-wall-plaster-connected-0001.png",
     "width": 64,
     "height": 96,
-    "sha256": "c7da2871cf6bba6c6b8f68d2131d008e551d784754b6ec151025777e18a43b7a",
+    "sha256": "18e669c819235861b1781e43a76b874f66145053252eae2bcf5fedb8bfdd9d00",
     "requestedMask": "0001",
     "cornerAlpha": [
       0,
@@ -46,7 +46,7 @@
     "file": "building-wall-plaster-connected-0010.png",
     "width": 64,
     "height": 96,
-    "sha256": "995020e18470f14d3a701bb9be99ed79ac6f83be2d1b4556b3eddab8feb8b731",
+    "sha256": "9b9ce9dcee8b769ef13c4022b8810e5c905ad7f959515ffe704dd27bf73d026d",
     "requestedMask": "0010",
     "cornerAlpha": [
       0,
@@ -60,7 +60,7 @@
     "file": "building-wall-plaster-connected-0011.png",
     "width": 64,
     "height": 96,
-    "sha256": "cdd07beb4f257c8bba2fdf58cdfc7de1ef4f9b7ea1b9f4b4177002318507359d",
+    "sha256": "a47d2e517f248430b9999da2ec71fee189850ed3990d16fd2f92439bc46fb0c1",
     "requestedMask": "0011",
     "cornerAlpha": [
       0,
@@ -74,7 +74,7 @@
     "file": "building-wall-plaster-connected-0100.png",
     "width": 64,
     "height": 96,
-    "sha256": "944400b4325329f96504a2394e24ba191b993f4216b23fc037a55df791a1b557",
+    "sha256": "5b650434a1b62d4c0a830ff7865b313611fd63a31a686afedf394af04ffc0423",
     "requestedMask": "0100",
     "cornerAlpha": [
       0,
@@ -88,7 +88,7 @@
     "file": "building-wall-plaster-connected-0101.png",
     "width": 64,
     "height": 96,
-    "sha256": "a16cc03374583ace20b6e498d1b60752b7e615641f0c86e2987caf4beb1ff97c",
+    "sha256": "ab38fdd7f812bb3092a532e59258e8b00d34e243d8397d07a7b6c0e2d264bc98",
     "requestedMask": "0101",
     "cornerAlpha": [
       0,
@@ -102,7 +102,7 @@
     "file": "building-wall-plaster-connected-0110.png",
     "width": 64,
     "height": 96,
-    "sha256": "d3772096adc18a7bc9ee486b99e70f3a865dc23b122e5fb5cfa8579980a92f65",
+    "sha256": "327b2e40d952d541628c21e9447c2878df60e81b4a15f6183f95dd53fb1ab71d",
     "requestedMask": "0110",
     "cornerAlpha": [
       0,
@@ -116,7 +116,7 @@
     "file": "building-wall-plaster-connected-0111.png",
     "width": 64,
     "height": 96,
-    "sha256": "dc35d9ec9c64284fbeae85a7a9b49215cd237813c22bdd5c813f3e6af4adb84e",
+    "sha256": "4dd49efacadfc0ec1990d2f6a8e850615e0a409d743e8ecd24f352a11890a1e5",
     "requestedMask": "0111",
     "cornerAlpha": [
       0,
@@ -130,7 +130,7 @@
     "file": "building-wall-plaster-connected-1000.png",
     "width": 64,
     "height": 96,
-    "sha256": "aa05dd9634673a4d7e442c975a38f72f208f21809206d5901605cc954e59a132",
+    "sha256": "12318fc08bec474d112f61440e635d974c252aac1b47c8e3f495c5ac956ba593",
     "requestedMask": "1000",
     "cornerAlpha": [
       0,
@@ -144,7 +144,7 @@
     "file": "building-wall-plaster-connected-1001.png",
     "width": 64,
     "height": 96,
-    "sha256": "323083496c4c9c691202b1223a03853d12760f46942ae62a426f282331e1a6d1",
+    "sha256": "2151a58ba44a3b74d685d06c9fe688d6db55070e5b7f5839f7cf53009cbd44b5",
     "requestedMask": "1001",
     "cornerAlpha": [
       0,
@@ -158,7 +158,7 @@
     "file": "building-wall-plaster-connected-1010.png",
     "width": 64,
     "height": 96,
-    "sha256": "5fef30984113b3bc68e43c82fd6954ffcafb43f07756338b3def3d01d3ffeb77",
+    "sha256": "35badb241d97614c42300714f96b9cf6d358bf1925863803044b85e1b32d933b",
     "requestedMask": "1010",
     "cornerAlpha": [
       0,
@@ -172,7 +172,7 @@
     "file": "building-wall-plaster-connected-1011.png",
     "width": 64,
     "height": 96,
-    "sha256": "7cd1737c09b998d2e4ce8e8898131a04101b8325fc4e08b13bc22b03d86c5671",
+    "sha256": "25d88ec80d02584fd600081dace6cc590c6d4664342a395726f14df1f65e843d",
     "requestedMask": "1011",
     "cornerAlpha": [
       0,
@@ -186,7 +186,7 @@
     "file": "building-wall-plaster-connected-1100.png",
     "width": 64,
     "height": 96,
-    "sha256": "1f50259e623355a16ce739528d85bf339df5205fecb27e16509ffad9847712f0",
+    "sha256": "33b05c8ff553165ffdddbe5dd97152131a547c0628a4592e53a6c2693a0c7a42",
     "requestedMask": "1100",
     "cornerAlpha": [
       0,
@@ -200,7 +200,7 @@
     "file": "building-wall-plaster-connected-1101.png",
     "width": 64,
     "height": 96,
-    "sha256": "d3df3e77da9744cbc71b2ecf136f3e04c6b93ef287fe1b99f22883f103c626c1",
+    "sha256": "0a0ed6ecbca5e77f7c17fdb8c073b7ccc0a939299a5ca59a72d409cbedacf19f",
     "requestedMask": "1101",
     "cornerAlpha": [
       0,
@@ -214,7 +214,7 @@
     "file": "building-wall-plaster-connected-1110.png",
     "width": 64,
     "height": 96,
-    "sha256": "cd508a6f84da3cae8625862ddc43411994021b0759468d052c361ade709cab0a",
+    "sha256": "627d04dd922ccecbf05b386cfe83fc9eafd3035bd70673a8eba5d7b73e7326dc",
     "requestedMask": "1110",
     "cornerAlpha": [
       0,
@@ -228,7 +228,7 @@
     "file": "building-wall-plaster-connected-1111.png",
     "width": 64,
     "height": 96,
-    "sha256": "cd5e5e8068fc92ac6230f03acbd6d27042f9b9811bb738c512b3a1765014e70d",
+    "sha256": "1666096d4878291b0a092ee1068f5824c157abab6baa32a4508e3a9e4362f656",
     "requestedMask": "1111",
     "cornerAlpha": [
       0,

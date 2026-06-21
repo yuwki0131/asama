@@ -49,10 +49,10 @@ async function fit(source: Buffer, width: number, height: number, bottomPadding:
 }
 
 async function wallMask(base: Buffer, mask: string): Promise<Buffer> {
-  if (mask === "0000") return isolatedWall(base);
+  if (mask === "0000") return alignBottomToAnchor(await isolatedWall(base), 80);
   const alternate = await sharp(base).flop().png().toBuffer();
-  if (mask === "0101") return base;
-  if (mask === "1010") return alternate;
+  if (mask === "0101") return alignBottomToAnchor(base, 80);
+  if (mask === "1010") return alignBottomToAnchor(alternate, 80);
 
   const branches = await Promise.all([
     halfWall(alternate, "right"),
@@ -68,10 +68,55 @@ async function wallMask(base: Buffer, mask: string): Promise<Buffer> {
     }
   }
 
-  return sharp({ create: { width: 64, height: 96, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+  const rendered = await sharp({ create: { width: 64, height: 96, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
     .composite(composites)
     .png()
     .toBuffer();
+  return alignBottomToAnchor(rendered, 80);
+}
+
+async function alignBottomToAnchor(source: Buffer, anchorY: number): Promise<Buffer> {
+  const { data, info } = await sharp(source).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const bounds = alphaBounds(data, info.width, info.height);
+  if (bounds === null) return source;
+  const deltaY = anchorY - bounds.maxY;
+  if (deltaY === 0) return source;
+  const shifted = Buffer.alloc(data.length);
+  for (let y = 0; y < info.height; y += 1) {
+    for (let x = 0; x < info.width; x += 1) {
+      const targetY = y + deltaY;
+      if (targetY < 0 || targetY >= info.height) continue;
+      const sourceOffset = (y * info.width + x) * 4;
+      const targetOffset = (targetY * info.width + x) * 4;
+      shifted[targetOffset] = data[sourceOffset] ?? 0;
+      shifted[targetOffset + 1] = data[sourceOffset + 1] ?? 0;
+      shifted[targetOffset + 2] = data[sourceOffset + 2] ?? 0;
+      shifted[targetOffset + 3] = data[sourceOffset + 3] ?? 0;
+    }
+  }
+  return sharp(shifted, { raw: info }).png().toBuffer();
+}
+
+function alphaBounds(
+  data: Buffer,
+  width: number,
+  height: number
+): { readonly minX: number; readonly minY: number; readonly maxX: number; readonly maxY: number } | null {
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = -1;
+  let maxY = -1;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if ((data[(y * width + x) * 4 + 3] ?? 0) > 10) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+  return maxX < 0 ? null : { minX, minY, maxX, maxY };
 }
 
 async function isolatedWall(source: Buffer): Promise<Buffer> {
@@ -220,7 +265,7 @@ async function build(): Promise<void> {
   const validations = [];
 
   const wallBaseFile = "building-wall-plaster.png";
-  await writeFile(path.join(dir, wallBaseFile), wall);
+  await writeFile(path.join(dir, wallBaseFile), await alignBottomToAnchor(wall, 80));
   entries.push({
     id: "building.wall.plaster",
     file: wallBaseFile,

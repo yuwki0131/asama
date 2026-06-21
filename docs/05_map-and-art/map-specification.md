@@ -9,6 +9,9 @@
 - 単層ナビゲーション
 - マップ全体常時表示
 
+投影・anchor・footprintの描画契約は
+`docs/05_map-and-art/isometric-alignment.md`を正とします。
+
 ## 1グリッド
 
 厳密な実寸は持ちません。目安は3〜5m相当ですが、兵士と建物は視認性のため誇張します。

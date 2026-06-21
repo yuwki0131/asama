@@ -252,6 +252,31 @@
       }
     },
     {
+      "assetId": "building.yagura.small.normal",
+      "kind": "building",
+      "output": "building-yagura-small-normal.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/batch-01/building-yagura-small-normal.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 208,
+        "anchorX": 112,
+        "anchorY": 183
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
       "assetId": "building.market",
       "kind": "building",
       "output": "building-market.png",

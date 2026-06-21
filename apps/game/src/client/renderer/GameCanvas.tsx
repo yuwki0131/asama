@@ -52,9 +52,11 @@ const UNIT_GROUND_OFFSET_Y = 0;
 const TERRAIN_UNDERLAY_PADDING = 0.5;
 const LEGACY_WALL_HEIGHT = 72;
 const LEGACY_GATE_HEIGHT = 80;
-const MIN_ZOOM = 0.45;
-const MAX_ZOOM = 2;
+const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
+const DEBUG_ALIGNMENT_ENABLED =
+  import.meta.env.VITE_DEBUG_ALIGNMENT === "true" ||
+  (import.meta.env.DEV && import.meta.env.VITE_DEBUG_ALIGNMENT !== "false");
 const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
   fence: rectangleFootprint(1, 1),
   wall: rectangleFootprint(1, 1),
@@ -179,6 +181,7 @@ export function GameCanvas({
         overlayLayerRef.current = overlayLayer;
         unitLayerRef.current = unitLayer;
         centerCameraOnCell({ x: 64, y: 64 }, host, cameraRef.current);
+        snapCamera(cameraRef.current);
         setReady(true);
       });
 
@@ -286,8 +289,8 @@ export function GameCanvas({
         if (drag.moved) {
           const dx = event.clientX - drag.lastX;
           const dy = event.clientY - drag.lastY;
-          cameraRef.current.x += dx;
-          cameraRef.current.y += dy;
+          cameraRef.current.x = roundScreenPixel(cameraRef.current.x + dx);
+          cameraRef.current.y = roundScreenPixel(cameraRef.current.y + dy);
           setCameraVersion((version) => version + 1);
         }
         drag.lastX = event.clientX;
@@ -346,10 +349,10 @@ export function GameCanvas({
       event.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const before = screenToWorld(event.clientX - rect.left, event.clientY - rect.top, cameraRef.current);
-      const nextZoom = clamp(cameraRef.current.zoom * (event.deltaY > 0 ? 0.9 : 1.1), MIN_ZOOM, MAX_ZOOM);
+      const nextZoom = stepZoom(cameraRef.current.zoom, event.deltaY > 0 ? -1 : 1);
       cameraRef.current.zoom = nextZoom;
-      cameraRef.current.x = event.clientX - rect.left - before.x * nextZoom;
-      cameraRef.current.y = event.clientY - rect.top - before.y * nextZoom;
+      cameraRef.current.x = roundScreenPixel(event.clientX - rect.left - before.x * nextZoom);
+      cameraRef.current.y = roundScreenPixel(event.clientY - rect.top - before.y * nextZoom);
       setCameraVersion((version) => version + 1);
     };
 
@@ -433,7 +436,7 @@ function renderScene(
     return;
   }
 
-  world.position.set(camera.x, camera.y);
+  world.position.set(roundScreenPixel(camera.x), roundScreenPixel(camera.y));
   world.scale.set(camera.zoom);
 
   const firstCell = snapshot.map.cells[0]?.coord;
@@ -474,11 +477,15 @@ function renderScene(
   }
 
   for (const building of [...snapshot.buildings].sort(compareBuildingsForDraw)) {
-    addBuildingSprite(unitLayer, building, assets);
+    addBuildingSprite(unitLayer, building, assets, camera.zoom);
   }
 
   for (const unit of [...snapshot.units].sort(compareUnitsForDraw)) {
-    addUnitSprite(unitLayer, unit, assets);
+    addUnitSprite(unitLayer, unit, assets, camera.zoom);
+  }
+
+  if (DEBUG_ALIGNMENT_ENABLED) {
+    addAlignmentDebugOverlay(unitLayer, snapshot, camera, app.screen.width, app.screen.height, assets);
   }
 }
 
@@ -575,7 +582,8 @@ function addCellActionPreview(
 function addBuildingSprite(
   layer: Container,
   building: BuildingSnapshot,
-  assets: ReadonlyMap<string, LoadedAsset>
+  assets: ReadonlyMap<string, LoadedAsset>,
+  zoom: number
 ): void {
   const hasDedicatedAsset = assets.has(building.assetId);
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
@@ -584,8 +592,8 @@ function addBuildingSprite(
   const direction = !hasDedicatedAsset && isNeSwGateType(building.type) ? -1 : 1;
   sprite.scale.set(scale.x * direction, scale.y);
   sprite.position.set(
-    point.x,
-    point.y - sprite.texture.height * (1 - sprite.anchor.y) * (scale.y - 1)
+    roundWorldPixel(point.x, zoom),
+    roundWorldPixel(point.y - sprite.texture.height * (1 - sprite.anchor.y) * (scale.y - 1), zoom)
   );
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
@@ -611,26 +619,28 @@ function legacyFortificationScale(
 function addUnitSprite(
   layer: Container,
   unit: UnitSnapshot,
-  assets: ReadonlyMap<string, LoadedAsset>
+  assets: ReadonlyMap<string, LoadedAsset>,
+  zoom: number
 ): void {
   if (unit.selected) {
     const ring = createSprite("overlay.unit.selection-ring", assets);
-    ring.position.copyFrom(cellToWorld(unit.position));
+    const ringPoint = cellToWorld(unit.position);
+    ring.position.set(roundWorldPixel(ringPoint.x, zoom), roundWorldPixel(ringPoint.y, zoom));
     layer.addChild(ring);
   }
 
   const sprite = createSprite(unit.assetId, assets);
   const point = cellToWorld(unit.position);
-  sprite.position.set(point.x, point.y + UNIT_GROUND_OFFSET_Y);
+  sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + UNIT_GROUND_OFFSET_Y, zoom));
   if (unit.owner === "enemy") {
     sprite.tint = 0xff9f8f;
   }
   layer.addChild(sprite);
 
-  addUnitHealthBar(layer, unit, point);
+  addUnitHealthBar(layer, unit, point, zoom);
 }
 
-function addUnitHealthBar(layer: Container, unit: UnitSnapshot, point: CellCoord): void {
+function addUnitHealthBar(layer: Container, unit: UnitSnapshot, point: CellCoord, zoom: number): void {
   if (unit.hp >= unit.maxHp) {
     return;
   }
@@ -644,7 +654,7 @@ function addUnitHealthBar(layer: Container, unit: UnitSnapshot, point: CellCoord
     color: unit.owner === "enemy" ? 0xd85a4a : 0x58d99a,
     alpha: 0.95
   });
-  bar.position.set(point.x, point.y + UNIT_GROUND_OFFSET_Y);
+  bar.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + UNIT_GROUND_OFFSET_Y, zoom));
   layer.addChild(bar);
 }
 
@@ -682,57 +692,71 @@ function buildingRenderPoint(building: BuildingSnapshot): CellCoord {
     return cellToWorld(building.position);
   }
 
-  if (!isGroundPlaneBuilding(building.type)) {
-    return buildingFootprintBottomPoint(building);
+  if (!isCenterAnchoredBuilding(building.type)) {
+    return footprintSouthWorld(building.footprint);
   }
 
-  const total = building.footprint.reduce(
-    (accumulator, cell) => {
-      const point = cellToWorld(cell);
-      return {
-        x: accumulator.x + point.x,
-        y: accumulator.y + point.y
-      };
-    },
-    { x: 0, y: 0 }
-  );
+  return footprintCenterWorld(building.footprint);
+}
 
+function footprintCenterWorld(footprint: readonly CellCoord[]): CellCoord {
+  const bounds = footprintBounds(footprint);
+  const centerCell = {
+    x: (bounds.minX + bounds.maxX) / 2,
+    y: (bounds.minY + bounds.maxY) / 2
+  };
+  return cellToWorld(centerCell);
+}
+
+function footprintSouthWorld(footprint: readonly CellCoord[]): CellCoord {
+  const bounds = footprintBounds(footprint);
+  return gridCornerToWorld({ x: bounds.maxX + 1, y: bounds.maxY + 1 });
+}
+
+function footprintBounds(footprint: readonly CellCoord[]): {
+  readonly minX: number;
+  readonly maxX: number;
+  readonly minY: number;
+  readonly maxY: number;
+} {
+  return footprint.reduce(
+    (bounds, cell) => ({
+      minX: Math.min(bounds.minX, cell.x),
+      maxX: Math.max(bounds.maxX, cell.x),
+      minY: Math.min(bounds.minY, cell.y),
+      maxY: Math.max(bounds.maxY, cell.y)
+    }),
+    {
+      minX: Number.POSITIVE_INFINITY,
+      maxX: Number.NEGATIVE_INFINITY,
+      minY: Number.POSITIVE_INFINITY,
+      maxY: Number.NEGATIVE_INFINITY
+    }
+  );
+}
+
+function footprintDiamondPoints(footprint: readonly CellCoord[]): readonly CellCoord[] {
+  const bounds = footprintBounds(footprint);
+  return [
+    gridCornerToWorld({ x: bounds.minX, y: bounds.minY }),
+    gridCornerToWorld({ x: bounds.maxX + 1, y: bounds.minY }),
+    gridCornerToWorld({ x: bounds.maxX + 1, y: bounds.maxY + 1 }),
+    gridCornerToWorld({ x: bounds.minX, y: bounds.maxY + 1 })
+  ];
+}
+
+function gridCornerToWorld(corner: CellCoord): CellCoord {
   return {
-    x: total.x / building.footprint.length,
-    y: total.y / building.footprint.length
+    x: (corner.x - corner.y) * (TILE_WIDTH / 2),
+    y: (corner.x + corner.y) * (TILE_HEIGHT / 2) - TILE_HEIGHT / 2
   };
 }
 
-function buildingFootprintBottomPoint(building: BuildingSnapshot): CellCoord {
-  const bottomCells = building.footprint.reduce(
-    (accumulator, cell) => {
-      const point = cellToWorld(cell);
-      if (point.y > accumulator.y) {
-        return { y: point.y, cells: [{ cell, point }] };
-      }
-
-      if (point.y === accumulator.y) {
-        return { y: accumulator.y, cells: [...accumulator.cells, { cell, point }] };
-      }
-
-      return accumulator;
-    },
-    { y: Number.NEGATIVE_INFINITY, cells: [] as { readonly cell: CellCoord; readonly point: CellCoord }[] }
-  );
-
-  if (bottomCells.cells.length === 0) {
-    return cellToWorld(building.position);
-  }
-
-  const x = bottomCells.cells.reduce((sum, item) => sum + item.point.x, 0) / bottomCells.cells.length;
-  return {
-    x,
-    y: bottomCells.y + TILE_HEIGHT / 2
-  };
-}
-
-function isGroundPlaneBuilding(buildingType: BuildingType): boolean {
+function isCenterAnchoredBuilding(buildingType: BuildingType): boolean {
   return (
+    buildingType === "fence" ||
+    buildingType === "wall" ||
+    isGateType(buildingType) ||
     buildingType === "dry_moat" ||
     buildingType === "water_moat" ||
     buildingType === "honmaru" ||
@@ -741,6 +765,117 @@ function isGroundPlaneBuilding(buildingType: BuildingType): boolean {
     buildingType === "earth_bridge" ||
     buildingType === "wood_bridge"
   );
+}
+
+function addAlignmentDebugOverlay(
+  layer: Container,
+  snapshot: WorldSnapshot,
+  camera: CameraState,
+  screenWidth: number,
+  screenHeight: number,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  const grid = new Graphics();
+  for (const cell of snapshot.map.cells) {
+    if (isVisibleCell(cell.coord, camera, screenWidth, screenHeight)) {
+      drawCellDiamond(grid, cell.coord, 0x65c8ff, 0.18);
+    }
+  }
+
+  for (const building of snapshot.buildings) {
+    drawFootprintDiamond(grid, building.footprint, 0xffd166, 0.85);
+    const anchor = buildingRenderPoint(building);
+    drawCrosshair(grid, anchor, 0xff3b30);
+    drawSpriteBounds(grid, building, assets);
+  }
+
+  layer.addChild(grid);
+}
+
+function drawCellDiamond(graphics: Graphics, cell: CellCoord, color: number, alpha: number): void {
+  const point = cellToWorld(cell);
+  graphics
+    .poly([
+      point.x,
+      point.y - TILE_HEIGHT / 2,
+      point.x + TILE_WIDTH / 2,
+      point.y,
+      point.x,
+      point.y + TILE_HEIGHT / 2,
+      point.x - TILE_WIDTH / 2,
+      point.y
+    ])
+    .stroke({ color, alpha, width: 1 });
+}
+
+function drawFootprintDiamond(graphics: Graphics, footprint: readonly CellCoord[], color: number, alpha: number): void {
+  const points = footprintDiamondPoints(footprint);
+  graphics
+    .poly(points.flatMap((point) => [point.x, point.y]))
+    .stroke({ color, alpha, width: 2 });
+}
+
+function drawCrosshair(graphics: Graphics, point: CellCoord, color: number): void {
+  graphics
+    .moveTo(point.x - 6, point.y)
+    .lineTo(point.x + 6, point.y)
+    .moveTo(point.x, point.y - 6)
+    .lineTo(point.x, point.y + 6)
+    .stroke({ color, alpha: 0.95, width: 1.5 });
+}
+
+function drawSpriteBounds(
+  graphics: Graphics,
+  building: BuildingSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  const spriteAsset = firstLoadedAsset(buildingAssetCandidates(building), assets);
+  if (spriteAsset === null) {
+    return;
+  }
+
+  const point = buildingRenderPoint(building);
+  const width = spriteAsset.texture.width;
+  const height = spriteAsset.texture.height;
+  const left = point.x - width * spriteAsset.anchor.x;
+  const top = point.y - height * spriteAsset.anchor.y;
+  graphics.rect(left, top, width, height).stroke({ color: 0xff4fd8, alpha: 0.65, width: 1 });
+}
+
+function firstLoadedAsset(assetIds: readonly string[], assets: ReadonlyMap<string, LoadedAsset>): LoadedAsset | null {
+  for (const assetId of assetIds) {
+    const asset = assets.get(assetId);
+    if (asset !== undefined) {
+      return asset;
+    }
+  }
+  return null;
+}
+
+function snapCamera(camera: CameraState): void {
+  camera.x = roundScreenPixel(camera.x);
+  camera.y = roundScreenPixel(camera.y);
+  camera.zoom = nearestZoomStep(camera.zoom);
+}
+
+function stepZoom(currentZoom: number, direction: -1 | 1): number {
+  const index = ZOOM_STEPS.findIndex((zoom) => zoom === nearestZoomStep(currentZoom));
+  const nextIndex = clamp(index + direction, 0, ZOOM_STEPS.length - 1);
+  return ZOOM_STEPS[nextIndex] ?? 1;
+}
+
+function nearestZoomStep(zoom: number): number {
+  return ZOOM_STEPS.reduce((nearest, candidate) =>
+    Math.abs(candidate - zoom) < Math.abs(nearest - zoom) ? candidate : nearest
+  );
+}
+
+function roundScreenPixel(value: number): number {
+  return Math.round(value);
+}
+
+function roundWorldPixel(value: number, zoom: number): number {
+  return Math.round(value * zoom) / zoom;
 }
 
 function screenToWorld(x: number, y: number, camera: CameraState): CellCoord {
@@ -809,8 +944,8 @@ function centerCameraOnCell(cell: CellCoord, host: HTMLElement, camera: CameraSt
 }
 
 function compareUnitsForDraw(a: UnitSnapshot, b: UnitSnapshot): number {
-  const ay = a.position.x + a.position.y;
-  const by = b.position.x + b.position.y;
+  const ay = cellToWorld(a.position).y + UNIT_GROUND_OFFSET_Y;
+  const by = cellToWorld(b.position).y + UNIT_GROUND_OFFSET_Y;
   if (ay !== by) {
     return ay - by;
   }
@@ -818,8 +953,8 @@ function compareUnitsForDraw(a: UnitSnapshot, b: UnitSnapshot): number {
 }
 
 function compareBuildingsForDraw(a: BuildingSnapshot, b: BuildingSnapshot): number {
-  const ay = a.position.x + a.position.y;
-  const by = b.position.x + b.position.y;
+  const ay = buildingRenderPoint(a).y;
+  const by = buildingRenderPoint(b).y;
   if (ay !== by) {
     return ay - by;
   }
