@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  ENEMY_WAVES,
   FOOD_BALANCE,
   createInitialWorld,
   deserializeWorld,
@@ -106,9 +107,10 @@ describe("victory and defeat", () => {
     expect(world.outcome).toBeNull();
   });
 
-  it("grants defender victory when all enemies are annihilated", () => {
+  it("grants defender victory when all enemies are annihilated after every wave", () => {
     const world = createInitialWorld();
     world.units = world.units.filter((unit) => unit.owner !== "enemy");
+    world.nextWaveIndex = ENEMY_WAVES.length;
 
     updateWorld(world);
     updateWorld(world);
@@ -117,9 +119,20 @@ describe("victory and defeat", () => {
     expect(world.outcome?.reason).toBe("enemy_annihilated");
   });
 
+  it("withholds victory while attack waves are still pending", () => {
+    const world = createInitialWorld();
+    world.units = world.units.filter((unit) => unit.owner !== "enemy");
+
+    updateWorld(world);
+    updateWorld(world);
+
+    expect(world.outcome).toBeNull();
+  });
+
   it("freezes the world once an outcome is decided", () => {
     const world = createInitialWorld();
     world.units = world.units.filter((unit) => unit.owner !== "enemy");
+    world.nextWaveIndex = ENEMY_WAVES.length;
     updateWorld(world);
     updateWorld(world);
     const decidedTick = world.currentTick;
@@ -127,6 +140,21 @@ describe("victory and defeat", () => {
     updateWorld(world);
 
     expect(world.currentTick).toBe(decidedTick);
+  });
+
+  it("spawns attack waves on schedule", () => {
+    const world = createInitialWorld();
+    const firstWaveTick = ENEMY_WAVES[0]?.tick ?? 0;
+    const before = world.units.filter((unit) => unit.owner === "enemy").length;
+    while (world.currentTick <= firstWaveTick) {
+      updateWorld(world);
+      if (world.outcome !== null) {
+        break;
+      }
+    }
+    const after = world.units.filter((unit) => unit.owner === "enemy").length;
+    expect(after).toBeGreaterThan(before - 1);
+    expect(world.nextWaveIndex).toBeGreaterThanOrEqual(1);
   });
 });
 

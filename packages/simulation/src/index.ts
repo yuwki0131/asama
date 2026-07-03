@@ -103,6 +103,7 @@ export interface WorldState {
   nextBuildingId: number;
   invalidMoveTarget: CellCoord | null;
   outcome: GameOutcome | null;
+  nextWaveIndex: number;
   /** Deterministic RNG state (LCG); seeded at world creation. */
   rngState: number;
   food: FoodState;
@@ -137,6 +138,52 @@ const ENEMY_AI = {
   decisionIntervalTicks: 40,
   aggroRange: 12
 } as const;
+
+/** Building types the assault AI will breach when its route is blocked.
+ * Moats and objective buildings are indestructible terrain-like markers and
+ * must never be targeted. */
+const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
+  "wall",
+  "fence",
+  "gate",
+  "gate_wide_2",
+  "gate_wide_3",
+  "gate_ne_sw",
+  "gate_wide_2_ne_sw",
+  "gate_wide_3_ne_sw"
+];
+
+// Provisional attack waves (docs/07_scenarios/mvp-scenario.md defines three
+// waves; timings and compositions are unresolved balance values).
+export const ENEMY_WAVES: readonly {
+  readonly tick: number;
+  readonly spawns: readonly { readonly type: UnitType; readonly position: CellCoord }[];
+}[] = [
+  {
+    tick: 2400,
+    spawns: [
+      { type: "spear_ashigaru", position: { x: 86, y: 63 } },
+      { type: "spear_ashigaru", position: { x: 87, y: 68 } }
+    ]
+  },
+  {
+    tick: 7200,
+    spawns: [
+      { type: "spear_ashigaru", position: { x: 86, y: 63 } },
+      { type: "sword_ashigaru", position: { x: 86, y: 66 } },
+      { type: "archer", position: { x: 87, y: 68 } }
+    ]
+  },
+  {
+    tick: 12000,
+    spawns: [
+      { type: "spear_ashigaru", position: { x: 86, y: 63 } },
+      { type: "spear_ashigaru", position: { x: 86, y: 66 } },
+      { type: "sword_ashigaru", position: { x: 87, y: 64 } },
+      { type: "archer", position: { x: 87, y: 68 } }
+    ]
+  }
+];
 
 const WORLD_RNG_SEED = 0x6d2b79f5;
 
@@ -188,6 +235,7 @@ export function createInitialWorld(): WorldState {
     nextBuildingId: 1,
     invalidMoveTarget: null,
     outcome: null,
+    nextWaveIndex: 0,
     rngState: WORLD_RNG_SEED,
     food: {
       connectedStorehouseIds: [],
@@ -206,7 +254,9 @@ export function createInitialWorld(): WorldState {
   world.units.push(
     createUnit("unit:ashigaru:1", "player", "spear_ashigaru", { x: 62, y: 58 }),
     createUnit("unit:ashigaru:2", "player", "sword_ashigaru", { x: 62, y: 59 }),
+    createUnit("unit:ashigaru:3", "player", "spear_ashigaru", { x: 63, y: 57 }),
     createUnit("unit:archer:1", "player", "archer", { x: 63, y: 58 }),
+    createUnit("unit:archer:2", "player", "archer", { x: 64, y: 59 }),
     createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 86, y: 66 }),
     createUnit("unit:enemy:2", "enemy", "archer", { x: 87, y: 66 })
   );
@@ -538,9 +588,14 @@ function checkOutcome(world: WorldState): void {
     }
   }
 
-  // Defender victory: attacking force annihilated. Only meaningful once the
-  // scenario actually started with attackers, which the MVP layout does.
-  if (world.currentTick > 0 && !world.units.some((unit) => unit.owner === "enemy" && unit.hp > 0)) {
+  // Defender victory: attacking force annihilated after every attack wave
+  // has spawned; wiping the vanguard before reinforcements arrive is not a
+  // win yet.
+  if (
+    world.currentTick > 0 &&
+    world.nextWaveIndex >= ENEMY_WAVES.length &&
+    !world.units.some((unit) => unit.owner === "enemy" && unit.hp > 0)
+  ) {
     world.outcome = { winner: "player", reason: "enemy_annihilated", tick: world.currentTick };
   }
 }
@@ -548,6 +603,8 @@ function checkOutcome(world: WorldState): void {
 // --- Enemy AI: frontal assault profile (docs/07_scenarios/ai-profiles.md) --
 
 function updateEnemyAi(world: WorldState): void {
+  spawnAttackWaves(world);
+
   if (world.currentTick % ENEMY_AI.decisionIntervalTicks !== 0) {
     return;
   }
@@ -557,25 +614,22 @@ function updateEnemyAi(world: WorldState): void {
     if (unit.owner !== "enemy" || unit.hp <= 0) {
       continue;
     }
-    if (unit.attackTargetId !== null || unit.path.length > 0) {
-      continue;
-    }
 
-    // 1) Engage the nearest defender within aggro range.
-    let nearestDefender: UnitState | null = null;
-    let nearestDistance = ENEMY_AI.aggroRange + 1;
-    for (const candidate of world.units) {
-      if (candidate.owner !== "player" || candidate.hp <= 0) {
+    // Defenders in aggro range always take priority, even while the unit is
+    // marching or breaching a wall. An existing unit target is kept so the
+    // AI does not flip-flop between defenders every decision tick.
+    if (!hasUnitAttackTarget(world, unit)) {
+      const nearestDefender = nearestDefenderInAggro(world, unit);
+      if (nearestDefender !== null) {
+        unit.attackTargetId = nearestDefender.id;
+        unit.path = [];
+        unit.destination = null;
+        unit.movementProgress = 0;
         continue;
       }
-      const distance = manhattan(unit.position, candidate.position);
-      if (distance < nearestDistance) {
-        nearestDefender = candidate;
-        nearestDistance = distance;
-      }
     }
-    if (nearestDefender !== null) {
-      unit.attackTargetId = nearestDefender.id;
+
+    if (unit.attackTargetId !== null || unit.path.length > 0) {
       continue;
     }
 
@@ -583,21 +637,25 @@ function updateEnemyAi(world: WorldState): void {
       continue;
     }
 
-    // 2) March on the honmaru if a route exists.
     if (unit.pathRetryCooldown > 0) {
       unit.pathRetryCooldown -= ENEMY_AI.decisionIntervalTicks;
       continue;
     }
-    const path = findPath(world, unit.position, honmaru.position);
+
+    // March on the honmaru. The keep cell itself may be blocked by its
+    // garrison (occupied cells are impassable), so falling short by one
+    // cell still counts as a successful approach.
+    const direct = findPath(world, unit.position, honmaru.position);
+    const path = direct.length > 0 ? direct : findPathToAttackRange(world, unit.position, honmaru.position, 1);
     if (path.length > 0) {
-      unit.destination = honmaru.position;
+      unit.destination = path.at(-1) ?? null;
       unit.path = path;
       unit.movementProgress = 0;
       continue;
     }
     unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
 
-    // 3) Route blocked: breach the nearest defender fortification.
+    // Route blocked: breach the nearest defender fortification.
     const obstacle = nearestPlayerFortification(world, unit);
     if (obstacle !== null) {
       unit.attackTargetId = obstacle.id;
@@ -605,14 +663,38 @@ function updateEnemyAi(world: WorldState): void {
   }
 }
 
+function hasUnitAttackTarget(world: WorldState, unit: UnitState): boolean {
+  if (unit.attackTargetId === null) {
+    return false;
+  }
+  return world.units.some((candidate) => candidate.id === unit.attackTargetId && candidate.hp > 0);
+}
+
+function nearestDefenderInAggro(world: WorldState, unit: UnitState): UnitState | null {
+  let nearest: UnitState | null = null;
+  let nearestDistance = ENEMY_AI.aggroRange + 1;
+  for (const candidate of world.units) {
+    if (candidate.owner !== "player" || candidate.hp <= 0) {
+      continue;
+    }
+    const distance = manhattan(unit.position, candidate.position);
+    if (distance < nearestDistance) {
+      nearest = candidate;
+      nearestDistance = distance;
+    }
+  }
+  return nearest;
+}
+
 function nearestPlayerFortification(world: WorldState, unit: UnitState): BuildingState | null {
   let nearest: BuildingState | null = null;
   let nearestDistance = Number.POSITIVE_INFINITY;
   for (const building of world.buildings) {
-    if (building.owner !== "player" || building.lifecycleState !== "intact" || building.passable) {
-      continue;
-    }
-    if (building.type === "storehouse" && nearest !== null) {
+    if (
+      building.owner !== "player" ||
+      building.lifecycleState !== "intact" ||
+      !BREACHABLE_BUILDING_TYPES.includes(building.type)
+    ) {
       continue;
     }
     const distance = manhattan(unit.position, building.position);
@@ -622,6 +704,40 @@ function nearestPlayerFortification(world: WorldState, unit: UnitState): Buildin
     }
   }
   return nearest;
+}
+
+function spawnAttackWaves(world: WorldState): void {
+  while (world.nextWaveIndex < ENEMY_WAVES.length) {
+    const wave = ENEMY_WAVES[world.nextWaveIndex];
+    if (wave === undefined || world.currentTick < wave.tick) {
+      return;
+    }
+    for (const [index, spawn] of wave.spawns.entries()) {
+      const position = findSpawnCell(world, spawn.position);
+      if (position === null) {
+        continue;
+      }
+      world.units.push(createUnit(`unit:enemy:wave${world.nextWaveIndex}:${index}`, "enemy", spawn.type, position));
+    }
+    world.nextWaveIndex += 1;
+  }
+}
+
+function findSpawnCell(world: WorldState, preferred: CellCoord): CellCoord | null {
+  if (isPassable(world, preferred)) {
+    return preferred;
+  }
+  for (let radius = 1; radius <= 4; radius += 1) {
+    for (let dy = -radius; dy <= radius; dy += 1) {
+      for (let dx = -radius; dx <= radius; dx += 1) {
+        const candidate = { x: preferred.x + dx, y: preferred.y + dy };
+        if (isPassable(world, candidate)) {
+          return candidate;
+        }
+      }
+    }
+  }
+  return null;
 }
 
 // --- Save / load ------------------------------------------------------------
@@ -650,6 +766,7 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
   for (const unit of world.units) {
     unit.pathRetryCooldown ??= 0;
   }
+  world.nextWaveIndex ??= 0;
   return world;
 }
 
