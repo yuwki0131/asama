@@ -6,8 +6,9 @@
       "kind": "terrain",
       "output": "terrain-grass-base.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-01-corrections/terrain-grass-base.png"
+        "type": "blender",
+        "model": "terrain-grass-base",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -231,8 +232,9 @@
       "kind": "building",
       "output": "building-storehouse.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-building-scale/building-storehouse-large.png"
+        "type": "blender",
+        "model": "building-storehouse-graybox",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 4,

@@ -113,17 +113,6 @@
       }
     },
     {
-      "assetId": "terrain.grass.base",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-base.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
       "assetId": "terrain.dirt.base",
       "kind": "terrain",
       "file": "generated/terrain-dirt-base.png",
@@ -209,17 +198,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.82
-      }
-    },
-    {
-      "assetId": "building.storehouse",
-      "kind": "building",
-      "file": "generated/building-storehouse.png",
-      "width": 320,
-      "height": 260,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7807692307692308
       }
     },
     {
@@ -2255,6 +2233,28 @@
       "anchor": {
         "x": 0.5,
         "y": 0.9375
+      }
+    },
+    {
+      "assetId": "terrain.grass.base",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-base.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.storehouse",
+      "kind": "building",
+      "file": "generated/building-storehouse.png",
+      "width": 320,
+      "height": 260,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7807692307692308
       }
     }
   ]

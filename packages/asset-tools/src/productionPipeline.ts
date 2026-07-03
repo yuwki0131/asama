@@ -78,7 +78,11 @@ export async function renderBlenderAssets(): Promise<number> {
 }
 
 export async function postprocessProductionAssets(): Promise<number> {
-  return importRasterAssets();
+  // Both steps overwrite the SVG-generated PNGs for their source type, so
+  // assets:all must run them or placeholder art would ship as production.
+  const rasterCount = await importRasterAssets();
+  const blenderCount = await renderBlenderAssets();
+  return rasterCount + blenderCount;
 }
 
 export async function runBlenderCalibration(): Promise<void> {
