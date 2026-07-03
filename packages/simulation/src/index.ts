@@ -48,6 +48,8 @@ interface UnitState {
   readonly assetId: string;
   readonly ticksPerStep: number;
   movementProgress: number;
+  /** Ticks to wait before retrying a failed path search (A* throttling). */
+  pathRetryCooldown: number;
 }
 
 interface UnitDefinition {
@@ -582,6 +584,10 @@ function updateEnemyAi(world: WorldState): void {
     }
 
     // 2) March on the honmaru if a route exists.
+    if (unit.pathRetryCooldown > 0) {
+      unit.pathRetryCooldown -= ENEMY_AI.decisionIntervalTicks;
+      continue;
+    }
     const path = findPath(world, unit.position, honmaru.position);
     if (path.length > 0) {
       unit.destination = honmaru.position;
@@ -589,6 +595,7 @@ function updateEnemyAi(world: WorldState): void {
       unit.movementProgress = 0;
       continue;
     }
+    unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
 
     // 3) Route blocked: breach the nearest defender fortification.
     const obstacle = nearestPlayerFortification(world, unit);
@@ -639,6 +646,9 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
     world.map?.cells === undefined
   ) {
     throw new Error("Malformed save payload");
+  }
+  for (const unit of world.units) {
+    unit.pathRetryCooldown ??= 0;
   }
   return world;
 }
@@ -1085,7 +1095,8 @@ function createUnit(id: UnitId, owner: OwnerId, type: UnitType, position: CellCo
     attackTargetId: null,
     assetId: definition.assetId,
     ticksPerStep: definition.ticksPerStep,
-    movementProgress: 0
+    movementProgress: 0,
+    pathRetryCooldown: 0
   };
 }
 
@@ -1142,13 +1153,24 @@ function updateAttackMovement(world: WorldState): void {
     }
 
     if (unit.path.length === 0) {
+      // A failed search would otherwise repeat every tick and each miss
+      // explores the whole map; unreachable targets must back off.
+      if (unit.pathRetryCooldown > 0) {
+        unit.pathRetryCooldown -= 1;
+        continue;
+      }
       const path = findPathToAttackRange(world, unit.position, target.position, unit.attackRange);
+      if (path.length === 0) {
+        unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
+      }
       unit.path = path;
       unit.destination = path.at(-1) ?? null;
       unit.movementProgress = 0;
     }
   }
 }
+
+const PATH_RETRY_COOLDOWN_TICKS = 40;
 
 function attackTargetInRange(world: WorldState, attacker: UnitState): AttackTarget | null {
   if (attacker.attackTargetId === null) {

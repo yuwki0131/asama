@@ -444,7 +444,7 @@ function renderScene(
   const lastCell = snapshot.map.cells[snapshot.map.cells.length - 1]?.coord;
   const terrainKey = `${cameraVersion}:${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}`;
   if (lastTerrainKeyRef.current !== terrainKey) {
-    terrainLayer.removeChildren();
+    clearLayer(terrainLayer);
     const terrainUnderlay = new Graphics();
     terrainLayer.addChild(terrainUnderlay);
     for (const cell of snapshot.map.cells) {
@@ -456,8 +456,8 @@ function renderScene(
     lastTerrainKeyRef.current = terrainKey;
   }
 
-  overlayLayer.removeChildren();
-  unitLayer.removeChildren();
+  clearLayer(overlayLayer);
+  clearLayer(unitLayer);
 
   for (const unit of snapshot.units) {
     addPathSprites(overlayLayer, unit, assets);
@@ -686,6 +686,15 @@ function cellToWorld(cell: CellCoord): CellCoord {
     x: (cell.x - cell.y) * (TILE_WIDTH / 2),
     y: (cell.x + cell.y) * (TILE_HEIGHT / 2)
   };
+}
+
+function clearLayer(layer: Container): void {
+  // removeChildren alone does not release display objects in Pixi v8; the
+  // scene is rebuilt every snapshot, so undestroyed Graphics geometry (HP
+  // bars, rings, grid) accumulates until the tab runs out of memory.
+  for (const child of layer.removeChildren()) {
+    child.destroy({ children: true });
+  }
 }
 
 function buildingRenderPoint(building: BuildingSnapshot): CellCoord {

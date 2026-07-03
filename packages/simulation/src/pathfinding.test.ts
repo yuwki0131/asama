@@ -49,7 +49,8 @@ function unit(
     attackTargetId: null,
     assetId: `unit.${type}.test`,
     ticksPerStep: definition.step,
-    movementProgress: 0
+    movementProgress: 0,
+    pathRetryCooldown: 0
   };
 }
 

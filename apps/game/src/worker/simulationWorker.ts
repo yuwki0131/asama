@@ -58,7 +58,10 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
 function loop(now: number): void {
   const elapsed = now - lastTime;
   lastTime = now;
-  accumulatedMs += elapsed * speed;
+  // Cap the backlog: if the simulation falls behind, drop excess sim time
+  // instead of trying to fast-forward forever (which would keep the worker
+  // pegged and the tab frozen).
+  accumulatedMs = Math.min(accumulatedMs + elapsed * speed, tickMs * 16);
 
   let processed = 0;
   while (accumulatedMs >= tickMs && processed < 8) {
