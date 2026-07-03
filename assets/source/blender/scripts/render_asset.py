@@ -332,26 +332,58 @@ def map_box(low_map: tuple[float, float, float], high_map: tuple[float, float, f
     return (wx0, wy0, z0), (wx1, wy1, z1)
 
 
+# Building scale standard --------------------------------------------------
+#
+# Calibrated against building.tenshu.test (8x8 footprint, ~7.4 world units
+# tall including its stone base, filling ~93% of its footprint): the tenshu
+# is the reference silhouette the rest of the roster scales under.
+#
+#   - one wall story (ground to eaves): ~0.9-1.0 units (~35-39px)
+#   - common single-story building total height (ridge): ~1.6-1.9 units
+#   - ordinary buildings leave visible yard inside their logical footprint;
+#     only monumental structures (tenshu, yagura, gates) fill it
+#   - the unused footprint is grounded with a flat yard pad so the lot
+#     still reads as occupied
+
+STORY_WALL_HEIGHT = 0.95
+YARD_PAD_HEIGHT = 0.02
+
+
+def add_yard_pad(scene: bpy.types.Scene, footprint: float, material: bpy.types.Material) -> None:
+    """Flat pad covering the full map [-footprint..0]^2 lot.
+
+    The pad reaches the exact lot boundary so the sprite's south contact
+    pixel lands on the anchor (large buildings are placed by their south
+    corner).
+    """
+    add_box(scene, "YardPad", *map_box((-footprint, -footprint, 0.0), (0.0, 0.0, YARD_PAD_HEIGHT)), material)
+
+
 def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
-    """Kura (storehouse) massing study on a 4x4 footprint.
+    """Kura (storehouse) on a 4x4 lot, scaled to the tenshu standard.
 
     Large vertical building: south/bottom contact point at world origin, so
-    the footprint square is map [-4..0]x[-4..0]. Canvas 320x260, anchor 160,203.
+    the lot square is map [-4..0]x[-4..0]. Canvas 320x260, anchor 160,203.
+    The building itself is a modest single-story kura (~1.75 units to the
+    ridge, ~24% of the tenshu height) centered in the lot; a gravel yard pad
+    grounds the remaining footprint.
     """
     plaster = make_material("Plaster", (0.78, 0.76, 0.70, 1.0))
     stone = make_material("StoneBase", (0.42, 0.40, 0.36, 1.0))
     roof = make_material("RoofTile", (0.22, 0.24, 0.29, 1.0))
     wood = make_material("Wood", (0.35, 0.26, 0.18, 1.0))
+    gravel = make_material("YardGravel", (0.52, 0.48, 0.40, 1.0))
 
-    # Stone plinth covering most of the footprint.
-    add_box(scene, "Plinth", *map_box((-3.7, -3.7, 0.0), (-0.3, -0.3, 0.35)), stone)
-    # Plastered storehouse body, inset from the plinth.
-    add_box(scene, "Body", *map_box((-3.4, -3.0, 0.35), (-0.6, -1.0, 1.95)), plaster)
+    add_yard_pad(scene, 4.0, gravel)
+    # Stone plinth under the building only.
+    add_box(scene, "Plinth", *map_box((-3.15, -2.85, 0.0), (-0.85, -1.15, 0.22)), stone)
+    # Plastered storehouse body, one tall storage story.
+    add_box(scene, "Body", *map_box((-3.0, -2.7, 0.22), (-1.0, -1.3, 0.22 + STORY_WALL_HEIGHT)), plaster)
     # Dark wood band under the eaves.
-    add_box(scene, "EaveBand", *map_box((-3.45, -3.05, 1.7), (-0.55, -0.95, 1.95)), wood)
+    add_box(scene, "EaveBand", *map_box((-3.05, -2.75, 0.97), (-0.95, -1.25, 0.22 + STORY_WALL_HEIGHT)), wood)
     # Gabled tile roof with overhang, ridge along the long map-x axis.
-    low, high = map_box((-3.75, -3.35, 0.0), (-0.25, -0.65, 0.0))
-    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.95, 2.75, "x", roof)
+    low, high = map_box((-3.25, -2.95, 0.0), (-0.75, -1.05, 0.0))
+    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 0.22 + STORY_WALL_HEIGHT, 1.75, "x", roof)
 
 
 def build_calibration_chirality(scene: bpy.types.Scene) -> None:

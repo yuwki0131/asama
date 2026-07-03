@@ -3,7 +3,7 @@
 | assetId | status | canvas | anchor px | alpha bounds | footprint | base match | concern |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `terrain.grass.base` | present | 64x32 | 32,16 | 0,0-63,31 | 1x1 center | - | none |
-| `building.storehouse` | present | 320x260 | 160,203 | 50,3-269,193 | 4x4 south | corrected footprint foundation | bottom alpha differs from south anchor by -10px |
+| `building.storehouse` | present | 320x260 | 160,203 | 31,50-288,203 | 4x4 south | corrected footprint foundation | none |
 | `building.market` | present | 420x280 | 210,196 | 49,16-370,196 | 6x4 south | corrected footprint foundation | none |
 | `building.barracks` | present | 420x280 | 210,210 | 49,16-370,210 | 6x4 south | corrected footprint foundation | none |
 | `building.samurai_residence` | present | 460x360 | 230,273 | 37,18-428,273 | 6x6 south | corrected footprint foundation | none |
