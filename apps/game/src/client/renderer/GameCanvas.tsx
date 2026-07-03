@@ -465,24 +465,16 @@ function renderScene(
 
   const firstCell = snapshot.map.cells[0]?.coord;
   const lastCell = snapshot.map.cells[snapshot.map.cells.length - 1]?.coord;
-  // Rebuilding thousands of terrain sprites is the most expensive render
-  // step, so key it on the visible world region quantized to whole tiles
-  // (the culling margin is two tiles) instead of on every camera nudge.
-  const regionX = Math.round(-camera.x / camera.zoom / TILE_WIDTH);
-  const regionY = Math.round(-camera.y / camera.zoom / TILE_HEIGHT);
-  const terrainKey = `${regionX}:${regionY}:${camera.zoom}:${app.screen.width}x${app.screen.height}:${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}`;
+  // Terrain is static: build the whole map into chunk containers exactly
+  // once (per map/assets identity) and cull whole chunks per frame by
+  // toggling visibility. Rebuilding sprites on camera moves froze the tab
+  // when many cells were visible.
+  const terrainKey = `${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}`;
   if (lastTerrainKeyRef.current !== terrainKey) {
-    clearLayer(terrainLayer);
-    const terrainUnderlay = new Graphics();
-    terrainLayer.addChild(terrainUnderlay);
-    for (const cell of snapshot.map.cells) {
-      if (isVisibleCell(cell.coord, camera, app.screen.width, app.screen.height)) {
-        addTerrainUnderlay(terrainUnderlay, cell);
-        addTerrainSprite(terrainLayer, cell, assets);
-      }
-    }
+    buildTerrainChunks(terrainLayer, snapshot, assets);
     lastTerrainKeyRef.current = terrainKey;
   }
+  updateTerrainChunkVisibility(terrainLayer, camera, app.screen.width, app.screen.height);
 
   clearLayer(overlayLayer);
   clearLayer(unitLayer);
@@ -720,8 +712,74 @@ function clearLayer(layer: Container): void {
   // removeChildren alone does not release display objects in Pixi v8; the
   // scene is rebuilt every snapshot, so undestroyed Graphics geometry (HP
   // bars, rings, grid) accumulates until the tab runs out of memory.
+  // `context: true` matters: a Graphics owns an implicit GraphicsContext
+  // that destroy() keeps alive by default, which leaks several MB/s here.
   for (const child of layer.removeChildren()) {
-    child.destroy({ children: true });
+    child.destroy({ children: true, context: true });
+  }
+}
+
+const TERRAIN_CHUNK_CELLS = 16;
+
+interface TerrainChunkBounds {
+  readonly minX: number;
+  readonly minY: number;
+  readonly maxX: number;
+  readonly maxY: number;
+}
+
+function buildTerrainChunks(
+  terrainLayer: Container,
+  snapshot: WorldSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  clearLayer(terrainLayer);
+  const chunks = new Map<string, { container: Container; underlay: Graphics; bounds: TerrainChunkBounds }>();
+
+  for (const cell of snapshot.map.cells) {
+    const key = `${Math.floor(cell.coord.x / TERRAIN_CHUNK_CELLS)}:${Math.floor(cell.coord.y / TERRAIN_CHUNK_CELLS)}`;
+    let chunk = chunks.get(key);
+    if (chunk === undefined) {
+      const container = new Container();
+      const underlay = new Graphics();
+      container.addChild(underlay);
+      chunk = {
+        container,
+        underlay,
+        bounds: { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+      };
+      chunks.set(key, chunk);
+      terrainLayer.addChild(container);
+    }
+
+    addTerrainUnderlay(chunk.underlay, cell);
+    addTerrainSprite(chunk.container, cell, assets);
+
+    const world = cellToWorld(cell.coord);
+    chunk.bounds = {
+      minX: Math.min(chunk.bounds.minX, world.x - TILE_WIDTH),
+      minY: Math.min(chunk.bounds.minY, world.y - TILE_HEIGHT * 2),
+      maxX: Math.max(chunk.bounds.maxX, world.x + TILE_WIDTH),
+      maxY: Math.max(chunk.bounds.maxY, world.y + TILE_HEIGHT * 2)
+    };
+  }
+
+  for (const chunk of chunks.values()) {
+    (chunk.container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = chunk.bounds;
+  }
+}
+
+function updateTerrainChunkVisibility(terrainLayer: Container, camera: CameraState, width: number, height: number): void {
+  for (const child of terrainLayer.children) {
+    const bounds = (child as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds;
+    if (bounds === undefined) {
+      continue;
+    }
+    const left = bounds.minX * camera.zoom + camera.x;
+    const right = bounds.maxX * camera.zoom + camera.x;
+    const top = bounds.minY * camera.zoom + camera.y;
+    const bottom = bounds.maxY * camera.zoom + camera.y;
+    child.visible = right >= 0 && left <= width && bottom >= 0 && top <= height;
   }
 }
 
