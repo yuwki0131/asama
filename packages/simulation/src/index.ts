@@ -87,8 +87,8 @@ interface BuildingState {
   readonly maxHp: number;
   lifecycleState: BuildingLifecycleState;
   gateState: GateState | null;
-  readonly passable: boolean;
-  readonly movementCostModifier: number;
+  passable: boolean;
+  movementCostModifier: number;
   readonly assetId: string;
   food: number | null;
   readonly foodCapacity: number | null;
@@ -471,6 +471,34 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
 
   if (command.type === "recruitUnit") {
     return applyRecruitCommand(world, command.unitType);
+  }
+
+  if (command.type === "toggleGate") {
+    const position = clampCell(command.position);
+    const gate = world.buildings.find(
+      (building) =>
+        building.owner === "player" &&
+        building.lifecycleState === "intact" &&
+        building.gateState !== null &&
+        building.footprint.some((cell) => sameCell(cell, position))
+    );
+    if (gate === undefined) {
+      return "No gate there";
+    }
+    // Note: food connectivity intentionally does not recompute immediately
+    // after a gate toggle (food-and-supply.md); the periodic check picks the
+    // change up on its own schedule.
+    if (gate.gateState === "closed") {
+      gate.gateState = "open";
+      gate.passable = true;
+      gate.movementCostModifier = 2;
+    } else {
+      gate.gateState = "closed";
+      gate.passable = false;
+      gate.movementCostModifier = BLOCKED_MOVEMENT_COST;
+    }
+    clearUnitPathsThrough(world, gate.footprint);
+    return null;
   }
 
   if (command.type === "marketTrade") {
@@ -2089,7 +2117,8 @@ function connectedBuildingAssetId(world: WorldState, building: BuildingState): s
 function connectedGateAssetId(world: WorldState, gate: BuildingState): string {
   const orientation = isNeSwGate(gate.type) ? "ne_sw" : "nw_se";
   const width = gate.footprint.length;
-  return `building.gate.wood.closed.${orientation}.width${width}.connected.${gateConnectionMask(world, gate)}`;
+  const state = gate.gateState ?? "closed";
+  return `building.gate.wood.${state}.${orientation}.width${width}.connected.${gateConnectionMask(world, gate)}`;
 }
 
 function gateConnectionMask(world: WorldState, gate: BuildingState): string {

@@ -201,6 +201,18 @@ export function App() {
     }
   }, []);
 
+  const handleToggleGate = useCallback(
+    (position: CellCoord) => {
+      simulationRef.current?.enqueueCommand({
+        type: "toggleGate",
+        position,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
+
   const outcome = snapshot?.outcome ?? null;
   const food = snapshot?.food ?? null;
   const economy = snapshot?.economy ?? null;
@@ -350,6 +362,7 @@ export function App() {
           snapshot={snapshot}
           onDemolishBuilding={handleDemolishBuilding}
           onPlaceBuilding={handlePlaceBuilding}
+          onToggleGate={handleToggleGate}
           onSelectUnits={handleSelectUnits}
           onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}

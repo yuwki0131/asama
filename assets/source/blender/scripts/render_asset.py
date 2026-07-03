@@ -901,7 +901,7 @@ def gate_box(axis: str, along0: float, along1: float, across_half: float, z0: fl
     return (min(x0, x1), min(y0, y1), z0), (max(x0, x1), max(y0, y1), z1)
 
 
-def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str) -> None:
+def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, doors_closed: bool = True) -> None:
     mats = building_material_set()
     wood, door, roof, plaster, stone = mats["dark_wood"], mats["wood"], mats["roof"], mats["plaster"], mats["stone"]
 
@@ -918,9 +918,15 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str) ->
         low, high = gate_box(axis, along - GATE_PILLAR_SIZE / 2.0, along + GATE_PILLAR_SIZE / 2.0, GATE_PILLAR_SIZE / 2.0, 0.0, GATE_PILLAR_HEIGHT)
         add_box(scene, f"Pillar{label}", *map_box(low, high), wood)
 
-    # Closed double doors between the pillars.
-    low, high = gate_box(axis, -half + 0.38, half - 0.38, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
-    add_box(scene, "Doors", *map_box(low, high), door)
+    if doors_closed:
+        # Closed double doors between the pillars.
+        low, high = gate_box(axis, -half + 0.38, half - 0.38, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
+        add_box(scene, "Doors", *map_box(low, high), door)
+    else:
+        # Open gate: door leaves folded back against the pillars.
+        for side in (-1.0, 1.0):
+            low, high = gate_box(axis, side * (half - 0.42), side * (half - 0.38), 0.36, 0.0, GATE_DOOR_HEIGHT)
+            add_box(scene, f"OpenLeaf{side}", *map_box(low, high), door)
     # Kabuki lintel beam across the top.
     low, high = gate_box(axis, -half + 0.06, half - 0.06, 0.17, GATE_BEAM_BOTTOM, GATE_BEAM_TOP)
     add_box(scene, "Beam", *map_box(low, high), wood)
@@ -1080,10 +1086,10 @@ def resolve_model(name: str):
             mask = name[len(prefix):]
             if len(mask) == 4 and set(mask) <= {"0", "1"}:
                 return lambda scene, kit=kit, mask=mask: kit(scene, mask)
-    gate = re.fullmatch(r"gate-wood-closed-(nw_se|ne_sw)-w([123])-([01]{4})", name)
+    gate = re.fullmatch(r"gate-wood-(closed|open)-(nw_se|ne_sw)-w([123])-([01]{4})", name)
     if gate is not None:
-        axis, width, mask = gate.group(1), int(gate.group(2)), gate.group(3)
-        return lambda scene: build_gate_wood(scene, axis, width, mask)
+        state, axis, width, mask = gate.group(1), gate.group(2), int(gate.group(3)), gate.group(4)
+        return lambda scene: build_gate_wood(scene, axis, width, mask, doors_closed=state == "closed")
     terrain = re.fullmatch(r"terrain-(grass|dirt|stone|water)-connected-([01]{4})", name)
     if terrain is not None:
         kind, mask = terrain.group(1), terrain.group(2)

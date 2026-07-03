@@ -20,6 +20,7 @@ interface GameCanvasProps {
   readonly onMoveSelected: (destination: CellCoord) => void;
   readonly onPlaceBuilding: (buildingType: BuildingType, position: CellCoord) => void;
   readonly onDemolishBuilding: (position: CellCoord) => void;
+  readonly onToggleGate: (position: CellCoord) => void;
 }
 
 interface AssetManifest {
@@ -93,7 +94,8 @@ export function GameCanvas({
   onAttackTarget,
   onMoveSelected,
   onPlaceBuilding,
-  onDemolishBuilding
+  onDemolishBuilding,
+  onToggleGate
 }: GameCanvasProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
@@ -108,6 +110,7 @@ export function GameCanvas({
   const onAttackTargetRef = useRef(onAttackTarget);
   const onPlaceBuildingRef = useRef(onPlaceBuilding);
   const onDemolishBuildingRef = useRef(onDemolishBuilding);
+  const onToggleGateRef = useRef(onToggleGate);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
   const dragRef = useRef<{
     pointerId: number;
@@ -180,6 +183,10 @@ export function GameCanvas({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [scheduleCameraRender]);
+
+  useEffect(() => {
+    onToggleGateRef.current = onToggleGate;
+  }, [onToggleGate]);
 
   useEffect(() => {
     snapshotRef.current = snapshot;
@@ -445,6 +452,14 @@ export function GameCanvas({
       if (hitUnit !== null && hitUnit.owner === "player") {
         onSelectUnitsRef.current([hitUnit.id], event.shiftKey);
         setSelectedCell(null);
+        return;
+      }
+
+      // Clicking one of our own gates toggles it open or closed.
+      const hitBuilding = findBuildingAtCell(clickedCell, snapshotRef.current);
+      if (hitBuilding !== null && hitBuilding.owner === "player" && hitBuilding.gateState !== null) {
+        onToggleGateRef.current(clickedCell);
+        setSelectedCell(clickedCell);
         return;
       }
 

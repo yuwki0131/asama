@@ -181,6 +181,12 @@ export type PlayerCommand =
       readonly trade: MarketTrade;
       readonly issuedAtTick: number;
       readonly clientSequence: number;
+    }
+  | {
+      readonly type: "toggleGate";
+      readonly position: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
     };
 
 export type MainToWorkerMessage =
