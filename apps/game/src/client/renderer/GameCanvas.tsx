@@ -15,7 +15,7 @@ interface GameCanvasProps {
   readonly snapshot: WorldSnapshot | null;
   readonly buildTool: BuildingType | "demolish" | null;
   readonly debugOverlayVisible: boolean;
-  readonly onSelectUnit: (unitId: UnitId) => void;
+  readonly onSelectUnits: (unitIds: readonly UnitId[], additive: boolean) => void;
   readonly onAttackTarget: (targetId: EntityId) => void;
   readonly onMoveSelected: (destination: CellCoord) => void;
   readonly onPlaceBuilding: (buildingType: BuildingType, position: CellCoord) => void;
@@ -89,7 +89,7 @@ export function GameCanvas({
   snapshot,
   buildTool,
   debugOverlayVisible,
-  onSelectUnit,
+  onSelectUnits,
   onAttackTarget,
   onMoveSelected,
   onPlaceBuilding,
@@ -104,13 +104,14 @@ export function GameCanvas({
   const lastTerrainKeyRef = useRef<string | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(snapshot);
   const buildToolRef = useRef<BuildingType | "demolish" | null>(buildTool);
-  const onSelectUnitRef = useRef(onSelectUnit);
+  const onSelectUnitsRef = useRef(onSelectUnits);
   const onAttackTargetRef = useRef(onAttackTarget);
   const onPlaceBuildingRef = useRef(onPlaceBuilding);
   const onDemolishBuildingRef = useRef(onDemolishBuilding);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
   const dragRef = useRef<{
     pointerId: number;
+    mode: "select" | "pan";
     startX: number;
     startY: number;
     lastX: number;
@@ -123,6 +124,12 @@ export function GameCanvas({
   const [selectedCell, setSelectedCell] = useState<CellCoord | null>(null);
   const [localInvalidMoveTarget, setLocalInvalidMoveTarget] = useState<CellCoord | null>(null);
   const [cameraVersion, setCameraVersion] = useState(0);
+  const [selectionBox, setSelectionBox] = useState<{
+    readonly x0: number;
+    readonly y0: number;
+    readonly x1: number;
+    readonly y1: number;
+  } | null>(null);
   const cameraRafRef = useRef<number | null>(null);
 
   // Wheel and drag events fire far more often than the display refreshes;
@@ -147,6 +154,34 @@ export function GameCanvas({
   }, []);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      const step = 64;
+      switch (event.key.toLowerCase()) {
+        case "w":
+          cameraRef.current.y += step;
+          break;
+        case "s":
+          cameraRef.current.y -= step;
+          break;
+        case "a":
+          cameraRef.current.x += step;
+          break;
+        case "d":
+          cameraRef.current.x -= step;
+          break;
+        default:
+          return;
+      }
+      scheduleCameraRender();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [scheduleCameraRender]);
+
+  useEffect(() => {
     snapshotRef.current = snapshot;
   }, [snapshot]);
 
@@ -155,8 +190,8 @@ export function GameCanvas({
   }, [buildTool]);
 
   useEffect(() => {
-    onSelectUnitRef.current = onSelectUnit;
-  }, [onSelectUnit]);
+    onSelectUnitsRef.current = onSelectUnits;
+  }, [onSelectUnits]);
 
   useEffect(() => {
     onAttackTargetRef.current = onAttackTarget;
@@ -294,11 +329,17 @@ export function GameCanvas({
     const canvas = app.canvas;
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (event.button !== 0) {
+      // Left button drags a selection box (per controls spec); middle button
+      // pans the camera. Right button issues commands via contextmenu.
+      if (event.button !== 0 && event.button !== 1) {
         return;
+      }
+      if (event.button === 1) {
+        event.preventDefault();
       }
       dragRef.current = {
         pointerId: event.pointerId,
+        mode: event.button === 1 ? "pan" : "select",
         startX: event.clientX,
         startY: event.clientY,
         lastX: event.clientX,
@@ -316,12 +357,21 @@ export function GameCanvas({
         if (!drag.moved && Math.hypot(totalDx, totalDy) > 6) {
           drag.moved = true;
         }
-        if (drag.moved) {
+        if (drag.moved && drag.mode === "pan") {
           const dx = event.clientX - drag.lastX;
           const dy = event.clientY - drag.lastY;
           cameraRef.current.x = roundScreenPixel(cameraRef.current.x + dx);
           cameraRef.current.y = roundScreenPixel(cameraRef.current.y + dy);
           scheduleCameraRender();
+        }
+        if (drag.moved && drag.mode === "select" && buildToolRef.current === null) {
+          const rect = canvas.getBoundingClientRect();
+          setSelectionBox({
+            x0: drag.startX - rect.left,
+            y0: drag.startY - rect.top,
+            x1: event.clientX - rect.left,
+            y1: event.clientY - rect.top
+          });
         }
         drag.lastX = event.clientX;
         drag.lastY = event.clientY;
@@ -340,35 +390,69 @@ export function GameCanvas({
 
       dragRef.current = null;
       canvas.releasePointerCapture(event.pointerId);
-      if (!drag.moved) {
-        const rect = canvas.getBoundingClientRect();
-        const screenPoint = {
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top
-        };
-        const clickedCell = screenToCell(screenPoint.x, screenPoint.y, cameraRef.current);
-        const activeBuildTool = buildToolRef.current;
-        if (activeBuildTool === "demolish") {
-          setSelectedCell(clickedCell);
-          onDemolishBuildingRef.current(clickedCell);
-          return;
-        }
+      setSelectionBox(null);
 
-        if (activeBuildTool !== null) {
-          setSelectedCell(clickedCell);
-          onPlaceBuildingRef.current(activeBuildTool, clickedCell);
-          return;
-        }
+      const rect = canvas.getBoundingClientRect();
 
-        const hitUnit = findUnitAtScreenPoint(screenPoint, snapshotRef.current, cameraRef.current);
-        if (hitUnit !== null) {
-          onSelectUnitRef.current(hitUnit.id);
-          setSelectedCell(null);
-          return;
+      if (drag.moved && drag.mode === "select" && buildToolRef.current === null) {
+        // Box select: every player unit whose screen point falls inside the
+        // dragged rectangle.
+        const minX = Math.min(drag.startX, event.clientX) - rect.left;
+        const maxX = Math.max(drag.startX, event.clientX) - rect.left;
+        const minY = Math.min(drag.startY, event.clientY) - rect.top;
+        const maxY = Math.max(drag.startY, event.clientY) - rect.top;
+        const snapshot = snapshotRef.current;
+        const ids: UnitId[] = [];
+        for (const unit of snapshot?.units ?? []) {
+          if (unit.owner !== "player") {
+            continue;
+          }
+          const point = unitScreenPoint(unit, cameraRef.current);
+          if (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY) {
+            ids.push(unit.id);
+          }
         }
-
-        setSelectedCell(clickedCell);
+        if (ids.length > 0 || !event.shiftKey) {
+          onSelectUnitsRef.current(ids, event.shiftKey);
+        }
+        setSelectedCell(null);
+        return;
       }
+
+      if (drag.mode !== "select" || drag.moved) {
+        return;
+      }
+
+      const screenPoint = {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+      const clickedCell = screenToCell(screenPoint.x, screenPoint.y, cameraRef.current);
+      const activeBuildTool = buildToolRef.current;
+      if (activeBuildTool === "demolish") {
+        setSelectedCell(clickedCell);
+        onDemolishBuildingRef.current(clickedCell);
+        return;
+      }
+
+      if (activeBuildTool !== null) {
+        setSelectedCell(clickedCell);
+        onPlaceBuildingRef.current(activeBuildTool, clickedCell);
+        return;
+      }
+
+      const hitUnit = findUnitAtScreenPoint(screenPoint, snapshotRef.current, cameraRef.current);
+      if (hitUnit !== null && hitUnit.owner === "player") {
+        onSelectUnitsRef.current([hitUnit.id], event.shiftKey);
+        setSelectedCell(null);
+        return;
+      }
+
+      // Plain click on the ground clears the current selection.
+      if (!event.shiftKey) {
+        onSelectUnitsRef.current([], false);
+      }
+      setSelectedCell(clickedCell);
     };
 
     const handlePointerLeave = () => {
@@ -426,6 +510,12 @@ export function GameCanvas({
       onMoveSelected(destination);
     };
 
+    const blockMiddleAutoscroll = (event: MouseEvent) => {
+      if (event.button === 1) {
+        event.preventDefault();
+      }
+    };
+    canvas.addEventListener("mousedown", blockMiddleAutoscroll);
     canvas.addEventListener("pointerdown", handlePointerDown);
     canvas.addEventListener("pointermove", handlePointerMove);
     canvas.addEventListener("pointerup", handlePointerUp);
@@ -434,6 +524,7 @@ export function GameCanvas({
     canvas.addEventListener("contextmenu", handleContextMenu);
 
     return () => {
+      canvas.removeEventListener("mousedown", blockMiddleAutoscroll);
       canvas.removeEventListener("pointerdown", handlePointerDown);
       canvas.removeEventListener("pointermove", handlePointerMove);
       canvas.removeEventListener("pointerup", handlePointerUp);
@@ -443,7 +534,21 @@ export function GameCanvas({
     };
   }, [onMoveSelected, ready, scheduleCameraRender]);
 
-  return <div ref={hostRef} className="game-canvas" />;
+  return (
+    <div ref={hostRef} className="game-canvas">
+      {selectionBox === null ? null : (
+        <div
+          className="selection-box"
+          style={{
+            left: Math.min(selectionBox.x0, selectionBox.x1),
+            top: Math.min(selectionBox.y0, selectionBox.y1),
+            width: Math.abs(selectionBox.x1 - selectionBox.x0),
+            height: Math.abs(selectionBox.y1 - selectionBox.y0)
+          }}
+        />
+      )}
+    </div>
+  );
 }
 
 function renderScene(

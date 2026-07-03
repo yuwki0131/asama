@@ -192,3 +192,15 @@ button {
   margin: 2px 4px;
   background: #4a5157;
 }
+
+.game-canvas {
+  position: relative;
+}
+
+.selection-box {
+  position: absolute;
+  z-index: 10;
+  border: 1px solid #7fd08a;
+  background: rgba(110, 200, 130, 0.12);
+  pointer-events: none;
+}

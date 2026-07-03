@@ -46,16 +46,30 @@ export function App() {
     };
   }, []);
 
-  const handleSelectUnit = useCallback(
-    (unitId: string) => {
+  const handleSelectUnits = useCallback(
+    (unitIds: readonly string[], additive: boolean) => {
+      let nextIds: readonly string[] = unitIds;
+      if (additive) {
+        // Shift adds to the selection; shift-clicking an already selected
+        // unit removes it (controls spec: 追加・除外).
+        const current = new Set(snapshot?.units.filter((unit) => unit.selected).map((unit) => unit.id) ?? []);
+        for (const id of unitIds) {
+          if (current.has(id)) {
+            current.delete(id);
+          } else {
+            current.add(id);
+          }
+        }
+        nextIds = [...current];
+      }
       simulationRef.current?.enqueueCommand({
         type: "selectUnits",
-        unitIds: [unitId],
+        unitIds: nextIds,
         issuedAtTick: snapshot?.currentTick ?? 0,
         clientSequence: Date.now()
       });
     },
-    [snapshot?.currentTick]
+    [snapshot?.currentTick, snapshot?.units]
   );
 
   const handleMoveSelected = useCallback(
@@ -302,7 +316,7 @@ export function App() {
           snapshot={snapshot}
           onDemolishBuilding={handleDemolishBuilding}
           onPlaceBuilding={handlePlaceBuilding}
-          onSelectUnit={handleSelectUnit}
+          onSelectUnits={handleSelectUnits}
           onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}
         />

@@ -341,25 +341,39 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       return "That cell is not passable";
     }
 
-    let assignedPath = false;
-    for (const unit of world.units) {
-      if (!command.unitIds.includes(unit.id)) {
-        continue;
-      }
+    // Group move: each unit receives its own formation slot around the
+    // destination so the group arrives arranged instead of stacking.
+    const movers = world.units.filter((unit) => command.unitIds.includes(unit.id));
+    movers.sort((a, b) => manhattan(a.position, destination) - manhattan(b.position, destination));
+    const slots = formationSlots(world, destination, movers.length);
 
-      const path = findPath(world, unit.position, destination);
-      if (path.length === 0 && !sameCell(unit.position, destination)) {
+    let assignedPath = false;
+    let slotIndex = 0;
+    for (const unit of movers) {
+      let assigned = false;
+      while (slotIndex < slots.length) {
+        const slot = slots[slotIndex];
+        slotIndex += 1;
+        if (slot === undefined) {
+          break;
+        }
+        const path = findPath(world, unit.position, slot);
+        if (path.length === 0) {
+          continue;
+        }
+        unit.destination = slot;
+        unit.path = path;
+        unit.movementProgress = 0;
+        unit.attackTargetId = null;
+        assigned = true;
+        assignedPath = true;
+        break;
+      }
+      if (!assigned) {
         unit.destination = null;
         unit.path = [];
         unit.movementProgress = 0;
-        continue;
       }
-
-      unit.destination = path.length > 0 ? destination : null;
-      unit.path = path;
-      unit.movementProgress = 0;
-      unit.attackTargetId = null;
-      assignedPath = true;
     }
 
     if (!assignedPath) {
@@ -1043,6 +1057,40 @@ function spawnAttackWaves(world: WorldState): void {
     }
     world.nextWaveIndex += 1;
   }
+}
+
+/**
+ * Collects up to `count` passable cells around a destination in BFS order.
+ * The destination itself comes first, so slots form a packed cluster and a
+ * multi-unit move arrives as a formation.
+ */
+function formationSlots(world: WorldState, destination: CellCoord, count: number): CellCoord[] {
+  const slots: CellCoord[] = [];
+  const visited = new Set<string>([cellKey(destination)]);
+  const queue: CellCoord[] = [destination];
+  let explored = 0;
+  const explorationLimit = Math.max(count * 12, 200);
+
+  while (queue.length > 0 && slots.length < count && explored < explorationLimit) {
+    const current = queue.shift();
+    if (current === undefined) {
+      break;
+    }
+    explored += 1;
+    if (isPassable(world, current)) {
+      slots.push(current);
+    }
+    for (const direction of ORTHOGONAL_DIRECTIONS) {
+      const next = { x: current.x + direction.x, y: current.y + direction.y };
+      const key = cellKey(next);
+      if (visited.has(key) || !isInsideMap(next)) {
+        continue;
+      }
+      visited.add(key);
+      queue.push(next);
+    }
+  }
+  return slots;
 }
 
 function findSpawnCell(world: WorldState, preferred: CellCoord): CellCoord | null {
