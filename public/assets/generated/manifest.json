@@ -267,61 +267,6 @@
       }
     },
     {
-      "assetId": "building.fence.wood",
-      "kind": "building",
-      "file": "generated/building-fence-wood.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.wall.plaster",
-      "kind": "building",
-      "file": "generated/building-wall-plaster.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed",
-      "kind": "building",
-      "file": "generated/building-gate-wood-closed.png",
-      "width": 80,
-      "height": 80,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7625
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.width2",
-      "kind": "building",
-      "file": "generated/building-gate-wood-closed-width2.png",
-      "width": 128,
-      "height": 80,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.9125
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.width3",
-      "kind": "building",
-      "file": "generated/building-gate-wood-closed-width3.png",
-      "width": 192,
-      "height": 80,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.9125
-      }
-    },
-    {
       "assetId": "building.dry_moat",
       "kind": "building",
       "file": "generated/building-dry-moat.png",
@@ -341,182 +286,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0000",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0000.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0001",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0001.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0010",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0010.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0011",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0011.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0100",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0100.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0101",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0101.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0110",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0110.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.0111",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-0111.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1000",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1000.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1001",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1001.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1010",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1010.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1011",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1011.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1100",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1100.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1101",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1101.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1110",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1110.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.fence.wood.connected.1111",
-      "kind": "building",
-      "file": "generated/building-fence-wood-connected-1111.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
       }
     },
     {
@@ -1752,6 +1521,479 @@
       }
     },
     {
+      "assetId": "terrain.grass.base",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-base.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.storehouse",
+      "kind": "building",
+      "file": "generated/building-storehouse.png",
+      "width": 224,
+      "height": 176,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8181818181818182
+      }
+    },
+    {
+      "assetId": "building.market",
+      "kind": "building",
+      "file": "generated/building-market.png",
+      "width": 256,
+      "height": 192,
+      "anchor": {
+        "x": 0.5625,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.barracks",
+      "kind": "building",
+      "file": "generated/building-barracks.png",
+      "width": 256,
+      "height": 192,
+      "anchor": {
+        "x": 0.5625,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.samurai_residence",
+      "kind": "building",
+      "file": "generated/building-samurai-residence.png",
+      "width": 288,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "building.town_block",
+      "kind": "building",
+      "file": "generated/building-town-block.png",
+      "width": 416,
+      "height": 304,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8947368421052632
+      }
+    },
+    {
+      "assetId": "building.fence.wood",
+      "kind": "building",
+      "file": "generated/building-fence-wood.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.wall.plaster",
+      "kind": "building",
+      "file": "generated/building-wall-plaster.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed",
+      "kind": "building",
+      "file": "generated/building-gate-wood-closed.png",
+      "width": 96,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9285714285714286
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.width2",
+      "kind": "building",
+      "file": "generated/building-gate-wood-closed-width2.png",
+      "width": 160,
+      "height": 120,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9333333333333333
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.width3",
+      "kind": "building",
+      "file": "generated/building-gate-wood-closed-width3.png",
+      "width": 224,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0000",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0000.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0001",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0001.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0010",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0010.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0011",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0011.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0100",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0100.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0101",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0101.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0110",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0110.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.0111",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-0111.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1000",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1000.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1001",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1001.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1010",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1010.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1011",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1011.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1100",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1100.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1101",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1101.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1110",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1110.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.connected.1111",
+      "kind": "building",
+      "file": "generated/building-fence-wood-connected-1111.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0000",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0000.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0001",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0001.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0010",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0010.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0011",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0011.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0100",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0100.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0101",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0101.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0110",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0110.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0111",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0111.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1000",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1000.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1001",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1001.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1010.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1011",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1011.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1100",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1100.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1101",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1101.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1110",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1110.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1111",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1111.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
       "assetId": "building.gate.wood.closed.nw_se.width1.connected.0000",
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width1-connected-0000.png",
@@ -2013,248 +2255,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.9375
-      }
-    },
-    {
-      "assetId": "terrain.grass.base",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-base.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.storehouse",
-      "kind": "building",
-      "file": "generated/building-storehouse.png",
-      "width": 224,
-      "height": 176,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8181818181818182
-      }
-    },
-    {
-      "assetId": "building.market",
-      "kind": "building",
-      "file": "generated/building-market.png",
-      "width": 256,
-      "height": 192,
-      "anchor": {
-        "x": 0.5625,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.barracks",
-      "kind": "building",
-      "file": "generated/building-barracks.png",
-      "width": 256,
-      "height": 192,
-      "anchor": {
-        "x": 0.5625,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.samurai_residence",
-      "kind": "building",
-      "file": "generated/building-samurai-residence.png",
-      "width": 288,
-      "height": 224,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8571428571428571
-      }
-    },
-    {
-      "assetId": "building.town_block",
-      "kind": "building",
-      "file": "generated/building-town-block.png",
-      "width": 416,
-      "height": 304,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8947368421052632
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0000",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0000.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0001",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0001.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0010",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0010.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0011",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0011.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0100",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0100.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0101",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0101.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0110",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0110.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.0111",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-0111.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1000",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1000.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1001",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1001.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1010",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1010.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1011",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1011.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1100",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1100.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1101",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1101.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1110",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1110.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1111",
-      "kind": "building",
-      "file": "generated/building-wall-plaster-connected-1111.png",
-      "width": 64,
-      "height": 96,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8333333333333334
       }
     }
   ]

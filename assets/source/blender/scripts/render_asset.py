@@ -45,6 +45,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 
 import bpy
@@ -616,15 +617,145 @@ def build_wall_plaster_mask(scene: bpy.types.Scene, mask: str) -> None:
         )
 
 
+# Gate kit -------------------------------------------------------------------
+#
+# Kabukimon-style gates spanning 1-3 tiles. nw_se gates run along map x
+# (footprint width x 1), ne_sw gates along map y (1 x width). Origin is the
+# footprint south corner. The connection mask marks which ends adjoin walls
+# (nw_se: E/W bits, ne_sw: N/S bits); connected ends grow a wall stub that
+# meets the wall-kit socket at the end tile's edge midpoint.
+
+GATE_PILLAR_SIZE = 0.30
+GATE_PILLAR_HEIGHT = 1.35
+GATE_DOOR_HEIGHT = 1.05
+GATE_DOOR_THICKNESS = 0.10
+GATE_BEAM_BOTTOM = 1.08
+GATE_BEAM_TOP = 1.30
+GATE_ROOF_TOP = 1.72
+
+
+def gate_axis_point(axis: str, along: float, across: float) -> tuple[float, float]:
+    """Map coordinates for a point at `along` on the gate axis, `across`
+    offset from the centerline. nw_se runs along x (centerline y=-0.5),
+    ne_sw along y (centerline x=-0.5). `along` is negative into the gate."""
+    if axis == "nw_se":
+        return (along, -0.5 + across)
+    return (-0.5 + across, along)
+
+
+def gate_box(axis: str, along0: float, along1: float, across_half: float, z0: float, z1: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    x0, y0 = gate_axis_point(axis, along0, -across_half)
+    x1, y1 = gate_axis_point(axis, along1, across_half)
+    return (min(x0, x1), min(y0, y1), z0), (max(x0, x1), max(y0, y1), z1)
+
+
+def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str) -> None:
+    wood = make_material("GatePillar", (0.33, 0.25, 0.17, 1.0))
+    door = make_material("GateDoor", (0.45, 0.35, 0.24, 1.0))
+    roof = make_material("GateRoof", (0.22, 0.24, 0.29, 1.0))
+    plaster = make_material("WallPlaster", (0.80, 0.78, 0.72, 1.0))
+    stone = make_material("WallStone", (0.40, 0.38, 0.34, 1.0))
+
+    length = float(width)
+    # Stone threshold sill covering the full footprint; grounds the sprite
+    # so its south contact pixel lands on the anchor.
+    if axis == "nw_se":
+        add_box(scene, "Sill", *map_box((-length, -1.0, 0.0), (0.0, 0.0, 0.035)), stone)
+    else:
+        add_box(scene, "Sill", *map_box((-1.0, -length, 0.0), (0.0, 0.0, 0.035)), stone)
+
+    # Flanking pillars just inside each end of the footprint.
+    for label, along in (("Near", -0.22), ("Far", -length + 0.22)):
+        low, high = gate_box(axis, along - GATE_PILLAR_SIZE / 2.0, along + GATE_PILLAR_SIZE / 2.0, GATE_PILLAR_SIZE / 2.0, 0.0, GATE_PILLAR_HEIGHT)
+        add_box(scene, f"Pillar{label}", *map_box(low, high), wood)
+
+    # Closed double doors between the pillars.
+    low, high = gate_box(axis, -length + 0.38, -0.38, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
+    add_box(scene, "Doors", *map_box(low, high), door)
+    # Kabuki lintel beam across the top.
+    low, high = gate_box(axis, -length + 0.06, -0.06, 0.17, GATE_BEAM_BOTTOM, GATE_BEAM_TOP)
+    add_box(scene, "Beam", *map_box(low, high), wood)
+
+    # Gabled roof over the full span, ridge along the gate axis.
+    roof_low, roof_high = gate_box(axis, -length - 0.12, 0.12, 0.42, 0.0, 0.0)
+    low, high = map_box(roof_low, roof_high)
+    ridge_axis = "x" if axis == "nw_se" else "y"
+    add_gable_roof(scene, "GateRoof", (low[0], low[1]), (high[0], high[1]), GATE_BEAM_TOP, GATE_ROOF_TOP, ridge_axis, roof)
+
+    # Wall stubs on connected ends, matching the wall-kit profile so the
+    # socket at the end tile edge midpoint lines up with neighbor walls.
+    bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    end_direction = {"nw_se": (("E", -0.30, 0.0), ("W", -length, -length + 0.30)), "ne_sw": (("S", -0.30, 0.0), ("N", -length, -length + 0.30))}
+    for name, along0, along1 in end_direction[axis]:
+        if not bits.get(name, False):
+            continue
+        low, high = gate_box(axis, along0, along1, WALL_BASE_THICKNESS / 2.0, 0.0, WALL_BASE_HEIGHT)
+        add_box(scene, f"Stub{name}Base", *map_box(low, high), stone)
+        low, high = gate_box(axis, along0, along1, WALL_BODY_THICKNESS / 2.0, WALL_BASE_HEIGHT, WALL_BODY_TOP)
+        add_box(scene, f"Stub{name}Body", *map_box(low, high), plaster)
+        low, high = gate_box(axis, along0, along1, WALL_COPING_THICKNESS / 2.0, 0.0, 0.0)
+        wlow, whigh = map_box(low, high)
+        add_gable_roof(scene, f"Stub{name}Coping", (wlow[0], wlow[1]), (whigh[0], whigh[1]), WALL_BODY_TOP, WALL_COPING_TOP, ridge_axis, roof)
+
+
+# Connected fence kit -------------------------------------------------------
+#
+# Wooden palisade fence, same socket contract as the wall kit: arms run from
+# tile center to edge midpoints of set mask directions. Canvas 64x64,
+# anchor (32,48).
+
+FENCE_HEIGHT = 0.72
+FENCE_POST_SIZE = 0.10
+FENCE_RAIL_THICKNESS = 0.055
+FENCE_RAIL_LEVELS = ((0.26, 0.36), (0.52, 0.62))
+
+
+def fence_post(scene: bpy.types.Scene, name: str, map_x: float, map_y: float, material: bpy.types.Material, height: float = FENCE_HEIGHT) -> None:
+    half = FENCE_POST_SIZE / 2.0
+    add_box(scene, name, *map_box((map_x - half, map_y - half, 0.0), (map_x + half, map_y + half, height)), material)
+
+
+def build_fence_wood_mask(scene: bpy.types.Scene, mask: str) -> None:
+    wood = make_material("FenceWood", (0.44, 0.34, 0.23, 1.0))
+    dark = make_material("FencePost", (0.36, 0.27, 0.18, 1.0))
+
+    bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    active = [name for name, on in bits.items() if on]
+
+    # Center post always present.
+    fence_post(scene, "PostCenter", 0.0, 0.0, dark, FENCE_HEIGHT + 0.05)
+    if not active:
+        return
+
+    for index, name in enumerate(active):
+        dx, dy = WALL_DIRECTIONS[name]
+        inset = WALL_EPSILON * (index + 1)
+        # Two intermediate posts along the arm.
+        for distance, label in ((0.24, "A"), (0.48, "B")):
+            fence_post(scene, f"Post{name}{label}", dx * distance, dy * distance, dark)
+        # Two rail levels spanning center to tile edge.
+        for level, (z0, z1) in enumerate(FENCE_RAIL_LEVELS):
+            half = FENCE_RAIL_THICKNESS / 2.0 - inset
+            low, high = wall_arm_box((dx, dy), half, z0, z1)
+            add_box(scene, f"Rail{name}{level}", *map_box(low, high), wood)
+
+
 def resolve_model(name: str):
     builder = MODEL_REGISTRY.get(name)
     if builder is not None:
         return builder
-    prefix = "wall-plaster-connected-"
-    if name.startswith(prefix):
-        mask = name[len(prefix):]
-        if len(mask) == 4 and set(mask) <= {"0", "1"}:
-            return lambda scene: build_wall_plaster_mask(scene, mask)
+    for prefix, kit in (
+        ("wall-plaster-connected-", build_wall_plaster_mask),
+        ("fence-wood-connected-", build_fence_wood_mask),
+    ):
+        if name.startswith(prefix):
+            mask = name[len(prefix):]
+            if len(mask) == 4 and set(mask) <= {"0", "1"}:
+                return lambda scene, kit=kit, mask=mask: kit(scene, mask)
+    gate = re.fullmatch(r"gate-wood-closed-(nw_se|ne_sw)-w([123])-([01]{4})", name)
+    if gate is not None:
+        axis, width, mask = gate.group(1), int(gate.group(2)), gate.group(3)
+        return lambda scene: build_gate_wood(scene, axis, width, mask)
     return None
 
 

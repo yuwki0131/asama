@@ -512,8 +512,9 @@
       "kind": "building",
       "output": "building-fence-wood.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -537,8 +538,9 @@
       "kind": "building",
       "output": "building-wall-plaster.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -562,16 +564,17 @@
       "kind": "building",
       "output": "building-gate-wood-closed.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-01-corrections/building-gate-wood-closed.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w1-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
         "footprintHeight": 1,
-        "canvasWidth": 80,
-        "canvasHeight": 80,
-        "anchorX": 40,
-        "anchorY": 61
+        "canvasWidth": 96,
+        "canvasHeight": 112,
+        "anchorX": 48,
+        "anchorY": 104
       },
       "category": "building",
       "postprocess": {
@@ -587,16 +590,17 @@
       "kind": "building",
       "output": "building-gate-wood-closed-width2.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/building-gate-wood-closed-width2.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w2-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 2,
         "footprintHeight": 1,
-        "canvasWidth": 128,
-        "canvasHeight": 80,
-        "anchorX": 64,
-        "anchorY": 73
+        "canvasWidth": 160,
+        "canvasHeight": 120,
+        "anchorX": 80,
+        "anchorY": 112
       },
       "category": "building",
       "postprocess": {
@@ -612,16 +616,17 @@
       "kind": "building",
       "output": "building-gate-wood-closed-width3.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/building-gate-wood-closed-width3.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w3-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 3,
         "footprintHeight": 1,
-        "canvasWidth": 192,
-        "canvasHeight": 80,
-        "anchorX": 96,
-        "anchorY": 73
+        "canvasWidth": 224,
+        "canvasHeight": 128,
+        "anchorX": 112,
+        "anchorY": 120
       },
       "category": "building",
       "postprocess": {
@@ -687,8 +692,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0000.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -712,8 +718,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0001.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -737,8 +744,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0010.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -762,8 +770,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0011.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -787,8 +796,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0100.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -812,8 +822,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0101.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -837,8 +848,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0110.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -862,8 +874,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-0111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-0111.png"
+        "type": "blender",
+        "model": "fence-wood-connected-0111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -887,8 +900,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1000.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -912,8 +926,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1001.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -937,8 +952,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1010.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -962,8 +978,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1011.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -987,8 +1004,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1100.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1012,8 +1030,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1101.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1037,8 +1056,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1110.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1062,8 +1082,9 @@
       "kind": "building",
       "output": "building-fence-wood-connected-1111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-fence-wood-connected-1111.png"
+        "type": "blender",
+        "model": "fence-wood-connected-1111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4303,8 +4324,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width1-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w1-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4328,8 +4350,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width1-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0100.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w1-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4353,8 +4376,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width1-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0001.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w1-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4378,8 +4402,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width1-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width1-connected-0101.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w1-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4403,8 +4428,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width2-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w2-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 2,
@@ -4428,8 +4454,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width2-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0100.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w2-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 2,
@@ -4453,8 +4480,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width2-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0001.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w2-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 2,
@@ -4478,8 +4506,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width2-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width2-connected-0101.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w2-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 2,
@@ -4503,8 +4532,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width3-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w3-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 3,
@@ -4528,8 +4558,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width3-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0100.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w3-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 3,
@@ -4553,8 +4584,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width3-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0001.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w3-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 3,
@@ -4578,8 +4610,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width3-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-nw-se-width3-connected-0101.png"
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-w3-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 3,
@@ -4603,8 +4636,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width1-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-0000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w1-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4628,8 +4662,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width1-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-1000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w1-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4653,8 +4688,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width1-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-0010.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w1-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4678,8 +4714,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width1-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width1-connected-1010.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w1-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4703,8 +4740,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width2-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-0000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w2-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4728,8 +4766,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width2-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-1000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w2-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4753,8 +4792,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width2-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-0010.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w2-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4778,8 +4818,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width2-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width2-connected-1010.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w2-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4803,8 +4844,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width3-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-0000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w3-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4828,8 +4870,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width3-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-1000.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w3-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4853,8 +4896,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width3-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-0010.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w3-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4878,8 +4922,9 @@
       "kind": "building",
       "output": "building-gate-wood-closed-ne-sw-width3-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-gate-wood-closed-ne-sw-width3-connected-1010.png"
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-w3-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
