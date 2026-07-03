@@ -7,7 +7,9 @@ export type EntityId = string;
 export type UnitId = EntityId;
 export type BuildingId = EntityId;
 export type OwnerId = "player" | "enemy" | "neutral";
-export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer";
+export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer" | "engineer";
+
+export type EngineerTaskKind = "ladder" | "fillMoat";
 export type TerrainType = "grass" | "dirt" | "water" | "stone";
 export type BuildingType =
   | "fence"
@@ -65,6 +67,13 @@ export interface UnitSnapshot {
   readonly attackCooldownRemaining: number;
   readonly targetId: EntityId | null;
   readonly assetId: string;
+  readonly task: EngineerTaskSnapshot | null;
+}
+
+export interface EngineerTaskSnapshot {
+  readonly kind: EngineerTaskKind;
+  readonly target: CellCoord;
+  readonly progress: number;
 }
 
 export interface BuildingSnapshot {
@@ -84,6 +93,8 @@ export interface BuildingSnapshot {
   readonly food: number | null;
   readonly foodCapacity: number | null;
   readonly connectedToHonmaru: boolean;
+  readonly ladderHp: number | null;
+  readonly fillProgress: number;
 }
 
 export type GameOutcomeReason = "honmaru_fallen" | "starvation" | "enemy_annihilated" | "time_held";
@@ -213,6 +224,14 @@ export type PlayerCommand =
     }
   | {
       readonly type: "toggleGate";
+      readonly position: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "engineerTask";
+      readonly unitIds: readonly UnitId[];
+      readonly task: EngineerTaskKind;
       readonly position: CellCoord;
       readonly issuedAtTick: number;
       readonly clientSequence: number;

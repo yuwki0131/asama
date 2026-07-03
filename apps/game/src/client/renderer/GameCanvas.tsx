@@ -11,9 +11,11 @@ import type {
   WorldSnapshot
 } from "@asama/shared";
 
+export type ToolMode = BuildingType | "demolish" | "ladder" | "fillMoat" | null;
+
 interface GameCanvasProps {
   readonly snapshot: WorldSnapshot | null;
-  readonly buildTool: BuildingType | "demolish" | null;
+  readonly buildTool: ToolMode;
   readonly debugOverlayVisible: boolean;
   readonly onSelectUnits: (unitIds: readonly UnitId[], additive: boolean) => void;
   readonly onAttackTarget: (targetId: EntityId) => void;
@@ -21,6 +23,7 @@ interface GameCanvasProps {
   readonly onPlaceBuilding: (buildingType: BuildingType, position: CellCoord) => void;
   readonly onDemolishBuilding: (position: CellCoord) => void;
   readonly onToggleGate: (position: CellCoord) => void;
+  readonly onEngineerTask: (task: "ladder" | "fillMoat", position: CellCoord) => void;
 }
 
 interface AssetManifest {
@@ -95,7 +98,8 @@ export function GameCanvas({
   onMoveSelected,
   onPlaceBuilding,
   onDemolishBuilding,
-  onToggleGate
+  onToggleGate,
+  onEngineerTask
 }: GameCanvasProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
@@ -105,12 +109,13 @@ export function GameCanvas({
   const unitLayerRef = useRef<Container | null>(null);
   const lastTerrainKeyRef = useRef<string | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(snapshot);
-  const buildToolRef = useRef<BuildingType | "demolish" | null>(buildTool);
+  const buildToolRef = useRef<ToolMode>(buildTool);
   const onSelectUnitsRef = useRef(onSelectUnits);
   const onAttackTargetRef = useRef(onAttackTarget);
   const onPlaceBuildingRef = useRef(onPlaceBuilding);
   const onDemolishBuildingRef = useRef(onDemolishBuilding);
   const onToggleGateRef = useRef(onToggleGate);
+  const onEngineerTaskRef = useRef(onEngineerTask);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
   const dragRef = useRef<{
     pointerId: number;
@@ -187,6 +192,10 @@ export function GameCanvas({
   useEffect(() => {
     onToggleGateRef.current = onToggleGate;
   }, [onToggleGate]);
+
+  useEffect(() => {
+    onEngineerTaskRef.current = onEngineerTask;
+  }, [onEngineerTask]);
 
   useEffect(() => {
     snapshotRef.current = snapshot;
@@ -442,6 +451,12 @@ export function GameCanvas({
         return;
       }
 
+      if (activeBuildTool === "ladder" || activeBuildTool === "fillMoat") {
+        setSelectedCell(clickedCell);
+        onEngineerTaskRef.current(activeBuildTool, clickedCell);
+        return;
+      }
+
       if (activeBuildTool !== null) {
         setSelectedCell(clickedCell);
         onPlaceBuildingRef.current(activeBuildTool, clickedCell);
@@ -576,7 +591,7 @@ function renderScene(
   snapshot: WorldSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
   camera: CameraState,
-  buildTool: BuildingType | "demolish" | null,
+  buildTool: ToolMode,
   debugOverlayVisible: boolean,
   hoverCell: CellCoord | null,
   selectedCell: CellCoord | null,
@@ -703,10 +718,15 @@ function addCellActionPreview(
   layer: Container,
   cell: CellCoord,
   snapshot: WorldSnapshot,
-  buildTool: BuildingType | "demolish" | null,
+  buildTool: ToolMode,
   assets: ReadonlyMap<string, LoadedAsset>
 ): void {
   if (buildTool === null) {
+    addOverlaySprite(layer, cell, "overlay.cell.selected", assets);
+    return;
+  }
+
+  if (buildTool === "ladder" || buildTool === "fillMoat") {
     addOverlaySprite(layer, cell, "overlay.cell.selected", assets);
     return;
   }
@@ -746,6 +766,16 @@ function addBuildingSprite(
     sprite.tint = 0xffaaa0;
   }
   layer.addChild(sprite);
+
+  if (building.ladderHp !== null) {
+    const ladderAsset = assets.get("building.wall.ladder.attached");
+    if (ladderAsset !== undefined) {
+      const ladder = new Sprite(ladderAsset.texture);
+      ladder.anchor.set(ladderAsset.anchor.x, ladderAsset.anchor.y);
+      ladder.position.set(sprite.position.x, sprite.position.y);
+      layer.addChild(ladder);
+    }
+  }
 }
 
 function legacyFortificationScale(

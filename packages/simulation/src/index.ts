@@ -14,6 +14,7 @@ import {
   type TerrainCellSnapshot,
   type TerrainType,
   type EconomySnapshot,
+  type EngineerTaskKind,
   type FoodSnapshot,
   type GameOutcome,
   type MarketTrade,
@@ -55,6 +56,8 @@ interface UnitState {
   movementProgress: number;
   /** Ticks to wait before retrying a failed path search (A* throttling). */
   pathRetryCooldown: number;
+  /** Active engineer work order (ladder or moat fill). */
+  task: { kind: EngineerTaskKind; target: CellCoord; progress: number } | null;
 }
 
 interface UnitDefinition {
@@ -94,6 +97,10 @@ interface BuildingState {
   readonly assetId: string;
   food: number | null;
   readonly foodCapacity: number | null;
+  /** Attached siege ladder; while present the wall is climbable. */
+  ladderHp: number | null;
+  /** Accumulated moat-fill work (engineer ticks). */
+  fillProgress: number;
 }
 
 interface AttackTarget {
@@ -166,7 +173,8 @@ export const ECONOMY_BALANCE = {
   recruitCosts: {
     spear_ashigaru: { gold: 20, weapons: 1 },
     sword_ashigaru: { gold: 28, weapons: 1 },
-    archer: { gold: 32, weapons: 1 }
+    archer: { gold: 32, weapons: 1 },
+    engineer: { gold: 30, weapons: 0 }
   } as Record<UnitType, { readonly gold: number; readonly weapons: number }>,
   market: {
     foodLot: 50,
@@ -193,6 +201,16 @@ export const FOOD_BALANCE = {
 const ENEMY_AI = {
   decisionIntervalTicks: 40,
   aggroRange: 12
+} as const;
+
+// Provisional siege values (docs/03_combat/siege-system.md).
+export const SIEGE_BALANCE = {
+  ladderBuildTicks: 60,
+  ladderHp: 60,
+  ladderMoveCost: 4,
+  moatFillTicks: 300,
+  /** Interrupted moat work keeps its progress (spec-recommended default). */
+  preserveProgressOnInterrupt: true
 } as const;
 
 /** Building types the assault AI will breach when its route is blocked.
@@ -253,6 +271,15 @@ const unitDefinitions: Record<UnitType, UnitDefinition> = {
     attackCooldownTicks: Math.round(1.6 * 20),
     ticksPerStep: 7,
     assetId: "unit.archer.idle.south"
+  },
+  engineer: {
+    type: "engineer",
+    maxHp: 80,
+    attackDamage: 8,
+    attackRange: 1,
+    attackCooldownTicks: Math.round(1.5 * 20),
+    ticksPerStep: 7,
+    assetId: "unit.engineer.idle.south"
   }
 };
 
@@ -417,7 +444,9 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       // Player-built storehouses start empty; stock arrives via harvest or
       // supply carts, not construction.
       food: command.buildingType === "storehouse" ? 0 : null,
-      foodCapacity: command.buildingType === "storehouse" ? FOOD_BALANCE.storehouseCapacity : null
+      foodCapacity: command.buildingType === "storehouse" ? FOOD_BALANCE.storehouseCapacity : null,
+      ladderHp: null,
+      fillProgress: 0
     });
     world.nextBuildingId += 1;
     world.invalidMoveTarget = null;
@@ -480,6 +509,10 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     return applyMarketTrade(world, command.trade);
   }
 
+  if (command.type === "engineerTask") {
+    return applyEngineerTaskCommand(world, command.unitIds, command.task, clampCell(command.position));
+  }
+
   return null;
 }
 
@@ -514,6 +547,7 @@ export function updateWorld(world: WorldState): void {
   }
 
   updateCombat(world);
+  updateEngineerTasks(world);
   updateFoodSupply(world);
   updateEconomy(world);
   checkOutcome(world);
@@ -976,7 +1010,7 @@ function updateEnemyAi(world: WorldState): void {
       }
     }
 
-    if (unit.attackTargetId !== null || unit.path.length > 0) {
+    if (unit.attackTargetId !== null || unit.path.length > 0 || unit.task !== null) {
       continue;
     }
 
@@ -1002,12 +1036,41 @@ function updateEnemyAi(world: WorldState): void {
     }
     unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
 
-    // Route blocked: breach the nearest defender fortification.
+    // Route blocked: breach the nearest defender fortification. Engineers
+    // ladder walls and fill moats; combat units hack at the obstacle.
+    if (unit.type === "engineer" && unit.task === null) {
+      const wall = nearestBuildingOfTypes(world, unit, ["wall"]);
+      if (wall !== null && wall.ladderHp === null) {
+        unit.task = { kind: "ladder", target: wall.position, progress: 0 };
+        continue;
+      }
+      const moat = nearestBuildingOfTypes(world, unit, ["dry_moat", "water_moat"]);
+      if (moat !== null) {
+        unit.task = { kind: "fillMoat", target: moat.position, progress: 0 };
+        continue;
+      }
+    }
     const obstacle = nearestPlayerFortification(world, unit);
     if (obstacle !== null) {
       unit.attackTargetId = obstacle.id;
     }
   }
+}
+
+function nearestBuildingOfTypes(world: WorldState, unit: UnitState, types: readonly BuildingType[]): BuildingState | null {
+  let nearest: BuildingState | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  for (const building of world.buildings) {
+    if (building.owner !== "player" || building.lifecycleState !== "intact" || !types.includes(building.type)) {
+      continue;
+    }
+    const distance = manhattan(unit.position, building.position);
+    if (distance < nearestDistance) {
+      nearest = building;
+      nearestDistance = distance;
+    }
+  }
+  return nearest;
 }
 
 function hasUnitAttackTarget(world: WorldState, unit: UnitState): boolean {
@@ -1121,6 +1184,132 @@ function findSpawnCell(world: WorldState, preferred: CellCoord): CellCoord | nul
   return null;
 }
 
+// --- Engineers: ladders and moat filling (docs/03_combat/siege-system.md) --
+
+function applyEngineerTaskCommand(
+  world: WorldState,
+  unitIds: readonly UnitId[],
+  kind: EngineerTaskKind,
+  position: CellCoord
+): string | null {
+  const engineers = world.units.filter(
+    (unit) => unitIds.includes(unit.id) && unit.type === "engineer" && unit.hp > 0
+  );
+  if (engineers.length === 0) {
+    return "No engineers selected";
+  }
+
+  const target = engineerTaskTarget(world, kind, position);
+  if (target === null) {
+    return kind === "ladder" ? "Ladders attach to intact walls" : "Select a moat cell to fill";
+  }
+
+  for (const engineer of engineers) {
+    engineer.task = { kind, target: position, progress: 0 };
+    engineer.attackTargetId = null;
+    engineer.path = [];
+    engineer.destination = null;
+    engineer.movementProgress = 0;
+    engineer.pathRetryCooldown = 0;
+  }
+  world.invalidMoveTarget = null;
+  return null;
+}
+
+function engineerTaskTarget(world: WorldState, kind: EngineerTaskKind, position: CellCoord): BuildingState | null {
+  const building = getBuildingAt(world, position);
+  if (building === null || building.lifecycleState !== "intact") {
+    return null;
+  }
+  if (kind === "ladder") {
+    return building.type === "wall" && building.ladderHp === null ? building : null;
+  }
+  return building.type === "dry_moat" || building.type === "water_moat" ? building : null;
+}
+
+function updateEngineerTasks(world: WorldState): void {
+  for (const unit of world.units) {
+    if (unit.task === null || unit.hp <= 0 || unit.type !== "engineer") {
+      if (unit.task !== null && unit.type !== "engineer") {
+        unit.task = null;
+      }
+      continue;
+    }
+
+    const target = engineerWorkTarget(world, unit.task.kind, unit.task.target);
+    if (target === null) {
+      // Target destroyed, filled, or already laddered: order complete/void.
+      unit.task = null;
+      continue;
+    }
+
+    if (manhattan(unit.position, unit.task.target) > 1) {
+      if (unit.path.length === 0) {
+        if (unit.pathRetryCooldown > 0) {
+          unit.pathRetryCooldown -= 1;
+          continue;
+        }
+        const path = findPathToAttackRange(world, unit.position, unit.task.target, 1);
+        if (path.length === 0) {
+          unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
+          continue;
+        }
+        unit.path = path;
+        unit.destination = path.at(-1) ?? null;
+        unit.movementProgress = 0;
+      }
+      continue;
+    }
+
+    // Adjacent: work.
+    unit.path = [];
+    unit.destination = null;
+    if (unit.task.kind === "ladder") {
+      unit.task.progress += 1;
+      if (unit.task.progress >= SIEGE_BALANCE.ladderBuildTicks) {
+        attachLadder(target);
+        unit.task = null;
+      }
+      continue;
+    }
+
+    // Moat fill: progress lives on the moat so several engineers stack and
+    // interruption preserves work (preserveProgressOnInterrupt).
+    target.fillProgress += 1;
+    if (target.fillProgress >= SIEGE_BALANCE.moatFillTicks) {
+      world.buildings = world.buildings.filter((building) => building.id !== target.id);
+      for (const worker of world.units) {
+        if (worker.task !== null && sameCell(worker.task.target, unit.task.target)) {
+          worker.task = null;
+        }
+      }
+    }
+  }
+}
+
+function engineerWorkTarget(world: WorldState, kind: EngineerTaskKind, position: CellCoord): BuildingState | null {
+  const building = getBuildingAt(world, position);
+  if (building === null || building.lifecycleState !== "intact") {
+    return null;
+  }
+  if (kind === "ladder") {
+    return building.type === "wall" && building.ladderHp === null ? building : null;
+  }
+  return building.type === "dry_moat" || building.type === "water_moat" ? building : null;
+}
+
+function attachLadder(wall: BuildingState): void {
+  wall.ladderHp = SIEGE_BALANCE.ladderHp;
+  wall.passable = true;
+  wall.movementCostModifier = SIEGE_BALANCE.ladderMoveCost;
+}
+
+function detachLadder(wall: BuildingState): void {
+  wall.ladderHp = null;
+  wall.passable = false;
+  wall.movementCostModifier = BLOCKED_MOVEMENT_COST;
+}
+
 // --- Save / load ------------------------------------------------------------
 
 const SAVE_VERSION = 1;
@@ -1146,6 +1335,11 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
   }
   for (const unit of world.units) {
     unit.pathRetryCooldown ??= 0;
+    unit.task ??= null;
+  }
+  for (const building of world.buildings) {
+    building.ladderHp ??= null;
+    building.fillProgress ??= 0;
   }
   world.nextWaveIndex ??= 0;
   world.scenario ??= { waves: mvpDefenseScenario.waves, victory: mvpDefenseScenario.victory };
@@ -1190,7 +1384,8 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
       attackCooldownTicks: unit.attackCooldownTicks,
       attackCooldownRemaining: unit.attackCooldownRemaining,
       targetId: unit.targetId,
-      assetId: unit.assetId
+      assetId: unit.assetId,
+      task: unit.task
     })),
     buildings: world.buildings.map((building) => snapshotBuilding(world, building))
   };
@@ -1563,7 +1758,8 @@ function createUnit(id: UnitId, owner: OwnerId, type: UnitType, position: CellCo
     assetId: definition.assetId,
     ticksPerStep: definition.ticksPerStep,
     movementProgress: 0,
-    pathRetryCooldown: 0
+    pathRetryCooldown: 0,
+    task: null
   };
 }
 
@@ -1587,7 +1783,18 @@ function updateCombat(world: WorldState): void {
       continue;
     }
 
-    target.hp -= damageAgainst(unit);
+    const damage = damageAgainst(unit);
+    const laddered = target as Partial<BuildingState>;
+    if (laddered.ladderHp !== undefined && laddered.ladderHp !== null && unit.attackRange === 1) {
+      // Melee strikes tear down the attached ladder before the wall itself
+      // takes damage (siege-system.md: 梯子破壊).
+      laddered.ladderHp -= damage;
+      if (laddered.ladderHp <= 0) {
+        detachLadder(target as BuildingState);
+      }
+    } else {
+      target.hp -= damage;
+    }
     unit.targetId = target.id;
     unit.attackCooldownRemaining = unit.attackCooldownTicks;
   }
@@ -1914,7 +2121,9 @@ function createBuildingState(
     movementCostModifier: definition.movementCostModifier,
     assetId: definition.assetId,
     food: type === "storehouse" ? FOOD_BALANCE.storehouseInitialFood : null,
-    foodCapacity: type === "storehouse" ? FOOD_BALANCE.storehouseCapacity : null
+    foodCapacity: type === "storehouse" ? FOOD_BALANCE.storehouseCapacity : null,
+    ladderHp: null,
+    fillProgress: 0
   };
 }
 
@@ -1998,7 +2207,9 @@ function snapshotBuilding(world: WorldState, building: BuildingState): BuildingS
     assetId: connectedBuildingAssetId(world, building),
     food: building.food,
     foodCapacity: building.foodCapacity,
-    connectedToHonmaru: world.food.connectedStorehouseIds.includes(building.id)
+    connectedToHonmaru: world.food.connectedStorehouseIds.includes(building.id),
+    ladderHp: building.ladderHp,
+    fillProgress: building.fillProgress
   };
 }
 

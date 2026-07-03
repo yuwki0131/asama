@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitType, WorldSnapshot } from "@asama/shared";
-import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas } from "../renderer/GameCanvas";
+import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type ToolMode } from "../renderer/GameCanvas";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 
 const DEBUG_STATUS_PANEL_ENABLED =
@@ -12,7 +12,7 @@ export function App() {
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [simulationStatus, setSimulationStatus] = useState("starting");
-  const [buildTool, setBuildTool] = useState<BuildingType | "demolish" | null>(null);
+  const [buildTool, setBuildTool] = useState<ToolMode>(null);
   const [debugVisible, setDebugVisible] = useState(DEBUG_STATUS_PANEL_ENABLED || DEBUG_OVERLAY_DEFAULT_ENABLED);
   const [speed, setSpeed] = useState<0 | 1 | 2 | 4>(1);
   const lastRunningSpeedRef = useRef<1 | 2 | 4>(1);
@@ -213,6 +213,21 @@ export function App() {
     [snapshot?.currentTick]
   );
 
+  const handleEngineerTask = useCallback(
+    (task: "ladder" | "fillMoat", position: CellCoord) => {
+      const selectedIds = snapshot?.units.filter((unit) => unit.selected).map((unit) => unit.id) ?? [];
+      simulationRef.current?.enqueueCommand({
+        type: "engineerTask",
+        unitIds: selectedIds,
+        task,
+        position,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick, snapshot?.units]
+  );
+
   const outcome = snapshot?.outcome ?? null;
   const food = snapshot?.food ?? null;
   const economy = snapshot?.economy ?? null;
@@ -332,6 +347,16 @@ export function App() {
         <button type="button" onClick={() => handleRecruit("archer")}>
           徴兵:弓
         </button>
+        <button type="button" onClick={() => handleRecruit("engineer")}>
+          徴兵:工兵
+        </button>
+        <span className="bar-divider" />
+        <button className={buildTool === "ladder" ? "active" : ""} type="button" onClick={() => setBuildTool("ladder")}>
+          梯子設置
+        </button>
+        <button className={buildTool === "fillMoat" ? "active" : ""} type="button" onClick={() => setBuildTool("fillMoat")}>
+          堀埋め
+        </button>
         <span className="bar-divider" />
         <button type="button" onClick={() => handleMarketTrade("buyFood")}>
           市場:食料購入
@@ -365,6 +390,7 @@ export function App() {
           onDemolishBuilding={handleDemolishBuilding}
           onPlaceBuilding={handlePlaceBuilding}
           onToggleGate={handleToggleGate}
+          onEngineerTask={handleEngineerTask}
           onSelectUnits={handleSelectUnits}
           onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}
@@ -397,7 +423,7 @@ function seasonLabel(season: Season): string {
 }
 
 interface DebugStatusPanelProps {
-  readonly buildTool: BuildingType | "demolish" | null;
+  readonly buildTool: ToolMode;
   readonly selectedUnits: NonNullable<WorldSnapshot["units"]>;
   readonly simulationError: string | null;
   readonly simulationStatus: string;

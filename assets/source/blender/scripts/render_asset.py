@@ -718,6 +718,40 @@ def build_town_block_graybox(scene: bpy.types.Scene) -> None:
         add_gabled_house(scene, name, low, high, wall_top, ridge_top, axis, mats[wall], mats["roof"], roof_overhang=0.18)
 
 
+def build_unit_engineer(scene: bpy.types.Scene) -> None:
+    """Engineer figure, ~28px tall at unit scale. Canvas 48x64, anchor 24,52.48
+    (matches the existing unit sprites). Ground contact at origin."""
+    cloth = make_material("EngineerCloth", (0.30, 0.33, 0.28, 1.0))
+    skin = make_material("EngineerSkin", (0.62, 0.48, 0.36, 1.0))
+    hat = make_material("EngineerHat", (0.55, 0.47, 0.28, 1.0))
+    tool = make_material("EngineerTool", (0.35, 0.27, 0.18, 1.0))
+
+    add_box(scene, "Legs", *map_box((-0.09, -0.06, 0.0), (0.09, 0.06, 0.30)), cloth)
+    add_box(scene, "Torso", *map_box((-0.11, -0.07, 0.30), (0.11, 0.07, 0.52)), cloth)
+    add_box(scene, "Head", *map_box((-0.06, -0.06, 0.52), (0.06, 0.06, 0.64)), skin)
+    # Straw hat: flat wide box + small crown.
+    add_box(scene, "HatBrim", *map_box((-0.13, -0.13, 0.63), (0.13, 0.13, 0.66)), hat)
+    add_box(scene, "HatTop", *map_box((-0.06, -0.06, 0.66), (0.06, 0.06, 0.71)), hat)
+    # Shovel over the shoulder.
+    add_box(scene, "ShovelShaft", *map_box((0.10, -0.02, 0.20), (0.14, 0.02, 0.72)), tool)
+    add_box(scene, "ShovelBlade", *map_box((0.08, -0.04, 0.72), (0.16, 0.04, 0.82)), tool)
+
+
+def build_wall_ladder(scene: bpy.types.Scene) -> None:
+    """Siege ladder leaning over a wall cell, drawn as an overlay sprite on
+    the laddered wall. Canvas 64x96, anchor 32,80 (same as the wall)."""
+    wood = make_material("LadderWood", (0.52, 0.40, 0.24, 1.0))
+    steps = 7
+    for i in range(steps + 1):
+        t = i / steps
+        x = 0.38 - 0.48 * t
+        y = 0.38 - 0.48 * t
+        z = 1.28 * t
+        add_box(scene, f"Rung{i}", *map_box((x - 0.05, y - 0.24, z), (x + 0.05, y + 0.24, z + 0.05)), wood)
+    # Side rails hinted as slightly larger end rungs.
+    add_box(scene, "BaseFoot", *map_box((0.34, 0.10, 0.0), (0.46, 0.66, 0.05)), wood)
+
+
 # Connected wall kit -------------------------------------------------------
 #
 # One parametric builder covers all 16 connection masks. Arms run from the
@@ -1116,6 +1150,8 @@ MODEL_REGISTRY = {
     "building-farm-paddy": build_farm_paddy,
     "building-earth-bridge": build_earth_bridge,
     "building-wood-bridge": build_wood_bridge,
+    "unit-engineer": build_unit_engineer,
+    "wall-ladder": build_wall_ladder,
 }
 
 

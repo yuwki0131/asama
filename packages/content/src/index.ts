@@ -68,6 +68,7 @@ export const mvpDefenseScenario: ScenarioDefinition = {
     spawns: [
       { type: "spear_ashigaru", position: { x: 86, y: 63 } },
       { type: "sword_ashigaru", position: { x: 86, y: 66 } },
+      { type: "engineer", position: { x: 88, y: 65 } },
       { type: "archer", position: { x: 87, y: 68 } }
     ]
   },
@@ -77,6 +78,8 @@ export const mvpDefenseScenario: ScenarioDefinition = {
       { type: "spear_ashigaru", position: { x: 86, y: 63 } },
       { type: "spear_ashigaru", position: { x: 86, y: 66 } },
       { type: "sword_ashigaru", position: { x: 87, y: 64 } },
+      { type: "engineer", position: { x: 88, y: 65 } },
+      { type: "engineer", position: { x: 88, y: 67 } },
       { type: "archer", position: { x: 87, y: 68 } }
     ]
   }

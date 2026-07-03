@@ -2520,6 +2520,28 @@
         "x": 0.5,
         "y": 0.75
       }
+    },
+    {
+      "assetId": "unit.engineer.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-engineer-idle-south.png",
+      "width": 48,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "building.wall.ladder.attached",
+      "kind": "building",
+      "file": "generated/building-wall-ladder-attached.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
     }
   ]
 }

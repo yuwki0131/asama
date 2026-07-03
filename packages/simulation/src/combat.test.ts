@@ -27,7 +27,8 @@ function unit(
   const definitions = {
     spear_ashigaru: { hp: 100, damage: 14, range: 1, cooldown: 26, step: 6 },
     sword_ashigaru: { hp: 110, damage: 18, range: 1, cooldown: 22, step: 6 },
-    archer: { hp: 70, damage: 12, range: 8, cooldown: 32, step: 7 }
+    archer: { hp: 70, damage: 12, range: 8, cooldown: 32, step: 7 },
+    engineer: { hp: 80, damage: 8, range: 1, cooldown: 30, step: 7 }
   } satisfies Record<UnitType, { hp: number; damage: number; range: number; cooldown: number; step: number }>;
   const definition = definitions[type];
 
@@ -50,7 +51,8 @@ function unit(
     assetId: `unit.${type}.test`,
     ticksPerStep: definition.step,
     movementProgress: 0,
-    pathRetryCooldown: 0
+    pathRetryCooldown: 0,
+    task: null
   };
 }
 
