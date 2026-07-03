@@ -374,6 +374,110 @@ def build_calibration_chirality(scene: bpy.types.Scene) -> None:
     add_box(scene, "ChiralityCube", *map_box((1.0, 0.0, 0.0), (2.0, 1.0, 1.0)), cube)
 
 
+# Connected wall kit -------------------------------------------------------
+#
+# One parametric builder covers all 16 connection masks. Arms run from the
+# tile center to the edge midpoint of each set direction, so socket
+# continuity with neighbor tiles holds by construction: every arm is cut
+# exactly at the tile edge and the neighbor's matching arm continues it.
+# Mask bit order N,E,S,W matches simulation map-coordinate adjacency
+# (y-1, x+1, y+1, x-1).
+
+WALL_DIRECTIONS = {
+    "N": (0.0, -1.0),
+    "E": (1.0, 0.0),
+    "S": (0.0, 1.0),
+    "W": (-1.0, 0.0),
+}
+
+WALL_BASE_THICKNESS = 0.38
+WALL_BASE_HEIGHT = 0.22
+WALL_BODY_THICKNESS = 0.26
+WALL_BODY_TOP = 0.95
+WALL_COPING_THICKNESS = 0.36
+WALL_COPING_TOP = 1.14
+# Per-part inset multiplier that breaks coplanar faces where arms overlap
+# near the tile center; far below one pixel (1px is about 0.022 units).
+WALL_EPSILON = 0.0012
+
+
+def wall_arm_box(direction: tuple[float, float], half_thickness: float, z0: float, z1: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    dx, dy = direction
+    if dx != 0.0:
+        x0, x1 = (0.0, 0.5) if dx > 0 else (-0.5, 0.0)
+        return (x0, -half_thickness, z0), (x1, half_thickness, z1)
+    y0, y1 = (0.0, 0.5) if dy > 0 else (-0.5, 0.0)
+    return (-half_thickness, y0, z0), (half_thickness, y1, z1)
+
+
+def build_wall_plaster_mask(scene: bpy.types.Scene, mask: str) -> None:
+    plaster = make_material("WallPlaster", (0.80, 0.78, 0.72, 1.0))
+    stone = make_material("WallStone", (0.40, 0.38, 0.34, 1.0))
+    coping = make_material("WallCoping", (0.22, 0.24, 0.29, 1.0))
+
+    bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    active = [name for name, on in bits.items() if on]
+
+    if not active:
+        # Isolated pillar: square post with a pyramid cap.
+        half = WALL_BASE_THICKNESS / 2.0
+        add_box(scene, "PillarBase", *map_box((-half, -half, 0.0), (half, half, WALL_BASE_HEIGHT)), stone)
+        body_half = WALL_BODY_THICKNESS / 2.0 + 0.03
+        add_box(scene, "PillarBody", *map_box((-body_half, -body_half, WALL_BASE_HEIGHT), (body_half, body_half, WALL_BODY_TOP)), plaster)
+        cap_half = WALL_COPING_THICKNESS / 2.0 + 0.02
+        apex = ((0.0, 0.0, WALL_COPING_TOP))
+        base_z = WALL_BODY_TOP
+        add_mesh(
+            scene,
+            "PillarCap",
+            [
+                (-cap_half, -cap_half, base_z), (cap_half, -cap_half, base_z),
+                (cap_half, cap_half, base_z), (-cap_half, cap_half, base_z),
+                apex,
+            ],
+            [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4), (0, 3, 2, 1)],
+            coping,
+        )
+        return
+
+    for index, name in enumerate(active):
+        direction = WALL_DIRECTIONS[name]
+        inset = WALL_EPSILON * (index + 1)
+
+        base_low, base_high = wall_arm_box(direction, WALL_BASE_THICKNESS / 2.0 - inset, 0.0, WALL_BASE_HEIGHT)
+        add_box(scene, f"WallBase{name}", *map_box(base_low, base_high), stone)
+
+        body_low, body_high = wall_arm_box(direction, WALL_BODY_THICKNESS / 2.0 - inset, WALL_BASE_HEIGHT, WALL_BODY_TOP)
+        add_box(scene, f"WallBody{name}", *map_box(body_low, body_high), plaster)
+
+        half = WALL_COPING_THICKNESS / 2.0 - inset
+        cop_low, cop_high = wall_arm_box(direction, half, 0.0, 0.0)
+        low, high = map_box(cop_low, cop_high)
+        ridge_axis = "x" if direction[0] != 0.0 else "y"
+        add_gable_roof(
+            scene,
+            f"WallCoping{name}",
+            (low[0], low[1]),
+            (high[0], high[1]),
+            WALL_BODY_TOP,
+            WALL_COPING_TOP,
+            ridge_axis,
+            coping,
+        )
+
+
+def resolve_model(name: str):
+    builder = MODEL_REGISTRY.get(name)
+    if builder is not None:
+        return builder
+    prefix = "wall-plaster-connected-"
+    if name.startswith(prefix):
+        mask = name[len(prefix):]
+        if len(mask) == 4 and set(mask) <= {"0", "1"}:
+            return lambda scene: build_wall_plaster_mask(scene, mask)
+    return None
+
+
 MODEL_REGISTRY = {
     "calibration-tile": build_calibration_tile,
     "calibration-cube": build_calibration_cube,
@@ -394,9 +498,9 @@ def main() -> None:
     canvas_w, canvas_h = parse_pair(args.canvas, "x")
     anchor_x, anchor_y = parse_pair(args.anchor, ",")
 
-    builder = MODEL_REGISTRY.get(args.model)
+    builder = resolve_model(args.model)
     if builder is None:
-        raise SystemExit(f"unknown model: {args.model}; known: {sorted(MODEL_REGISTRY)}")
+        raise SystemExit(f"unknown model: {args.model}; known: {sorted(MODEL_REGISTRY)} plus wall-plaster-connected-<NESW mask>")
 
     scene = reset_scene()
     builder(scene)

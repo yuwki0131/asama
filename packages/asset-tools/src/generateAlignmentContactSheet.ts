@@ -247,8 +247,16 @@ function targetConcern(target: AlignmentTarget, bounds: AlphaBounds | null, anch
   if (target.placement === "south" && bounds.maxY !== anchor.y) {
     return `bottom alpha differs from south anchor by ${bounds.maxY - anchor.y}px`;
   }
-  if (target.sockets === true && bounds.maxY !== anchor.y) {
-    return `connected contact bottom differs from anchor by ${bounds.maxY - anchor.y}px`;
+  if (target.sockets === true) {
+    // Flat ribbon-style art ends exactly on the anchor line. True-3D art
+    // (Blender pipeline) is centered on the tile centerline and its base
+    // extends south by up to half the structure thickness; for a 1x1 tile
+    // that is at most (0.5 + thickness/2) * 16px, so 12px covers walls up
+    // to 0.5 tiles thick. Anything past that indicates a misplaced anchor.
+    const overhang = bounds.maxY - anchor.y;
+    if (overhang < 0 || overhang > 12) {
+      return `connected contact bottom differs from anchor by ${overhang}px`;
+    }
   }
   return "none";
 }

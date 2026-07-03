@@ -1083,8 +1083,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0000.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1108,8 +1109,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0001.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1133,8 +1135,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0010.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1158,8 +1161,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0011.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1183,8 +1187,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0100.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1208,8 +1213,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0101.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1233,8 +1239,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0110.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1258,8 +1265,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-0111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-0111.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-0111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1283,8 +1291,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1000.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1308,8 +1317,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1001.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1333,8 +1343,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1010.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1358,8 +1369,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1011.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1383,8 +1395,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1100.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1408,8 +1421,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1101.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1433,8 +1447,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1110.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1458,8 +1473,9 @@
       "kind": "building",
       "output": "building-wall-plaster-connected-1111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-directional-wall-gates/building-wall-plaster-connected-1111.png"
+        "type": "blender",
+        "model": "wall-plaster-connected-1111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
