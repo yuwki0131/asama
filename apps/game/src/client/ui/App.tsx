@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BuildingType, CellCoord, EntityId, WorldSnapshot } from "@asama/shared";
-import { GameCanvas } from "../renderer/GameCanvas";
+import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas } from "../renderer/GameCanvas";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 
 const DEBUG_STATUS_PANEL_ENABLED =
@@ -13,6 +13,7 @@ export function App() {
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [simulationStatus, setSimulationStatus] = useState("starting");
   const [buildTool, setBuildTool] = useState<BuildingType | "demolish" | null>(null);
+  const [debugVisible, setDebugVisible] = useState(DEBUG_STATUS_PANEL_ENABLED || DEBUG_OVERLAY_DEFAULT_ENABLED);
   const selectedUnits = snapshot?.units.filter((unit) => unit.selected) ?? [];
 
   useEffect(() => {
@@ -197,6 +198,13 @@ export function App() {
           <button type="button" onClick={() => void handleQuickLoad()}>
             Load
           </button>
+          <button
+            className={debugVisible ? "active" : ""}
+            type="button"
+            onClick={() => setDebugVisible((visible) => !visible)}
+          >
+            Debug
+          </button>
         </div>
       </header>
       <div className="buildbar">
@@ -236,6 +244,7 @@ export function App() {
         )}
         <GameCanvas
           buildTool={buildTool}
+          debugOverlayVisible={debugVisible}
           snapshot={snapshot}
           onDemolishBuilding={handleDemolishBuilding}
           onPlaceBuilding={handlePlaceBuilding}
@@ -243,7 +252,7 @@ export function App() {
           onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}
         />
-        {DEBUG_STATUS_PANEL_ENABLED ? (
+        {debugVisible ? (
           <DebugStatusPanel
             buildTool={buildTool}
             selectedUnits={selectedUnits}

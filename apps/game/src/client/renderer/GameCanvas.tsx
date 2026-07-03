@@ -14,6 +14,7 @@ import type {
 interface GameCanvasProps {
   readonly snapshot: WorldSnapshot | null;
   readonly buildTool: BuildingType | "demolish" | null;
+  readonly debugOverlayVisible: boolean;
   readonly onSelectUnit: (unitId: UnitId) => void;
   readonly onAttackTarget: (targetId: EntityId) => void;
   readonly onMoveSelected: (destination: CellCoord) => void;
@@ -54,7 +55,9 @@ const LEGACY_WALL_HEIGHT = 72;
 const LEGACY_GATE_HEIGHT = 80;
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
-const DEBUG_ALIGNMENT_ENABLED =
+/** Initial state for the in-game debug toggle; the Debug button in the top
+ * bar switches the overlay and status panel at runtime. */
+export const DEBUG_OVERLAY_DEFAULT_ENABLED =
   import.meta.env.VITE_DEBUG_ALIGNMENT === "true" ||
   (import.meta.env.DEV && import.meta.env.VITE_DEBUG_ALIGNMENT !== "false");
 const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
@@ -85,6 +88,7 @@ const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
 export function GameCanvas({
   snapshot,
   buildTool,
+  debugOverlayVisible,
   onSelectUnit,
   onAttackTarget,
   onMoveSelected,
@@ -270,6 +274,7 @@ export function GameCanvas({
       assets,
       cameraRef.current,
       buildTool,
+      debugOverlayVisible,
       hoverCell,
       selectedCell,
       localInvalidMoveTarget
@@ -277,7 +282,7 @@ export function GameCanvas({
     // cameraVersion is not read by renderScene, but camera pans and zooms
     // mutate cameraRef without new state; the version bump re-triggers this
     // effect so the scene follows the camera.
-  }, [assets, buildTool, cameraVersion, hoverCell, localInvalidMoveTarget, ready, selectedCell, snapshot]);
+  }, [assets, buildTool, cameraVersion, debugOverlayVisible, hoverCell, localInvalidMoveTarget, ready, selectedCell, snapshot]);
 
   useEffect(() => {
     const app = appRef.current;
@@ -452,6 +457,7 @@ function renderScene(
   assets: ReadonlyMap<string, LoadedAsset>,
   camera: CameraState,
   buildTool: BuildingType | "demolish" | null,
+  debugOverlayVisible: boolean,
   hoverCell: CellCoord | null,
   selectedCell: CellCoord | null,
   localInvalidMoveTarget: CellCoord | null
@@ -505,7 +511,7 @@ function renderScene(
     addUnitSprite(unitLayer, unit, assets, camera.zoom);
   }
 
-  if (DEBUG_ALIGNMENT_ENABLED) {
+  if (debugOverlayVisible) {
     addAlignmentDebugOverlay(unitLayer, snapshot, camera, app.screen.width, app.screen.height, assets);
   }
 }
