@@ -23,6 +23,20 @@ The camera rig guarantees the contract by construction:
 Models place their logical placement point at world origin:
     - surface / connected assets: footprint center at origin
     - large vertical buildings: south/bottom contact point at origin
+
+Map-to-world convention (IMPORTANT):
+    Screen space is y-down (left-handed) while Blender world space is
+    right-handed, so satisfying both screenX=(mapX-mapY)*32 and
+    screenY=(mapX+mapY)*16 with a physical camera requires mirroring one
+    axis. The fixed convention is:
+
+        worldX = mapX
+        worldY = -mapY
+
+    Model builders MUST author geometry in world coordinates using this
+    mapping. Example: a building whose footprint extends 4 tiles north-west
+    from its south contact corner at map [-4..0]x[-4..0] occupies world
+    x in [-4,0], y in [0,4]. Use map_xy() to convert.
 """
 
 from __future__ import annotations
@@ -125,8 +139,34 @@ def setup_render(scene: bpy.types.Scene, canvas_w: int, canvas_h: int, spec_name
         scene.cycles.samples = 64
         scene.cycles.seed = seed
         scene.cycles.use_denoising = False
+        setup_production_lighting(scene)
     else:
         raise SystemExit(f"unknown render spec: {spec_name}")
+
+
+def setup_production_lighting(scene: bpy.types.Scene) -> None:
+    """Fixed sun per art direction: light from screen top-left, shadows to
+    screen bottom-right, identical for every asset.
+
+    With the fixed camera azimuth, screen bottom-right corresponds to the
+    world direction (+x, slightly -y). The sun travels along that horizontal
+    heading at roughly 50 degrees elevation.
+    """
+    direction = Vector((1.0, -0.2, -1.4)).normalized()
+    sun_data = bpy.data.lights.new("Sun", type="SUN")
+    sun_data.energy = 3.5
+    sun_data.angle = 0.06
+    sun = bpy.data.objects.new("Sun", sun_data)
+    sun.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
+    scene.collection.objects.link(sun)
+
+    world = bpy.data.worlds.new("World")
+    world.use_nodes = True
+    background = world.node_tree.nodes.get("Background")
+    if background is not None:
+        background.inputs["Color"].default_value = (0.55, 0.6, 0.68, 1.0)
+        background.inputs["Strength"].default_value = 0.45
+    scene.world = world
 
 
 def make_material(name: str, rgba: tuple[float, float, float, float]) -> bpy.types.Material:
@@ -201,10 +241,146 @@ def build_calibration_grid(scene: bpy.types.Scene) -> None:
             )
 
 
+def add_box(scene: bpy.types.Scene, name: str, low: tuple[float, float, float], high: tuple[float, float, float], material: bpy.types.Material) -> bpy.types.Object:
+    x0, y0, z0 = low
+    x1, y1, z1 = high
+    return add_mesh(
+        scene,
+        name,
+        [
+            (x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0),
+            (x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1),
+        ],
+        [
+            (0, 1, 2, 3), (4, 5, 6, 7),
+            (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7),
+        ],
+        material,
+    )
+
+
+def add_gable_roof(scene: bpy.types.Scene, name: str, low: tuple[float, float], high: tuple[float, float], base_z: float, ridge_z: float, ridge_axis: str, material: bpy.types.Material) -> bpy.types.Object:
+    """Gabled prism roof. Ridge runs along ridge_axis ('x' or 'y')."""
+    x0, y0 = low
+    x1, y1 = high
+    if ridge_axis == "x":
+        ridge_a = ((x0, (y0 + y1) / 2.0, ridge_z))
+        ridge_b = ((x1, (y0 + y1) / 2.0, ridge_z))
+        vertices = [
+            (x0, y0, base_z), (x1, y0, base_z), (x1, y1, base_z), (x0, y1, base_z),
+            ridge_a, ridge_b,
+        ]
+        faces = [(0, 1, 5, 4), (2, 3, 4, 5), (0, 4, 3), (1, 2, 5), (0, 3, 2, 1)]
+    else:
+        ridge_a = (((x0 + x1) / 2.0, y0, ridge_z))
+        ridge_b = (((x0 + x1) / 2.0, y1, ridge_z))
+        vertices = [
+            (x0, y0, base_z), (x1, y0, base_z), (x1, y1, base_z), (x0, y1, base_z),
+            ridge_a, ridge_b,
+        ]
+        faces = [(0, 4, 5, 3), (1, 2, 5, 4), (0, 1, 4), (2, 3, 5), (0, 3, 2, 1)]
+    return add_mesh(scene, name, vertices, faces, material)
+
+
+def make_grass_material() -> bpy.types.Material:
+    """Low-saturation grass with subtle large-scale noise variation."""
+    material = bpy.data.materials.new("Grass")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 6.0
+    noise.inputs["Detail"].default_value = 4.0
+
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.35
+    ramp.color_ramp.elements[0].color = (0.208, 0.294, 0.157, 1.0)
+    ramp.color_ramp.elements[1].position = 0.75
+    ramp.color_ramp.elements[1].color = (0.322, 0.412, 0.204, 1.0)
+
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    return material
+
+
+def build_terrain_grass(scene: bpy.types.Scene) -> None:
+    """One grass surface tile, footprint center at origin. Canvas 64x32, anchor 32,16."""
+    add_mesh(
+        scene,
+        "GrassTile",
+        [(-0.5, -0.5, 0.0), (0.5, -0.5, 0.0), (0.5, 0.5, 0.0), (-0.5, 0.5, 0.0)],
+        [(0, 1, 2, 3)],
+        make_grass_material(),
+    )
+
+
+def map_xy(map_x: float, map_y: float) -> tuple[float, float]:
+    """Convert map-grid coordinates to Blender world coordinates."""
+    return (map_x, -map_y)
+
+
+def map_box(low_map: tuple[float, float, float], high_map: tuple[float, float, float]) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    """Convert a map-space box (low/high corners) to world-space low/high."""
+    (x0, y0, z0), (x1, y1, z1) = low_map, high_map
+    wx0, wy1 = map_xy(x0, y0)
+    wx1, wy0 = map_xy(x1, y1)
+    return (wx0, wy0, z0), (wx1, wy1, z1)
+
+
+def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
+    """Kura (storehouse) massing study on a 4x4 footprint.
+
+    Large vertical building: south/bottom contact point at world origin, so
+    the footprint square is map [-4..0]x[-4..0]. Canvas 320x260, anchor 160,203.
+    """
+    plaster = make_material("Plaster", (0.78, 0.76, 0.70, 1.0))
+    stone = make_material("StoneBase", (0.42, 0.40, 0.36, 1.0))
+    roof = make_material("RoofTile", (0.22, 0.24, 0.29, 1.0))
+    wood = make_material("Wood", (0.35, 0.26, 0.18, 1.0))
+
+    # Stone plinth covering most of the footprint.
+    add_box(scene, "Plinth", *map_box((-3.7, -3.7, 0.0), (-0.3, -0.3, 0.35)), stone)
+    # Plastered storehouse body, inset from the plinth.
+    add_box(scene, "Body", *map_box((-3.4, -3.0, 0.35), (-0.6, -1.0, 1.95)), plaster)
+    # Dark wood band under the eaves.
+    add_box(scene, "EaveBand", *map_box((-3.45, -3.05, 1.7), (-0.55, -0.95, 1.95)), wood)
+    # Gabled tile roof with overhang, ridge along the long map-x axis.
+    low, high = map_box((-3.75, -3.35, 0.0), (-0.25, -0.65, 0.0))
+    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.95, 2.75, "x", roof)
+
+
+def build_calibration_chirality(scene: bpy.types.Scene) -> None:
+    """Asymmetric marker that locks the map-to-world mirror convention.
+
+    A flat tile sits at map (0,0) (footprint center at origin) and a unit
+    cube occupies the EAST neighbor column, map [1..2]x[0..1]. Map east
+    (+mapX) must project to screen lower-right, so with canvas 160x128 and
+    anchor 80,48 the cube must appear right of and below the flat tile.
+    The opaque centroid must land right of canvas center; a mirrored
+    projection puts it left, which the calibration check must reject.
+    """
+    tile = make_material("ChiralityTile", (0.2, 0.5, 0.7, 1.0))
+    cube = make_material("ChiralityCube", (0.75, 0.55, 0.15, 1.0))
+    add_mesh(
+        scene,
+        "ChiralityTilePlane",
+        [(-0.5, 0.5, 0.0), (0.5, 0.5, 0.0), (0.5, -0.5, 0.0), (-0.5, -0.5, 0.0)],
+        [(0, 1, 2, 3)],
+        tile,
+    )
+    add_box(scene, "ChiralityCube", *map_box((1.0, 0.0, 0.0), (2.0, 1.0, 1.0)), cube)
+
+
 MODEL_REGISTRY = {
     "calibration-tile": build_calibration_tile,
     "calibration-cube": build_calibration_cube,
     "calibration-grid": build_calibration_grid,
+    "calibration-chirality": build_calibration_chirality,
+    "terrain-grass-base": build_terrain_grass,
+    "building-storehouse-graybox": build_storehouse_graybox,
 }
 
 

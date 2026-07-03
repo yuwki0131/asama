@@ -13,6 +13,7 @@
     "validate:generated-assets": "pnpm --filter @asama/asset-tools validate:generated",
     "assets:generate:placeholder": "pnpm --filter @asama/asset-tools assets:generate:placeholder",
     "assets:render:blender": "pnpm --filter @asama/asset-tools assets:render:blender",
+    "assets:blender:calibration": "pnpm --filter @asama/asset-tools assets:blender:calibration",
     "assets:import:raster": "pnpm --filter @asama/asset-tools assets:import:raster",
     "assets:postprocess": "pnpm --filter @asama/asset-tools assets:postprocess",
     "assets:atlas": "pnpm --filter @asama/asset-tools assets:atlas",

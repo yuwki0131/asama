@@ -8,12 +8,17 @@ export function toBlenderRenderSpec(asset: ProductionAssetSpec, outputDirectory:
   }
 
   return {
-    scene: asset.source.scene,
+    ...(asset.source.scene === undefined ? {} : { scene: asset.source.scene }),
+    ...(asset.source.model === undefined ? {} : { model: asset.source.model }),
     ...(asset.source.collection === undefined ? {} : { collection: asset.source.collection }),
     outputDirectory,
     resolution: {
       width: asset.geometry.canvasWidth,
       height: asset.geometry.canvasHeight
+    },
+    anchor: {
+      x: asset.geometry.anchorX,
+      y: asset.geometry.anchorY
     },
     transparentBackground: true,
     renderSpec: asset.source.renderSpec
@@ -24,7 +29,6 @@ export function buildBlenderCommand(spec: BlenderRenderSpec, pythonScript: strin
   const args = [
     "blender",
     "--background",
-    spec.scene,
     "--python",
     pythonScript,
     "--",
@@ -38,6 +42,8 @@ export function buildBlenderCommand(spec: BlenderRenderSpec, pythonScript: strin
     String(spec.transparentBackground)
   ];
 
+  appendOptional(args, "--scene", spec.scene);
+  appendOptional(args, "--model", spec.model);
   appendOptional(args, "--collection", spec.collection);
   appendOptional(args, "--camera", spec.camera);
   appendOptional(args, "--frame", spec.frame);
@@ -53,7 +59,9 @@ export async function validateBlenderAssetInputs(assets: readonly ProductionAsse
     if (asset.source.type !== "blender") {
       continue;
     }
-    await access(asset.source.scene);
+    if (asset.source.scene !== undefined) {
+      await access(asset.source.scene);
+    }
   }
 }
 

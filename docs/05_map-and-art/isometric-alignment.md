@@ -44,6 +44,25 @@ Runtime placement depends on asset geometry class.
 The sprite is then placed by its manifest anchor. The renderer must not carry
 hidden per-asset visual offsets to compensate for incorrect source art.
 
+## Blender World Convention
+
+Screen space is y-down while Blender world space is right-handed, so a
+physical camera cannot satisfy both `screenX = (mapX - mapY) * 32` and
+`screenY = (mapX + mapY) * 16` without mirroring one axis. The Blender
+pipeline fixes this convention:
+
+```text
+worldX = mapX
+worldY = -mapY
+camera: orthographic, rotation (60deg, 0, 45deg), ortho scale = canvasWidth / (64 / sqrt(2))
+```
+
+Model builders in `assets/source/blender/scripts/render_asset.py` must author
+geometry in world coordinates using this mapping. The `calibration-chirality`
+model guards the convention: map east (+mapX) must project to screen
+lower-right. Symmetric calibration shapes cannot detect a mirrored setup; the
+chirality check must stay in the calibration suite.
+
 ## Connected Socket Contract
 
 Connected 1x1 structures use the same map-coordinate mask order as simulation:

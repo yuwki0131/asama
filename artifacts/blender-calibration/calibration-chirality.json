@@ -1,0 +1,15 @@
+{
+  "model": "calibration-chirality",
+  "output": "/home/yuwki0131/workspace/asama/artifacts/blender-calibration/raw-renders/calibration-chirality.png",
+  "canvas": [
+    160,
+    128
+  ],
+  "anchor": [
+    80.0,
+    48.0
+  ],
+  "renderSpec": "cycles-cpu",
+  "pxPerUnit": 45.25483399593904,
+  "blenderVersion": "5.1.1"
+}

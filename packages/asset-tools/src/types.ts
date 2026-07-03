@@ -82,7 +82,8 @@ export type AssetSource =
     }
   | {
       readonly type: "blender";
-      readonly scene: string;
+      readonly model?: string;
+      readonly scene?: string;
       readonly collection?: string;
       readonly renderSpec: string;
     }
@@ -142,20 +143,24 @@ export interface ProductionPostprocessSpec {
 }
 
 export interface BlenderRenderSpec {
-  readonly scene: string;
+  readonly model?: string;
+  readonly scene?: string;
   readonly collection?: string;
   readonly camera?: string;
   readonly outputDirectory: string;
+  readonly outputName?: string;
   readonly resolution: {
     readonly width: number;
     readonly height: number;
   };
+  readonly anchor: AssetAnchor;
   readonly transparentBackground: boolean;
   readonly frame?: number;
   readonly direction?: string;
   readonly animation?: string;
   readonly renderSeed?: number;
   readonly renderSpec: string;
+  readonly reportJson?: string;
 }
 
 export interface AtlasBuildSpec {

@@ -1,6 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
-import { blenderPlanLines, defaultBlenderRenderScript, validateBlenderAssetInputs } from "./blenderAdapter";
+import {
+  renderBlenderAsset,
+  renderCalibrationSuite,
+  resolveBlenderBinary
+} from "./blenderRender";
+import { defaultBlenderRenderScript } from "./blenderAdapter";
 import { readManifest } from "./manifest";
 import { readProductionAssetConfig } from "./productionConfig";
 import { importRasterAsset } from "./postprocess";
@@ -48,20 +53,45 @@ async function readExistingGeneratedManifest(): Promise<{ readonly assets: reado
   }
 }
 
-export async function renderBlenderAssets(options: { readonly mock?: boolean } = {}): Promise<readonly string[]> {
+export async function renderBlenderAssets(): Promise<number> {
   const config = await readProductionAssetConfig(productionConfigPath);
   const blenderAssets = config.assets.filter((asset) => asset.source.type === "blender");
-  await mkdir(join(intermediateAssetsDir, "raw-renders"), { recursive: true });
-
-  if (!options.mock) {
-    await validateBlenderAssetInputs(blenderAssets);
+  if (blenderAssets.length === 0) {
+    return 0;
   }
 
-  return blenderPlanLines(blenderAssets, join(intermediateAssetsDir, "raw-renders"), defaultBlenderRenderScript(repoRoot));
+  const blenderBinary = await resolveBlenderBinary();
+  const rawOutputDirectory = join(intermediateAssetsDir, "raw-renders");
+  const reportDirectory = join(intermediateAssetsDir, "render-reports");
+  await mkdir(generatedOutputDir, { recursive: true });
+  for (const asset of blenderAssets) {
+    await renderBlenderAsset(asset, {
+      blenderBinary,
+      pythonScript: defaultBlenderRenderScript(repoRoot),
+      rawOutputDirectory,
+      runtimeOutputDirectory: generatedOutputDir,
+      reportDirectory
+    });
+  }
+  await mergeProductionManifest(blenderAssets);
+  return blenderAssets.length;
 }
 
 export async function postprocessProductionAssets(): Promise<number> {
   return importRasterAssets();
+}
+
+export async function runBlenderCalibration(): Promise<void> {
+  const blenderBinary = await resolveBlenderBinary();
+  const results = await renderCalibrationSuite({
+    blenderBinary,
+    pythonScript: defaultBlenderRenderScript(repoRoot),
+    artifactDirectory: join(repoRoot, "artifacts/blender-calibration")
+  });
+  const failures = results.filter((result) => !result.passed);
+  if (failures.length > 0) {
+    throw new Error(`Blender calibration failed; see artifacts/blender-calibration/report.md`);
+  }
 }
 
 export async function buildAtlas(spec: AtlasBuildSpec = { padding: 2 }): Promise<void> {
@@ -97,6 +127,25 @@ export function toGeneratedAsset(asset: ProductionAssetSpec): GeneratedAsset {
       y: asset.geometry.anchorY / asset.geometry.canvasHeight
     }
   };
+}
+
+async function mergeProductionManifest(assets: readonly ProductionAssetSpec[]): Promise<void> {
+  const existingManifest = await readExistingGeneratedManifest();
+  const productionAssets = assets.map(toGeneratedAsset);
+  const productionIds = new Set(productionAssets.map((asset) => asset.assetId));
+  const mergedAssets = [
+    ...existingManifest.assets.filter((asset) => !productionIds.has(asset.assetId)),
+    ...productionAssets
+  ];
+  await writeFile(
+    generatedManifestPath,
+    `${JSON.stringify(
+      { version: 1, generatedBy: "@asama/asset-tools production", assets: mergedAssets },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
 }
 
 function toRasterImportSpec(asset: ProductionAssetSpec): RasterImportSpec {

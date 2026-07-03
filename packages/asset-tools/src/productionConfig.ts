@@ -68,11 +68,22 @@ function parseSource(value: unknown, index: number): AssetSource {
     return { type: "procedural-svg", pattern: source.pattern };
   }
   if (source.type === "blender") {
-    assertString(source.scene, `assets[${index}].source.scene`);
+    const hasModel = source.model !== undefined;
+    const hasScene = source.scene !== undefined;
+    if (hasModel === hasScene) {
+      throw new Error(`assets[${index}].source must specify exactly one of model or scene`);
+    }
+    if (hasModel) {
+      assertString(source.model, `assets[${index}].source.model`);
+    }
+    if (hasScene) {
+      assertString(source.scene, `assets[${index}].source.scene`);
+    }
     assertString(source.renderSpec, `assets[${index}].source.renderSpec`);
     return {
       type: "blender",
-      scene: source.scene,
+      ...(source.model === undefined ? {} : { model: source.model }),
+      ...(source.scene === undefined ? {} : { scene: source.scene }),
       ...(source.collection === undefined ? {} : { collection: source.collection }),
       renderSpec: source.renderSpec
     };

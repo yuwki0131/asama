@@ -1,0 +1,15 @@
+{
+  "model": "calibration-tile",
+  "output": "/home/yuwki0131/workspace/asama/artifacts/blender-calibration/raw-renders/calibration-tile.png",
+  "canvas": [
+    64,
+    32
+  ],
+  "anchor": [
+    32.0,
+    16.0
+  ],
+  "renderSpec": "cycles-cpu",
+  "pxPerUnit": 45.25483399593904,
+  "blenderVersion": "5.1.1"
+}

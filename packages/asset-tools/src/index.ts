@@ -10,6 +10,7 @@ import {
   importRasterAssets,
   postprocessProductionAssets,
   renderBlenderAssets,
+  runBlenderCalibration,
   validateProductionAssetDefinitions
 } from "./productionPipeline";
 import { generatedManifestPath, generatedOutputDir, placeholderManifestPath, placeholderOutputDir, publicAssetsDir } from "./paths";
@@ -24,12 +25,15 @@ try {
     const manifest = await generateGeneratedAssets();
     console.log(`Generated ${manifest.assets.length} requested assets.`);
   } else if (command === "assets:render:blender") {
-    const plan = await renderBlenderAssets({ mock: process.argv.includes("--mock") });
-    if (plan.length === 0) {
+    const count = await renderBlenderAssets();
+    if (count === 0) {
       console.log("No Blender production assets configured.");
     } else {
-      console.log(plan.join("\n"));
+      console.log(`Rendered ${count} Blender production assets.`);
     }
+  } else if (command === "assets:blender:calibration") {
+    await runBlenderCalibration();
+    console.log("Blender calibration passed; wrote artifacts/blender-calibration/report.md.");
   } else if (command === "assets:import:raster") {
     const count = await importRasterAssets();
     console.log(`Imported ${count} raster production assets.`);
@@ -74,7 +78,7 @@ try {
     console.log("Removed generated assets.");
   } else {
     console.error(
-      "Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|assets:generate:placeholder|assets:render:blender|assets:import:raster|assets:postprocess|assets:atlas|assets:validate|assets:audit:production|assets:all|validate:manifest|clean>"
+      "Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|assets:generate:placeholder|assets:render:blender|assets:blender:calibration|assets:import:raster|assets:postprocess|assets:atlas|assets:validate|assets:audit:production|assets:all|validate:manifest|clean>"
     );
     process.exitCode = 1;
   }

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
 import sharp from "sharp";
-import { buildBlenderCommand } from "./blenderAdapter";
+import { alphaBoundsFromRgba, buildHeadlessBlenderArgs } from "./blenderRender";
 import { buildAtlas } from "./productionPipeline";
 import { parseProductionAsset } from "./productionConfig";
 import { importRasterAsset, validateRasterImportSpec } from "./postprocess";
@@ -19,9 +19,9 @@ describe("production asset schema", () => {
         output: "building-yagura-small-normal.png",
         source: {
           type: "blender",
-          scene: "assets/source/blender/scenes/yagura-small.blend",
+          model: "calibration-cube",
           collection: "YaguraSmall",
-          renderSpec: "iso-building-default"
+          renderSpec: "workbench-flat"
         },
         geometry: {
           footprintWidth: 2,
@@ -37,11 +37,14 @@ describe("production asset schema", () => {
     );
 
     expect(asset.source.type).toBe("blender");
+    if (asset.source.type === "blender") {
+      expect(asset.source.model).toBe("calibration-cube");
+    }
     expect(asset.geometry.footprintWidth).toBe(2);
     expect(asset.geometry.canvasWidth).toBe(192);
   });
 
-  it("rejects unknown source types and invalid anchors", () => {
+  it("rejects unknown source types, invalid anchors, and ambiguous Blender sources", () => {
     expect(() =>
       parseProductionAsset(
         {
@@ -61,6 +64,31 @@ describe("production asset schema", () => {
         0
       )
     ).toThrow(/Unknown/);
+
+    expect(() =>
+      parseProductionAsset(
+        {
+          assetId: "bad.blender",
+          kind: "building",
+          output: "bad.png",
+          source: {
+            type: "blender",
+            model: "calibration-cube",
+            scene: "assets/source/blender/scenes/yagura-small.blend",
+            renderSpec: "workbench-flat"
+          },
+          geometry: {
+            footprintWidth: 1,
+            footprintHeight: 1,
+            canvasWidth: 64,
+            canvasHeight: 80,
+            anchorX: 32,
+            anchorY: 56
+          }
+        },
+        0
+      )
+    ).toThrow(/exactly one/);
   });
 });
 
@@ -168,46 +196,63 @@ describe("raster import", () => {
 });
 
 describe("Blender adapter and atlas", () => {
-  it("builds a headless Blender command without executing Blender", () => {
+  it("builds render_asset.py args without executing Blender", () => {
     const spec: BlenderRenderSpec = {
-      scene: "assets/source/blender/scenes/yagura.blend",
-      collection: "YaguraSmall",
-      camera: "IsoCameraNE",
+      model: "calibration-cube",
       outputDirectory: "assets/intermediate/raw-renders",
+      outputName: "building-yagura-small-normal",
       resolution: { width: 192, height: 176 },
+      anchor: { x: 96, y: 156 },
       transparentBackground: true,
       frame: 1,
-      direction: "ne",
       renderSeed: 42,
-      renderSpec: "iso-building-default"
+      renderSpec: "workbench-flat",
+      reportJson: "assets/intermediate/render-reports/building-yagura-small-normal.json"
     };
 
-    expect(buildBlenderCommand(spec, "assets/source/blender/scripts/render_asset.py")).toEqual([
-      "blender",
+    expect(buildHeadlessBlenderArgs(spec, "assets/source/blender/scripts/render_asset.py")).toEqual([
       "--background",
-      "assets/source/blender/scenes/yagura.blend",
+      "--factory-startup",
       "--python",
       "assets/source/blender/scripts/render_asset.py",
       "--",
-      "--render-spec",
-      "iso-building-default",
+      "--model",
+      "calibration-cube",
+      "--canvas",
+      "192x176",
+      "--anchor",
+      "96,156",
       "--output-directory",
       "assets/intermediate/raw-renders",
-      "--resolution",
-      "192x176",
+      "--render-spec",
+      "workbench-flat",
       "--transparent-background",
       "true",
-      "--collection",
-      "YaguraSmall",
-      "--camera",
-      "IsoCameraNE",
-      "--frame",
-      "1",
-      "--direction",
-      "ne",
-      "--render-seed",
-      "42"
+      "--output-name",
+      "building-yagura-small-normal",
+      "--report-json",
+      "assets/intermediate/render-reports/building-yagura-small-normal.json"
     ]);
+  });
+
+  it("computes alpha bounds using the calibration threshold", () => {
+    const data = Buffer.alloc(4 * 4 * 4);
+    for (let y = 1; y <= 2; y += 1) {
+      for (let x = 0; x <= 3; x += 1) {
+        data[(y * 4 + x) * 4 + 3] = 9;
+      }
+    }
+    data[(0 * 4 + 0) * 4 + 3] = 8;
+
+    expect(alphaBoundsFromRgba(data, 4, 4, 8)).toEqual({
+      minX: 0,
+      minY: 1,
+      maxX: 3,
+      maxY: 2,
+      width: 4,
+      height: 2,
+      widestRowWidth: 4
+    });
   });
 
   it("rejects negative atlas padding", async () => {
