@@ -25,11 +25,13 @@ try {
     const manifest = await generateGeneratedAssets();
     console.log(`Generated ${manifest.assets.length} requested assets.`);
   } else if (command === "assets:render:blender") {
-    const count = await renderBlenderAssets();
-    if (count === 0) {
+    const result = await renderBlenderAssets();
+    if (result.total === 0) {
       console.log("No Blender production assets configured.");
     } else {
-      console.log(`Rendered ${count} Blender production assets.`);
+      console.log(
+        `Rendered ${result.total} Blender production assets; rendered ${result.rendered}, cached-hit ${result.cachedHit}.`
+      );
     }
   } else if (command === "assets:blender:calibration") {
     await runBlenderCalibration();
@@ -38,8 +40,10 @@ try {
     const count = await importRasterAssets();
     console.log(`Imported ${count} raster production assets.`);
   } else if (command === "assets:postprocess") {
-    const count = await postprocessProductionAssets();
-    console.log(`Postprocessed ${count} production assets.`);
+    const result = await postprocessProductionAssets();
+    console.log(
+      `Postprocessed ${result.total} production assets; rendered ${result.blender.rendered}, cached-hit ${result.blender.cachedHit}.`
+    );
   } else if (command === "assets:atlas") {
     await buildAtlas();
     console.log("Wrote atlas plan.");
@@ -61,12 +65,14 @@ try {
   } else if (command === "assets:all") {
     await generatePlaceholders();
     await generateGeneratedAssets();
-    await postprocessProductionAssets();
+    const postprocessResult = await postprocessProductionAssets();
     await buildAtlas();
     await validateProductionAssetDefinitions();
     const manifest = await readManifest(generatedManifestPath);
     await validateManifest(manifest, publicAssetsDir);
-    console.log(`Completed asset pipeline; validated ${manifest.assets.length} generated assets.`);
+    console.log(
+      `Completed asset pipeline; rendered ${postprocessResult.blender.rendered}, cached-hit ${postprocessResult.blender.cachedHit}; validated ${manifest.assets.length} generated assets.`
+    );
   } else if (command === "validate-manifest") {
     const manifestPath = process.argv[3] === "generated" ? generatedManifestPath : placeholderManifestPath;
     const manifest = await readManifest(manifestPath);

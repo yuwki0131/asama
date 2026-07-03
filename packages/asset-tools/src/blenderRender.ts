@@ -18,6 +18,12 @@ export interface BlenderRunResult {
   readonly stdout: string;
 }
 
+export interface BlenderRawRenderResult {
+  readonly assetId: string;
+  readonly rawOutput: string;
+  readonly stdout: string;
+}
+
 export interface AlphaBounds {
   readonly minX: number;
   readonly minY: number;
@@ -129,6 +135,27 @@ export async function renderBlenderAsset(
     readonly reportDirectory?: string;
   }
 ): Promise<BlenderRunResult> {
+  const result = await renderBlenderAssetRaw(asset, options);
+  const runtimeOutput = join(options.runtimeOutputDirectory, asset.output);
+  await importBlenderRawAsset(asset, result.rawOutput, runtimeOutput);
+
+  return {
+    assetId: asset.assetId,
+    rawOutput: result.rawOutput,
+    runtimeOutput,
+    stdout: result.stdout
+  };
+}
+
+export async function renderBlenderAssetRaw(
+  asset: ProductionAssetSpec,
+  options: {
+    readonly blenderBinary: string;
+    readonly pythonScript: string;
+    readonly rawOutputDirectory: string;
+    readonly reportDirectory?: string;
+  }
+): Promise<BlenderRawRenderResult> {
   const spec = toHeadlessBlenderRenderSpec(asset, options.rawOutputDirectory, options.reportDirectory);
   if (spec.reportJson !== undefined) {
     await mkdir(dirname(spec.reportJson), { recursive: true });
@@ -138,16 +165,20 @@ export async function renderBlenderAsset(
   const { stdout } = await execFileAsync(options.blenderBinary, buildHeadlessBlenderArgs(spec, options.pythonScript), {
     maxBuffer: 1024 * 1024 * 8
   });
-  const rawOutput = join(options.rawOutputDirectory, `${spec.outputName ?? spec.model ?? "render"}.png`);
-  const runtimeOutput = join(options.runtimeOutputDirectory, asset.output);
-  await importRasterAsset(toBlenderRasterImportSpec(asset, rawOutput, runtimeOutput));
 
   return {
     assetId: asset.assetId,
-    rawOutput,
-    runtimeOutput,
+    rawOutput: join(options.rawOutputDirectory, `${spec.outputName ?? spec.model ?? "render"}.png`),
     stdout
   };
+}
+
+export async function importBlenderRawAsset(
+  asset: ProductionAssetSpec,
+  rawOutput: string,
+  runtimeOutput: string
+): Promise<void> {
+  await importRasterAsset(toBlenderRasterImportSpec(asset, rawOutput, runtimeOutput));
 }
 
 export async function renderCalibrationSuite(options: {

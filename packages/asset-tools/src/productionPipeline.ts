@@ -1,9 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
 import {
-  renderBlenderAsset,
+  importBlenderRawAsset,
+  renderBlenderAssetRaw,
   renderCalibrationSuite,
-  resolveBlenderBinary
+  resolveBlenderBinary,
+  toHeadlessBlenderRenderSpec
 } from "./blenderRender";
 import { defaultBlenderRenderScript } from "./blenderAdapter";
 import { readManifest } from "./manifest";
@@ -15,9 +17,29 @@ import {
   generatedOutputDir,
   intermediateAssetsDir,
   productionConfigPath,
+  renderCacheDir,
   repoRoot
 } from "./paths";
+import {
+  computeRenderCacheKey,
+  readRenderCacheIndex,
+  resolveRenderCacheHit,
+  storeRenderCachePng,
+  writeRenderCacheIndex
+} from "./renderCache";
 import type { AtlasBuildSpec, GeneratedAsset, ProductionAssetSpec, RasterImportSpec } from "./types";
+
+export interface BlenderRenderBatchResult {
+  readonly total: number;
+  readonly rendered: number;
+  readonly cachedHit: number;
+}
+
+export interface ProductionPostprocessResult {
+  readonly total: number;
+  readonly raster: number;
+  readonly blender: BlenderRenderBatchResult;
+}
 
 export async function importRasterAssets(): Promise<number> {
   const config = await readProductionAssetConfig(productionConfigPath);
@@ -53,36 +75,67 @@ async function readExistingGeneratedManifest(): Promise<{ readonly assets: reado
   }
 }
 
-export async function renderBlenderAssets(): Promise<number> {
+export async function renderBlenderAssets(): Promise<BlenderRenderBatchResult> {
   const config = await readProductionAssetConfig(productionConfigPath);
   const blenderAssets = config.assets.filter((asset) => asset.source.type === "blender");
   if (blenderAssets.length === 0) {
-    return 0;
+    return { total: 0, rendered: 0, cachedHit: 0 };
   }
 
-  const blenderBinary = await resolveBlenderBinary();
+  let blenderBinary: string | undefined;
+  const pythonScript = defaultBlenderRenderScript(repoRoot);
   const rawOutputDirectory = join(intermediateAssetsDir, "raw-renders");
   const reportDirectory = join(intermediateAssetsDir, "render-reports");
+  const cacheIndex = await readRenderCacheIndex(renderCacheDir);
+  let cacheIndexDirty = false;
+  let rendered = 0;
+  let cachedHit = 0;
+
   await mkdir(generatedOutputDir, { recursive: true });
   for (const asset of blenderAssets) {
-    await renderBlenderAsset(asset, {
+    const spec = toHeadlessBlenderRenderSpec(asset, rawOutputDirectory, reportDirectory);
+    const cacheKey = await computeRenderCacheKey(asset, spec, pythonScript);
+    const cachedPng = await resolveRenderCacheHit(renderCacheDir, cacheKey.sha256);
+    const runtimeOutput = join(generatedOutputDir, asset.output);
+
+    if (cachedPng !== null) {
+      await importBlenderRawAsset(asset, cachedPng, runtimeOutput);
+      cachedHit += 1;
+      if (cacheIndex[cacheKey.sha256] === undefined) {
+        cacheIndex[cacheKey.sha256] = cacheKey.metadata;
+        cacheIndexDirty = true;
+      }
+      continue;
+    }
+
+    blenderBinary ??= await resolveBlenderBinary();
+    const result = await renderBlenderAssetRaw(asset, {
       blenderBinary,
-      pythonScript: defaultBlenderRenderScript(repoRoot),
+      pythonScript,
       rawOutputDirectory,
-      runtimeOutputDirectory: generatedOutputDir,
       reportDirectory
     });
+    await importBlenderRawAsset(asset, result.rawOutput, runtimeOutput);
+    await storeRenderCachePng(renderCacheDir, cacheKey.sha256, result.rawOutput, cacheIndex, cacheKey.metadata);
+    rendered += 1;
+  }
+  if (cacheIndexDirty) {
+    await writeRenderCacheIndex(renderCacheDir, cacheIndex);
   }
   await mergeProductionManifest(blenderAssets);
-  return blenderAssets.length;
+  return { total: blenderAssets.length, rendered, cachedHit };
 }
 
-export async function postprocessProductionAssets(): Promise<number> {
+export async function postprocessProductionAssets(): Promise<ProductionPostprocessResult> {
   // Both steps overwrite the SVG-generated PNGs for their source type, so
   // assets:all must run them or placeholder art would ship as production.
   const rasterCount = await importRasterAssets();
-  const blenderCount = await renderBlenderAssets();
-  return rasterCount + blenderCount;
+  const blenderResult = await renderBlenderAssets();
+  return {
+    total: rasterCount + blenderResult.total,
+    raster: rasterCount,
+    blender: blenderResult
+  };
 }
 
 export async function runBlenderCalibration(): Promise<void> {

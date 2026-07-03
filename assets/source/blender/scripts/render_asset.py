@@ -320,6 +320,106 @@ def build_terrain_grass(scene: bpy.types.Scene) -> None:
     )
 
 
+# Terrain kit ----------------------------------------------------------------
+#
+# Simulation gives every terrain cell `terrain.<type>.connected.<NESW mask>`
+# where a bit is 1 when the neighbor is the SAME terrain. Each 0 bit gets a
+# thin border treatment along that tile edge (shoreline for water, soil rim
+# for the ground types). Tiles must stay flat: a 64x32 canvas has no headroom
+# above the diamond, so borders are color strips, not relief.
+
+TERRAIN_EDGE_WIDTH = 0.14
+
+
+def make_noise_material(name: str, dark: tuple[float, float, float], light: tuple[float, float, float], scale: float = 6.0) -> bpy.types.Material:
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = scale
+    noise.inputs["Detail"].default_value = 4.0
+
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.35
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
+    ramp.color_ramp.elements[1].position = 0.75
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    return material
+
+
+TERRAIN_STYLES = {
+    "grass": {
+        "surface": lambda: make_noise_material("GrassSurface", (0.208, 0.294, 0.157), (0.322, 0.412, 0.204)),
+        "variant": lambda: make_noise_material("GrassVariant", (0.190, 0.270, 0.145), (0.300, 0.380, 0.190), scale=10.0),
+        "edge": (0.34, 0.29, 0.21),
+    },
+    "dirt": {
+        "surface": lambda: make_noise_material("DirtSurface", (0.36, 0.30, 0.22), (0.48, 0.41, 0.30)),
+        "variant": lambda: make_noise_material("DirtVariant", (0.33, 0.27, 0.20), (0.45, 0.38, 0.28), scale=10.0),
+        "edge": (0.29, 0.24, 0.18),
+    },
+    "stone": {
+        "surface": lambda: make_noise_material("StoneSurface", (0.36, 0.37, 0.38), (0.52, 0.53, 0.54), scale=8.0),
+        "variant": lambda: make_noise_material("StoneVariant", (0.34, 0.35, 0.36), (0.50, 0.51, 0.52), scale=12.0),
+        "edge": (0.26, 0.27, 0.29),
+    },
+    "water": {
+        "surface": lambda: make_noise_material("WaterSurface", (0.075, 0.145, 0.185), (0.115, 0.195, 0.235), scale=4.0),
+        "variant": lambda: make_noise_material("WaterVariant", (0.070, 0.140, 0.180), (0.110, 0.190, 0.230), scale=7.0),
+        "edge": (0.50, 0.45, 0.34),
+    },
+}
+
+# Tile edge quads in map coordinates. Edge order matches the NESW mask; N is
+# the edge toward map y-1.
+TERRAIN_EDGE_QUADS = {
+    "N": ((-0.5, -0.5), (0.5, -0.5 + TERRAIN_EDGE_WIDTH)),
+    "E": ((0.5 - TERRAIN_EDGE_WIDTH, -0.5), (0.5, 0.5)),
+    "S": ((-0.5, 0.5 - TERRAIN_EDGE_WIDTH), (0.5, 0.5)),
+    "W": ((-0.5, -0.5), (-0.5 + TERRAIN_EDGE_WIDTH, 0.5)),
+}
+
+
+def add_flat_quad(scene: bpy.types.Scene, name: str, low_map: tuple[float, float], high_map: tuple[float, float], z: float, material: bpy.types.Material) -> None:
+    x0, y0 = low_map
+    x1, y1 = high_map
+    corners = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    add_mesh(scene, name, [(*map_xy(x, y), z) for x, y in corners], [(0, 1, 2, 3)], material)
+
+
+# Same-terrain edges bleed slightly past the tile boundary so antialiased
+# edge pixels overlap the neighbor tile instead of leaving a dark seam line.
+TERRAIN_BLEED = 0.03
+
+
+def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
+    style = TERRAIN_STYLES[terrain]
+    same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    y0 = -0.5 - (TERRAIN_BLEED if same["N"] else 0.0)
+    x1 = 0.5 + (TERRAIN_BLEED if same["E"] else 0.0)
+    y1 = 0.5 + (TERRAIN_BLEED if same["S"] else 0.0)
+    x0 = -0.5 - (TERRAIN_BLEED if same["W"] else 0.0)
+    add_flat_quad(scene, "Surface", (x0, y0), (x1, y1), 0.0, style["surface"]())
+    edge_material = make_material("TerrainEdge", (*style["edge"], 1.0))
+    for index, name in enumerate(("N", "E", "S", "W")):
+        if same[name]:
+            continue
+        low, high = TERRAIN_EDGE_QUADS[name]
+        add_flat_quad(scene, f"Edge{name}", low, high, 0.002 + 0.0005 * index, edge_material)
+
+
+def build_terrain_base(scene: bpy.types.Scene, terrain: str, variant: bool = False) -> None:
+    style = TERRAIN_STYLES[terrain]
+    add_flat_quad(scene, "Surface", (-0.5, -0.5), (0.5, 0.5), 0.0, style["variant" if variant else "surface"]())
+
+
 def map_xy(map_x: float, map_y: float) -> tuple[float, float]:
     """Convert map-grid coordinates to Blender world coordinates."""
     return (map_x, -map_y)
@@ -897,6 +997,14 @@ def resolve_model(name: str):
     if gate is not None:
         axis, width, mask = gate.group(1), int(gate.group(2)), gate.group(3)
         return lambda scene: build_gate_wood(scene, axis, width, mask)
+    terrain = re.fullmatch(r"terrain-(grass|dirt|stone|water)-connected-([01]{4})", name)
+    if terrain is not None:
+        kind, mask = terrain.group(1), terrain.group(2)
+        return lambda scene: build_terrain_mask(scene, kind, mask)
+    flat = re.fullmatch(r"terrain-(grass|dirt|stone|water)-(base|variant)", name)
+    if flat is not None:
+        kind, variant = flat.group(1), flat.group(2) == "variant"
+        return lambda scene: build_terrain_base(scene, kind, variant)
     return None
 
 

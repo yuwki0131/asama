@@ -12,6 +12,7 @@ export const rasterSourceDir = join(sourceAssetsDir, "raster");
 export const blenderSourceDir = join(sourceAssetsDir, "blender");
 export const intermediateAssetsDir = join(repoRoot, "assets/intermediate");
 export const processedAssetsDir = join(intermediateAssetsDir, "processed");
+export const renderCacheDir = join(intermediateAssetsDir, "render-cache");
 export const atlasOutputDir = join(repoRoot, "assets/generated/atlases");
 export const publicAssetsDir = join(repoRoot, "public/assets");
 export const placeholderOutputDir = join(publicAssetsDir, "placeholders");
