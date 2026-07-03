@@ -13,6 +13,9 @@ import {
   type PlayerCommand,
   type TerrainCellSnapshot,
   type TerrainType,
+  type FoodSnapshot,
+  type GameOutcome,
+  type SerializedWorld,
   type UnitId,
   type UnitType,
   type WorldSnapshot
@@ -82,6 +85,8 @@ interface BuildingState {
   readonly passable: boolean;
   readonly movementCostModifier: number;
   readonly assetId: string;
+  food: number | null;
+  readonly foodCapacity: number | null;
 }
 
 interface AttackTarget {
@@ -95,6 +100,10 @@ export interface WorldState {
   currentTick: number;
   nextBuildingId: number;
   invalidMoveTarget: CellCoord | null;
+  outcome: GameOutcome | null;
+  /** Deterministic RNG state (LCG); seeded at world creation. */
+  rngState: number;
+  food: FoodState;
   map: {
     width: number;
     height: number;
@@ -103,6 +112,31 @@ export interface WorldState {
   units: UnitState[];
   buildings: BuildingState[];
 }
+
+interface FoodState {
+  /** Storehouse ids connected to the honmaru at the last connectivity check. */
+  connectedStorehouseIds: BuildingId[];
+  nextConnectivityCheckTick: number;
+  nextConsumptionTick: number;
+}
+
+// Provisional balance values; unresolved numbers stay parameterized here
+// (docs/10_development/unresolved-issues.md).
+export const FOOD_BALANCE = {
+  storehouseCapacity: 800,
+  storehouseInitialFood: 600,
+  foodPerUnitPerCycle: 2,
+  consumptionCycleTicks: 30 * 20,
+  connectivityMinTicks: 8 * 20,
+  connectivityMaxTicks: 12 * 20
+} as const;
+
+const ENEMY_AI = {
+  decisionIntervalTicks: 40,
+  aggroRange: 12
+} as const;
+
+const WORLD_RNG_SEED = 0x6d2b79f5;
 
 interface SnapshotOptions {
   readonly includeMapCells?: boolean;
@@ -151,17 +185,29 @@ export function createInitialWorld(): WorldState {
     currentTick: 0,
     nextBuildingId: 1,
     invalidMoveTarget: null,
+    outcome: null,
+    rngState: WORLD_RNG_SEED,
+    food: {
+      connectedStorehouseIds: [],
+      nextConnectivityCheckTick: 0,
+      nextConsumptionTick: FOOD_BALANCE.consumptionCycleTicks
+    },
     map: createInitialMap(),
-    units: [
-      createUnit("unit:ashigaru:1", "player", "spear_ashigaru", { x: 45, y: 68 }),
-      createUnit("unit:ashigaru:2", "player", "sword_ashigaru", { x: 46, y: 68 }),
-      createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 86, y: 66 }),
-      createUnit("unit:enemy:2", "enemy", "archer", { x: 87, y: 66 })
-    ],
+    units: [],
     buildings: []
   };
 
   seedInitialBuildings(world);
+  // Units spawn after buildings so building placement validation does not
+  // reject cells the garrison stands on. A defender standing on the honmaru
+  // cell blocks capture (victory-and-defeat.md); the others screen it.
+  world.units.push(
+    createUnit("unit:ashigaru:1", "player", "spear_ashigaru", { x: 62, y: 58 }),
+    createUnit("unit:ashigaru:2", "player", "sword_ashigaru", { x: 62, y: 59 }),
+    createUnit("unit:archer:1", "player", "archer", { x: 63, y: 58 }),
+    createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 86, y: 66 }),
+    createUnit("unit:enemy:2", "enemy", "archer", { x: 87, y: 66 })
+  );
   return world;
 }
 
@@ -264,7 +310,11 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       gateState: definition.gateState,
       passable: definition.passable,
       movementCostModifier: definition.movementCostModifier,
-      assetId: definition.assetId
+      assetId: definition.assetId,
+      // Player-built storehouses start empty; stock arrives via harvest or
+      // supply carts, not construction.
+      food: command.buildingType === "storehouse" ? 0 : null,
+      foodCapacity: command.buildingType === "storehouse" ? FOOD_BALANCE.storehouseCapacity : null
     });
     world.nextBuildingId += 1;
     world.invalidMoveTarget = null;
@@ -295,6 +345,12 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
 }
 
 export function updateWorld(world: WorldState): void {
+  if (world.outcome !== null) {
+    return;
+  }
+
+  updateEnemyAi(world);
+
   for (const unit of world.units) {
     if (unit.path.length === 0) {
       unit.destination = null;
@@ -319,7 +375,272 @@ export function updateWorld(world: WorldState): void {
   }
 
   updateCombat(world);
+  updateFoodSupply(world);
+  checkOutcome(world);
   world.currentTick += 1;
+}
+
+function nextRandom(world: WorldState): number {
+  // Deterministic LCG (Numerical Recipes constants); state lives in the
+  // world so save/load reproduces the same sequence.
+  world.rngState = (Math.imul(world.rngState, 1664525) + 1013904223) >>> 0;
+  return world.rngState / 0x100000000;
+}
+
+function intactBuildingsOfType(world: WorldState, type: BuildingType): BuildingState[] {
+  return world.buildings.filter((building) => building.type === type && building.lifecycleState === "intact");
+}
+
+// --- Food supply (docs/02_game-rules/food-and-supply.md) -------------------
+
+function updateFoodSupply(world: WorldState): void {
+  if (world.currentTick >= world.food.nextConnectivityCheckTick) {
+    world.food.connectedStorehouseIds = computeConnectedStorehouseIds(world);
+    const range = FOOD_BALANCE.connectivityMaxTicks - FOOD_BALANCE.connectivityMinTicks;
+    world.food.nextConnectivityCheckTick =
+      world.currentTick + FOOD_BALANCE.connectivityMinTicks + Math.floor(nextRandom(world) * range);
+  }
+
+  if (world.currentTick < world.food.nextConsumptionTick) {
+    return;
+  }
+  world.food.nextConsumptionTick = world.currentTick + FOOD_BALANCE.consumptionCycleTicks;
+
+  const required = requiredFoodPerCycle(world);
+  if (required === 0) {
+    return;
+  }
+
+  // Consume farthest storehouse first (spec: 本丸から遠い蔵から順に消費).
+  const honmaru = intactBuildingsOfType(world, "honmaru")[0];
+  const connected = connectedStorehouses(world);
+  if (honmaru !== undefined) {
+    connected.sort((a, b) => manhattan(honmaru.position, b.position) - manhattan(honmaru.position, a.position));
+  }
+
+  let remaining = required;
+  for (const storehouse of connected) {
+    if (remaining === 0) {
+      break;
+    }
+    const paid = Math.min(storehouse.food ?? 0, remaining);
+    storehouse.food = (storehouse.food ?? 0) - paid;
+    remaining -= paid;
+  }
+
+  if (remaining > 0) {
+    // Could not pay the cycle's requirement from connected storehouses:
+    // the castle surrenders (兵糧切れ).
+    world.outcome = { winner: "enemy", reason: "starvation", tick: world.currentTick };
+  }
+}
+
+function requiredFoodPerCycle(world: WorldState): number {
+  const defenders = world.units.filter((unit) => unit.owner === "player" && unit.hp > 0).length;
+  return defenders * FOOD_BALANCE.foodPerUnitPerCycle;
+}
+
+function connectedStorehouses(world: WorldState): BuildingState[] {
+  const connectedIds = new Set(world.food.connectedStorehouseIds);
+  return intactBuildingsOfType(world, "storehouse").filter((storehouse) => connectedIds.has(storehouse.id));
+}
+
+/**
+ * Storehouses reachable from the honmaru over passable cells. The path may
+ * end on any cell orthogonally adjacent to the storehouse footprint; roads
+ * are not required and enemy unit positions are ignored (spec).
+ */
+function computeConnectedStorehouseIds(world: WorldState): BuildingId[] {
+  const honmaru = intactBuildingsOfType(world, "honmaru")[0];
+  if (honmaru === undefined) {
+    return [];
+  }
+
+  const storehouses = intactBuildingsOfType(world, "storehouse");
+  if (storehouses.length === 0) {
+    return [];
+  }
+
+  const adjacency = new Map<string, BuildingId>();
+  for (const storehouse of storehouses) {
+    for (const cell of storehouse.footprint) {
+      for (const direction of ORTHOGONAL_DIRECTIONS) {
+        adjacency.set(cellKey({ x: cell.x + direction.x, y: cell.y + direction.y }), storehouse.id);
+      }
+    }
+  }
+
+  const connected = new Set<BuildingId>();
+  const visited = new Set<string>();
+  const queue: CellCoord[] = [];
+  for (const cell of honmaru.footprint) {
+    queue.push(cell);
+    visited.add(cellKey(cell));
+  }
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (current === undefined) {
+      break;
+    }
+
+    const storehouseId = adjacency.get(cellKey(current));
+    if (storehouseId !== undefined) {
+      connected.add(storehouseId);
+      if (connected.size === storehouses.length) {
+        break;
+      }
+    }
+
+    for (const direction of ORTHOGONAL_DIRECTIONS) {
+      const next = { x: current.x + direction.x, y: current.y + direction.y };
+      const key = cellKey(next);
+      if (visited.has(key) || !isInsideMap(next) || !isPassable(world, next)) {
+        continue;
+      }
+      visited.add(key);
+      queue.push(next);
+    }
+  }
+
+  return [...connected];
+}
+
+// --- Victory / defeat (docs/02_game-rules/victory-and-defeat.md) -----------
+
+function checkOutcome(world: WorldState): void {
+  if (world.outcome !== null) {
+    return;
+  }
+
+  // Honmaru fall: at one simulation cut, enemy combat units occupy the
+  // honmaru footprint while no defender combat unit is inside.
+  const honmaru = intactBuildingsOfType(world, "honmaru")[0];
+  if (honmaru !== undefined) {
+    const cells = new Set(honmaru.footprint.map(cellKey));
+    let enemiesInside = 0;
+    let defendersInside = 0;
+    for (const unit of world.units) {
+      if (unit.hp <= 0 || !cells.has(cellKey(unit.position))) {
+        continue;
+      }
+      if (unit.owner === "enemy") {
+        enemiesInside += 1;
+      } else if (unit.owner === "player") {
+        defendersInside += 1;
+      }
+    }
+    if (enemiesInside > 0 && defendersInside === 0) {
+      world.outcome = { winner: "enemy", reason: "honmaru_fallen", tick: world.currentTick };
+      return;
+    }
+  }
+
+  // Defender victory: attacking force annihilated. Only meaningful once the
+  // scenario actually started with attackers, which the MVP layout does.
+  if (world.currentTick > 0 && !world.units.some((unit) => unit.owner === "enemy" && unit.hp > 0)) {
+    world.outcome = { winner: "player", reason: "enemy_annihilated", tick: world.currentTick };
+  }
+}
+
+// --- Enemy AI: frontal assault profile (docs/07_scenarios/ai-profiles.md) --
+
+function updateEnemyAi(world: WorldState): void {
+  if (world.currentTick % ENEMY_AI.decisionIntervalTicks !== 0) {
+    return;
+  }
+
+  const honmaru = intactBuildingsOfType(world, "honmaru")[0];
+  for (const unit of world.units) {
+    if (unit.owner !== "enemy" || unit.hp <= 0) {
+      continue;
+    }
+    if (unit.attackTargetId !== null || unit.path.length > 0) {
+      continue;
+    }
+
+    // 1) Engage the nearest defender within aggro range.
+    let nearestDefender: UnitState | null = null;
+    let nearestDistance = ENEMY_AI.aggroRange + 1;
+    for (const candidate of world.units) {
+      if (candidate.owner !== "player" || candidate.hp <= 0) {
+        continue;
+      }
+      const distance = manhattan(unit.position, candidate.position);
+      if (distance < nearestDistance) {
+        nearestDefender = candidate;
+        nearestDistance = distance;
+      }
+    }
+    if (nearestDefender !== null) {
+      unit.attackTargetId = nearestDefender.id;
+      continue;
+    }
+
+    if (honmaru === undefined) {
+      continue;
+    }
+
+    // 2) March on the honmaru if a route exists.
+    const path = findPath(world, unit.position, honmaru.position);
+    if (path.length > 0) {
+      unit.destination = honmaru.position;
+      unit.path = path;
+      unit.movementProgress = 0;
+      continue;
+    }
+
+    // 3) Route blocked: breach the nearest defender fortification.
+    const obstacle = nearestPlayerFortification(world, unit);
+    if (obstacle !== null) {
+      unit.attackTargetId = obstacle.id;
+    }
+  }
+}
+
+function nearestPlayerFortification(world: WorldState, unit: UnitState): BuildingState | null {
+  let nearest: BuildingState | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  for (const building of world.buildings) {
+    if (building.owner !== "player" || building.lifecycleState !== "intact" || building.passable) {
+      continue;
+    }
+    if (building.type === "storehouse" && nearest !== null) {
+      continue;
+    }
+    const distance = manhattan(unit.position, building.position);
+    if (distance < nearestDistance) {
+      nearest = building;
+      nearestDistance = distance;
+    }
+  }
+  return nearest;
+}
+
+// --- Save / load ------------------------------------------------------------
+
+const SAVE_VERSION = 1;
+
+export function serializeWorld(world: WorldState): SerializedWorld {
+  return { version: SAVE_VERSION, world: JSON.parse(JSON.stringify(world)) };
+}
+
+export function deserializeWorld(serialized: SerializedWorld): WorldState {
+  if (serialized.version !== SAVE_VERSION) {
+    throw new Error(`Unsupported save version: ${serialized.version}`);
+  }
+  const world = serialized.world as WorldState;
+  if (
+    typeof world !== "object" ||
+    world === null ||
+    !Array.isArray(world.units) ||
+    !Array.isArray(world.buildings) ||
+    typeof world.currentTick !== "number" ||
+    world.map?.cells === undefined
+  ) {
+    throw new Error("Malformed save payload");
+  }
+  return world;
 }
 
 export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}): WorldSnapshot {
@@ -328,6 +649,8 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
   return {
     currentTick: world.currentTick,
     invalidMoveTarget: world.invalidMoveTarget,
+    outcome: world.outcome,
+    food: snapshotFood(world),
     map: {
       width: world.map.width,
       height: world.map.height,
@@ -1100,7 +1423,9 @@ function createBuildingState(
     gateState: definition.gateState,
     passable: definition.passable,
     movementCostModifier: definition.movementCostModifier,
-    assetId: definition.assetId
+    assetId: definition.assetId,
+    food: type === "storehouse" ? FOOD_BALANCE.storehouseInitialFood : null,
+    foodCapacity: type === "storehouse" ? FOOD_BALANCE.storehouseCapacity : null
   };
 }
 
@@ -1181,7 +1506,32 @@ function snapshotBuilding(world: WorldState, building: BuildingState): BuildingS
     gateState: building.gateState,
     passable: building.passable,
     movementCostModifier: building.movementCostModifier,
-    assetId: connectedBuildingAssetId(world, building)
+    assetId: connectedBuildingAssetId(world, building),
+    food: building.food,
+    foodCapacity: building.foodCapacity,
+    connectedToHonmaru: world.food.connectedStorehouseIds.includes(building.id)
+  };
+}
+
+function snapshotFood(world: WorldState): FoodSnapshot {
+  const storehouses = intactBuildingsOfType(world, "storehouse");
+  const connectedIds = new Set(world.food.connectedStorehouseIds);
+  let available = 0;
+  let total = 0;
+  let capacity = 0;
+  for (const storehouse of storehouses) {
+    total += storehouse.food ?? 0;
+    capacity += storehouse.foodCapacity ?? 0;
+    if (connectedIds.has(storehouse.id)) {
+      available += storehouse.food ?? 0;
+    }
+  }
+  return {
+    available,
+    total,
+    capacity,
+    requiredPerCycle: requiredFoodPerCycle(world),
+    nextConsumptionInTicks: Math.max(0, world.food.nextConsumptionTick - world.currentTick)
   };
 }
 

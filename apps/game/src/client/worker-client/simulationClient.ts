@@ -1,12 +1,15 @@
-import type { CellCoord, MainToWorkerMessage, PlayerCommand, WorkerToMainMessage, WorldSnapshot } from "@asama/shared";
+import type { CellCoord, MainToWorkerMessage, PlayerCommand, SerializedWorld, WorkerToMainMessage, WorldSnapshot } from "@asama/shared";
 
 type SnapshotListener = (snapshot: WorldSnapshot) => void;
 type ErrorListener = (message: string) => void;
+type SaveStateListener = (state: SerializedWorld) => void;
 
 export interface SimulationClient {
   init(): void;
   setSpeed(speed: 0 | 1 | 2 | 4): void;
   enqueueCommand(command: PlayerCommand): void;
+  requestSaveState(): Promise<SerializedWorld>;
+  loadSaveState(state: SerializedWorld): void;
   subscribe(listener: SnapshotListener): () => void;
   subscribeErrors(listener: ErrorListener): () => void;
   dispose(): void;
@@ -18,6 +21,7 @@ export function createSimulationClient(): SimulationClient {
   });
   const listeners = new Set<SnapshotListener>();
   const errorListeners = new Set<ErrorListener>();
+  const saveStateListeners = new Set<SaveStateListener>();
   let cachedMapCells: WorldSnapshot["map"]["cells"] | null = null;
 
   worker.addEventListener("message", (event: MessageEvent<WorkerToMainMessage>) => {
@@ -28,6 +32,14 @@ export function createSimulationClient(): SimulationClient {
       for (const listener of listeners) {
         listener(snapshot);
       }
+      return;
+    }
+
+    if (message.type === "saveState") {
+      for (const listener of saveStateListeners) {
+        listener(message.state);
+      }
+      saveStateListeners.clear();
       return;
     }
 
@@ -61,6 +73,15 @@ export function createSimulationClient(): SimulationClient {
     },
     enqueueCommand(command) {
       post(worker, { type: "enqueueCommand", command });
+    },
+    requestSaveState() {
+      return new Promise((resolve) => {
+        saveStateListeners.add(resolve);
+        post(worker, { type: "requestSaveState" });
+      });
+    },
+    loadSaveState(state) {
+      post(worker, { type: "loadSaveState", state });
     },
     subscribe(listener) {
       listeners.add(listener);

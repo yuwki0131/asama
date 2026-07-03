@@ -118,6 +118,53 @@ export function App() {
     [snapshot?.currentTick]
   );
 
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+
+  const handleQuickSave = useCallback(async () => {
+    const simulation = simulationRef.current;
+    if (simulation === null) {
+      return;
+    }
+    try {
+      const state = await simulation.requestSaveState();
+      const response = await fetch("/api/saves", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ saveId: "quicksave", data: state })
+      });
+      setSaveStatus(response.ok ? "saved" : `save failed (${response.status})`);
+    } catch (error) {
+      setSaveStatus(error instanceof Error ? error.message : "save failed");
+    }
+  }, []);
+
+  const handleQuickLoad = useCallback(async () => {
+    const simulation = simulationRef.current;
+    if (simulation === null) {
+      return;
+    }
+    try {
+      const response = await fetch("/api/saves/quicksave");
+      if (!response.ok) {
+        setSaveStatus(`load failed (${response.status})`);
+        return;
+      }
+      const stream = response.body?.pipeThrough(new DecompressionStream("gzip"));
+      if (stream === undefined) {
+        setSaveStatus("load failed (no body)");
+        return;
+      }
+      const state = JSON.parse(await new Response(stream).text());
+      simulation.loadSaveState(state);
+      setSaveStatus("loaded");
+    } catch (error) {
+      setSaveStatus(error instanceof Error ? error.message : "load failed");
+    }
+  }, []);
+
+  const outcome = snapshot?.outcome ?? null;
+  const food = snapshot?.food ?? null;
+
   return (
     <main className="app">
       <header className="topbar">
@@ -129,6 +176,12 @@ export function App() {
             map {snapshot?.map.width ?? 128}x{snapshot?.map.height ?? 128}
           </span>
           <span>units {snapshot?.units.length ?? 0}</span>
+          <span>
+            food {food === null ? "-" : `${food.available}/${food.capacity}`}
+            {food !== null && food.requiredPerCycle > 0
+              ? ` (-${food.requiredPerCycle} in ${Math.ceil(food.nextConsumptionInTicks / 20)}s)`
+              : ""}
+          </span>
           <span>selected {selectedUnits.length}</span>
           <span>
             destination{" "}
@@ -136,7 +189,14 @@ export function App() {
               ? "-"
               : `${selectedUnits[0].destination.x},${selectedUnits[0].destination.y}`}
           </span>
+          {saveStatus === null ? null : <span>{saveStatus}</span>}
           {simulationError === null ? null : <span className="error-text">{simulationError}</span>}
+          <button type="button" onClick={() => void handleQuickSave()}>
+            Save
+          </button>
+          <button type="button" onClick={() => void handleQuickLoad()}>
+            Load
+          </button>
         </div>
       </header>
       <div className="buildbar">
@@ -162,6 +222,18 @@ export function App() {
         </button>
       </div>
       <section className="game-view">
+        {outcome === null ? null : (
+          <div className={`outcome-banner ${outcome.winner === "player" ? "victory" : "defeat"}`}>
+            <strong>{outcome.winner === "player" ? "勝利" : "敗北"}</strong>
+            <span>
+              {outcome.reason === "honmaru_fallen"
+                ? "本丸が陥落しました"
+                : outcome.reason === "starvation"
+                  ? "兵糧が尽き、開城しました"
+                  : "敵軍を全滅させました"}
+            </span>
+          </div>
+        )}
         <GameCanvas
           buildTool={buildTool}
           snapshot={snapshot}

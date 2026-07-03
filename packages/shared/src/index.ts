@@ -81,11 +81,34 @@ export interface BuildingSnapshot {
   readonly passable: boolean;
   readonly movementCostModifier: number;
   readonly assetId: string;
+  readonly food: number | null;
+  readonly foodCapacity: number | null;
+  readonly connectedToHonmaru: boolean;
+}
+
+export type GameOutcomeReason = "honmaru_fallen" | "starvation" | "enemy_annihilated";
+
+export interface GameOutcome {
+  readonly winner: OwnerId;
+  readonly reason: GameOutcomeReason;
+  readonly tick: number;
+}
+
+export interface FoodSnapshot {
+  /** Food in storehouses currently connected to the honmaru. */
+  readonly available: number;
+  /** Food in all intact storehouses regardless of connectivity. */
+  readonly total: number;
+  readonly capacity: number;
+  readonly requiredPerCycle: number;
+  readonly nextConsumptionInTicks: number;
 }
 
 export interface WorldSnapshot {
   readonly currentTick: number;
   readonly invalidMoveTarget: CellCoord | null;
+  readonly outcome: GameOutcome | null;
+  readonly food: FoodSnapshot;
   readonly map: {
     readonly width: number;
     readonly height: number;
@@ -134,10 +157,18 @@ export type MainToWorkerMessage =
   | { readonly type: "init" }
   | { readonly type: "setSpeed"; readonly speed: 0 | 1 | 2 | 4 }
   | { readonly type: "enqueueCommand"; readonly command: PlayerCommand }
-  | { readonly type: "requestSnapshot" };
+  | { readonly type: "requestSnapshot" }
+  | { readonly type: "requestSaveState" }
+  | { readonly type: "loadSaveState"; readonly state: SerializedWorld };
 
 export type WorkerToMainMessage =
   | { readonly type: "ready"; readonly snapshot: WorldSnapshot }
   | { readonly type: "snapshot"; readonly snapshot: WorldSnapshot }
+  | { readonly type: "saveState"; readonly state: SerializedWorld }
   | { readonly type: "commandRejected"; readonly reason: string }
   | { readonly type: "error"; readonly message: string };
+
+export interface SerializedWorld {
+  readonly version: number;
+  readonly world: unknown;
+}

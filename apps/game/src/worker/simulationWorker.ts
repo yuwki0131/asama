@@ -1,4 +1,4 @@
-import { createInitialWorld, applyCommand, snapshotWorld, updateWorld } from "@asama/simulation";
+import { createInitialWorld, applyCommand, deserializeWorld, serializeWorld, snapshotWorld, updateWorld } from "@asama/simulation";
 import { SIM_TICKS_PER_SECOND, SNAPSHOTS_PER_SECOND, type MainToWorkerMessage, type WorkerToMainMessage } from "@asama/shared";
 
 let world = createInitialWorld();
@@ -35,6 +35,23 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
 
   if (message.type === "requestSnapshot") {
     post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: false }) });
+    return;
+  }
+
+  if (message.type === "requestSaveState") {
+    post({ type: "saveState", state: serializeWorld(world) });
+    return;
+  }
+
+  if (message.type === "loadSaveState") {
+    try {
+      world = deserializeWorld(message.state);
+    } catch (error) {
+      post({ type: "error", message: error instanceof Error ? error.message : "Failed to load save" });
+      return;
+    }
+    lastSnapshotTick = world.currentTick;
+    post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: true }) });
   }
 });
 
