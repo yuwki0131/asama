@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Application, Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
+import { MAP_HEIGHT, MAP_WIDTH } from "@asama/shared";
 import type {
   BuildingSnapshot,
   BuildingType,
@@ -123,6 +124,8 @@ export function GameCanvas({
   const onAttackMoveRef = useRef(onAttackMove);
   const onStopSelectedRef = useRef(onStopSelected);
   const heldKeysRef = useRef<Set<string>>(new Set());
+  const minimapRef = useRef<HTMLCanvasElement | null>(null);
+  const minimapTerrainRef = useRef<{ key: string; canvas: HTMLCanvasElement } | null>(null);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
   const dragRef = useRef<{
     pointerId: number;
@@ -364,6 +367,7 @@ export function GameCanvas({
       selectedCell,
       localInvalidMoveTarget
     );
+    drawMinimap(minimapRef.current, minimapTerrainRef, snapshot, cameraRef.current, hostRef.current);
     // cameraVersion is not read by renderScene, but camera pans and zooms
     // mutate cameraRef without new state; the version bump re-triggers this
     // effect so the scene follows the camera.
@@ -604,8 +608,35 @@ export function GameCanvas({
     };
   }, [onMoveSelected, ready, scheduleCameraRender]);
 
+  const handleMinimapPointer = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (event.buttons === 0 && event.type !== "pointerdown") {
+      return;
+    }
+    const canvas = event.currentTarget;
+    const rect = canvas.getBoundingClientRect();
+    const cellX = ((event.clientX - rect.left) / rect.width) * MAP_WIDTH;
+    const cellY = ((event.clientY - rect.top) / rect.height) * MAP_HEIGHT;
+    const host = hostRef.current;
+    if (host === null) {
+      return;
+    }
+    const world = cellToWorld({ x: cellX, y: cellY });
+    const camera = cameraRef.current;
+    camera.x = roundScreenPixel(host.clientWidth / 2 - world.x * camera.zoom);
+    camera.y = roundScreenPixel(host.clientHeight / 2 - world.y * camera.zoom);
+    scheduleCameraRender();
+  };
+
   return (
     <div ref={hostRef} className="game-canvas">
+      <canvas
+        ref={minimapRef}
+        className="minimap"
+        width={MAP_WIDTH}
+        height={MAP_HEIGHT}
+        onPointerDown={handleMinimapPointer}
+        onPointerMove={handleMinimapPointer}
+      />
       {selectionBox === null ? null : (
         <div
           className="selection-box"
@@ -913,6 +944,89 @@ function clearLayer(layer: Container): void {
   for (const child of layer.removeChildren()) {
     child.destroy({ children: true, context: true });
   }
+}
+
+const MINIMAP_TERRAIN_COLORS: Record<string, string> = {
+  grass: "#7d9c60",
+  dirt: "#8a7a58",
+  water: "#33566b",
+  stone: "#6f7278"
+};
+
+function drawMinimap(
+  canvas: HTMLCanvasElement | null,
+  terrainCacheRef: { current: { key: string; canvas: HTMLCanvasElement } | null },
+  snapshot: WorldSnapshot,
+  camera: CameraState,
+  host: HTMLElement | null
+): void {
+  if (canvas === null || snapshot.map.cells.length === 0) {
+    return;
+  }
+  const context = canvas.getContext("2d");
+  if (context === null) {
+    return;
+  }
+
+  const terrainKey = `${snapshot.map.width}:${snapshot.map.height}:${snapshot.map.cells.length}`;
+  let terrainCache = terrainCacheRef.current;
+  if (terrainCache === null || terrainCache.key !== terrainKey) {
+    const offscreen = document.createElement("canvas");
+    offscreen.width = snapshot.map.width;
+    offscreen.height = snapshot.map.height;
+    const offscreenContext = offscreen.getContext("2d");
+    if (offscreenContext === null) {
+      return;
+    }
+    for (const cell of snapshot.map.cells) {
+      offscreenContext.fillStyle = MINIMAP_TERRAIN_COLORS[cell.terrain] ?? "#555";
+      offscreenContext.fillRect(cell.coord.x, cell.coord.y, 1, 1);
+    }
+    terrainCache = { key: terrainKey, canvas: offscreen };
+    terrainCacheRef.current = terrainCache;
+  }
+
+  context.imageSmoothingEnabled = false;
+  context.drawImage(terrainCache.canvas, 0, 0);
+
+  for (const building of snapshot.buildings) {
+    context.fillStyle = building.owner === "enemy" ? "#c2543f" : "#e0d6b8";
+    for (const cell of building.footprint) {
+      context.fillRect(cell.x, cell.y, 1, 1);
+    }
+  }
+
+  for (const unit of snapshot.units) {
+    context.fillStyle = unit.owner === "enemy" ? "#ff5040" : "#63e063";
+    context.fillRect(unit.position.x - 1, unit.position.y - 1, 2, 2);
+  }
+
+  // Viewport: project the visible screen corners into cell space.
+  if (host !== null) {
+    const corners = [
+      screenToCellFloat(0, 0, camera),
+      screenToCellFloat(host.clientWidth, 0, camera),
+      screenToCellFloat(host.clientWidth, host.clientHeight, camera),
+      screenToCellFloat(0, host.clientHeight, camera)
+    ];
+    context.strokeStyle = "#f4efe6";
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(corners[0]?.x ?? 0, corners[0]?.y ?? 0);
+    for (const corner of corners.slice(1)) {
+      context.lineTo(corner.x, corner.y);
+    }
+    context.closePath();
+    context.stroke();
+  }
+}
+
+function screenToCellFloat(x: number, y: number, camera: CameraState): { x: number; y: number } {
+  const local = screenToWorld(x, y, camera);
+  return {
+    x: local.y / TILE_HEIGHT + local.x / TILE_WIDTH,
+    y: local.y / TILE_HEIGHT - local.x / TILE_WIDTH
+  };
 }
 
 const TERRAIN_CHUNK_CELLS = 16;
