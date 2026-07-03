@@ -352,7 +352,9 @@ export function App() {
                 ? "本丸が陥落しました"
                 : outcome.reason === "starvation"
                   ? "兵糧が尽き、開城しました"
-                  : "敵軍を全滅させました"}
+                  : outcome.reason === "time_held"
+                    ? "規定時間、本丸を守り抜きました"
+                    : "敵軍を全滅させました"}
             </span>
           </div>
         )}

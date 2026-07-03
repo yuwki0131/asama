@@ -23,6 +23,8 @@ import {
   type UnitType,
   type WorldSnapshot
 } from "@asama/shared";
+import { mvpDefenseScenario } from "@asama/content";
+import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
 
 interface TerrainCellState {
   readonly coord: CellCoord;
@@ -107,6 +109,10 @@ export interface WorldState {
   invalidMoveTarget: CellCoord | null;
   outcome: GameOutcome | null;
   nextWaveIndex: number;
+  scenario: {
+    waves: readonly ScenarioWave[];
+    victory: ScenarioDefinition["victory"];
+  };
   /** Deterministic RNG state (LCG); seeded at world creation. */
   rngState: number;
   food: FoodState;
@@ -203,37 +209,8 @@ const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
   "gate_wide_3_ne_sw"
 ];
 
-// Provisional attack waves (docs/07_scenarios/mvp-scenario.md defines three
-// waves; timings and compositions are unresolved balance values).
-export const ENEMY_WAVES: readonly {
-  readonly tick: number;
-  readonly spawns: readonly { readonly type: UnitType; readonly position: CellCoord }[];
-}[] = [
-  {
-    tick: 2400,
-    spawns: [
-      { type: "spear_ashigaru", position: { x: 86, y: 63 } },
-      { type: "spear_ashigaru", position: { x: 87, y: 68 } }
-    ]
-  },
-  {
-    tick: 7200,
-    spawns: [
-      { type: "spear_ashigaru", position: { x: 86, y: 63 } },
-      { type: "sword_ashigaru", position: { x: 86, y: 66 } },
-      { type: "archer", position: { x: 87, y: 68 } }
-    ]
-  },
-  {
-    tick: 12000,
-    spawns: [
-      { type: "spear_ashigaru", position: { x: 86, y: 63 } },
-      { type: "spear_ashigaru", position: { x: 86, y: 66 } },
-      { type: "sword_ashigaru", position: { x: 87, y: 64 } },
-      { type: "archer", position: { x: 87, y: 68 } }
-    ]
-  }
-];
+/** Compatibility export: the default scenario's waves (tests, tooling). */
+export const ENEMY_WAVES: readonly ScenarioWave[] = mvpDefenseScenario.waves;
 
 const WORLD_RNG_SEED = 0x6d2b79f5;
 
@@ -279,13 +256,17 @@ const unitDefinitions: Record<UnitType, UnitDefinition> = {
   }
 };
 
-export function createInitialWorld(): WorldState {
+export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScenario): WorldState {
   const world: WorldState = {
     currentTick: 0,
     nextBuildingId: 1,
     invalidMoveTarget: null,
     outcome: null,
     nextWaveIndex: 0,
+    scenario: {
+      waves: scenario.waves,
+      victory: scenario.victory
+    },
     rngState: WORLD_RNG_SEED,
     food: {
       connectedStorehouseIds: [],
@@ -306,19 +287,13 @@ export function createInitialWorld(): WorldState {
     buildings: []
   };
 
-  seedInitialBuildings(world);
+  seedInitialBuildings(world, scenario);
   // Units spawn after buildings so building placement validation does not
   // reject cells the garrison stands on. A defender standing on the honmaru
   // cell blocks capture (victory-and-defeat.md); the others screen it.
-  world.units.push(
-    createUnit("unit:ashigaru:1", "player", "spear_ashigaru", { x: 62, y: 58 }),
-    createUnit("unit:ashigaru:2", "player", "sword_ashigaru", { x: 62, y: 59 }),
-    createUnit("unit:ashigaru:3", "player", "spear_ashigaru", { x: 63, y: 57 }),
-    createUnit("unit:archer:1", "player", "archer", { x: 63, y: 58 }),
-    createUnit("unit:archer:2", "player", "archer", { x: 64, y: 59 }),
-    createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 86, y: 66 }),
-    createUnit("unit:enemy:2", "enemy", "archer", { x: 87, y: 66 })
-  );
+  for (const [index, spawn] of scenario.initialUnits.entries()) {
+    world.units.push(createUnit(`unit:init:${index}`, spawn.owner, spawn.type, spawn.position));
+  }
   // The world starts at the beginning of spring; farms present now are
   // planted for the first year's harvest.
   world.economy.plantedFarmIds = intactBuildingsOfType(world, "farm").map((farm) => farm.id);
@@ -952,12 +927,20 @@ function checkOutcome(world: WorldState): void {
     }
   }
 
+  // Defender victory by endurance: hold the honmaru until the scenario's
+  // deadline (victory-and-defeat.md: 規定時間まで本丸を保持).
+  const holdTicks = world.scenario.victory.holdTicks;
+  if (holdTicks !== null && world.currentTick >= holdTicks) {
+    world.outcome = { winner: "player", reason: "time_held", tick: world.currentTick };
+    return;
+  }
+
   // Defender victory: attacking force annihilated after every attack wave
   // has spawned; wiping the vanguard before reinforcements arrive is not a
   // win yet.
   if (
     world.currentTick > 0 &&
-    world.nextWaveIndex >= ENEMY_WAVES.length &&
+    world.nextWaveIndex >= world.scenario.waves.length &&
     !world.units.some((unit) => unit.owner === "enemy" && unit.hp > 0)
   ) {
     world.outcome = { winner: "player", reason: "enemy_annihilated", tick: world.currentTick };
@@ -1071,8 +1054,8 @@ function nearestPlayerFortification(world: WorldState, unit: UnitState): Buildin
 }
 
 function spawnAttackWaves(world: WorldState): void {
-  while (world.nextWaveIndex < ENEMY_WAVES.length) {
-    const wave = ENEMY_WAVES[world.nextWaveIndex];
+  while (world.nextWaveIndex < world.scenario.waves.length) {
+    const wave = world.scenario.waves[world.nextWaveIndex];
     if (wave === undefined || world.currentTick < wave.tick) {
       return;
     }
@@ -1165,6 +1148,7 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
     unit.pathRetryCooldown ??= 0;
   }
   world.nextWaveIndex ??= 0;
+  world.scenario ??= { waves: mvpDefenseScenario.waves, victory: mvpDefenseScenario.victory };
   world.economy ??= {
     gold: ECONOMY_BALANCE.initialGold,
     weapons: ECONOMY_BALANCE.initialWeapons,
@@ -1250,50 +1234,6 @@ const townBlockFootprint = rectangularFootprint(6, 6);
 const farmFootprint = rectangularFootprint(4, 4);
 const tenshuFootprint = rectangularFootprint(8, 8);
 const yaguraFootprint = rectangularFootprint(2, 2);
-
-const initialBuildingPlacements: readonly {
-  readonly type: BuildingType;
-  readonly position: CellCoord;
-  readonly owner?: OwnerId;
-}[] = [
-  { type: "tenshu", position: { x: 54, y: 54 } },
-  { type: "honmaru", position: { x: 62, y: 58 } },
-  { type: "yagura", position: { x: 50, y: 58 } },
-  { type: "storehouse", position: { x: 47, y: 62 } },
-  { type: "market", position: { x: 52, y: 66 } },
-  { type: "barracks", position: { x: 60, y: 66 } },
-  { type: "samurai_residence", position: { x: 68, y: 55 } },
-  { type: "town_block", position: { x: 70, y: 64 } },
-  { type: "farm", position: { x: 50, y: 72 } },
-  { type: "farm", position: { x: 55, y: 72 } },
-  { type: "road", position: { x: 61, y: 64 } },
-  { type: "road", position: { x: 62, y: 64 } },
-  { type: "road", position: { x: 63, y: 64 } },
-  { type: "road", position: { x: 64, y: 65 } },
-  { type: "road", position: { x: 65, y: 65 } },
-  { type: "road", position: { x: 67, y: 65 } },
-  { type: "road", position: { x: 68, y: 65 } },
-  { type: "road", position: { x: 69, y: 65 } },
-  { type: "fence", position: { x: 52, y: 50 } },
-  { type: "fence", position: { x: 53, y: 50 } },
-  { type: "fence", position: { x: 54, y: 50 } },
-  { type: "fence", position: { x: 55, y: 50 } },
-  { type: "wall", position: { x: 56, y: 50 } },
-  { type: "wall", position: { x: 57, y: 50 } },
-  { type: "wall", position: { x: 58, y: 50 } },
-  { type: "wall", position: { x: 59, y: 50 } },
-  { type: "gate_wide_3", position: { x: 60, y: 50 } },
-  { type: "gate_wide_3", position: { x: 64, y: 74 } },
-  { type: "dry_moat", position: { x: 80, y: 58 } },
-  { type: "dry_moat", position: { x: 80, y: 59 } },
-  { type: "dry_moat", position: { x: 80, y: 60 } },
-  { type: "water_moat", position: { x: 82, y: 58 } },
-  { type: "water_moat", position: { x: 82, y: 59 } },
-  { type: "water_moat", position: { x: 82, y: 60 } },
-  { type: "earth_bridge", position: { x: 61, y: 44 } },
-  { type: "wood_bridge", position: { x: 62, y: 45 } },
-  { type: "gate_wide_3", position: { x: 84, y: 65 }, owner: "enemy" }
-];
 
 const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
   fence: {
@@ -1936,8 +1876,8 @@ function canPlaceBuilding(world: WorldState, position: CellCoord, definition: Bu
   return footprint.every((cell) => canPlaceOnCell(world, cell, definition));
 }
 
-function seedInitialBuildings(world: WorldState): void {
-  for (const placement of initialBuildingPlacements) {
+function seedInitialBuildings(world: WorldState, scenario: ScenarioDefinition): void {
+  for (const placement of scenario.initialBuildings) {
     const definition = buildingDefinitions[placement.type];
     if (definition === undefined) {
       throw new Error(`Unknown initial building type: ${placement.type}`);

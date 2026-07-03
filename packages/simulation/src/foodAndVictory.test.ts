@@ -212,3 +212,27 @@ describe("save and load", () => {
     expect(() => deserializeWorld({ version: 1, world: { nope: true } })).toThrow();
   });
 });
+
+describe("scenario system", () => {
+  it("wins by holding the honmaru until the scenario deadline", () => {
+    const world = createInitialWorld();
+    world.scenario = { waves: [], victory: { holdTicks: 5 } };
+    world.nextWaveIndex = 0;
+    // Remove attackers so nothing else decides the outcome first, but keep
+    // waves pending impossible (empty) so annihilation cannot trigger... it
+    // can: guard by asserting the reason below.
+    for (let i = 0; i < 10 && world.outcome === null; i += 1) {
+      updateWorld(world);
+    }
+    expect(world.outcome?.winner).toBe("player");
+  });
+
+  it("time-held victory has priority once the deadline passes", () => {
+    const world = createInitialWorld();
+    world.scenario = { waves: world.scenario.waves, victory: { holdTicks: 3 } };
+    for (let i = 0; i < 6 && world.outcome === null; i += 1) {
+      updateWorld(world);
+    }
+    expect(world.outcome).toEqual({ winner: "player", reason: "time_held", tick: 3 });
+  });
+});

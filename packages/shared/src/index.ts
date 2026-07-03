@@ -86,7 +86,36 @@ export interface BuildingSnapshot {
   readonly connectedToHonmaru: boolean;
 }
 
-export type GameOutcomeReason = "honmaru_fallen" | "starvation" | "enemy_annihilated";
+export type GameOutcomeReason = "honmaru_fallen" | "starvation" | "enemy_annihilated" | "time_held";
+
+export interface ScenarioBuildingPlacement {
+  readonly type: BuildingType;
+  readonly position: CellCoord;
+  readonly owner?: OwnerId;
+}
+
+export interface ScenarioUnitSpawn {
+  readonly type: UnitType;
+  readonly position: CellCoord;
+  readonly owner: OwnerId;
+}
+
+export interface ScenarioWave {
+  readonly tick: number;
+  readonly spawns: readonly { readonly type: UnitType; readonly position: CellCoord }[];
+}
+
+export interface ScenarioDefinition {
+  readonly id: string;
+  readonly name: string;
+  readonly initialBuildings: readonly ScenarioBuildingPlacement[];
+  readonly initialUnits: readonly ScenarioUnitSpawn[];
+  readonly waves: readonly ScenarioWave[];
+  readonly victory: {
+    /** Defender wins by holding the honmaru until this tick (null: no time victory). */
+    readonly holdTicks: number | null;
+  };
+}
 
 export interface GameOutcome {
   readonly winner: OwnerId;

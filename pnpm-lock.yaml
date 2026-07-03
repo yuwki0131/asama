@@ -84,6 +84,10 @@ importers:
         version: 2.1.9(@types/node@22.19.21)
 
   packages/content:
+    dependencies:
+      '@asama/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       typescript:
         specifier: ^5.7.2
@@ -103,6 +107,9 @@ importers:
 
   packages/simulation:
     dependencies:
+      '@asama/content':
+        specifier: workspace:*
+        version: link:../content
       '@asama/shared':
         specifier: workspace:*
         version: link:../shared
