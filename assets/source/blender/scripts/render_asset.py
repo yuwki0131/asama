@@ -617,6 +617,66 @@ def build_wall_plaster_mask(scene: bpy.types.Scene, mask: str) -> None:
         )
 
 
+def add_frustum(scene: bpy.types.Scene, name: str, low_map: tuple[float, float], high_map: tuple[float, float], z0: float, z1: float, top_inset: float, material: bpy.types.Material) -> None:
+    """Tapered box (ishigaki-style base): bottom rectangle, inset top."""
+    x0, y0 = low_map
+    x1, y1 = high_map
+    i = top_inset
+    bottom = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    top = [(x0 + i, y0 + i), (x1 - i, y0 + i), (x1 - i, y1 - i), (x0 + i, y1 - i)]
+    vertices = [(*map_xy(x, y), z0) for x, y in bottom] + [(*map_xy(x, y), z1) for x, y in top]
+    faces = [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    add_mesh(scene, name, vertices, faces, material)
+
+
+def build_yagura_small_graybox(scene: bpy.types.Scene) -> None:
+    """Small watchtower on a 2x2 footprint (monumental: fills the lot).
+
+    South corner at origin, lot map [-2..0]x[-2..0]. Canvas 160x200,
+    anchor 80,168. Tapered stone base + plastered story + watch story with a
+    gabled roof; ridge 3.15 units (~43% of the tenshu height).
+    """
+    plaster = make_material("Plaster", (0.78, 0.76, 0.70, 1.0))
+    stone = make_material("Ishigaki", (0.44, 0.42, 0.37, 1.0))
+    roof = make_material("RoofTile", (0.22, 0.24, 0.29, 1.0))
+    wood = make_material("DarkWood", (0.30, 0.23, 0.16, 1.0))
+
+    add_frustum(scene, "Base", (-2.0, -2.0), (0.0, 0.0), 0.0, 0.95, 0.28, stone)
+    add_box(scene, "Story1", *map_box((-1.72, -1.72, 0.95), (-0.28, -0.28, 1.85)), plaster)
+    # Skirt roof between stories.
+    add_box(scene, "Skirt", *map_box((-1.88, -1.88, 1.82), (-0.12, -0.12, 1.92)), roof)
+    add_box(scene, "Story2", *map_box((-1.45, -1.45, 1.92), (-0.55, -0.55, 2.72)), plaster)
+    # Open watch band under the top roof.
+    add_box(scene, "WatchBand", *map_box((-1.48, -1.48, 2.52), (-0.52, -0.52, 2.72)), wood)
+    low, high = map_box((-1.65, -1.65, 0.0), (-0.35, -0.35, 0.0))
+    add_gable_roof(scene, "TopRoof", (low[0], low[1]), (high[0], high[1]), 2.72, 3.15, "x", roof)
+
+
+def build_farm_paddy(scene: bpy.types.Scene) -> None:
+    """Rice paddy filling a 4x4 surface footprint, centered at origin.
+
+    Canvas 256x128, anchor 128,64. Border and cross ridges (aze) around
+    four water paddies; surface class, flat relief only.
+    """
+    ridge = make_material("AzeDirt", (0.42, 0.36, 0.27, 1.0))
+    water = make_material("PaddyWater", (0.20, 0.30, 0.29, 1.0))
+
+    add_box(scene, "FieldBase", *map_box((-2.0, -2.0, 0.0), (2.0, 2.0, 0.02)), ridge)
+    add_box(scene, "Water", *map_box((-1.86, -1.86, 0.021), (1.86, 1.86, 0.045)), water)
+    half_ridge = 0.07
+    # Staggered ridge heights break coplanar faces where ridges cross.
+    for index, (name, low, high) in enumerate((
+        ("AzeN", (-2.0, -2.0), (2.0, -2.0 + 2 * half_ridge)),
+        ("AzeS", (-2.0, 2.0 - 2 * half_ridge), (2.0, 2.0)),
+        ("AzeW", (-2.0, -2.0), (-2.0 + 2 * half_ridge, 2.0)),
+        ("AzeE", (2.0 - 2 * half_ridge, -2.0), (2.0, 2.0)),
+        ("AzeMidX", (-half_ridge, -2.0), (half_ridge, 2.0)),
+        ("AzeMidY", (-2.0, -half_ridge), (2.0, half_ridge)),
+    )):
+        top = 0.078 - 0.0028 * index
+        add_box(scene, name, *map_box((low[0], low[1], 0.0), (high[0], high[1], top)), ridge)
+
+
 # Gate kit -------------------------------------------------------------------
 #
 # Kabukimon-style gates spanning 1-3 tiles. nw_se gates run along map x
@@ -770,6 +830,8 @@ MODEL_REGISTRY = {
     "building-barracks-graybox": build_barracks_graybox,
     "building-samurai-residence-graybox": build_samurai_residence_graybox,
     "building-town-block-graybox": build_town_block_graybox,
+    "building-yagura-small-graybox": build_yagura_small_graybox,
+    "building-farm-paddy": build_farm_paddy,
 }
 
 

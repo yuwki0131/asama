@@ -37,10 +37,10 @@ const targets: readonly AlignmentTarget[] = [
   { assetId: "building.gate.wood.closed", footprintWidth: 1, footprintHeight: 1, placement: "south", baseMatch: "blender gate kit" },
   {
     assetId: "building.yagura.small.normal",
-    footprintWidth: 1,
-    footprintHeight: 1,
+    footprintWidth: 2,
+    footprintHeight: 2,
     placement: "south",
-    concern: "initial runtime source; final footprint pending design confirmation"
+    baseMatch: "blender tower kit"
   },
   { assetId: "building.wall.plaster.connected.1010", footprintWidth: 1, footprintHeight: 1, placement: "center", sockets: true },
   { assetId: "building.fence.wood.connected.1010", footprintWidth: 1, footprintHeight: 1, placement: "center", sockets: true }

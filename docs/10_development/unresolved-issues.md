@@ -32,7 +32,7 @@
 ## アート
 
 - 最終タイル表示サイズ
-- `building.yagura.small.normal` / `building.yagura.small.occupied-cutaway` のruntime content定義とmanifest反映方針
+- `building.yagura.small` のruntime content定義(シミュレーション建物型としての追加)。footprintは2x2で確定済み(2026-07-03)、`occupied-cutaway` variantの制作と反映方針は未決
 - 地形境界を4方向16マスクで確定するか、斜め接続を含む8方向方式へ拡張するか
 - 草地・土・石・水の異種地形境界に専用の組み合わせ別transition overlayを追加するか
 - MVP天守様式数

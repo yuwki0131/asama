@@ -258,16 +258,17 @@
       "kind": "building",
       "output": "building-yagura-small-normal.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-01/building-yagura-small-normal.png"
+        "type": "blender",
+        "model": "building-yagura-small-graybox",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 224,
-        "canvasHeight": 208,
-        "anchorX": 112,
-        "anchorY": 183
+        "footprintWidth": 2,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 200,
+        "anchorX": 80,
+        "anchorY": 168
       },
       "category": "building",
       "postprocess": {
@@ -412,8 +413,9 @@
       "kind": "building",
       "output": "building-farm.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-farm.png"
+        "type": "blender",
+        "model": "building-farm-paddy",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 4,

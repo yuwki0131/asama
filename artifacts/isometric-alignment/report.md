@@ -9,6 +9,6 @@
 | `building.samurai_residence` | present | 288x224 | 144,192 | 15,21-272,192 | 4x4 south | blender yard-pad foundation | none |
 | `building.town_block` | present | 416x304 | 208,272 | 15,11-400,272 | 6x6 south | blender yard-pad foundation | none |
 | `building.gate.wood.closed` | present | 96x112 | 48,104 | 14,10-81,104 | 1x1 south | blender gate kit | none |
-| `building.yagura.small.normal` | present | 224x208 | 112,183 | 50,19-174,183 | 1x1 south | - | initial runtime source; final footprint pending design confirmation |
+| `building.yagura.small.normal` | present | 160x200 | 80,168 | 15,2-143,168 | 2x2 south | blender tower kit | none |
 | `building.wall.plaster.connected.1010` | present | 64x96 | 32,80 | 9,27-54,91 | 1x1 center | - | none |
 | `building.fence.wood.connected.1010` | present | 64x64 | 32,48 | 13,10-50,57 | 1x1 center | - | none |

@@ -201,17 +201,6 @@
       }
     },
     {
-      "assetId": "building.yagura.small.normal",
-      "kind": "building",
-      "file": "generated/building-yagura-small-normal.png",
-      "width": 224,
-      "height": 208,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8798076923076923
-      }
-    },
-    {
       "assetId": "building.tenshu.test",
       "kind": "building",
       "file": "generated/building-tenshu-test.png",
@@ -220,17 +209,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.8269230769230769
-      }
-    },
-    {
-      "assetId": "building.farm",
-      "kind": "building",
-      "file": "generated/building-farm.png",
-      "width": 256,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
       }
     },
     {
@@ -1543,6 +1521,17 @@
       }
     },
     {
+      "assetId": "building.yagura.small.normal",
+      "kind": "building",
+      "file": "generated/building-yagura-small-normal.png",
+      "width": 160,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.84
+      }
+    },
+    {
       "assetId": "building.market",
       "kind": "building",
       "file": "generated/building-market.png",
@@ -1584,6 +1573,17 @@
       "anchor": {
         "x": 0.5,
         "y": 0.8947368421052632
+      }
+    },
+    {
+      "assetId": "building.farm",
+      "kind": "building",
+      "file": "generated/building-farm.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
       }
     },
     {
