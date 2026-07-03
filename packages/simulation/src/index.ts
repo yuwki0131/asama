@@ -391,6 +391,7 @@ const samuraiResidenceFootprint = rectangularFootprint(4, 4);
 const townBlockFootprint = rectangularFootprint(6, 6);
 const farmFootprint = rectangularFootprint(4, 4);
 const tenshuFootprint = rectangularFootprint(8, 8);
+const yaguraFootprint = rectangularFootprint(2, 2);
 
 const initialBuildingPlacements: readonly {
   readonly type: BuildingType;
@@ -399,6 +400,7 @@ const initialBuildingPlacements: readonly {
 }[] = [
   { type: "tenshu", position: { x: 54, y: 54 } },
   { type: "honmaru", position: { x: 62, y: 58 } },
+  { type: "yagura", position: { x: 50, y: 58 } },
   { type: "storehouse", position: { x: 47, y: 62 } },
   { type: "market", position: { x: 52, y: 66 } },
   { type: "barracks", position: { x: 60, y: 66 } },
@@ -643,6 +645,16 @@ const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
     passable: false,
     movementCostModifier: BLOCKED_MOVEMENT_COST,
     assetId: "building.tenshu.test",
+    gateState: null
+  },
+  yagura: {
+    type: "yagura",
+    category: "castle",
+    maxHp: 260,
+    footprint: yaguraFootprint,
+    passable: false,
+    movementCostModifier: BLOCKED_MOVEMENT_COST,
+    assetId: "building.yagura.small.normal",
     gateState: null
   }
 };

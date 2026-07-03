@@ -68,17 +68,18 @@ const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
   gate_wide_3_ne_sw: rectangleFootprint(1, 3),
   dry_moat: rectangleFootprint(1, 1),
   water_moat: rectangleFootprint(1, 1),
-  storehouse: rectangleFootprint(4, 4),
-  market: rectangleFootprint(6, 4),
-  barracks: rectangleFootprint(6, 4),
-  samurai_residence: rectangleFootprint(6, 6),
-  town_block: rectangleFootprint(8, 8),
+  storehouse: rectangleFootprint(3, 3),
+  market: rectangleFootprint(4, 3),
+  barracks: rectangleFootprint(4, 3),
+  samurai_residence: rectangleFootprint(4, 4),
+  town_block: rectangleFootprint(6, 6),
   farm: rectangleFootprint(4, 4),
   road: rectangleFootprint(1, 1),
   earth_bridge: rectangleFootprint(1, 1),
   wood_bridge: rectangleFootprint(1, 1),
   honmaru: rectangleFootprint(1, 1),
-  tenshu: rectangleFootprint(8, 8)
+  tenshu: rectangleFootprint(8, 8),
+  yagura: rectangleFootprint(2, 2)
 };
 
 export function GameCanvas({

@@ -285,6 +285,7 @@ const buildingTools: readonly { readonly type: BuildingType; readonly label: str
   { type: "barracks", label: "Barracks" },
   { type: "samurai_residence", label: "Samurai House" },
   { type: "town_block", label: "Town Block" },
+  { type: "yagura", label: "Yagura" },
   { type: "honmaru", label: "Honmaru" },
   { type: "tenshu", label: "Tenshu" }
 ];

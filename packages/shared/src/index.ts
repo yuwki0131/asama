@@ -30,7 +30,8 @@ export type BuildingType =
   | "earth_bridge"
   | "wood_bridge"
   | "honmaru"
-  | "tenshu";
+  | "tenshu"
+  | "yagura";
 export type BuildingCategory = "castle" | "moat" | "economy" | "military" | "residential" | "infrastructure" | "objective";
 export type BuildingLifecycleState = "intact" | "destroyed";
 export type GateState = "open" | "closed";
