@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Application, Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type {
   BuildingSnapshot,
@@ -119,6 +119,28 @@ export function GameCanvas({
   const [selectedCell, setSelectedCell] = useState<CellCoord | null>(null);
   const [localInvalidMoveTarget, setLocalInvalidMoveTarget] = useState<CellCoord | null>(null);
   const [cameraVersion, setCameraVersion] = useState(0);
+  const cameraRafRef = useRef<number | null>(null);
+
+  // Wheel and drag events fire far more often than the display refreshes;
+  // coalescing camera-driven re-renders to one per animation frame keeps a
+  // zoom gesture from queueing dozens of full scene rebuilds.
+  const scheduleCameraRender = useCallback(() => {
+    if (cameraRafRef.current !== null) {
+      return;
+    }
+    cameraRafRef.current = requestAnimationFrame(() => {
+      cameraRafRef.current = null;
+      setCameraVersion((version) => version + 1);
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (cameraRafRef.current !== null) {
+        cancelAnimationFrame(cameraRafRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     snapshotRef.current = snapshot;
@@ -247,12 +269,14 @@ export function GameCanvas({
       snapshot,
       assets,
       cameraRef.current,
-      cameraVersion,
       buildTool,
       hoverCell,
       selectedCell,
       localInvalidMoveTarget
     );
+    // cameraVersion is not read by renderScene, but camera pans and zooms
+    // mutate cameraRef without new state; the version bump re-triggers this
+    // effect so the scene follows the camera.
   }, [assets, buildTool, cameraVersion, hoverCell, localInvalidMoveTarget, ready, selectedCell, snapshot]);
 
   useEffect(() => {
@@ -292,7 +316,7 @@ export function GameCanvas({
           const dy = event.clientY - drag.lastY;
           cameraRef.current.x = roundScreenPixel(cameraRef.current.x + dx);
           cameraRef.current.y = roundScreenPixel(cameraRef.current.y + dy);
-          setCameraVersion((version) => version + 1);
+          scheduleCameraRender();
         }
         drag.lastX = event.clientX;
         drag.lastY = event.clientY;
@@ -354,7 +378,7 @@ export function GameCanvas({
       cameraRef.current.zoom = nextZoom;
       cameraRef.current.x = roundScreenPixel(event.clientX - rect.left - before.x * nextZoom);
       cameraRef.current.y = roundScreenPixel(event.clientY - rect.top - before.y * nextZoom);
-      setCameraVersion((version) => version + 1);
+      scheduleCameraRender();
     };
 
     const handleContextMenu = (event: MouseEvent) => {
@@ -412,7 +436,7 @@ export function GameCanvas({
       canvas.removeEventListener("wheel", handleWheel);
       canvas.removeEventListener("contextmenu", handleContextMenu);
     };
-  }, [onMoveSelected, ready]);
+  }, [onMoveSelected, ready, scheduleCameraRender]);
 
   return <div ref={hostRef} className="game-canvas" />;
 }
@@ -427,7 +451,6 @@ function renderScene(
   snapshot: WorldSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
   camera: CameraState,
-  cameraVersion: number,
   buildTool: BuildingType | "demolish" | null,
   hoverCell: CellCoord | null,
   selectedCell: CellCoord | null,
@@ -442,7 +465,12 @@ function renderScene(
 
   const firstCell = snapshot.map.cells[0]?.coord;
   const lastCell = snapshot.map.cells[snapshot.map.cells.length - 1]?.coord;
-  const terrainKey = `${cameraVersion}:${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}`;
+  // Rebuilding thousands of terrain sprites is the most expensive render
+  // step, so key it on the visible world region quantized to whole tiles
+  // (the culling margin is two tiles) instead of on every camera nudge.
+  const regionX = Math.round(-camera.x / camera.zoom / TILE_WIDTH);
+  const regionY = Math.round(-camera.y / camera.zoom / TILE_HEIGHT);
+  const terrainKey = `${regionX}:${regionY}:${camera.zoom}:${app.screen.width}x${app.screen.height}:${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}`;
   if (lastTerrainKeyRef.current !== terrainKey) {
     clearLayer(terrainLayer);
     const terrainUnderlay = new Graphics();
