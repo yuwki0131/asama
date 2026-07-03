@@ -154,18 +154,20 @@ def setup_production_lighting(scene: bpy.types.Scene) -> None:
     """
     direction = Vector((1.0, -0.2, -1.4)).normalized()
     sun_data = bpy.data.lights.new("Sun", type="SUN")
-    sun_data.energy = 3.5
+    sun_data.energy = 4.2
     sun_data.angle = 0.06
     sun = bpy.data.objects.new("Sun", sun_data)
     sun.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
     scene.collection.objects.link(sun)
 
+    # Ambient fill keeps shaded faces readable; slightly cool to contrast
+    # the warm sun without pushing saturation (art direction: low chroma).
     world = bpy.data.worlds.new("World")
     world.use_nodes = True
     background = world.node_tree.nodes.get("Background")
     if background is not None:
-        background.inputs["Color"].default_value = (0.55, 0.6, 0.68, 1.0)
-        background.inputs["Strength"].default_value = 0.45
+        background.inputs["Color"].default_value = (0.65, 0.68, 0.74, 1.0)
+        background.inputs["Strength"].default_value = 0.85
     scene.world = world
 
 
