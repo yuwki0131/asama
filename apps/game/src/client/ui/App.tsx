@@ -14,7 +14,31 @@ export function App() {
   const [simulationStatus, setSimulationStatus] = useState("starting");
   const [buildTool, setBuildTool] = useState<BuildingType | "demolish" | null>(null);
   const [debugVisible, setDebugVisible] = useState(DEBUG_STATUS_PANEL_ENABLED || DEBUG_OVERLAY_DEFAULT_ENABLED);
+  const [speed, setSpeed] = useState<0 | 1 | 2 | 4>(1);
+  const lastRunningSpeedRef = useRef<1 | 2 | 4>(1);
   const selectedUnits = snapshot?.units.filter((unit) => unit.selected) ?? [];
+
+  useEffect(() => {
+    simulationRef.current?.setSpeed(speed);
+    if (speed !== 0) {
+      lastRunningSpeedRef.current = speed;
+    }
+  }, [speed]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "Space" || event.repeat) {
+        return;
+      }
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      event.preventDefault();
+      setSpeed((current) => (current === 0 ? lastRunningSpeedRef.current : 0));
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     let simulation: SimulationClient;
@@ -240,6 +264,16 @@ export function App() {
           </span>
           {saveStatus === null ? null : <span>{saveStatus}</span>}
           {simulationError === null ? null : <span className="error-text">{simulationError}</span>}
+          {([0, 1, 2, 4] as const).map((value) => (
+            <button
+              className={speed === value ? "active" : ""}
+              key={value}
+              type="button"
+              onClick={() => setSpeed(value)}
+            >
+              {value === 0 ? "⏸" : `${value}x`}
+            </button>
+          ))}
           <button type="button" onClick={() => void handleQuickSave()}>
             Save
           </button>
