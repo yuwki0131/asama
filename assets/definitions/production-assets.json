@@ -439,8 +439,9 @@
       "kind": "building",
       "output": "building-road.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/batch-01/building-road-dirt.png"
+        "type": "blender",
+        "model": "road-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -464,8 +465,9 @@
       "kind": "building",
       "output": "building-earth-bridge.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-earth-bridge.png"
+        "type": "blender",
+        "model": "building-earth-bridge",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -489,8 +491,9 @@
       "kind": "building",
       "output": "building-wood-bridge.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/mock-removal-fortifications-surfaces/building-wood-bridge.png"
+        "type": "blender",
+        "model": "building-wood-bridge",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -644,8 +647,9 @@
       "kind": "building",
       "output": "building-dry-moat.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -669,8 +673,9 @@
       "kind": "building",
       "output": "building-water-moat.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected.png"
+        "type": "blender",
+        "model": "water-moat-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1526,8 +1531,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0000.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1551,8 +1557,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0001.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1576,8 +1583,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0010.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1601,8 +1609,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0011.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1626,8 +1635,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0100.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1651,8 +1661,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0101.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1676,8 +1687,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0110.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1701,8 +1713,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-0111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-0111.png"
+        "type": "blender",
+        "model": "dry-moat-connected-0111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1726,8 +1739,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1000.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1751,8 +1765,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1001.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1776,8 +1791,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1010.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1801,8 +1817,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1011.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1826,8 +1843,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1100.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1851,8 +1869,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1101.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1876,8 +1895,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1110.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1901,8 +1921,9 @@
       "kind": "building",
       "output": "building-dry-moat-connected-1111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-dry-moat-connected-1111.png"
+        "type": "blender",
+        "model": "dry-moat-connected-1111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1926,8 +1947,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0000.png"
+        "type": "blender",
+        "model": "water-moat-connected-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1951,8 +1973,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0001.png"
+        "type": "blender",
+        "model": "water-moat-connected-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1976,8 +1999,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0010.png"
+        "type": "blender",
+        "model": "water-moat-connected-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2001,8 +2025,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0011.png"
+        "type": "blender",
+        "model": "water-moat-connected-0011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2026,8 +2051,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0100.png"
+        "type": "blender",
+        "model": "water-moat-connected-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2051,8 +2077,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0101.png"
+        "type": "blender",
+        "model": "water-moat-connected-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2076,8 +2103,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0110.png"
+        "type": "blender",
+        "model": "water-moat-connected-0110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2101,8 +2129,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-0111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-0111.png"
+        "type": "blender",
+        "model": "water-moat-connected-0111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2126,8 +2155,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1000.png"
+        "type": "blender",
+        "model": "water-moat-connected-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2151,8 +2181,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1001.png"
+        "type": "blender",
+        "model": "water-moat-connected-1001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2176,8 +2207,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1010.png"
+        "type": "blender",
+        "model": "water-moat-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2201,8 +2233,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1011.png"
+        "type": "blender",
+        "model": "water-moat-connected-1011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2226,8 +2259,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1100.png"
+        "type": "blender",
+        "model": "water-moat-connected-1100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2251,8 +2285,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1101.png"
+        "type": "blender",
+        "model": "water-moat-connected-1101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2276,8 +2311,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1110.png"
+        "type": "blender",
+        "model": "water-moat-connected-1110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2301,8 +2337,9 @@
       "kind": "building",
       "output": "building-water-moat-connected-1111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-water-moat-connected-1111.png"
+        "type": "blender",
+        "model": "water-moat-connected-1111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3926,8 +3963,9 @@
       "kind": "building",
       "output": "building-road-connected-0000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0000.png"
+        "type": "blender",
+        "model": "road-connected-0000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3951,8 +3989,9 @@
       "kind": "building",
       "output": "building-road-connected-0001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0001.png"
+        "type": "blender",
+        "model": "road-connected-0001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3976,8 +4015,9 @@
       "kind": "building",
       "output": "building-road-connected-0010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0010.png"
+        "type": "blender",
+        "model": "road-connected-0010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4001,8 +4041,9 @@
       "kind": "building",
       "output": "building-road-connected-0011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0011.png"
+        "type": "blender",
+        "model": "road-connected-0011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4026,8 +4067,9 @@
       "kind": "building",
       "output": "building-road-connected-0100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0100.png"
+        "type": "blender",
+        "model": "road-connected-0100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4051,8 +4093,9 @@
       "kind": "building",
       "output": "building-road-connected-0101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0101.png"
+        "type": "blender",
+        "model": "road-connected-0101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4076,8 +4119,9 @@
       "kind": "building",
       "output": "building-road-connected-0110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0110.png"
+        "type": "blender",
+        "model": "road-connected-0110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4101,8 +4145,9 @@
       "kind": "building",
       "output": "building-road-connected-0111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-0111.png"
+        "type": "blender",
+        "model": "road-connected-0111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4126,8 +4171,9 @@
       "kind": "building",
       "output": "building-road-connected-1000.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1000.png"
+        "type": "blender",
+        "model": "road-connected-1000",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4151,8 +4197,9 @@
       "kind": "building",
       "output": "building-road-connected-1001.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1001.png"
+        "type": "blender",
+        "model": "road-connected-1001",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4176,8 +4223,9 @@
       "kind": "building",
       "output": "building-road-connected-1010.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1010.png"
+        "type": "blender",
+        "model": "road-connected-1010",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4201,8 +4249,9 @@
       "kind": "building",
       "output": "building-road-connected-1011.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1011.png"
+        "type": "blender",
+        "model": "road-connected-1011",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4226,8 +4275,9 @@
       "kind": "building",
       "output": "building-road-connected-1100.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1100.png"
+        "type": "blender",
+        "model": "road-connected-1100",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4251,8 +4301,9 @@
       "kind": "building",
       "output": "building-road-connected-1101.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1101.png"
+        "type": "blender",
+        "model": "road-connected-1101",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4276,8 +4327,9 @@
       "kind": "building",
       "output": "building-road-connected-1110.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1110.png"
+        "type": "blender",
+        "model": "road-connected-1110",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -4301,8 +4353,9 @@
       "kind": "building",
       "output": "building-road-connected-1111.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/wide-moat-surface-transitions/building-road-connected-1111.png"
+        "type": "blender",
+        "model": "road-connected-1111",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
         "footprintWidth": 1,

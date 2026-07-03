@@ -212,413 +212,6 @@
       }
     },
     {
-      "assetId": "building.road",
-      "kind": "building",
-      "file": "generated/building-road.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.earth_bridge",
-      "kind": "building",
-      "file": "generated/building-earth-bridge.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.wood_bridge",
-      "kind": "building",
-      "file": "generated/building-wood-bridge.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat",
-      "kind": "building",
-      "file": "generated/building-dry-moat.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat",
-      "kind": "building",
-      "file": "generated/building-water-moat.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0000",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0001",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0010",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0011",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0100",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0101",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0110",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.0111",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-0111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1000",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1001",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1010",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1011",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1100",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1101",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1110",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.dry_moat.connected.1111",
-      "kind": "building",
-      "file": "generated/building-dry-moat-connected-1111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0000",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0001",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0010",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0011",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0100",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0101",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0110",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.0111",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-0111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1000",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1001",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1010",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1011",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1100",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1101",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1110",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.water_moat.connected.1111",
-      "kind": "building",
-      "file": "generated/building-water-moat-connected-1111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
       "assetId": "terrain.grass.connected.0000",
       "kind": "terrain",
       "file": "generated/terrain-grass-connected-0000.png",
@@ -1323,182 +916,6 @@
       }
     },
     {
-      "assetId": "building.road.connected.0000",
-      "kind": "building",
-      "file": "generated/building-road-connected-0000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.0001",
-      "kind": "building",
-      "file": "generated/building-road-connected-0001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.0010",
-      "kind": "building",
-      "file": "generated/building-road-connected-0010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.0011",
-      "kind": "building",
-      "file": "generated/building-road-connected-0011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.0100",
-      "kind": "building",
-      "file": "generated/building-road-connected-0100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.0101",
-      "kind": "building",
-      "file": "generated/building-road-connected-0101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.0110",
-      "kind": "building",
-      "file": "generated/building-road-connected-0110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.0111",
-      "kind": "building",
-      "file": "generated/building-road-connected-0111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1000",
-      "kind": "building",
-      "file": "generated/building-road-connected-1000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1001",
-      "kind": "building",
-      "file": "generated/building-road-connected-1001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1010",
-      "kind": "building",
-      "file": "generated/building-road-connected-1010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1011",
-      "kind": "building",
-      "file": "generated/building-road-connected-1011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1100",
-      "kind": "building",
-      "file": "generated/building-road-connected-1100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1101",
-      "kind": "building",
-      "file": "generated/building-road-connected-1101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1110",
-      "kind": "building",
-      "file": "generated/building-road-connected-1110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.road.connected.1111",
-      "kind": "building",
-      "file": "generated/building-road-connected-1111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
       "assetId": "terrain.grass.base",
       "kind": "terrain",
       "file": "generated/terrain-grass-base.png",
@@ -1587,6 +1004,39 @@
       }
     },
     {
+      "assetId": "building.road",
+      "kind": "building",
+      "file": "generated/building-road.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge",
+      "kind": "building",
+      "file": "generated/building-earth-bridge.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.wood_bridge",
+      "kind": "building",
+      "file": "generated/building-wood-bridge.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
       "assetId": "building.fence.wood",
       "kind": "building",
       "file": "generated/building-fence-wood.png",
@@ -1639,6 +1089,28 @@
       "anchor": {
         "x": 0.5,
         "y": 0.9375
+      }
+    },
+    {
+      "assetId": "building.dry_moat",
+      "kind": "building",
+      "file": "generated/building-dry-moat.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat",
+      "kind": "building",
+      "file": "generated/building-water-moat.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
       }
     },
     {
@@ -1991,6 +1463,534 @@
       "anchor": {
         "x": 0.5,
         "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0000",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0001",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0010",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0011",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0100",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0110",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0111",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1000",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1001",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1011",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1100",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1101",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1110",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1111",
+      "kind": "building",
+      "file": "generated/building-dry-moat-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0000",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0001",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0010",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0011",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0100",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0110",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0111",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1000",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1001",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1011",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1100",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1101",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1110",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1111",
+      "kind": "building",
+      "file": "generated/building-water-moat-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0000",
+      "kind": "building",
+      "file": "generated/building-road-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0001",
+      "kind": "building",
+      "file": "generated/building-road-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0010",
+      "kind": "building",
+      "file": "generated/building-road-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0011",
+      "kind": "building",
+      "file": "generated/building-road-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0100",
+      "kind": "building",
+      "file": "generated/building-road-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0101",
+      "kind": "building",
+      "file": "generated/building-road-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0110",
+      "kind": "building",
+      "file": "generated/building-road-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0111",
+      "kind": "building",
+      "file": "generated/building-road-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1000",
+      "kind": "building",
+      "file": "generated/building-road-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1001",
+      "kind": "building",
+      "file": "generated/building-road-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010",
+      "kind": "building",
+      "file": "generated/building-road-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1011",
+      "kind": "building",
+      "file": "generated/building-road-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1100",
+      "kind": "building",
+      "file": "generated/building-road-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1101",
+      "kind": "building",
+      "file": "generated/building-road-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1110",
+      "kind": "building",
+      "file": "generated/building-road-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1111",
+      "kind": "building",
+      "file": "generated/building-road-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
       }
     },
     {

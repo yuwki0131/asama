@@ -758,6 +758,82 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str) ->
         add_gable_roof(scene, f"Stub{name}Coping", (wlow[0], wlow[1]), (whigh[0], whigh[1]), WALL_BODY_TOP, WALL_COPING_TOP, ridge_axis, roof)
 
 
+# Connected surface kits (road, moats) ---------------------------------------
+#
+# Flat surface families with the same socket contract: arms run from tile
+# center to edge midpoints. Canvas 64x32, anchor (32,16), footprint center at
+# origin. Moat depth is faked with color and shallow bank relief: real
+# negative-z digging would project outside the 64x32 diamond.
+
+
+def build_surface_arm_kit(
+    scene: bpy.types.Scene,
+    mask: str,
+    floor_material: bpy.types.Material,
+    floor_top: float,
+    arm_half: float,
+    bank_material: bpy.types.Material | None = None,
+    bank_top: float = 0.04,
+) -> None:
+    bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    active = [name for name, on in bits.items() if on]
+
+    pad_half = arm_half + 0.02
+    add_box(scene, "CenterPad", *map_box((-pad_half, -pad_half, 0.0), (pad_half, pad_half, floor_top)), floor_material)
+    for index, name in enumerate(active):
+        direction = WALL_DIRECTIONS[name]
+        inset = WALL_EPSILON * (index + 1)
+        low, high = wall_arm_box(direction, arm_half - inset, 0.0, floor_top - inset)
+        add_box(scene, f"Floor{name}", *map_box(low, high), floor_material)
+        if bank_material is not None:
+            for side in (-1.0, 1.0):
+                offset = side * (arm_half + 0.045)
+                blow, bhigh = wall_arm_box(direction, 0.045, 0.0, bank_top - inset)
+                dx, dy = direction
+                if dx != 0.0:
+                    blow = (blow[0], blow[1] + offset, blow[2])
+                    bhigh = (bhigh[0], bhigh[1] + offset, bhigh[2])
+                else:
+                    blow = (blow[0] + offset, blow[1], blow[2])
+                    bhigh = (bhigh[0] + offset, bhigh[1], bhigh[2])
+                add_box(scene, f"Bank{name}{side}", *map_box(blow, bhigh), bank_material)
+
+
+def build_road_mask(scene: bpy.types.Scene, mask: str) -> None:
+    dirt = make_material("RoadDirt", (0.54, 0.47, 0.36, 1.0))
+    build_surface_arm_kit(scene, mask, dirt, 0.014, 0.27)
+
+
+def build_dry_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
+    floor = make_material("MoatFloor", (0.30, 0.25, 0.19, 1.0))
+    bank = make_material("MoatBank", (0.48, 0.42, 0.32, 1.0))
+    build_surface_arm_kit(scene, mask, floor, 0.010, 0.33, bank_material=bank)
+
+
+def build_water_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
+    water = make_material("MoatWater", (0.09, 0.17, 0.21, 1.0))
+    bank = make_material("MoatBank", (0.48, 0.42, 0.32, 1.0))
+    build_surface_arm_kit(scene, mask, water, 0.010, 0.33, bank_material=bank)
+
+
+def build_earth_bridge(scene: bpy.types.Scene) -> None:
+    """Earthen causeway crossing along map x. Canvas 64x32, anchor 32,16."""
+    dirt = make_material("CausewayDirt", (0.50, 0.43, 0.32, 1.0))
+    add_box(scene, "Causeway", *map_box((-0.5, -0.30, 0.0), (0.5, 0.30, 0.07)), dirt)
+
+
+def build_wood_bridge(scene: bpy.types.Scene) -> None:
+    """Plank bridge crossing along map x with side rails."""
+    plank = make_material("BridgePlank", (0.47, 0.36, 0.24, 1.0))
+    rail = make_material("BridgeRail", (0.34, 0.26, 0.17, 1.0))
+    add_box(scene, "Deck", *map_box((-0.5, -0.28, 0.05), (0.5, 0.28, 0.10)), plank)
+    for side in (-1.0, 1.0):
+        y = side * 0.30
+        add_box(scene, f"Rail{side}", *map_box((-0.5, y - 0.03, 0.10), (0.5, y + 0.03, 0.32)), rail)
+        for px in (-0.42, 0.0, 0.42):
+            add_box(scene, f"RailPost{side}{px}", *map_box((px - 0.035, y - 0.035, 0.0), (px + 0.035, y + 0.035, 0.34)), rail)
+
+
 # Connected fence kit -------------------------------------------------------
 #
 # Wooden palisade fence, same socket contract as the wall kit: arms run from
@@ -807,6 +883,9 @@ def resolve_model(name: str):
     for prefix, kit in (
         ("wall-plaster-connected-", build_wall_plaster_mask),
         ("fence-wood-connected-", build_fence_wood_mask),
+        ("road-connected-", build_road_mask),
+        ("dry-moat-connected-", build_dry_moat_mask),
+        ("water-moat-connected-", build_water_moat_mask),
     ):
         if name.startswith(prefix):
             mask = name[len(prefix):]
@@ -832,6 +911,8 @@ MODEL_REGISTRY = {
     "building-town-block-graybox": build_town_block_graybox,
     "building-yagura-small-graybox": build_yagura_small_graybox,
     "building-farm-paddy": build_farm_paddy,
+    "building-earth-bridge": build_earth_bridge,
+    "building-wood-bridge": build_wood_bridge,
 }
 
 
