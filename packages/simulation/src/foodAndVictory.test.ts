@@ -75,6 +75,13 @@ describe("victory and defeat", () => {
       return;
     }
 
+    // Pull every defender away from the keep first; the initial layout
+    // garrisons a unit on the honmaru cell, which blocks capture.
+    for (const unit of world.units) {
+      if (unit.owner === "player") {
+        unit.position = { x: 40, y: 40 };
+      }
+    }
     enemy.position = honmaru.position;
     updateWorld(world);
 
