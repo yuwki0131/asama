@@ -17,16 +17,21 @@ interface AlignmentTarget {
   readonly placement: "center" | "south";
   readonly sockets?: boolean;
   readonly concern?: string;
+  readonly baseMatch?: string;
 }
 
 const TILE_WIDTH = 64;
 const TILE_HEIGHT = 32;
-const sheetCellWidth = 420;
-const sheetCellHeight = 340;
-const columns = 2;
+const sheetCellWidth = 900;
+const sheetCellHeight = 620;
+const columns = 1;
 const targets: readonly AlignmentTarget[] = [
   { assetId: "terrain.grass.base", footprintWidth: 1, footprintHeight: 1, placement: "center" },
-  { assetId: "building.storehouse", footprintWidth: 4, footprintHeight: 4, placement: "south" },
+  { assetId: "building.storehouse", footprintWidth: 4, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
+  { assetId: "building.market", footprintWidth: 6, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
+  { assetId: "building.barracks", footprintWidth: 6, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
+  { assetId: "building.samurai_residence", footprintWidth: 6, footprintHeight: 6, placement: "south", baseMatch: "corrected footprint foundation" },
+  { assetId: "building.town_block", footprintWidth: 8, footprintHeight: 8, placement: "south", baseMatch: "corrected footprint foundation" },
   { assetId: "building.gate.wood.closed", footprintWidth: 1, footprintHeight: 1, placement: "center", sockets: true },
   {
     assetId: "building.yagura.small.normal",
@@ -53,8 +58,8 @@ export async function generateAlignmentContactSheet(): Promise<string> {
   const reportRows: string[] = [
     "# Isometric Alignment Contact Sheet",
     "",
-    "| assetId | status | canvas | anchor px | alpha bounds | footprint | concern |",
-    "| --- | --- | --- | --- | --- | --- | --- |"
+    "| assetId | status | canvas | anchor px | alpha bounds | footprint | base match | concern |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |"
   ];
 
   for (const [index, target] of targets.entries()) {
@@ -62,7 +67,7 @@ export async function generateAlignmentContactSheet(): Promise<string> {
     const origin = targetOrigin(index);
     if (asset === undefined) {
       reportRows.push(
-        `| \`${target.assetId}\` | missing | - | - | - | ${target.footprintWidth}x${target.footprintHeight} ${target.placement} | runtime manifest entry missing |`
+        `| \`${target.assetId}\` | missing | - | - | - | ${target.footprintWidth}x${target.footprintHeight} ${target.placement} | - | runtime manifest entry missing |`
       );
       continue;
     }
@@ -76,7 +81,7 @@ export async function generateAlignmentContactSheet(): Promise<string> {
       top: Math.round(contact.y - anchor.y)
     });
     reportRows.push(
-      `| \`${target.assetId}\` | present | ${asset.width}x${asset.height} | ${anchor.x},${anchor.y} | ${formatBounds(bounds)} | ${target.footprintWidth}x${target.footprintHeight} ${target.placement} | ${targetConcern(target, bounds, anchor)} |`
+      `| \`${target.assetId}\` | present | ${asset.width}x${asset.height} | ${anchor.x},${anchor.y} | ${formatBounds(bounds)} | ${target.footprintWidth}x${target.footprintHeight} ${target.placement} | ${target.baseMatch ?? "-"} | ${targetConcern(target, bounds, anchor)} |`
     );
   }
 

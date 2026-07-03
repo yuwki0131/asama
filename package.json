@@ -19,6 +19,7 @@
     "assets:validate": "pnpm --filter @asama/asset-tools assets:validate",
     "assets:audit:production": "pnpm --filter @asama/asset-tools assets:audit:production",
     "assets:alignment:correct": "pnpm --filter @asama/asset-tools assets:alignment:correct",
+    "assets:alignment:correct-large-buildings": "pnpm --filter @asama/asset-tools assets:alignment:correct-large-buildings",
     "assets:alignment:contact-sheet": "pnpm --filter @asama/asset-tools assets:alignment:contact-sheet",
     "assets:all": "pnpm --filter @asama/asset-tools assets:all",
     "clean:assets": "pnpm --filter @asama/asset-tools clean",

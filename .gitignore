@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.vite/
+coverage/
+*.log
+*.tsbuildinfo
+saves/**/*.tmp
+public/assets/placeholders/
+!public/assets/.gitkeep
