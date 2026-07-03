@@ -348,6 +348,11 @@ export async function writeCalibrationReport(path: string, results: readonly Cal
   await writeFile(path, `${lines.join("\n")}\n`, "utf8");
 }
 
+// Reduced-palette default for Blender-rendered sprites (art direction:
+// 疑似ドット絵・減色調). Per-asset quantization, applied after the raw render,
+// so tuning it does not invalidate the render cache.
+const blenderPaletteDefault = { colors: 64, dither: 0.5 };
+
 function toBlenderRasterImportSpec(asset: ProductionAssetSpec, sourceFile: string, outputFile: string): RasterImportSpec {
   return {
     sourceFile,
@@ -359,7 +364,8 @@ function toBlenderRasterImportSpec(asset: ProductionAssetSpec, sourceFile: strin
     trim: false,
     resizeMode: "exact",
     category: asset.category ?? categoryForKind(asset.kind),
-    ...(asset.postprocess?.sharpen === undefined ? {} : { sharpen: asset.postprocess.sharpen })
+    ...(asset.postprocess?.sharpen === undefined ? {} : { sharpen: asset.postprocess.sharpen }),
+    palette: blenderPaletteDefault
   };
 }
 

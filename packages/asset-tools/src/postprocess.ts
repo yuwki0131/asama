@@ -45,7 +45,14 @@ export async function importRasterAsset(spec: RasterImportSpec): Promise<void> {
     image = image.sharpen({ sigma: sharpenSigma });
   }
 
-  await image.png().toFile(spec.outputFile);
+  if (spec.palette !== undefined) {
+    // Art direction asks for a reduced-palette pseudo-pixel look; per-asset
+    // quantization keeps the game-wide palette rich while giving each sprite
+    // retro grain.
+    await image.png({ palette: true, colors: spec.palette.colors, dither: spec.palette.dither }).toFile(spec.outputFile);
+  } else {
+    await image.png().toFile(spec.outputFile);
+  }
   await validateOutputPng(spec.outputFile, spec.canvasWidth, spec.canvasHeight);
 }
 

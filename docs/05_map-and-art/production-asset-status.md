@@ -8,11 +8,20 @@
 
 ## Runtime Audit
 
-As of 2026-06-19, the runtime production definition contains:
+As of 2026-07-04, the runtime production definition contains:
 
-- 194 reviewed raster assets produced from image-generated or corrected production sources.
-- 0 runtime-compatible candidates produced primarily by deterministic Sharp drawing rules.
+- 191 Blender-rendered assets from the procedural model pipeline
+  (`assets/source/blender/scripts/render_asset.py`), covering all buildings,
+  fortifications, gates, terrain, roads, moats, bridges, and farms. Geometry
+  (anchor, footprint, sockets, seams) is guaranteed by construction and
+  verified by `assets:blender:calibration` and the alignment contact sheet.
+- 4 reviewed raster assets kept intentionally: the three unit idle sprites and
+  `building.tenshu.test` (quality reference; Blender replacement deferred,
+  2026-07-04 decision).
 - 10 generated overlay/debug assets intentionally outside production raster definitions.
+
+Blender renders are cached under `assets/intermediate/render-cache/` keyed by
+script content and asset geometry; `assets:all` only re-renders what changed.
 
 Directory placement does not determine production quality. Assets generated primarily from polygons, lines, gradients, or deterministic texture rules remain candidates even when stored below `approved-production`.
 

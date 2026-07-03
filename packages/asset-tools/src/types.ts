@@ -132,6 +132,10 @@ export interface RasterImportSpec {
   readonly sharpen?: {
     readonly sigma: number;
   };
+  readonly palette?: {
+    readonly colors: number;
+    readonly dither: number;
+  };
 }
 
 export interface ProductionPostprocessSpec {

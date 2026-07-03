@@ -155,7 +155,7 @@ def setup_production_lighting(scene: bpy.types.Scene) -> None:
     """
     direction = Vector((1.0, -0.2, -1.4)).normalized()
     sun_data = bpy.data.lights.new("Sun", type="SUN")
-    sun_data.energy = 4.2
+    sun_data.energy = 4.8
     sun_data.angle = 0.06
     sun = bpy.data.objects.new("Sun", sun_data)
     sun.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
@@ -163,12 +163,13 @@ def setup_production_lighting(scene: bpy.types.Scene) -> None:
 
     # Ambient fill keeps shaded faces readable; slightly cool to contrast
     # the warm sun without pushing saturation (art direction: low chroma).
+    # Kept moderate so dark materials (roof tiles, water) stay dark.
     world = bpy.data.worlds.new("World")
     world.use_nodes = True
     background = world.node_tree.nodes.get("Background")
     if background is not None:
-        background.inputs["Color"].default_value = (0.65, 0.68, 0.74, 1.0)
-        background.inputs["Strength"].default_value = 0.85
+        background.inputs["Color"].default_value = (0.62, 0.66, 0.72, 1.0)
+        background.inputs["Strength"].default_value = 0.55
     scene.world = world
 
 
@@ -499,11 +500,8 @@ def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
     ridge, ~24% of the tenshu height) centered in the lot; a gravel yard pad
     grounds the remaining footprint.
     """
-    plaster = make_material("Plaster", (0.78, 0.76, 0.70, 1.0))
-    stone = make_material("StoneBase", (0.42, 0.40, 0.36, 1.0))
-    roof = make_material("RoofTile", (0.22, 0.24, 0.29, 1.0))
-    wood = make_material("Wood", (0.35, 0.26, 0.18, 1.0))
-    gravel = make_material("YardGravel", (0.52, 0.48, 0.40, 1.0))
+    mats = building_material_set()
+    plaster, stone, roof, wood, gravel = mats["plaster"], mats["stone"], mats["roof"], mats["dark_wood"], mats["gravel"]
 
     add_yard_pad(scene, 3.0, 3.0, gravel)
     # Stone plinth under the building only.
@@ -539,16 +537,111 @@ def build_calibration_chirality(scene: bpy.types.Scene) -> None:
     add_box(scene, "ChiralityCube", *map_box((1.0, 0.0, 0.0), (2.0, 1.0, 1.0)), cube)
 
 
+def make_textured_material(
+    name: str,
+    dark: tuple[float, float, float],
+    light: tuple[float, float, float],
+    scale: float | tuple[float, float, float] = 8.0,
+    detail: float = 3.0,
+    dark_stop: float = 0.35,
+    light_stop: float = 0.75,
+) -> bpy.types.Material:
+    """Noise-driven two-tone material. A non-uniform scale stretches the
+    noise into a grain (wood) or banding (roof tiles) direction."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    coords = nodes.new("ShaderNodeTexCoord")
+    mapping = nodes.new("ShaderNodeMapping")
+    if isinstance(scale, tuple):
+        mapping.inputs["Scale"].default_value = scale
+        noise_scale = 1.0
+    else:
+        noise_scale = scale
+        mapping.inputs["Scale"].default_value = (1.0, 1.0, 1.0)
+    links.new(coords.outputs["Object"], mapping.inputs["Vector"])
+
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = noise_scale
+    noise.inputs["Detail"].default_value = detail
+    links.new(mapping.outputs["Vector"], noise.inputs["Vector"])
+
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = dark_stop
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
+    ramp.color_ramp.elements[1].position = light_stop
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    return material
+
+
+def make_ishigaki_material(name: str = "IshigakiStone") -> bpy.types.Material:
+    """Fitted-stone masonry: voronoi cells with dark mortar seams."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    voronoi = nodes.new("ShaderNodeTexVoronoi")
+    voronoi.feature = "DISTANCE_TO_EDGE"
+    voronoi.inputs["Scale"].default_value = 5.5
+
+    seam_ramp = nodes.new("ShaderNodeValToRGB")
+    seam_ramp.color_ramp.elements[0].position = 0.0
+    seam_ramp.color_ramp.elements[0].color = (0.22, 0.20, 0.17, 1.0)
+    seam_ramp.color_ramp.elements[1].position = 0.10
+    seam_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    links.new(voronoi.outputs["Distance"], seam_ramp.inputs["Fac"])
+
+    stone_noise = nodes.new("ShaderNodeTexNoise")
+    stone_noise.inputs["Scale"].default_value = 4.0
+    stone_ramp = nodes.new("ShaderNodeValToRGB")
+    stone_ramp.color_ramp.elements[0].position = 0.3
+    stone_ramp.color_ramp.elements[0].color = (0.40, 0.37, 0.32, 1.0)
+    stone_ramp.color_ramp.elements[1].position = 0.8
+    stone_ramp.color_ramp.elements[1].color = (0.56, 0.52, 0.45, 1.0)
+    links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
+
+    mix = nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    mix.inputs["Factor"].default_value = 1.0
+    links.new(stone_ramp.outputs["Color"], mix.inputs["A"])
+    links.new(seam_ramp.outputs["Color"], mix.inputs["B"])
+    links.new(mix.outputs["Result"], bsdf.inputs["Base Color"])
+    return material
+
+
+def make_roof_material(name: str = "RoofTiles") -> bpy.types.Material:
+    """Kawara roof: dark blue-gray with subtle course banding."""
+    return make_textured_material(
+        name,
+        (0.055, 0.065, 0.09),
+        (0.13, 0.15, 0.19),
+        scale=(2.0, 2.0, 26.0),
+        detail=1.5,
+        dark_stop=0.42,
+        light_stop=0.62,
+    )
+
+
 def building_material_set() -> dict[str, bpy.types.Material]:
     return {
-        "plaster": make_material("Plaster", (0.78, 0.76, 0.70, 1.0)),
-        "wood": make_material("Wood", (0.42, 0.32, 0.22, 1.0)),
-        "dark_wood": make_material("DarkWood", (0.30, 0.23, 0.16, 1.0)),
-        "stone": make_material("StoneBase", (0.42, 0.40, 0.36, 1.0)),
-        "roof": make_material("RoofTile", (0.22, 0.24, 0.29, 1.0)),
-        "thatch": make_material("Thatch", (0.45, 0.38, 0.24, 1.0)),
-        "gravel": make_material("YardGravel", (0.52, 0.48, 0.40, 1.0)),
-        "dirt": make_material("YardDirt", (0.44, 0.38, 0.29, 1.0)),
+        "plaster": make_textured_material("Plaster", (0.74, 0.71, 0.64), (0.83, 0.81, 0.75), scale=5.0),
+        "wood": make_textured_material("Wood", (0.35, 0.26, 0.17), (0.48, 0.38, 0.26), scale=(18.0, 18.0, 2.5)),
+        "dark_wood": make_textured_material("DarkWood", (0.24, 0.18, 0.12), (0.36, 0.28, 0.19), scale=(18.0, 18.0, 2.5)),
+        "stone": make_ishigaki_material("StoneBase"),
+        "roof": make_roof_material("RoofTile"),
+        "thatch": make_textured_material("Thatch", (0.38, 0.31, 0.18), (0.52, 0.44, 0.27), scale=(3.0, 3.0, 22.0)),
+        "gravel": make_textured_material("YardGravel", (0.46, 0.42, 0.35), (0.58, 0.54, 0.46), scale=14.0),
+        "dirt": make_textured_material("YardDirt", (0.38, 0.32, 0.24), (0.50, 0.43, 0.33), scale=9.0),
     }
 
 
@@ -662,9 +755,8 @@ def wall_arm_box(direction: tuple[float, float], half_thickness: float, z0: floa
 
 
 def build_wall_plaster_mask(scene: bpy.types.Scene, mask: str) -> None:
-    plaster = make_material("WallPlaster", (0.80, 0.78, 0.72, 1.0))
-    stone = make_material("WallStone", (0.40, 0.38, 0.34, 1.0))
-    coping = make_material("WallCoping", (0.22, 0.24, 0.29, 1.0))
+    mats = building_material_set()
+    plaster, stone, coping = mats["plaster"], mats["stone"], mats["roof"]
 
     bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
     active = [name for name, on in bits.items() if on]
@@ -736,10 +828,8 @@ def build_yagura_small_graybox(scene: bpy.types.Scene) -> None:
     anchor 80,168. Tapered stone base + plastered story + watch story with a
     gabled roof; ridge 3.15 units (~43% of the tenshu height).
     """
-    plaster = make_material("Plaster", (0.78, 0.76, 0.70, 1.0))
-    stone = make_material("Ishigaki", (0.44, 0.42, 0.37, 1.0))
-    roof = make_material("RoofTile", (0.22, 0.24, 0.29, 1.0))
-    wood = make_material("DarkWood", (0.30, 0.23, 0.16, 1.0))
+    mats = building_material_set()
+    plaster, stone, roof, wood = mats["plaster"], mats["stone"], mats["roof"], mats["dark_wood"]
 
     add_frustum(scene, "Base", (-2.0, -2.0), (0.0, 0.0), 0.0, 0.95, 0.28, stone)
     add_box(scene, "Story1", *map_box((-1.72, -1.72, 0.95), (-0.28, -0.28, 1.85)), plaster)
@@ -812,11 +902,8 @@ def gate_box(axis: str, along0: float, along1: float, across_half: float, z0: fl
 
 
 def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str) -> None:
-    wood = make_material("GatePillar", (0.33, 0.25, 0.17, 1.0))
-    door = make_material("GateDoor", (0.45, 0.35, 0.24, 1.0))
-    roof = make_material("GateRoof", (0.22, 0.24, 0.29, 1.0))
-    plaster = make_material("WallPlaster", (0.80, 0.78, 0.72, 1.0))
-    stone = make_material("WallStone", (0.40, 0.38, 0.34, 1.0))
+    mats = building_material_set()
+    wood, door, roof, plaster, stone = mats["dark_wood"], mats["wood"], mats["roof"], mats["plaster"], mats["stone"]
 
     half = float(width) / 2.0
     # Stone threshold sill covering the full footprint; grounds the sprite
@@ -954,8 +1041,8 @@ def fence_post(scene: bpy.types.Scene, name: str, map_x: float, map_y: float, ma
 
 
 def build_fence_wood_mask(scene: bpy.types.Scene, mask: str) -> None:
-    wood = make_material("FenceWood", (0.44, 0.34, 0.23, 1.0))
-    dark = make_material("FencePost", (0.36, 0.27, 0.18, 1.0))
+    mats = building_material_set()
+    wood, dark = mats["wood"], mats["dark_wood"]
 
     bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
     active = [name for name, on in bits.items() if on]
