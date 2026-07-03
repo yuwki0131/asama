@@ -204,3 +204,25 @@ button {
   background: rgba(110, 200, 130, 0.12);
   pointer-events: none;
 }
+
+.alert-stack {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.alert-toast {
+  padding: 6px 18px;
+  border-radius: 4px;
+  background: rgba(120, 40, 30, 0.88);
+  border: 1px solid #d0664a;
+  color: #f4efe6;
+  font-size: 0.9rem;
+}

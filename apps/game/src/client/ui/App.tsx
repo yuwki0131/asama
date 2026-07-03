@@ -158,8 +158,9 @@ export function App() {
   );
 
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [saveSlot, setSaveSlot] = useState("quicksave");
 
-  const handleQuickSave = useCallback(async () => {
+  const saveToSlot = useCallback(async (slot: string, silent = false) => {
     const simulation = simulationRef.current;
     if (simulation === null) {
       return;
@@ -169,21 +170,23 @@ export function App() {
       const response = await fetch("/api/saves", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ saveId: "quicksave", data: state })
+        body: JSON.stringify({ saveId: slot, data: state })
       });
-      setSaveStatus(response.ok ? "saved" : `save failed (${response.status})`);
+      if (!silent || !response.ok) {
+        setSaveStatus(response.ok ? `${slot} saved` : `save failed (${response.status})`);
+      }
     } catch (error) {
       setSaveStatus(error instanceof Error ? error.message : "save failed");
     }
   }, []);
 
-  const handleQuickLoad = useCallback(async () => {
+  const loadFromSlot = useCallback(async (slot: string) => {
     const simulation = simulationRef.current;
     if (simulation === null) {
       return;
     }
     try {
-      const response = await fetch("/api/saves/quicksave");
+      const response = await fetch(`/api/saves/${slot}`);
       if (!response.ok) {
         setSaveStatus(`load failed (${response.status})`);
         return;
@@ -195,11 +198,23 @@ export function App() {
       }
       const state = JSON.parse(await new Response(stream).text());
       simulation.loadSaveState(state);
-      setSaveStatus("loaded");
+      setSaveStatus(`${slot} loaded`);
     } catch (error) {
       setSaveStatus(error instanceof Error ? error.message : "load failed");
     }
   }, []);
+
+  // Autosave every two minutes while the game is undecided.
+  const outcomeDecided = snapshot?.outcome != null;
+  useEffect(() => {
+    if (outcomeDecided) {
+      return;
+    }
+    const timer = setInterval(() => {
+      void saveToSlot("autosave", true);
+    }, 120000);
+    return () => clearInterval(timer);
+  }, [outcomeDecided, saveToSlot]);
 
   const handleToggleGate = useCallback(
     (position: CellCoord) => {
@@ -261,6 +276,7 @@ export function App() {
   const outcome = snapshot?.outcome ?? null;
   const food = snapshot?.food ?? null;
   const economy = snapshot?.economy ?? null;
+  const alerts = useGameAlerts(snapshot);
 
   const handleRecruit = useCallback(
     (unitType: UnitType) => {
@@ -331,10 +347,17 @@ export function App() {
               {value === 0 ? "⏸" : `${value}x`}
             </button>
           ))}
-          <button type="button" onClick={() => void handleQuickSave()}>
+          <select value={saveSlot} onChange={(event) => setSaveSlot(event.target.value)}>
+            <option value="quicksave">quicksave</option>
+            <option value="slot1">slot1</option>
+            <option value="slot2">slot2</option>
+            <option value="slot3">slot3</option>
+            <option value="autosave">autosave</option>
+          </select>
+          <button type="button" disabled={saveSlot === "autosave"} onClick={() => void saveToSlot(saveSlot)}>
             Save
           </button>
-          <button type="button" onClick={() => void handleQuickLoad()}>
+          <button type="button" onClick={() => void loadFromSlot(saveSlot)}>
             Load
           </button>
           <button
@@ -399,6 +422,15 @@ export function App() {
         </button>
       </div>
       <section className="game-view">
+        {alerts.length === 0 ? null : (
+          <div className="alert-stack" aria-live="polite">
+            {alerts.map((alert) => (
+              <div className="alert-toast" key={alert.id}>
+                {alert.text}
+              </div>
+            ))}
+          </div>
+        )}
         {outcome === null ? null : (
           <div className={`outcome-banner ${outcome.winner === "player" ? "victory" : "defeat"}`}>
             <strong>{outcome.winner === "player" ? "勝利" : "敗北"}</strong>
@@ -439,6 +471,87 @@ export function App() {
       </section>
     </main>
   );
+}
+
+interface GameAlert {
+  readonly id: number;
+  readonly text: string;
+}
+
+const ALERT_DURATION_MS = 6000;
+const HONMARU_ALERT_RANGE = 12;
+
+/** Derives alert toasts by diffing successive snapshots client-side. */
+function useGameAlerts(snapshot: WorldSnapshot | null): readonly GameAlert[] {
+  const [alerts, setAlerts] = useState<readonly (GameAlert & { readonly expiresAt: number })[]>([]);
+  const nextIdRef = useRef(1);
+  const prevRef = useRef<{
+    enemyCount: number;
+    ladderedWalls: number;
+    foodLow: boolean;
+    enemyNearHonmaru: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (snapshot === null) {
+      return;
+    }
+    const enemyCount = snapshot.units.filter((unit) => unit.owner === "enemy").length;
+    const ladderedWalls = snapshot.buildings.filter(
+      (building) => building.owner === "player" && building.ladderHp !== null
+    ).length;
+    const foodLow = snapshot.food.requiredPerCycle > 0 && snapshot.food.available < snapshot.food.requiredPerCycle * 3;
+    const honmaru = snapshot.buildings.find((building) => building.type === "honmaru");
+    const enemyNearHonmaru =
+      honmaru !== undefined &&
+      snapshot.units.some(
+        (unit) =>
+          unit.owner === "enemy" &&
+          Math.abs(unit.position.x - honmaru.position.x) + Math.abs(unit.position.y - honmaru.position.y) <=
+            HONMARU_ALERT_RANGE
+      );
+
+    const previous = prevRef.current;
+    prevRef.current = { enemyCount, ladderedWalls, foodLow, enemyNearHonmaru };
+    if (previous === null) {
+      return;
+    }
+
+    const fired: string[] = [];
+    if (enemyCount > previous.enemyCount) {
+      fired.push("敵の増援が出現しました");
+    }
+    if (ladderedWalls > previous.ladderedWalls) {
+      fired.push("城壁に梯子が架けられています!");
+    }
+    if (foodLow && !previous.foodLow) {
+      fired.push("兵糧が残りわずかです");
+    }
+    if (enemyNearHonmaru && !previous.enemyNearHonmaru) {
+      fired.push("敵が本丸に接近しています!");
+    }
+    if (fired.length === 0) {
+      return;
+    }
+    const now = Date.now();
+    setAlerts((current) => [
+      ...current.filter((alert) => alert.expiresAt > now),
+      ...fired.map((text) => ({ id: nextIdRef.current++, text, expiresAt: now + ALERT_DURATION_MS }))
+    ]);
+  }, [snapshot]);
+
+  useEffect(() => {
+    if (alerts.length === 0) {
+      return;
+    }
+    const timer = setInterval(() => {
+      const now = Date.now();
+      setAlerts((current) => (current.some((alert) => alert.expiresAt <= now) ? current.filter((alert) => alert.expiresAt > now) : current));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [alerts.length]);
+
+  return alerts;
 }
 
 function seasonLabel(season: Season): string {
