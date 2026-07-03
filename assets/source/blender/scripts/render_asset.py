@@ -349,14 +349,44 @@ STORY_WALL_HEIGHT = 0.95
 YARD_PAD_HEIGHT = 0.02
 
 
-def add_yard_pad(scene: bpy.types.Scene, footprint: float, material: bpy.types.Material) -> None:
-    """Flat pad covering the full map [-footprint..0]^2 lot.
+def add_yard_pad(scene: bpy.types.Scene, lot_width: float, lot_height: float, material: bpy.types.Material) -> None:
+    """Flat pad covering the full map [-lot_width..0]x[-lot_height..0] lot.
 
     The pad reaches the exact lot boundary so the sprite's south contact
     pixel lands on the anchor (large buildings are placed by their south
     corner).
     """
-    add_box(scene, "YardPad", *map_box((-footprint, -footprint, 0.0), (0.0, 0.0, YARD_PAD_HEIGHT)), material)
+    add_box(scene, "YardPad", *map_box((-lot_width, -lot_height, 0.0), (0.0, 0.0, YARD_PAD_HEIGHT)), material)
+
+
+def add_gabled_house(
+    scene: bpy.types.Scene,
+    name: str,
+    low: tuple[float, float],
+    high: tuple[float, float],
+    wall_top: float,
+    ridge_top: float,
+    ridge_axis: str,
+    wall_material: bpy.types.Material,
+    roof_material: bpy.types.Material,
+    plinth_material: bpy.types.Material | None = None,
+    plinth_height: float = 0.0,
+    roof_overhang: float = 0.2,
+) -> None:
+    """Common house block: optional plinth, walls, gabled roof with overhang.
+
+    low/high are the wall footprint corners in map coordinates.
+    """
+    x0, y0 = low
+    x1, y1 = high
+    base = 0.0
+    if plinth_material is not None and plinth_height > 0.0:
+        add_box(scene, f"{name}Plinth", *map_box((x0 - 0.08, y0 - 0.08, 0.0), (x1 + 0.08, y1 + 0.08, plinth_height)), plinth_material)
+        base = plinth_height
+    add_box(scene, f"{name}Body", *map_box((x0, y0, base), (x1, y1, wall_top)), wall_material)
+    roof_low, roof_high = map_box((x0 - roof_overhang, y0 - roof_overhang, 0.0), (x1 + roof_overhang, y1 + roof_overhang, 0.0))
+    world_axis = ridge_axis  # map x stays world x; map y maps to world y with flipped sign only
+    add_gable_roof(scene, f"{name}Roof", (roof_low[0], roof_low[1]), (roof_high[0], roof_high[1]), wall_top, ridge_top, world_axis, roof_material)
 
 
 def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
@@ -374,7 +404,7 @@ def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
     wood = make_material("Wood", (0.35, 0.26, 0.18, 1.0))
     gravel = make_material("YardGravel", (0.52, 0.48, 0.40, 1.0))
 
-    add_yard_pad(scene, 3.0, gravel)
+    add_yard_pad(scene, 3.0, 3.0, gravel)
     # Stone plinth under the building only.
     add_box(scene, "Plinth", *map_box((-2.65, -2.35, 0.0), (-0.35, -0.65, 0.22)), stone)
     # Plastered storehouse body, one tall storage story.
@@ -406,6 +436,92 @@ def build_calibration_chirality(scene: bpy.types.Scene) -> None:
         tile,
     )
     add_box(scene, "ChiralityCube", *map_box((1.0, 0.0, 0.0), (2.0, 1.0, 1.0)), cube)
+
+
+def building_material_set() -> dict[str, bpy.types.Material]:
+    return {
+        "plaster": make_material("Plaster", (0.78, 0.76, 0.70, 1.0)),
+        "wood": make_material("Wood", (0.42, 0.32, 0.22, 1.0)),
+        "dark_wood": make_material("DarkWood", (0.30, 0.23, 0.16, 1.0)),
+        "stone": make_material("StoneBase", (0.42, 0.40, 0.36, 1.0)),
+        "roof": make_material("RoofTile", (0.22, 0.24, 0.29, 1.0)),
+        "thatch": make_material("Thatch", (0.45, 0.38, 0.24, 1.0)),
+        "gravel": make_material("YardGravel", (0.52, 0.48, 0.40, 1.0)),
+        "dirt": make_material("YardDirt", (0.44, 0.38, 0.29, 1.0)),
+    }
+
+
+def build_market_graybox(scene: bpy.types.Scene) -> None:
+    """Ichiba (market) on a 4x3 lot: two open stall sheds along map x.
+
+    Canvas 256x192, anchor 128,160. Low wooden sheds (ridge 1.3 units).
+    """
+    mats = building_material_set()
+    add_yard_pad(scene, 4.0, 3.0, mats["gravel"])
+    add_gabled_house(scene, "StallNorth", (-3.5, -2.6), (-0.5, -1.75), 0.8, 1.3, "x", mats["wood"], mats["thatch"], roof_overhang=0.15)
+    add_gabled_house(scene, "StallSouth", (-3.5, -1.25), (-0.5, -0.4), 0.8, 1.3, "x", mats["wood"], mats["thatch"], roof_overhang=0.15)
+
+
+def build_barracks_graybox(scene: bpy.types.Scene) -> None:
+    """Heisha (barracks) on a 4x3 lot: one nagaya longhouse, drill yard south.
+
+    Canvas 256x192, anchor 128,160. Single story (walls 0.9, ridge 1.65).
+    """
+    mats = building_material_set()
+    add_yard_pad(scene, 4.0, 3.0, mats["dirt"])
+    add_gabled_house(
+        scene, "Nagaya", (-3.6, -2.5), (-0.4, -1.4), 1.05, 1.65, "x",
+        mats["dark_wood"], mats["roof"], plinth_material=mats["stone"], plinth_height=0.15,
+    )
+
+
+def build_samurai_residence_graybox(scene: bpy.types.Scene) -> None:
+    """Buke-yashiki (samurai residence) on a 4x4 lot: walled compound with a
+    main house and a south gate gap.
+
+    Canvas 288x224, anchor 144,192. Main house ridge 1.85 units.
+    """
+    mats = building_material_set()
+    add_yard_pad(scene, 4.0, 4.0, mats["gravel"])
+
+    wall_height = 0.55
+    t = 0.15
+    # Perimeter wall with a centered gap on the south-east edge (map y=0 side).
+    for name, low, high in (
+        ("CompoundWallN", (-3.95, -4.0, 0.0), (-0.05, -4.0 + t, wall_height)),
+        ("CompoundWallW", (-4.0, -3.95, 0.0), (-4.0 + t, -0.05, wall_height)),
+        ("CompoundWallE", (-t, -3.95, 0.0), (0.0, -0.05, wall_height)),
+        ("CompoundWallS1", (-3.95, -t, 0.0), (-2.35, 0.0, wall_height)),
+        ("CompoundWallS2", (-1.65, -t, 0.0), (-0.05, 0.0, wall_height)),
+    ):
+        add_box(scene, name, *map_box(low, high), mats["plaster"])
+
+    add_gabled_house(
+        scene, "MainHouse", (-3.2, -3.3), (-1.2, -2.0), 1.13, 1.85, "x",
+        mats["plaster"], mats["roof"], plinth_material=mats["stone"], plinth_height=0.18, roof_overhang=0.25,
+    )
+    # Small storehouse annex in the east corner of the yard.
+    add_gabled_house(scene, "Annex", (-1.0, -2.6), (-0.3, -1.9), 0.75, 1.1, "y", mats["dark_wood"], mats["roof"], roof_overhang=0.1)
+
+
+def build_town_block_graybox(scene: bpy.types.Scene) -> None:
+    """Machi (town block) on a 6x6 lot: four machiya houses around a cross
+    alley, one of them two-story.
+
+    Canvas 416x304, anchor 208,272.
+    """
+    mats = building_material_set()
+    add_yard_pad(scene, 6.0, 6.0, mats["dirt"])
+
+    houses = (
+        # name, low, high, wall_top, ridge_top, ridge_axis, wall_mat
+        ("MachiyaNW", (-5.6, -5.5), (-3.4, -4.0), 1.9, 2.35, "x", "plaster"),
+        ("MachiyaNE", (-2.6, -5.5), (-0.4, -4.1), 0.95, 1.6, "x", "wood"),
+        ("MachiyaSW", (-5.6, -2.2), (-3.5, -0.7), 0.95, 1.5, "y", "dark_wood"),
+        ("MachiyaSE", (-2.5, -2.3), (-0.4, -0.6), 0.95, 1.7, "y", "wood"),
+    )
+    for name, low, high, wall_top, ridge_top, axis, wall in houses:
+        add_gabled_house(scene, name, low, high, wall_top, ridge_top, axis, mats[wall], mats["roof"], roof_overhang=0.18)
 
 
 # Connected wall kit -------------------------------------------------------
@@ -519,6 +635,10 @@ MODEL_REGISTRY = {
     "calibration-chirality": build_calibration_chirality,
     "terrain-grass-base": build_terrain_grass,
     "building-storehouse-graybox": build_storehouse_graybox,
+    "building-market-graybox": build_market_graybox,
+    "building-barracks-graybox": build_barracks_graybox,
+    "building-samurai-residence-graybox": build_samurai_residence_graybox,
+    "building-town-block-graybox": build_town_block_graybox,
 }
 
 

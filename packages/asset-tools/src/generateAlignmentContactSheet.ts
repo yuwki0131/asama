@@ -28,10 +28,10 @@ const columns = 1;
 const targets: readonly AlignmentTarget[] = [
   { assetId: "terrain.grass.base", footprintWidth: 1, footprintHeight: 1, placement: "center" },
   { assetId: "building.storehouse", footprintWidth: 3, footprintHeight: 3, placement: "south", baseMatch: "blender yard-pad foundation" },
-  { assetId: "building.market", footprintWidth: 6, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
-  { assetId: "building.barracks", footprintWidth: 6, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
-  { assetId: "building.samurai_residence", footprintWidth: 6, footprintHeight: 6, placement: "south", baseMatch: "corrected footprint foundation" },
-  { assetId: "building.town_block", footprintWidth: 8, footprintHeight: 8, placement: "south", baseMatch: "corrected footprint foundation" },
+  { assetId: "building.market", footprintWidth: 4, footprintHeight: 3, placement: "south", baseMatch: "blender yard-pad foundation" },
+  { assetId: "building.barracks", footprintWidth: 4, footprintHeight: 3, placement: "south", baseMatch: "blender yard-pad foundation" },
+  { assetId: "building.samurai_residence", footprintWidth: 4, footprintHeight: 4, placement: "south", baseMatch: "blender yard-pad foundation" },
+  { assetId: "building.town_block", footprintWidth: 6, footprintHeight: 6, placement: "south", baseMatch: "blender yard-pad foundation" },
   { assetId: "building.gate.wood.closed", footprintWidth: 1, footprintHeight: 1, placement: "center", sockets: true },
   {
     assetId: "building.yagura.small.normal",

@@ -283,16 +283,17 @@
       "kind": "building",
       "output": "building-market.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-building-scale/building-market-large.png"
+        "type": "blender",
+        "model": "building-market-graybox",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
-        "footprintWidth": 6,
-        "footprintHeight": 4,
-        "canvasWidth": 420,
-        "canvasHeight": 280,
-        "anchorX": 210,
-        "anchorY": 196
+        "footprintWidth": 4,
+        "footprintHeight": 3,
+        "canvasWidth": 256,
+        "canvasHeight": 192,
+        "anchorX": 144,
+        "anchorY": 160
       },
       "category": "building",
       "postprocess": {
@@ -308,16 +309,17 @@
       "kind": "building",
       "output": "building-barracks.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-building-scale/building-barracks-large.png"
+        "type": "blender",
+        "model": "building-barracks-graybox",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
-        "footprintWidth": 6,
-        "footprintHeight": 4,
-        "canvasWidth": 420,
-        "canvasHeight": 280,
-        "anchorX": 210,
-        "anchorY": 210
+        "footprintWidth": 4,
+        "footprintHeight": 3,
+        "canvasWidth": 256,
+        "canvasHeight": 192,
+        "anchorX": 144,
+        "anchorY": 160
       },
       "category": "building",
       "postprocess": {
@@ -333,16 +335,17 @@
       "kind": "building",
       "output": "building-samurai-residence.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-building-scale/building-samurai-residence-large.png"
+        "type": "blender",
+        "model": "building-samurai-residence-graybox",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
-        "footprintWidth": 6,
-        "footprintHeight": 6,
-        "canvasWidth": 460,
-        "canvasHeight": 360,
-        "anchorX": 230,
-        "anchorY": 273
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 288,
+        "canvasHeight": 224,
+        "anchorX": 144,
+        "anchorY": 192
       },
       "category": "building",
       "postprocess": {
@@ -358,16 +361,17 @@
       "kind": "building",
       "output": "building-town-block.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/approved-production/large-building-scale/building-town-block-large.png"
+        "type": "blender",
+        "model": "building-town-block-graybox",
+        "renderSpec": "cycles-cpu"
       },
       "geometry": {
-        "footprintWidth": 8,
-        "footprintHeight": 8,
-        "canvasWidth": 640,
-        "canvasHeight": 420,
-        "anchorX": 320,
-        "anchorY": 338
+        "footprintWidth": 6,
+        "footprintHeight": 6,
+        "canvasWidth": 416,
+        "canvasHeight": 304,
+        "anchorX": 208,
+        "anchorY": 272
       },
       "category": "building",
       "postprocess": {

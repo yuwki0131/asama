@@ -385,10 +385,10 @@ function rectangularFootprint(width: number, height: number): readonly CellCoord
 }
 
 const storehouseFootprint = rectangularFootprint(3, 3);
-const marketFootprint = rectangularFootprint(6, 4);
-const barracksFootprint = rectangularFootprint(6, 4);
-const samuraiResidenceFootprint = rectangularFootprint(6, 6);
-const townBlockFootprint = rectangularFootprint(8, 8);
+const marketFootprint = rectangularFootprint(4, 3);
+const barracksFootprint = rectangularFootprint(4, 3);
+const samuraiResidenceFootprint = rectangularFootprint(4, 4);
+const townBlockFootprint = rectangularFootprint(6, 6);
 const farmFootprint = rectangularFootprint(4, 4);
 const tenshuFootprint = rectangularFootprint(8, 8);
 
