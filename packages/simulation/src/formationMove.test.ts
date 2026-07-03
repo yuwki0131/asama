@@ -89,7 +89,7 @@ describe("attack move and stop", () => {
     const rejection = applyCommand(world, {
       type: "attackMoveUnits",
       unitIds: ids,
-      destination: { x: 52, y: 66 },
+      destination: { x: 50, y: 66 },
       issuedAtTick: 0,
       clientSequence: 1
     });
