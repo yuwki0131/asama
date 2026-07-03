@@ -73,3 +73,51 @@ describe("formation movement", () => {
     expect(rejection).toBe("That cell is not passable");
   });
 });
+
+describe("attack move and stop", () => {
+  it("engages enemies encountered during an attack move", () => {
+    const world = createInitialWorld();
+    const ids = playerUnitIds(world);
+    const enemy = world.units.find((unit) => unit.owner === "enemy");
+    if (enemy === undefined) {
+      expect.unreachable();
+      return;
+    }
+    // Put an enemy on the route, well inside aggro range of the column.
+    enemy.position = { x: 58, y: 62 };
+
+    const rejection = applyCommand(world, {
+      type: "attackMoveUnits",
+      unitIds: ids,
+      destination: { x: 52, y: 66 },
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+    expect(rejection).toBeNull();
+
+    for (let i = 0; i < 60; i += 1) {
+      updateWorld(world);
+    }
+
+    const engaged = world.units.filter((unit) => ids.includes(unit.id) && unit.targetId === enemy.id);
+    expect(engaged.length).toBeGreaterThan(0);
+  });
+
+  it("stop clears movement, targets and tasks", () => {
+    const world = createInitialWorld();
+    const ids = playerUnitIds(world);
+    applyCommand(world, moveCommand(ids, { x: 50, y: 66 }));
+
+    const rejection = applyCommand(world, { type: "stopUnits", unitIds: ids, issuedAtTick: 0, clientSequence: 2 });
+
+    expect(rejection).toBeNull();
+    for (const unit of world.units) {
+      if (!ids.includes(unit.id)) {
+        continue;
+      }
+      expect(unit.path.length).toBe(0);
+      expect(unit.destination).toBeNull();
+      expect(unit.attackTargetId).toBeNull();
+    }
+  });
+});

@@ -52,7 +52,8 @@ function unit(
     ticksPerStep: definition.step,
     movementProgress: 0,
     pathRetryCooldown: 0,
-    task: null
+    task: null,
+    attackMoveDestination: null
   };
 }
 

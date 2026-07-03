@@ -24,6 +24,8 @@ interface GameCanvasProps {
   readonly onDemolishBuilding: (position: CellCoord) => void;
   readonly onToggleGate: (position: CellCoord) => void;
   readonly onEngineerTask: (task: "ladder" | "fillMoat", position: CellCoord) => void;
+  readonly onAttackMove: (destination: CellCoord) => void;
+  readonly onStopSelected: () => void;
 }
 
 interface AssetManifest {
@@ -99,7 +101,9 @@ export function GameCanvas({
   onPlaceBuilding,
   onDemolishBuilding,
   onToggleGate,
-  onEngineerTask
+  onEngineerTask,
+  onAttackMove,
+  onStopSelected
 }: GameCanvasProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
@@ -116,6 +120,9 @@ export function GameCanvas({
   const onDemolishBuildingRef = useRef(onDemolishBuilding);
   const onToggleGateRef = useRef(onToggleGate);
   const onEngineerTaskRef = useRef(onEngineerTask);
+  const onAttackMoveRef = useRef(onAttackMove);
+  const onStopSelectedRef = useRef(onStopSelected);
+  const heldKeysRef = useRef<Set<string>>(new Set());
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
   const dragRef = useRef<{
     pointerId: number;
@@ -166,27 +173,46 @@ export function GameCanvas({
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
         return;
       }
+      const key = event.key.toLowerCase();
+      heldKeysRef.current.add(key);
+      // While A is held it acts as the attack-move modifier, so it must not
+      // also scroll the camera.
+      if (key === "s" && !event.repeat) {
+        onStopSelectedRef.current();
+        return;
+      }
+      // Camera scroll lives on the arrow keys: the controls spec assigns
+      // WASD to the camera but also S=stop and A=attack-move, so the letter
+      // keys go to unit commands and arrows drive the camera.
       const step = 64;
-      switch (event.key.toLowerCase()) {
-        case "w":
+      switch (event.key) {
+        case "ArrowUp":
           cameraRef.current.y += step;
           break;
-        case "s":
+        case "ArrowDown":
           cameraRef.current.y -= step;
           break;
-        case "a":
+        case "ArrowLeft":
           cameraRef.current.x += step;
           break;
-        case "d":
+        case "ArrowRight":
           cameraRef.current.x -= step;
           break;
         default:
           return;
       }
+      event.preventDefault();
       scheduleCameraRender();
     };
+    const handleKeyUp = (event: KeyboardEvent) => {
+      heldKeysRef.current.delete(event.key.toLowerCase());
+    };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
   }, [scheduleCameraRender]);
 
   useEffect(() => {
@@ -196,6 +222,14 @@ export function GameCanvas({
   useEffect(() => {
     onEngineerTaskRef.current = onEngineerTask;
   }, [onEngineerTask]);
+
+  useEffect(() => {
+    onAttackMoveRef.current = onAttackMove;
+  }, [onAttackMove]);
+
+  useEffect(() => {
+    onStopSelectedRef.current = onStopSelected;
+  }, [onStopSelected]);
 
   useEffect(() => {
     snapshotRef.current = snapshot;
@@ -460,6 +494,12 @@ export function GameCanvas({
       if (activeBuildTool !== null) {
         setSelectedCell(clickedCell);
         onPlaceBuildingRef.current(activeBuildTool, clickedCell);
+        return;
+      }
+
+      if (heldKeysRef.current.has("a")) {
+        onAttackMoveRef.current(clickedCell);
+        setSelectedCell(clickedCell);
         return;
       }
 

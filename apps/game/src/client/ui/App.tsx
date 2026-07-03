@@ -228,6 +228,36 @@ export function App() {
     [snapshot?.currentTick, snapshot?.units]
   );
 
+  const handleAttackMove = useCallback(
+    (destination: CellCoord) => {
+      const selectedIds = snapshot?.units.filter((unit) => unit.selected).map((unit) => unit.id) ?? [];
+      if (selectedIds.length === 0) {
+        return;
+      }
+      simulationRef.current?.enqueueCommand({
+        type: "attackMoveUnits",
+        unitIds: selectedIds,
+        destination,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick, snapshot?.units]
+  );
+
+  const handleStopSelected = useCallback(() => {
+    const selectedIds = snapshot?.units.filter((unit) => unit.selected).map((unit) => unit.id) ?? [];
+    if (selectedIds.length === 0) {
+      return;
+    }
+    simulationRef.current?.enqueueCommand({
+      type: "stopUnits",
+      unitIds: selectedIds,
+      issuedAtTick: snapshot?.currentTick ?? 0,
+      clientSequence: Date.now()
+    });
+  }, [snapshot?.currentTick, snapshot?.units]);
+
   const outcome = snapshot?.outcome ?? null;
   const food = snapshot?.food ?? null;
   const economy = snapshot?.economy ?? null;
@@ -391,6 +421,8 @@ export function App() {
           onPlaceBuilding={handlePlaceBuilding}
           onToggleGate={handleToggleGate}
           onEngineerTask={handleEngineerTask}
+          onAttackMove={handleAttackMove}
+          onStopSelected={handleStopSelected}
           onSelectUnits={handleSelectUnits}
           onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}

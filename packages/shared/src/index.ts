@@ -229,6 +229,19 @@ export type PlayerCommand =
       readonly clientSequence: number;
     }
   | {
+      readonly type: "attackMoveUnits";
+      readonly unitIds: readonly UnitId[];
+      readonly destination: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "stopUnits";
+      readonly unitIds: readonly UnitId[];
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
       readonly type: "engineerTask";
       readonly unitIds: readonly UnitId[];
       readonly task: EngineerTaskKind;

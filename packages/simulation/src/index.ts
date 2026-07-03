@@ -58,6 +58,8 @@ interface UnitState {
   pathRetryCooldown: number;
   /** Active engineer work order (ladder or moat fill). */
   task: { kind: EngineerTaskKind; target: CellCoord; progress: number } | null;
+  /** Attack-move order: advance here, engaging enemies encountered on the way. */
+  attackMoveDestination: CellCoord | null;
 }
 
 interface UnitDefinition {
@@ -367,6 +369,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
         unit.path = path;
         unit.movementProgress = 0;
         unit.attackTargetId = null;
+        unit.attackMoveDestination = null;
         assigned = true;
         assignedPath = true;
         break;
@@ -509,6 +512,41 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     return applyMarketTrade(world, command.trade);
   }
 
+  if (command.type === "attackMoveUnits") {
+    const destination = clampCell(command.destination);
+    const rejection = applyCommand(world, {
+      type: "moveUnits",
+      unitIds: command.unitIds,
+      destination,
+      issuedAtTick: command.issuedAtTick,
+      clientSequence: command.clientSequence
+    });
+    if (rejection !== null) {
+      return rejection;
+    }
+    for (const unit of world.units) {
+      if (command.unitIds.includes(unit.id) && unit.path.length > 0) {
+        unit.attackMoveDestination = destination;
+      }
+    }
+    return null;
+  }
+
+  if (command.type === "stopUnits") {
+    for (const unit of world.units) {
+      if (!command.unitIds.includes(unit.id)) {
+        continue;
+      }
+      unit.path = [];
+      unit.destination = null;
+      unit.movementProgress = 0;
+      unit.attackTargetId = null;
+      unit.attackMoveDestination = null;
+      unit.task = null;
+    }
+    return null;
+  }
+
   if (command.type === "engineerTask") {
     return applyEngineerTaskCommand(world, command.unitIds, command.task, clampCell(command.position));
   }
@@ -547,6 +585,7 @@ export function updateWorld(world: WorldState): void {
   }
 
   updateCombat(world);
+  updateAttackMoveBehavior(world);
   updateEngineerTasks(world);
   updateFoodSupply(world);
   updateEconomy(world);
@@ -1184,6 +1223,69 @@ function findSpawnCell(world: WorldState, preferred: CellCoord): CellCoord | nul
   return null;
 }
 
+/** Attack-move: units advancing under an attack-move order engage enemies
+ * that come into aggro range and resume the advance once they fall. */
+function updateAttackMoveBehavior(world: WorldState): void {
+  if (world.currentTick % 10 !== 0) {
+    return;
+  }
+  for (const unit of world.units) {
+    if (unit.attackMoveDestination === null || unit.hp <= 0) {
+      continue;
+    }
+
+    if (unit.attackTargetId === null) {
+      let nearest: UnitState | null = null;
+      let nearestDistance = ENEMY_AI.aggroRange + 1;
+      for (const candidate of world.units) {
+        if (candidate.hp <= 0 || !areEnemies(unit.owner, candidate.owner)) {
+          continue;
+        }
+        const distance = manhattan(unit.position, candidate.position);
+        if (distance < nearestDistance) {
+          nearest = candidate;
+          nearestDistance = distance;
+        }
+      }
+      if (nearest !== null) {
+        unit.attackTargetId = nearest.id;
+        unit.path = [];
+        unit.destination = null;
+        unit.movementProgress = 0;
+        continue;
+      }
+    }
+
+    // No engagement: make sure the advance continues.
+    if (unit.attackTargetId === null && unit.path.length === 0) {
+      if (sameCell(unit.position, unit.attackMoveDestination) || manhattan(unit.position, unit.attackMoveDestination) <= 1) {
+        unit.attackMoveDestination = null;
+        continue;
+      }
+      if (unit.pathRetryCooldown > 0) {
+        unit.pathRetryCooldown -= 10;
+        continue;
+      }
+      const path = findPath(world, unit.position, unit.attackMoveDestination);
+      if (path.length === 0) {
+        const near = findPathToAttackRange(world, unit.position, unit.attackMoveDestination, 1);
+        if (near.length === 0) {
+          unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
+          unit.attackMoveDestination = null;
+          continue;
+        }
+        unit.path = near;
+        unit.destination = near.at(-1) ?? null;
+        unit.movementProgress = 0;
+        continue;
+      }
+      unit.path = path;
+      unit.destination = unit.attackMoveDestination;
+      unit.movementProgress = 0;
+    }
+  }
+}
+
 // --- Engineers: ladders and moat filling (docs/03_combat/siege-system.md) --
 
 function applyEngineerTaskCommand(
@@ -1336,6 +1438,7 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
   for (const unit of world.units) {
     unit.pathRetryCooldown ??= 0;
     unit.task ??= null;
+    unit.attackMoveDestination ??= null;
   }
   for (const building of world.buildings) {
     building.ladderHp ??= null;
@@ -1759,7 +1862,8 @@ function createUnit(id: UnitId, owner: OwnerId, type: UnitType, position: CellCo
     ticksPerStep: definition.ticksPerStep,
     movementProgress: 0,
     pathRetryCooldown: 0,
-    task: null
+    task: null,
+    attackMoveDestination: null
   };
 }
 
