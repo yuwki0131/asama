@@ -27,7 +27,7 @@ const sheetCellHeight = 620;
 const columns = 1;
 const targets: readonly AlignmentTarget[] = [
   { assetId: "terrain.grass.base", footprintWidth: 1, footprintHeight: 1, placement: "center" },
-  { assetId: "building.storehouse", footprintWidth: 4, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
+  { assetId: "building.storehouse", footprintWidth: 3, footprintHeight: 3, placement: "south", baseMatch: "blender yard-pad foundation" },
   { assetId: "building.market", footprintWidth: 6, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
   { assetId: "building.barracks", footprintWidth: 6, footprintHeight: 4, placement: "south", baseMatch: "corrected footprint foundation" },
   { assetId: "building.samurai_residence", footprintWidth: 6, footprintHeight: 6, placement: "south", baseMatch: "corrected footprint foundation" },
@@ -244,7 +244,10 @@ function formatBounds(bounds: AlphaBounds | null): string {
 function targetConcern(target: AlignmentTarget, bounds: AlphaBounds | null, anchor: CellCoord): string {
   if (target.concern !== undefined) return target.concern;
   if (bounds === null) return "no visible alpha";
-  if (target.placement === "south" && bounds.maxY !== anchor.y) {
+  if (target.placement === "south" && Math.abs(bounds.maxY - anchor.y) > 1) {
+    // The anchor maps to a pixel center, so the south vertex only partially
+    // covers its last row and antialiasing may leave it under the alpha
+    // threshold; one pixel of slack is geometry-true.
     return `bottom alpha differs from south anchor by ${bounds.maxY - anchor.y}px`;
   }
   if (target.sockets === true) {

@@ -237,12 +237,12 @@
         "renderSpec": "cycles-cpu"
       },
       "geometry": {
-        "footprintWidth": 4,
-        "footprintHeight": 4,
-        "canvasWidth": 320,
-        "canvasHeight": 260,
-        "anchorX": 160,
-        "anchorY": 203
+        "footprintWidth": 3,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 176,
+        "anchorX": 112,
+        "anchorY": 144
       },
       "category": "building",
       "postprocess": {

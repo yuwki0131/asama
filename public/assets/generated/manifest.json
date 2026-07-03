@@ -2074,11 +2074,11 @@
       "assetId": "building.storehouse",
       "kind": "building",
       "file": "generated/building-storehouse.png",
-      "width": 320,
-      "height": 260,
+      "width": 224,
+      "height": 176,
       "anchor": {
         "x": 0.5,
-        "y": 0.7807692307692308
+        "y": 0.8181818181818182
       }
     },
     {

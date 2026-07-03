@@ -384,7 +384,7 @@ function rectangularFootprint(width: number, height: number): readonly CellCoord
   return footprint;
 }
 
-const storehouseFootprint = rectangularFootprint(4, 4);
+const storehouseFootprint = rectangularFootprint(3, 3);
 const marketFootprint = rectangularFootprint(6, 4);
 const barracksFootprint = rectangularFootprint(6, 4);
 const samuraiResidenceFootprint = rectangularFootprint(6, 6);

@@ -360,10 +360,10 @@ def add_yard_pad(scene: bpy.types.Scene, footprint: float, material: bpy.types.M
 
 
 def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
-    """Kura (storehouse) on a 4x4 lot, scaled to the tenshu standard.
+    """Kura (storehouse) on a 3x3 lot, scaled to the tenshu standard.
 
     Large vertical building: south/bottom contact point at world origin, so
-    the lot square is map [-4..0]x[-4..0]. Canvas 320x260, anchor 160,203.
+    the lot square is map [-3..0]x[-3..0]. Canvas 224x176, anchor 112,144.
     The building itself is a modest single-story kura (~1.75 units to the
     ridge, ~24% of the tenshu height) centered in the lot; a gravel yard pad
     grounds the remaining footprint.
@@ -374,15 +374,15 @@ def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
     wood = make_material("Wood", (0.35, 0.26, 0.18, 1.0))
     gravel = make_material("YardGravel", (0.52, 0.48, 0.40, 1.0))
 
-    add_yard_pad(scene, 4.0, gravel)
+    add_yard_pad(scene, 3.0, gravel)
     # Stone plinth under the building only.
-    add_box(scene, "Plinth", *map_box((-3.15, -2.85, 0.0), (-0.85, -1.15, 0.22)), stone)
+    add_box(scene, "Plinth", *map_box((-2.65, -2.35, 0.0), (-0.35, -0.65, 0.22)), stone)
     # Plastered storehouse body, one tall storage story.
-    add_box(scene, "Body", *map_box((-3.0, -2.7, 0.22), (-1.0, -1.3, 0.22 + STORY_WALL_HEIGHT)), plaster)
+    add_box(scene, "Body", *map_box((-2.5, -2.2, 0.22), (-0.5, -0.8, 0.22 + STORY_WALL_HEIGHT)), plaster)
     # Dark wood band under the eaves.
-    add_box(scene, "EaveBand", *map_box((-3.05, -2.75, 0.97), (-0.95, -1.25, 0.22 + STORY_WALL_HEIGHT)), wood)
+    add_box(scene, "EaveBand", *map_box((-2.55, -2.25, 0.97), (-0.45, -0.75, 0.22 + STORY_WALL_HEIGHT)), wood)
     # Gabled tile roof with overhang, ridge along the long map-x axis.
-    low, high = map_box((-3.25, -2.95, 0.0), (-0.75, -1.05, 0.0))
+    low, high = map_box((-2.75, -2.45, 0.0), (-0.25, -0.55, 0.0))
     add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 0.22 + STORY_WALL_HEIGHT, 1.75, "x", roof)
 
 
