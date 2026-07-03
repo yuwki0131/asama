@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Application, Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
 import { MAP_HEIGHT, MAP_WIDTH } from "@asama/shared";
+import { buildingSpecs } from "@asama/content";
 import type {
   BuildingSnapshot,
   BuildingType,
@@ -58,8 +59,6 @@ const TILE_WIDTH = 64;
 const TILE_HEIGHT = 32;
 const UNIT_GROUND_OFFSET_Y = 0;
 const TERRAIN_UNDERLAY_PADDING = 0.5;
-const LEGACY_WALL_HEIGHT = 72;
-const LEGACY_GATE_HEIGHT = 80;
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
 /** Initial state for the in-game debug toggle; the Debug button in the top
@@ -67,30 +66,11 @@ const GENERATED_MANIFEST_URL = "/assets/generated/manifest.json";
 export const DEBUG_OVERLAY_DEFAULT_ENABLED =
   import.meta.env.VITE_DEBUG_ALIGNMENT === "true" ||
   (import.meta.env.DEV && import.meta.env.VITE_DEBUG_ALIGNMENT !== "false");
-const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = {
-  fence: rectangleFootprint(1, 1),
-  wall: rectangleFootprint(1, 1),
-  gate: rectangleFootprint(1, 1),
-  gate_wide_2: rectangleFootprint(2, 1),
-  gate_wide_3: rectangleFootprint(3, 1),
-  gate_ne_sw: rectangleFootprint(1, 1),
-  gate_wide_2_ne_sw: rectangleFootprint(1, 2),
-  gate_wide_3_ne_sw: rectangleFootprint(1, 3),
-  dry_moat: rectangleFootprint(1, 1),
-  water_moat: rectangleFootprint(1, 1),
-  storehouse: rectangleFootprint(3, 3),
-  market: rectangleFootprint(4, 3),
-  barracks: rectangleFootprint(4, 3),
-  samurai_residence: rectangleFootprint(4, 4),
-  town_block: rectangleFootprint(6, 6),
-  farm: rectangleFootprint(4, 4),
-  road: rectangleFootprint(1, 1),
-  earth_bridge: rectangleFootprint(1, 1),
-  wood_bridge: rectangleFootprint(1, 1),
-  honmaru: rectangleFootprint(1, 1),
-  tenshu: rectangleFootprint(8, 8),
-  yagura: rectangleFootprint(2, 2)
-};
+// Placement previews use the same footprint data as the simulation, derived
+// from @asama/content so the two can never drift apart again.
+const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = Object.fromEntries(
+  Object.values(buildingSpecs).map((spec) => [spec.type, rectangleFootprint(spec.footprint.width, spec.footprint.height)])
+) as Record<BuildingType, readonly CellCoord[]>;
 
 export function GameCanvas({
   snapshot,
@@ -823,16 +803,9 @@ function addBuildingSprite(
   assets: ReadonlyMap<string, LoadedAsset>,
   zoom: number
 ): void {
-  const hasDedicatedAsset = assets.has(building.assetId);
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
   const point = buildingRenderPoint(building);
-  const scale = legacyFortificationScale(building, sprite);
-  const direction = !hasDedicatedAsset && isNeSwGateType(building.type) ? -1 : 1;
-  sprite.scale.set(scale.x * direction, scale.y);
-  sprite.position.set(
-    roundWorldPixel(point.x, zoom),
-    roundWorldPixel(point.y - sprite.texture.height * (1 - sprite.anchor.y) * (scale.y - 1), zoom)
-  );
+  sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y, zoom));
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
   }
@@ -847,21 +820,6 @@ function addBuildingSprite(
       layer.addChild(ladder);
     }
   }
-}
-
-function legacyFortificationScale(
-  building: BuildingSnapshot,
-  sprite: Sprite
-): { readonly x: number; readonly y: number } {
-  if (building.type === "wall" && sprite.texture.height <= LEGACY_WALL_HEIGHT) {
-    return { x: 1, y: 1.35 };
-  }
-
-  if (isGateType(building.type) && sprite.texture.height <= LEGACY_GATE_HEIGHT) {
-    return { x: 1.12, y: 1.2 };
-  }
-
-  return { x: 1, y: 1 };
 }
 
 function addUnitSprite(

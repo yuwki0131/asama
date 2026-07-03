@@ -1,6 +1,7 @@
 import {
   MAP_HEIGHT,
   MAP_WIDTH,
+  SIM_TICKS_PER_SECOND,
   type BuildingId,
   type BuildingCategory,
   type BuildingLifecycleState,
@@ -24,7 +25,7 @@ import {
   type UnitType,
   type WorldSnapshot
 } from "@asama/shared";
-import { mvpDefenseScenario } from "@asama/content";
+import { buildingSpecs, mvpDefenseScenario, unitSpecs } from "@asama/content";
 import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
 
 interface TerrainCellState {
@@ -246,44 +247,22 @@ const ORTHOGONAL_DIRECTIONS: readonly CellCoord[] = [
 ];
 const BLOCKED_MOVEMENT_COST = 9999;
 
-const unitDefinitions: Record<UnitType, UnitDefinition> = {
-  spear_ashigaru: {
-    type: "spear_ashigaru",
-    maxHp: 100,
-    attackDamage: 14,
-    attackRange: 1,
-    attackCooldownTicks: Math.round(1.3 * 20),
-    ticksPerStep: 6,
-    assetId: "unit.spear_ashigaru.idle.south"
-  },
-  sword_ashigaru: {
-    type: "sword_ashigaru",
-    maxHp: 110,
-    attackDamage: 18,
-    attackRange: 1,
-    attackCooldownTicks: Math.round(1.1 * 20),
-    ticksPerStep: 6,
-    assetId: "unit.sword_ashigaru.idle.south"
-  },
-  archer: {
-    type: "archer",
-    maxHp: 70,
-    attackDamage: 12,
-    attackRange: 8,
-    attackCooldownTicks: Math.round(1.6 * 20),
-    ticksPerStep: 7,
-    assetId: "unit.archer.idle.south"
-  },
-  engineer: {
-    type: "engineer",
-    maxHp: 80,
-    attackDamage: 8,
-    attackRange: 1,
-    attackCooldownTicks: Math.round(1.5 * 20),
-    ticksPerStep: 7,
-    assetId: "unit.engineer.idle.south"
-  }
-};
+// Unit stats live in @asama/content; the simulation derives tick-based
+// cooldowns from the content's seconds.
+const unitDefinitions: Record<UnitType, UnitDefinition> = Object.fromEntries(
+  Object.values(unitSpecs).map((spec) => [
+    spec.type,
+    {
+      type: spec.type,
+      maxHp: spec.maxHp,
+      attackDamage: spec.attackDamage,
+      attackRange: spec.attackRange,
+      attackCooldownTicks: Math.round(spec.attackCooldownSeconds * SIM_TICKS_PER_SECOND),
+      ticksPerStep: spec.ticksPerStep,
+      assetId: spec.assetId
+    }
+  ])
+) as Record<UnitType, UnitDefinition>;
 
 export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScenario): WorldState {
   const world: WorldState = {
@@ -1494,25 +1473,6 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
   };
 }
 
-const oneCellFootprint: readonly CellCoord[] = [{ x: 0, y: 0 }];
-const twoCellXFootprint: readonly CellCoord[] = [
-  { x: 0, y: 0 },
-  { x: 1, y: 0 }
-];
-const threeCellXFootprint: readonly CellCoord[] = [
-  { x: 0, y: 0 },
-  { x: 1, y: 0 },
-  { x: 2, y: 0 }
-];
-const twoCellYFootprint: readonly CellCoord[] = [
-  { x: 0, y: 0 },
-  { x: 0, y: 1 }
-];
-const threeCellYFootprint: readonly CellCoord[] = [
-  { x: 0, y: 0 },
-  { x: 0, y: 1 },
-  { x: 0, y: 2 }
-];
 
 function rectangularFootprint(width: number, height: number): readonly CellCoord[] {
   const footprint: CellCoord[] = [];
@@ -1524,237 +1484,25 @@ function rectangularFootprint(width: number, height: number): readonly CellCoord
   return footprint;
 }
 
-const storehouseFootprint = rectangularFootprint(3, 3);
-const marketFootprint = rectangularFootprint(4, 3);
-const barracksFootprint = rectangularFootprint(4, 3);
-const samuraiResidenceFootprint = rectangularFootprint(4, 4);
-const townBlockFootprint = rectangularFootprint(6, 6);
-const farmFootprint = rectangularFootprint(4, 4);
-const tenshuFootprint = rectangularFootprint(8, 8);
-const yaguraFootprint = rectangularFootprint(2, 2);
 
-const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {
-  fence: {
-    type: "fence",
-    category: "castle",
-    maxHp: 120,
-    footprint: oneCellFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.fence.wood",
-    gateState: null
-  },
-  wall: {
-    type: "wall",
-    category: "castle",
-    maxHp: 260,
-    footprint: oneCellFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.wall.plaster",
-    gateState: null
-  },
-  gate: {
-    type: "gate",
-    category: "castle",
-    maxHp: 220,
-    footprint: oneCellFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.gate.wood.closed",
-    gateState: "closed"
-  },
-  gate_wide_2: {
-    type: "gate_wide_2",
-    category: "castle",
-    maxHp: 320,
-    footprint: twoCellXFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.gate.wood.closed.width2",
-    gateState: "closed"
-  },
-  gate_wide_3: {
-    type: "gate_wide_3",
-    category: "castle",
-    maxHp: 420,
-    footprint: threeCellXFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.gate.wood.closed.width3",
-    gateState: "closed"
-  },
-  gate_ne_sw: {
-    type: "gate_ne_sw",
-    category: "castle",
-    maxHp: 220,
-    footprint: oneCellFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.gate.wood.closed.ne_sw",
-    gateState: "closed"
-  },
-  gate_wide_2_ne_sw: {
-    type: "gate_wide_2_ne_sw",
-    category: "castle",
-    maxHp: 320,
-    footprint: twoCellYFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.gate.wood.closed.ne_sw.width2",
-    gateState: "closed"
-  },
-  gate_wide_3_ne_sw: {
-    type: "gate_wide_3_ne_sw",
-    category: "castle",
-    maxHp: 420,
-    footprint: threeCellYFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.gate.wood.closed.ne_sw.width3",
-    gateState: "closed"
-  },
-  dry_moat: {
-    type: "dry_moat",
-    category: "moat",
-    maxHp: 9999,
-    footprint: oneCellFootprint,
-    passable: true,
-    movementCostModifier: 5,
-    assetId: "building.dry_moat",
-    gateState: null
-  },
-  water_moat: {
-    type: "water_moat",
-    category: "moat",
-    maxHp: 9999,
-    footprint: oneCellFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.water_moat",
-    gateState: null
-  },
-  storehouse: {
-    type: "storehouse",
-    category: "economy",
-    maxHp: 180,
-    footprint: storehouseFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.storehouse",
-    gateState: null
-  },
-  market: {
-    type: "market",
-    category: "economy",
-    maxHp: 160,
-    footprint: marketFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.market",
-    gateState: null
-  },
-  barracks: {
-    type: "barracks",
-    category: "military",
-    maxHp: 220,
-    footprint: barracksFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.barracks",
-    gateState: null
-  },
-  samurai_residence: {
-    type: "samurai_residence",
-    category: "residential",
-    maxHp: 190,
-    footprint: samuraiResidenceFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.samurai_residence",
-    gateState: null
-  },
-  town_block: {
-    type: "town_block",
-    category: "residential",
-    maxHp: 150,
-    footprint: townBlockFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.town_block",
-    gateState: null
-  },
-  farm: {
-    type: "farm",
-    category: "economy",
-    maxHp: 80,
-    footprint: farmFootprint,
-    passable: true,
-    movementCostModifier: 2,
-    assetId: "building.farm",
-    gateState: null
-  },
-  road: {
-    type: "road",
-    category: "infrastructure",
-    maxHp: 9999,
-    footprint: oneCellFootprint,
-    passable: true,
-    movementCostModifier: 0,
-    assetId: "building.road",
-    gateState: null
-  },
-  earth_bridge: {
-    type: "earth_bridge",
-    category: "infrastructure",
-    maxHp: 220,
-    footprint: oneCellFootprint,
-    passable: true,
-    movementCostModifier: 0,
-    assetId: "building.earth_bridge",
-    gateState: null
-  },
-  wood_bridge: {
-    type: "wood_bridge",
-    category: "infrastructure",
-    maxHp: 140,
-    footprint: oneCellFootprint,
-    passable: true,
-    movementCostModifier: 1,
-    assetId: "building.wood_bridge",
-    gateState: null
-  },
-  honmaru: {
-    type: "honmaru",
-    category: "objective",
-    maxHp: 9999,
-    footprint: oneCellFootprint,
-    passable: true,
-    movementCostModifier: 1,
-    assetId: "building.honmaru.marker",
-    gateState: null
-  },
-  tenshu: {
-    type: "tenshu",
-    category: "objective",
-    maxHp: 9999,
-    footprint: tenshuFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.tenshu.test",
-    gateState: null
-  },
-  yagura: {
-    type: "yagura",
-    category: "castle",
-    maxHp: 260,
-    footprint: yaguraFootprint,
-    passable: false,
-    movementCostModifier: BLOCKED_MOVEMENT_COST,
-    assetId: "building.yagura.small.normal",
-    gateState: null
-  }
-};
+// Building definitions live in @asama/content as rectangle footprints; the
+// simulation expands them to cell lists and applies the blocked-movement
+// sentinel to impassable buildings.
+const buildingDefinitions: Record<BuildingType, BuildingDefinition> = Object.fromEntries(
+  Object.values(buildingSpecs).map((spec) => [
+    spec.type,
+    {
+      type: spec.type,
+      category: spec.category,
+      maxHp: spec.maxHp,
+      footprint: rectangularFootprint(spec.footprint.width, spec.footprint.height),
+      passable: spec.passable,
+      movementCostModifier: spec.movementCostModifier ?? (spec.passable ? 1 : BLOCKED_MOVEMENT_COST),
+      assetId: spec.assetId,
+      gateState: spec.gateState
+    }
+  ])
+) as Record<BuildingType, BuildingDefinition>;
 
 function createInitialMap(): WorldState["map"] {
   const baseCells: TerrainCellState[] = [];
