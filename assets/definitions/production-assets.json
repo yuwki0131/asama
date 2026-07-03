@@ -577,7 +577,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -603,7 +603,7 @@
         "footprintWidth": 2,
         "footprintHeight": 1,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -629,7 +629,7 @@
         "footprintWidth": 3,
         "footprintHeight": 1,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4387,7 +4387,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4413,7 +4413,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4439,7 +4439,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4465,7 +4465,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4491,7 +4491,7 @@
         "footprintWidth": 2,
         "footprintHeight": 1,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4517,7 +4517,7 @@
         "footprintWidth": 2,
         "footprintHeight": 1,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4543,7 +4543,7 @@
         "footprintWidth": 2,
         "footprintHeight": 1,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4569,7 +4569,7 @@
         "footprintWidth": 2,
         "footprintHeight": 1,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4595,7 +4595,7 @@
         "footprintWidth": 3,
         "footprintHeight": 1,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4621,7 +4621,7 @@
         "footprintWidth": 3,
         "footprintHeight": 1,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4647,7 +4647,7 @@
         "footprintWidth": 3,
         "footprintHeight": 1,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4673,7 +4673,7 @@
         "footprintWidth": 3,
         "footprintHeight": 1,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4699,7 +4699,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4725,7 +4725,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4751,7 +4751,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4777,7 +4777,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 96,
-        "canvasHeight": 112,
+        "canvasHeight": 128,
         "anchorX": 48,
         "anchorY": 104
       },
@@ -4803,7 +4803,7 @@
         "footprintWidth": 1,
         "footprintHeight": 2,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4829,7 +4829,7 @@
         "footprintWidth": 1,
         "footprintHeight": 2,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4855,7 +4855,7 @@
         "footprintWidth": 1,
         "footprintHeight": 2,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4881,7 +4881,7 @@
         "footprintWidth": 1,
         "footprintHeight": 2,
         "canvasWidth": 160,
-        "canvasHeight": 120,
+        "canvasHeight": 144,
         "anchorX": 80,
         "anchorY": 112
       },
@@ -4907,7 +4907,7 @@
         "footprintWidth": 1,
         "footprintHeight": 3,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4933,7 +4933,7 @@
         "footprintWidth": 1,
         "footprintHeight": 3,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4959,7 +4959,7 @@
         "footprintWidth": 1,
         "footprintHeight": 3,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },
@@ -4985,7 +4985,7 @@
         "footprintWidth": 1,
         "footprintHeight": 3,
         "canvasWidth": 224,
-        "canvasHeight": 128,
+        "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
       },

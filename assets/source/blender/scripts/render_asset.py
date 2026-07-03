@@ -681,7 +681,9 @@ def build_farm_paddy(scene: bpy.types.Scene) -> None:
 #
 # Kabukimon-style gates spanning 1-3 tiles. nw_se gates run along map x
 # (footprint width x 1), ne_sw gates along map y (1 x width). Origin is the
-# footprint south corner. The connection mask marks which ends adjoin walls
+# FOOTPRINT CENTER: the runtime treats gates as center-anchored buildings
+# (GameCanvas isCenterAnchoredBuilding), so the anchor pixel is placed on the
+# center of the footprint. The connection mask marks which ends adjoin walls
 # (nw_se: E/W bits, ne_sw: N/S bits); connected ends grow a wall stub that
 # meets the wall-kit socket at the end tile's edge midpoint.
 
@@ -696,11 +698,11 @@ GATE_ROOF_TOP = 1.72
 
 def gate_axis_point(axis: str, along: float, across: float) -> tuple[float, float]:
     """Map coordinates for a point at `along` on the gate axis, `across`
-    offset from the centerline. nw_se runs along x (centerline y=-0.5),
-    ne_sw along y (centerline x=-0.5). `along` is negative into the gate."""
+    offset from the centerline. Footprint center is the origin, so `along`
+    runs from -length/2 to +length/2 and `across` from -0.5 to +0.5."""
     if axis == "nw_se":
-        return (along, -0.5 + across)
-    return (-0.5 + across, along)
+        return (along, across)
+    return (across, along)
 
 
 def gate_box(axis: str, along0: float, along1: float, across_half: float, z0: float, z1: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
@@ -716,28 +718,28 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str) ->
     plaster = make_material("WallPlaster", (0.80, 0.78, 0.72, 1.0))
     stone = make_material("WallStone", (0.40, 0.38, 0.34, 1.0))
 
-    length = float(width)
+    half = float(width) / 2.0
     # Stone threshold sill covering the full footprint; grounds the sprite
-    # so its south contact pixel lands on the anchor.
+    # on its logical lot.
     if axis == "nw_se":
-        add_box(scene, "Sill", *map_box((-length, -1.0, 0.0), (0.0, 0.0, 0.035)), stone)
+        add_box(scene, "Sill", *map_box((-half, -0.5, 0.0), (half, 0.5, 0.035)), stone)
     else:
-        add_box(scene, "Sill", *map_box((-1.0, -length, 0.0), (0.0, 0.0, 0.035)), stone)
+        add_box(scene, "Sill", *map_box((-0.5, -half, 0.0), (0.5, half, 0.035)), stone)
 
     # Flanking pillars just inside each end of the footprint.
-    for label, along in (("Near", -0.22), ("Far", -length + 0.22)):
+    for label, along in (("Near", half - 0.22), ("Far", -half + 0.22)):
         low, high = gate_box(axis, along - GATE_PILLAR_SIZE / 2.0, along + GATE_PILLAR_SIZE / 2.0, GATE_PILLAR_SIZE / 2.0, 0.0, GATE_PILLAR_HEIGHT)
         add_box(scene, f"Pillar{label}", *map_box(low, high), wood)
 
     # Closed double doors between the pillars.
-    low, high = gate_box(axis, -length + 0.38, -0.38, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
+    low, high = gate_box(axis, -half + 0.38, half - 0.38, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
     add_box(scene, "Doors", *map_box(low, high), door)
     # Kabuki lintel beam across the top.
-    low, high = gate_box(axis, -length + 0.06, -0.06, 0.17, GATE_BEAM_BOTTOM, GATE_BEAM_TOP)
+    low, high = gate_box(axis, -half + 0.06, half - 0.06, 0.17, GATE_BEAM_BOTTOM, GATE_BEAM_TOP)
     add_box(scene, "Beam", *map_box(low, high), wood)
 
     # Gabled roof over the full span, ridge along the gate axis.
-    roof_low, roof_high = gate_box(axis, -length - 0.12, 0.12, 0.42, 0.0, 0.0)
+    roof_low, roof_high = gate_box(axis, -half - 0.12, half + 0.12, 0.42, 0.0, 0.0)
     low, high = map_box(roof_low, roof_high)
     ridge_axis = "x" if axis == "nw_se" else "y"
     add_gable_roof(scene, "GateRoof", (low[0], low[1]), (high[0], high[1]), GATE_BEAM_TOP, GATE_ROOF_TOP, ridge_axis, roof)
@@ -745,7 +747,7 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str) ->
     # Wall stubs on connected ends, matching the wall-kit profile so the
     # socket at the end tile edge midpoint lines up with neighbor walls.
     bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
-    end_direction = {"nw_se": (("E", -0.30, 0.0), ("W", -length, -length + 0.30)), "ne_sw": (("S", -0.30, 0.0), ("N", -length, -length + 0.30))}
+    end_direction = {"nw_se": (("E", half - 0.30, half), ("W", -half, -half + 0.30)), "ne_sw": (("S", half - 0.30, half), ("N", -half, -half + 0.30))}
     for name, along0, along1 in end_direction[axis]:
         if not bits.get(name, False):
             continue

@@ -422,8 +422,7 @@ const initialBuildingPlacements: readonly {
   { type: "wall", position: { x: 57, y: 50 } },
   { type: "wall", position: { x: 58, y: 50 } },
   { type: "wall", position: { x: 59, y: 50 } },
-  { type: "gate", position: { x: 60, y: 50 } },
-  { type: "gate_wide_2", position: { x: 60, y: 74 } },
+  { type: "gate_wide_3", position: { x: 60, y: 50 } },
   { type: "gate_wide_3", position: { x: 64, y: 74 } },
   { type: "dry_moat", position: { x: 80, y: 58 } },
   { type: "dry_moat", position: { x: 80, y: 59 } },
@@ -433,7 +432,7 @@ const initialBuildingPlacements: readonly {
   { type: "water_moat", position: { x: 82, y: 60 } },
   { type: "earth_bridge", position: { x: 61, y: 44 } },
   { type: "wood_bridge", position: { x: 62, y: 45 } },
-  { type: "gate", position: { x: 84, y: 65 }, owner: "enemy" }
+  { type: "gate_wide_3", position: { x: 84, y: 65 }, owner: "enemy" }
 ];
 
 const buildingDefinitions: Record<BuildingType, BuildingDefinition> = {

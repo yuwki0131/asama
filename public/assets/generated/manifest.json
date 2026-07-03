@@ -1063,10 +1063,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -1074,10 +1074,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-width2.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -1085,10 +1085,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-width3.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -1998,10 +1998,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width1-connected-0000.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2009,10 +2009,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width1-connected-0100.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2020,10 +2020,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width1-connected-0001.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2031,10 +2031,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width1-connected-0101.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2042,10 +2042,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width2-connected-0000.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2053,10 +2053,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width2-connected-0100.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2064,10 +2064,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width2-connected-0001.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2075,10 +2075,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width2-connected-0101.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2086,10 +2086,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width3-connected-0000.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -2097,10 +2097,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width3-connected-0100.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -2108,10 +2108,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width3-connected-0001.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -2119,10 +2119,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-nw-se-width3-connected-0101.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -2130,10 +2130,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width1-connected-0000.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2141,10 +2141,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width1-connected-1000.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2152,10 +2152,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width1-connected-0010.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2163,10 +2163,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width1-connected-1010.png",
       "width": 96,
-      "height": 112,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.9285714285714286
+        "y": 0.8125
       }
     },
     {
@@ -2174,10 +2174,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width2-connected-0000.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2185,10 +2185,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width2-connected-1000.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2196,10 +2196,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width2-connected-0010.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2207,10 +2207,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width2-connected-1010.png",
       "width": 160,
-      "height": 120,
+      "height": 144,
       "anchor": {
         "x": 0.5,
-        "y": 0.9333333333333333
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2218,10 +2218,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width3-connected-0000.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -2229,10 +2229,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width3-connected-1000.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -2240,10 +2240,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width3-connected-0010.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     },
     {
@@ -2251,10 +2251,10 @@
       "kind": "building",
       "file": "generated/building-gate-wood-closed-ne-sw-width3-connected-1010.png",
       "width": 224,
-      "height": 128,
+      "height": 160,
       "anchor": {
         "x": 0.5,
-        "y": 0.9375
+        "y": 0.75
       }
     }
   ]

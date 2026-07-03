@@ -268,12 +268,10 @@ function buildingTypeCounts(snapshot: WorldSnapshot | null): string {
 const buildingTools: readonly { readonly type: BuildingType; readonly label: string }[] = [
   { type: "fence", label: "Fence" },
   { type: "wall", label: "Wall" },
-  { type: "gate", label: "Gate NW-SE 1" },
-  { type: "gate_wide_2", label: "Gate NW-SE 2" },
-  { type: "gate_wide_3", label: "Gate NW-SE 3" },
-  { type: "gate_ne_sw", label: "Gate NE-SW 1" },
-  { type: "gate_wide_2_ne_sw", label: "Gate NE-SW 2" },
-  { type: "gate_wide_3_ne_sw", label: "Gate NE-SW 3" },
+  // MVP exposes only the 3-tile gates (2026-07-03 decision); the narrower
+  // gate types remain in the data model but are not placeable.
+  { type: "gate_wide_3", label: "Gate NW-SE" },
+  { type: "gate_wide_3_ne_sw", label: "Gate NE-SW" },
   { type: "dry_moat", label: "Dry Moat" },
   { type: "water_moat", label: "Water Moat" },
   { type: "road", label: "Road" },
