@@ -185,3 +185,10 @@ button {
 .outcome-banner span {
   color: #e8e2d4;
 }
+
+.bar-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 4px;
+  background: #4a5157;
+}

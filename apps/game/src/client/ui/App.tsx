@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { BuildingType, CellCoord, EntityId, WorldSnapshot } from "@asama/shared";
+import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitType, WorldSnapshot } from "@asama/shared";
 import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas } from "../renderer/GameCanvas";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 
@@ -165,6 +165,31 @@ export function App() {
 
   const outcome = snapshot?.outcome ?? null;
   const food = snapshot?.food ?? null;
+  const economy = snapshot?.economy ?? null;
+
+  const handleRecruit = useCallback(
+    (unitType: UnitType) => {
+      simulationRef.current?.enqueueCommand({
+        type: "recruitUnit",
+        unitType,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
+
+  const handleMarketTrade = useCallback(
+    (trade: MarketTrade) => {
+      simulationRef.current?.enqueueCommand({
+        type: "marketTrade",
+        trade,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
 
   return (
     <main className="app">
@@ -183,6 +208,15 @@ export function App() {
               ? ` (-${food.requiredPerCycle} in ${Math.ceil(food.nextConsumptionInTicks / 20)}s)`
               : ""}
           </span>
+          <span>gold {economy?.gold ?? "-"}</span>
+          <span>weapons {economy?.weapons ?? "-"}</span>
+          <span>
+            pop {economy === null ? "-" : `${economy.population}/${economy.populationCapacity}`}
+          </span>
+          <span>
+            recruits {economy === null ? "-" : `${economy.recruitPool}/${economy.recruitPoolMax}`}
+          </span>
+          <span>{economy === null ? "-" : `${economy.year}年 ${seasonLabel(economy.season)}`}</span>
           <span>selected {selectedUnits.length}</span>
           <span>
             destination{" "}
@@ -228,6 +262,26 @@ export function App() {
         >
           Demolish
         </button>
+        <span className="bar-divider" />
+        <button type="button" onClick={() => handleRecruit("spear_ashigaru")}>
+          徴兵:槍
+        </button>
+        <button type="button" onClick={() => handleRecruit("sword_ashigaru")}>
+          徴兵:刀
+        </button>
+        <button type="button" onClick={() => handleRecruit("archer")}>
+          徴兵:弓
+        </button>
+        <span className="bar-divider" />
+        <button type="button" onClick={() => handleMarketTrade("buyFood")}>
+          市場:食料購入
+        </button>
+        <button type="button" onClick={() => handleMarketTrade("sellFood")}>
+          市場:食料売却
+        </button>
+        <button type="button" onClick={() => handleMarketTrade("buyWeapons")}>
+          市場:武器購入
+        </button>
       </div>
       <section className="game-view">
         {outcome === null ? null : (
@@ -264,6 +318,19 @@ export function App() {
       </section>
     </main>
   );
+}
+
+function seasonLabel(season: Season): string {
+  switch (season) {
+    case "spring":
+      return "春";
+    case "summer":
+      return "夏";
+    case "autumn":
+      return "秋";
+    case "winter":
+      return "冬";
+  }
 }
 
 interface DebugStatusPanelProps {

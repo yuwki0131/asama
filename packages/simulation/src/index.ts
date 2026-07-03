@@ -13,8 +13,11 @@ import {
   type PlayerCommand,
   type TerrainCellSnapshot,
   type TerrainType,
+  type EconomySnapshot,
   type FoodSnapshot,
   type GameOutcome,
+  type MarketTrade,
+  type Season,
   type SerializedWorld,
   type UnitId,
   type UnitType,
@@ -107,6 +110,7 @@ export interface WorldState {
   /** Deterministic RNG state (LCG); seeded at world creation. */
   rngState: number;
   food: FoodState;
+  economy: EconomyState;
   map: {
     width: number;
     height: number;
@@ -122,6 +126,52 @@ interface FoodState {
   nextConnectivityCheckTick: number;
   nextConsumptionTick: number;
 }
+
+interface EconomyState {
+  gold: number;
+  weapons: number;
+  population: number;
+  recruitPool: number;
+  /** Farms registered at the spring planting cut for this year's harvest. */
+  plantedFarmIds: BuildingId[];
+  lastProcessedMonth: number;
+  lastProcessedSeason: number;
+}
+
+// Provisional economy balance (docs/02_game-rules/population-and-economy.md,
+// seasons-and-harvest.md). Unresolved numbers stay parameterized here.
+// Wood and stone have no sink yet (construction costs are unimplemented), so
+// they are deferred; see docs/10_development/unresolved-issues.md.
+export const ECONOMY_BALANCE = {
+  seasonTicks: 225 * 20,
+  monthTicks: 75 * 20,
+  initialGold: 120,
+  initialWeapons: 6,
+  initialPopulation: 40,
+  populationPerTownCell: 2,
+  populationGrowthPerMonth: 6,
+  farmGrowthBonusPerFarm: 0.15,
+  /** MVP treats nengu and tax as one fixed burden rate. */
+  taxRate: 0.3,
+  taxCoefficient: 1.0,
+  mobilizationRate: 0.15,
+  recruitPoolRecoveryPerMonth: 3,
+  farmHarvestYield: 160,
+  recruitCosts: {
+    spear_ashigaru: { gold: 20, weapons: 1 },
+    sword_ashigaru: { gold: 28, weapons: 1 },
+    archer: { gold: 32, weapons: 1 }
+  } as Record<UnitType, { readonly gold: number; readonly weapons: number }>,
+  market: {
+    foodLot: 50,
+    foodBuyPrice: 30,
+    foodSellPrice: 15,
+    weaponsLot: 5,
+    weaponsBuyPrice: 40
+  }
+} as const;
+
+const SEASONS: readonly Season[] = ["spring", "summer", "autumn", "winter"];
 
 // Provisional balance values; unresolved numbers stay parameterized here
 // (docs/10_development/unresolved-issues.md).
@@ -242,6 +292,15 @@ export function createInitialWorld(): WorldState {
       nextConnectivityCheckTick: 0,
       nextConsumptionTick: FOOD_BALANCE.consumptionCycleTicks
     },
+    economy: {
+      gold: ECONOMY_BALANCE.initialGold,
+      weapons: ECONOMY_BALANCE.initialWeapons,
+      population: ECONOMY_BALANCE.initialPopulation,
+      recruitPool: Math.floor(ECONOMY_BALANCE.initialPopulation * ECONOMY_BALANCE.mobilizationRate),
+      plantedFarmIds: [],
+      lastProcessedMonth: 0,
+      lastProcessedSeason: 0
+    },
     map: createInitialMap(),
     units: [],
     buildings: []
@@ -260,6 +319,9 @@ export function createInitialWorld(): WorldState {
     createUnit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 86, y: 66 }),
     createUnit("unit:enemy:2", "enemy", "archer", { x: 87, y: 66 })
   );
+  // The world starts at the beginning of spring; farms present now are
+  // planted for the first year's harvest.
+  world.economy.plantedFarmIds = intactBuildingsOfType(world, "farm").map((farm) => farm.id);
   return world;
 }
 
@@ -393,6 +455,14 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     return null;
   }
 
+  if (command.type === "recruitUnit") {
+    return applyRecruitCommand(world, command.unitType);
+  }
+
+  if (command.type === "marketTrade") {
+    return applyMarketTrade(world, command.trade);
+  }
+
   return null;
 }
 
@@ -428,8 +498,260 @@ export function updateWorld(world: WorldState): void {
 
   updateCombat(world);
   updateFoodSupply(world);
+  updateEconomy(world);
   checkOutcome(world);
   world.currentTick += 1;
+}
+
+// --- Economy (docs/02_game-rules/population-and-economy.md,
+// docs/02_game-rules/seasons-and-harvest.md) --------------------------------
+
+function updateEconomy(world: WorldState): void {
+  const economy = world.economy;
+
+  const month = Math.floor(world.currentTick / ECONOMY_BALANCE.monthTicks);
+  if (month > economy.lastProcessedMonth) {
+    economy.lastProcessedMonth = month;
+    processMonthlyEconomy(world);
+  }
+
+  const season = Math.floor(world.currentTick / ECONOMY_BALANCE.seasonTicks);
+  if (season > economy.lastProcessedSeason) {
+    // Process each crossed boundary in order so fast-forwarding (load, high
+    // speed) never skips a planting or a harvest.
+    for (let index = economy.lastProcessedSeason + 1; index <= season; index += 1) {
+      processSeasonStart(world, index);
+    }
+    economy.lastProcessedSeason = season;
+  }
+}
+
+function processMonthlyEconomy(world: WorldState): void {
+  const economy = world.economy;
+
+  // Tax: 税収 = 人口 × 負担率 × 基礎税収係数.
+  economy.gold += Math.floor(economy.population * ECONOMY_BALANCE.taxRate * ECONOMY_BALANCE.taxCoefficient);
+
+  // Population growth: room in town blocks, farm base, approval.
+  const capacity = populationCapacity(world);
+  const room = capacity > 0 ? Math.max(0, 1 - economy.population / capacity) : 0;
+  const farmBonus = 1 + intactBuildingsOfType(world, "farm").length * ECONOMY_BALANCE.farmGrowthBonusPerFarm;
+  const growth = Math.floor(ECONOMY_BALANCE.populationGrowthPerMonth * room * farmBonus * currentApproval());
+  economy.population = Math.min(capacity > 0 ? capacity : economy.population, economy.population + growth);
+
+  // Recruit pool recovers monthly, capped by mobilizable population.
+  economy.recruitPool = Math.min(
+    maxRecruitPool(world),
+    economy.recruitPool + ECONOMY_BALANCE.recruitPoolRecoveryPerMonth
+  );
+}
+
+function processSeasonStart(world: WorldState, seasonIndex: number): void {
+  const season = SEASONS[seasonIndex % SEASONS.length];
+  if (season === "spring") {
+    // Planting cut: farms existing now are harvested this year.
+    world.economy.plantedFarmIds = intactBuildingsOfType(world, "farm").map((farm) => farm.id);
+  }
+  if (season === "winter") {
+    // Entering winter means autumn just ended: harvest in bulk.
+    harvestFarms(world);
+  }
+}
+
+function harvestFarms(world: WorldState): void {
+  const planted = new Set(world.economy.plantedFarmIds);
+  const farms = intactBuildingsOfType(world, "farm").filter((farm) => planted.has(farm.id));
+  if (farms.length === 0) {
+    return;
+  }
+  let harvest = farms.length * ECONOMY_BALANCE.farmHarvestYield;
+
+  // Store into reachable storehouses nearest the honmaru first (spec order
+  // for the regular harvest); surplus beyond total capacity is lost.
+  const honmaru = intactBuildingsOfType(world, "honmaru")[0];
+  const reachableIds = new Set(computeConnectedStorehouseIds(world));
+  const targets = intactBuildingsOfType(world, "storehouse").filter((storehouse) => reachableIds.has(storehouse.id));
+  if (honmaru !== undefined) {
+    targets.sort((a, b) => manhattan(honmaru.position, a.position) - manhattan(honmaru.position, b.position));
+  }
+  for (const storehouse of targets) {
+    if (harvest <= 0) {
+      break;
+    }
+    const space = (storehouse.foodCapacity ?? 0) - (storehouse.food ?? 0);
+    const stored = Math.min(space, harvest);
+    storehouse.food = (storehouse.food ?? 0) + stored;
+    harvest -= stored;
+  }
+}
+
+function populationCapacity(world: WorldState): number {
+  let cells = 0;
+  for (const townBlock of intactBuildingsOfType(world, "town_block")) {
+    if (isTownBlockActive(world, townBlock)) {
+      cells += townBlock.footprint.length;
+    }
+  }
+  return cells * ECONOMY_BALANCE.populationPerTownCell;
+}
+
+/** Town blocks need a road adjacent to their footprint to be effective. */
+function isTownBlockActive(world: WorldState, townBlock: BuildingState): boolean {
+  for (const cell of townBlock.footprint) {
+    for (const direction of ORTHOGONAL_DIRECTIONS) {
+      const neighbor = getBuildingAt(world, { x: cell.x + direction.x, y: cell.y + direction.y });
+      if (neighbor !== null && neighbor.type === "road") {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function currentApproval(): number {
+  // MVP: approval derives directly from the fixed burden rate.
+  return Math.max(0, Math.min(1, 1 - ECONOMY_BALANCE.taxRate * 0.8));
+}
+
+function maxRecruitPool(world: WorldState): number {
+  return Math.floor(world.economy.population * ECONOMY_BALANCE.mobilizationRate);
+}
+
+function applyRecruitCommand(world: WorldState, unitType: UnitType): string | null {
+  const definition = unitDefinitions[unitType];
+  if (definition === undefined) {
+    return "Unknown unit type";
+  }
+  const barracks = world.buildings.find(
+    (building) => building.type === "barracks" && building.owner === "player" && building.lifecycleState === "intact"
+  );
+  if (barracks === undefined) {
+    return "No barracks";
+  }
+  const cost = ECONOMY_BALANCE.recruitCosts[unitType];
+  if (world.economy.gold < cost.gold) {
+    return "Not enough gold";
+  }
+  if (world.economy.weapons < cost.weapons) {
+    return "Not enough weapons";
+  }
+  if (world.economy.recruitPool < 1) {
+    return "No recruits available";
+  }
+  const spawn = findSpawnCell(world, { x: barracks.position.x - 1, y: barracks.position.y - 1 });
+  if (spawn === null) {
+    return "No space to muster";
+  }
+
+  world.economy.gold -= cost.gold;
+  world.economy.weapons -= cost.weapons;
+  world.economy.recruitPool -= 1;
+  world.units.push(createUnit(`unit:recruit:${world.currentTick}:${world.units.length}`, "player", unitType, spawn));
+  return null;
+}
+
+function applyMarketTrade(world: WorldState, trade: MarketTrade): string | null {
+  const market = world.buildings.find(
+    (building) => building.type === "market" && building.owner === "player" && building.lifecycleState === "intact"
+  );
+  if (market === undefined) {
+    return "No market";
+  }
+  if (!isBuildingReachableFromHonmaru(world, market)) {
+    return "Market is not connected to the honmaru";
+  }
+  const prices = ECONOMY_BALANCE.market;
+
+  if (trade === "buyWeapons") {
+    if (world.economy.gold < prices.weaponsBuyPrice) {
+      return "Not enough gold";
+    }
+    world.economy.gold -= prices.weaponsBuyPrice;
+    world.economy.weapons += prices.weaponsLot;
+    return null;
+  }
+
+  const connectedIds = new Set(computeConnectedStorehouseIds(world));
+  const storehouses = intactBuildingsOfType(world, "storehouse").filter((storehouse) => connectedIds.has(storehouse.id));
+
+  if (trade === "buyFood") {
+    if (world.economy.gold < prices.foodBuyPrice) {
+      return "Not enough gold";
+    }
+    let remaining = prices.foodLot;
+    for (const storehouse of storehouses) {
+      if (remaining <= 0) {
+        break;
+      }
+      const space = (storehouse.foodCapacity ?? 0) - (storehouse.food ?? 0);
+      const stored = Math.min(space, remaining);
+      storehouse.food = (storehouse.food ?? 0) + stored;
+      remaining -= stored;
+    }
+    if (remaining === prices.foodLot) {
+      return "No storehouse space";
+    }
+    world.economy.gold -= prices.foodBuyPrice;
+    return null;
+  }
+
+  // sellFood
+  let toSell = prices.foodLot;
+  const available = storehouses.reduce((sum, storehouse) => sum + (storehouse.food ?? 0), 0);
+  if (available < toSell) {
+    return "Not enough food to sell";
+  }
+  for (const storehouse of storehouses) {
+    if (toSell <= 0) {
+      break;
+    }
+    const sold = Math.min(storehouse.food ?? 0, toSell);
+    storehouse.food = (storehouse.food ?? 0) - sold;
+    toSell -= sold;
+  }
+  world.economy.gold += prices.foodSellPrice;
+  return null;
+}
+
+/** Reuses the storehouse-style reachability: a building is reachable when a
+ * passable path from the honmaru reaches any cell adjacent to it. */
+function isBuildingReachableFromHonmaru(world: WorldState, building: BuildingState): boolean {
+  const honmaru = intactBuildingsOfType(world, "honmaru")[0];
+  if (honmaru === undefined) {
+    return false;
+  }
+  const targetCells = new Set<string>();
+  for (const cell of building.footprint) {
+    for (const direction of ORTHOGONAL_DIRECTIONS) {
+      targetCells.add(cellKey({ x: cell.x + direction.x, y: cell.y + direction.y }));
+    }
+  }
+
+  const visited = new Set<string>();
+  const queue: CellCoord[] = [];
+  for (const cell of honmaru.footprint) {
+    queue.push(cell);
+    visited.add(cellKey(cell));
+  }
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (current === undefined) {
+      break;
+    }
+    if (targetCells.has(cellKey(current))) {
+      return true;
+    }
+    for (const direction of ORTHOGONAL_DIRECTIONS) {
+      const next = { x: current.x + direction.x, y: current.y + direction.y };
+      const key = cellKey(next);
+      if (visited.has(key) || !isInsideMap(next) || !isPassable(world, next)) {
+        continue;
+      }
+      visited.add(key);
+      queue.push(next);
+    }
+  }
+  return false;
 }
 
 function nextRandom(world: WorldState): number {
@@ -767,6 +1089,15 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
     unit.pathRetryCooldown ??= 0;
   }
   world.nextWaveIndex ??= 0;
+  world.economy ??= {
+    gold: ECONOMY_BALANCE.initialGold,
+    weapons: ECONOMY_BALANCE.initialWeapons,
+    population: ECONOMY_BALANCE.initialPopulation,
+    recruitPool: Math.floor(ECONOMY_BALANCE.initialPopulation * ECONOMY_BALANCE.mobilizationRate),
+    plantedFarmIds: [],
+    lastProcessedMonth: Math.floor(world.currentTick / ECONOMY_BALANCE.monthTicks),
+    lastProcessedSeason: Math.floor(world.currentTick / ECONOMY_BALANCE.seasonTicks)
+  };
   return world;
 }
 
@@ -778,6 +1109,7 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
     invalidMoveTarget: world.invalidMoveTarget,
     outcome: world.outcome,
     food: snapshotFood(world),
+    economy: snapshotEconomy(world),
     map: {
       width: world.map.width,
       height: world.map.height,
@@ -864,6 +1196,8 @@ const initialBuildingPlacements: readonly {
   { type: "road", position: { x: 64, y: 65 } },
   { type: "road", position: { x: 65, y: 65 } },
   { type: "road", position: { x: 67, y: 65 } },
+  { type: "road", position: { x: 68, y: 65 } },
+  { type: "road", position: { x: 69, y: 65 } },
   { type: "fence", position: { x: 52, y: 50 } },
   { type: "fence", position: { x: 53, y: 50 } },
   { type: "fence", position: { x: 54, y: 50 } },
@@ -1649,6 +1983,22 @@ function snapshotBuilding(world: WorldState, building: BuildingState): BuildingS
     food: building.food,
     foodCapacity: building.foodCapacity,
     connectedToHonmaru: world.food.connectedStorehouseIds.includes(building.id)
+  };
+}
+
+function snapshotEconomy(world: WorldState): EconomySnapshot {
+  const seasonIndex = Math.floor(world.currentTick / ECONOMY_BALANCE.seasonTicks);
+  return {
+    gold: world.economy.gold,
+    weapons: world.economy.weapons,
+    population: world.economy.population,
+    populationCapacity: populationCapacity(world),
+    approval: currentApproval(),
+    recruitPool: world.economy.recruitPool,
+    recruitPoolMax: maxRecruitPool(world),
+    season: SEASONS[seasonIndex % SEASONS.length] ?? "spring",
+    year: Math.floor(seasonIndex / SEASONS.length) + 1,
+    plantedFarms: world.economy.plantedFarmIds.length
   };
 }
 

@@ -104,11 +104,29 @@ export interface FoodSnapshot {
   readonly nextConsumptionInTicks: number;
 }
 
+export type Season = "spring" | "summer" | "autumn" | "winter";
+
+export type MarketTrade = "buyFood" | "sellFood" | "buyWeapons";
+
+export interface EconomySnapshot {
+  readonly gold: number;
+  readonly weapons: number;
+  readonly population: number;
+  readonly populationCapacity: number;
+  readonly approval: number;
+  readonly recruitPool: number;
+  readonly recruitPoolMax: number;
+  readonly season: Season;
+  readonly year: number;
+  readonly plantedFarms: number;
+}
+
 export interface WorldSnapshot {
   readonly currentTick: number;
   readonly invalidMoveTarget: CellCoord | null;
   readonly outcome: GameOutcome | null;
   readonly food: FoodSnapshot;
+  readonly economy: EconomySnapshot;
   readonly map: {
     readonly width: number;
     readonly height: number;
@@ -149,6 +167,18 @@ export type PlayerCommand =
   | {
       readonly type: "demolishBuilding";
       readonly position: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "recruitUnit";
+      readonly unitType: UnitType;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      readonly type: "marketTrade";
+      readonly trade: MarketTrade;
       readonly issuedAtTick: number;
       readonly clientSequence: number;
     };
