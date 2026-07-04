@@ -118,8 +118,28 @@ def finish_material(material: bpy.types.Material, color_output) -> None:
     links.new(color_output, shade.inputs["A"])
     links.new(ramp.outputs["Color"], shade.inputs["B"])
 
+    # Ambient occlusion gives the deep eave and contact shadows that the
+    # emission shading would otherwise lose entirely.
+    ao = nodes.new("ShaderNodeAmbientOcclusion")
+    ao.inputs["Distance"].default_value = 0.7
+    soften = nodes.new("ShaderNodeMath")
+    soften.operation = "MULTIPLY_ADD"
+    soften.inputs[1].default_value = 0.68
+    soften.inputs[2].default_value = 0.32
+    links.new(ao.outputs["AO"], soften.inputs[0])
+    ao_color = nodes.new("ShaderNodeCombineColor")
+    links.new(soften.outputs["Value"], ao_color.inputs["Red"])
+    links.new(soften.outputs["Value"], ao_color.inputs["Green"])
+    links.new(soften.outputs["Value"], ao_color.inputs["Blue"])
+    shaded = nodes.new("ShaderNodeMix")
+    shaded.data_type = "RGBA"
+    shaded.blend_type = "MULTIPLY"
+    shaded.inputs["Factor"].default_value = 1.0
+    links.new(shade.outputs["Result"], shaded.inputs["A"])
+    links.new(ao_color.outputs["Color"], shaded.inputs["B"])
+
     emission = nodes.new("ShaderNodeEmission")
-    links.new(shade.outputs["Result"], emission.inputs["Color"])
+    links.new(shaded.outputs["Result"], emission.inputs["Color"])
 
     output = nodes.get("Material Output")
     if output is None:
@@ -146,6 +166,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--render-seed", type=int, default=0)
     parser.add_argument("--frame", type=int, default=1)
     parser.add_argument("--report-json", default=None, help="optional path for a render report JSON")
+    parser.add_argument("--supersample", type=int, default=1, help="render at N x resolution (caller downsamples)")
     return parser.parse_args(argv)
 
 
@@ -159,11 +180,11 @@ def reset_scene() -> bpy.types.Scene:
     return bpy.context.scene
 
 
-def setup_camera(scene: bpy.types.Scene, canvas_w: float, canvas_h: float, anchor_x: float, anchor_y: float) -> bpy.types.Object:
+def setup_camera(scene: bpy.types.Scene, canvas_w: float, canvas_h: float, anchor_x: float, anchor_y: float, px_per_unit: float = PX_PER_UNIT) -> bpy.types.Object:
     camera_data = bpy.data.cameras.new("IsoCamera")
     camera_data.type = "ORTHO"
     camera_data.sensor_fit = "HORIZONTAL"
-    camera_data.ortho_scale = canvas_w / PX_PER_UNIT
+    camera_data.ortho_scale = canvas_w / px_per_unit
     camera_data.clip_start = 0.1
     camera_data.clip_end = 500.0
 
@@ -182,8 +203,8 @@ def setup_camera(scene: bpy.types.Scene, canvas_w: float, canvas_h: float, ancho
     dx_px = anchor_x - canvas_w / 2.0
     dy_px = anchor_y - canvas_h / 2.0
     camera.location = (
-        right * (-dx_px / PX_PER_UNIT)
-        + up * (dy_px / PX_PER_UNIT)
+        right * (-dx_px / px_per_unit)
+        + up * (dy_px / px_per_unit)
         - forward * CAMERA_DISTANCE
     )
 
@@ -595,6 +616,176 @@ def add_gabled_house(
     roof_low, roof_high = map_box((x0 - roof_overhang, y0 - roof_overhang, 0.0), (x1 + roof_overhang, y1 + roof_overhang, 0.0))
     world_axis = ridge_axis  # map x stays world x; map y maps to world y with flipped sign only
     add_gable_roof(scene, f"{name}Roof", (roof_low[0], roof_low[1]), (roof_high[0], roof_high[1]), wall_top, ridge_top, world_axis, roof_material)
+
+
+def make_namako_material() -> bpy.types.Material:
+    """Namako-kabe: dark tiles with a raised white diagonal grid. The grid is
+    driven by two 45-degree wave sets in (wall-run, height) space so the same
+    shader reads correctly on both wall orientations."""
+    material = bpy.data.materials.new("NamakoWall")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+
+    coords = nodes.new("ShaderNodeTexCoord")
+    separate = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(coords.outputs["Object"], separate.inputs["Vector"])
+    run = nodes.new("ShaderNodeMath")
+    run.operation = "ADD"
+    links.new(separate.outputs["X"], run.inputs[0])
+    links.new(separate.outputs["Y"], run.inputs[1])
+
+    def diagonal(sign: float):
+        axis = nodes.new("ShaderNodeMath")
+        axis.operation = "MULTIPLY_ADD"
+        axis.inputs[1].default_value = sign
+        links.new(separate.outputs["Z"], axis.inputs[0])
+        links.new(run.outputs["Value"], axis.inputs[2])
+        freq = nodes.new("ShaderNodeMath")
+        freq.operation = "MULTIPLY"
+        freq.inputs[1].default_value = 7.0
+        links.new(axis.outputs["Value"], freq.inputs[0])
+        saw = nodes.new("ShaderNodeMath")
+        saw.operation = "FRACT"
+        links.new(freq.outputs["Value"], saw.inputs[0])
+        tri0 = nodes.new("ShaderNodeMath")
+        tri0.operation = "SUBTRACT"
+        links.new(saw.outputs["Value"], tri0.inputs[0])
+        tri0.inputs[1].default_value = 0.5
+        tri = nodes.new("ShaderNodeMath")
+        tri.operation = "ABSOLUTE"
+        links.new(tri0.outputs["Value"], tri.inputs[0])
+        line = nodes.new("ShaderNodeMath")
+        line.operation = "GREATER_THAN"
+        line.inputs[1].default_value = 0.40
+        links.new(tri.outputs["Value"], line.inputs[0])
+        return line.outputs["Value"]
+
+    either = nodes.new("ShaderNodeMath")
+    either.operation = "MAXIMUM"
+    links.new(diagonal(1.0), either.inputs[0])
+    links.new(diagonal(-1.0), either.inputs[1])
+
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "CONSTANT"
+    ramp.color_ramp.elements[0].position = 0.0
+    ramp.color_ramp.elements[0].color = (0.16, 0.17, 0.21, 1.0)
+    ramp.color_ramp.elements[1].position = 0.5
+    ramp.color_ramp.elements[1].color = (0.88, 0.86, 0.80, 1.0)
+    links.new(either.outputs["Value"], ramp.inputs["Fac"])
+    finish_material(material, ramp.outputs["Color"])
+    return material
+
+
+def make_showcase_plaster() -> bpy.types.Material:
+    """Warm plaster with soft painterly blotches instead of pure noise."""
+    material = bpy.data.materials.new("ShowcasePlaster")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 1.6
+    noise.inputs["Detail"].default_value = 2.0
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "EASE"
+    ramp.color_ramp.elements[0].position = 0.25
+    ramp.color_ramp.elements[0].color = (0.86, 0.81, 0.70, 1.0)
+    ramp.color_ramp.elements[1].position = 0.8
+    ramp.color_ramp.elements[1].color = (0.96, 0.93, 0.85, 1.0)
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    finish_material(material, ramp.outputs["Color"])
+    return material
+
+
+def make_showcase_roof() -> bpy.types.Material:
+    """Kawara roof with soft horizontal course bands plus painterly mottle."""
+    material = bpy.data.materials.new("ShowcaseRoof")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    coords = nodes.new("ShaderNodeTexCoord")
+    separate = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(coords.outputs["Object"], separate.inputs["Vector"])
+    courses = nodes.new("ShaderNodeMath")
+    courses.operation = "MULTIPLY"
+    courses.inputs[1].default_value = 16.0
+    links.new(separate.outputs["Z"], courses.inputs[0])
+    band0 = nodes.new("ShaderNodeMath")
+    band0.operation = "FRACT"
+    links.new(courses.outputs["Value"], band0.inputs[0])
+    band = nodes.new("ShaderNodeMath")
+    band.operation = "MULTIPLY_ADD"
+    band.inputs[1].default_value = 0.28
+    band.inputs[2].default_value = 0.74
+    links.new(band0.outputs["Value"], band.inputs[0])
+
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 2.2
+    noise.inputs["Detail"].default_value = 2.0
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "EASE"
+    ramp.color_ramp.elements[0].position = 0.3
+    ramp.color_ramp.elements[0].color = (0.15, 0.17, 0.23, 1.0)
+    ramp.color_ramp.elements[1].position = 0.75
+    ramp.color_ramp.elements[1].color = (0.26, 0.29, 0.37, 1.0)
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+
+    banded = nodes.new("ShaderNodeMix")
+    banded.data_type = "RGBA"
+    banded.blend_type = "MULTIPLY"
+    banded.inputs["Factor"].default_value = 1.0
+    links.new(ramp.outputs["Color"], banded.inputs["A"])
+    course_color = nodes.new("ShaderNodeCombineColor")
+    links.new(band.outputs["Value"], course_color.inputs["Red"])
+    links.new(band.outputs["Value"], course_color.inputs["Green"])
+    links.new(band.outputs["Value"], course_color.inputs["Blue"])
+    links.new(course_color.outputs["Color"], banded.inputs["B"])
+    finish_material(material, banded.outputs["Result"])
+    return material
+
+
+def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
+    """Production-quality kura for the painterly style gate. Same 3x3 lot and
+    massing as the approved graybox; detail: ishigaki plinth, namako-kabe
+    lower band, plastered upper storey, kannon double door with awning, two
+    mushiko windows, curved roof with ridge cap and oni end tiles."""
+    plaster = make_showcase_plaster()
+    namako = make_namako_material()
+    roof = make_showcase_roof()
+    stone = make_ishigaki_material("ShowcaseIshigaki")
+    wood = make_textured_material("ShowcaseWood", (0.30, 0.21, 0.13), (0.44, 0.33, 0.21), scale=(18.0, 18.0, 2.5))
+    gravel = make_textured_material("ShowcaseGravel", (0.55, 0.50, 0.40), (0.68, 0.63, 0.52), scale=14.0)
+    ridge_dark = make_material("RidgeTile", (0.13, 0.14, 0.19, 1.0))
+
+    add_yard_pad(scene, 3.0, 3.0, gravel)
+    # Ishigaki plinth.
+    add_frustum(scene, "Plinth", (-2.62, -2.32), (-0.38, -0.68), 0.0, 0.24, 0.05, stone)
+    # Namako lower band.
+    add_box(scene, "Namako", *map_box((-2.5, -2.2, 0.24), (-0.5, -0.8, 0.56)), namako)
+    # Plaster upper storey, slightly inset.
+    add_box(scene, "Upper", *map_box((-2.47, -2.17, 0.56), (-0.53, -0.83, 1.17)), plaster)
+
+    # Kannon double door on the long south-west face (map +y side), with a
+    # stepped plaster frame and a small tiled awning.
+    add_box(scene, "DoorFrame", *map_box((-1.78, -0.86, 0.24), (-1.22, -0.78, 0.98)), plaster)
+    add_box(scene, "DoorRecess", *map_box((-1.72, -0.83, 0.24), (-1.28, -0.76, 0.92)), wood)
+    add_box(scene, "DoorSplit", *map_box((-1.515, -0.80, 0.24), (-1.485, -0.75, 0.92)), ridge_dark)
+
+    # Mushiko windows high on the same face and one on the gable end.
+    for index, (wx0, wx1) in enumerate(((-2.28, -1.98), (-1.06, -0.76))):
+        add_box(scene, f"WinFrame{index}", *map_box((wx0 - 0.04, -0.85, 0.78), (wx1 + 0.04, -0.79, 1.04)), plaster)
+        add_box(scene, f"Win{index}", *map_box((wx0, -0.82, 0.82), (wx1, -0.77, 1.00)), ridge_dark)
+    add_box(scene, "GableWinFrame", *map_box((-0.55, -1.71, 0.80), (-0.47, -1.29, 1.06)), plaster)
+    add_box(scene, "GableWin", *map_box((-0.52, -1.66, 0.84), (-0.44, -1.34, 1.02)), ridge_dark)
+
+    # Curved roof with deeper eaves, ridge cap and oni end tiles.
+    low, high = map_box((-2.82, -2.5, 0.0), (-0.18, -0.5, 0.0))
+    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.80, "x", roof)
+    ridge_low, ridge_high = map_box((-2.86, -1.56, 0.0), (-0.14, -1.44, 0.0))
+    add_box(scene, "RidgeCap", (ridge_low[0], ridge_low[1], 1.78), (ridge_high[0], ridge_high[1], 1.87), ridge_dark)
+    for ox in (-2.86, -0.26):
+        end_low, end_high = map_box((ox, -1.60, 0.0), (ox + 0.12, -1.40, 0.0))
+        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.76), (end_high[0], end_high[1], 1.94), ridge_dark)
 
 
 def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
@@ -1339,6 +1530,7 @@ MODEL_REGISTRY = {
     "calibration-chirality": build_calibration_chirality,
     "terrain-grass-base": build_terrain_grass,
     "building-storehouse-graybox": build_storehouse_graybox,
+    "building-storehouse-showcase": build_storehouse_showcase,
     "building-market-graybox": build_market_graybox,
     "building-barracks-graybox": build_barracks_graybox,
     "building-samurai-residence-graybox": build_samurai_residence_graybox,
@@ -1375,7 +1567,12 @@ def main() -> None:
     builder(scene)
     if CURRENT_STYLE == "toon":
         add_outline_hulls(scene)
-    setup_camera(scene, canvas_w, canvas_h, anchor_x, anchor_y)
+    supersample = max(1, args.supersample)
+    canvas_w *= supersample
+    canvas_h *= supersample
+    anchor_x *= supersample
+    anchor_y *= supersample
+    setup_camera(scene, canvas_w, canvas_h, anchor_x, anchor_y, PX_PER_UNIT * supersample)
 
     output_name = args.output_name or args.model
     output_path = os.path.abspath(os.path.join(args.output_directory, f"{output_name}.png"))
