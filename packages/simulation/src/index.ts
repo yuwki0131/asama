@@ -18,6 +18,7 @@ import {
   type EngineerTaskKind,
   type FoodSnapshot,
   type GameOutcome,
+  type MapDecoration,
   type MarketTrade,
   type Season,
   type SerializedWorld,
@@ -131,6 +132,7 @@ export interface WorldState {
     width: number;
     height: number;
     cells: TerrainCellState[];
+    decorations: MapDecoration[];
   };
   units: UnitState[];
   buildings: BuildingState[];
@@ -1425,6 +1427,7 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
   }
   world.nextWaveIndex ??= 0;
   world.scenario ??= { waves: mvpDefenseScenario.waves, victory: mvpDefenseScenario.victory };
+  world.map.decorations ??= [];
   world.economy ??= {
     gold: ECONOMY_BALANCE.initialGold,
     weapons: ECONOMY_BALANCE.initialWeapons,
@@ -1449,7 +1452,8 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
     map: {
       width: world.map.width,
       height: world.map.height,
-      cells: includeMapCells ? world.map.cells.map(snapshotCell) : []
+      cells: includeMapCells ? world.map.cells.map(snapshotCell) : [],
+      decorations: includeMapCells ? world.map.decorations : []
     },
     units: world.units.map((unit) => ({
       id: unit.id,
@@ -1519,8 +1523,61 @@ function createInitialMap(): WorldState["map"] {
     cells: baseCells.map((cell) => ({
       ...cell,
       assetId: connectedTerrainAssetId(baseCells, MAP_WIDTH, MAP_HEIGHT, cell)
-    }))
+    })),
+    decorations: scatterDecorations(baseCells)
   };
+}
+
+/** Deterministic decoration scatter: trees on open grass, rocks near the
+ * stone ridge, reeds along the waterline. Purely visual (no collision). */
+function scatterDecorations(cells: readonly TerrainCellState[]): MapDecoration[] {
+  const decorations: MapDecoration[] = [];
+  const terrainAtCell = (x: number, y: number): TerrainType | null => {
+    if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
+      return null;
+    }
+    return cells[y * MAP_WIDTH + x]?.terrain ?? null;
+  };
+  const hash = (x: number, y: number, salt: number): number => {
+    let value = (x * 374761393 + y * 668265263 + salt * 2246822519) >>> 0;
+    value = (value ^ (value >>> 13)) >>> 0;
+    value = Math.imul(value, 1274126177) >>> 0;
+    return ((value ^ (value >>> 16)) >>> 0) / 0x100000000;
+  };
+
+  for (let y = 0; y < MAP_HEIGHT; y += 1) {
+    for (let x = 0; x < MAP_WIDTH; x += 1) {
+      const terrain = terrainAtCell(x, y);
+      if (terrain !== "grass") {
+        continue;
+      }
+      const nearWater = [terrainAtCell(x + 1, y), terrainAtCell(x - 1, y), terrainAtCell(x, y + 1), terrainAtCell(x, y - 1)].includes("water");
+      const nearStone = [terrainAtCell(x + 1, y), terrainAtCell(x - 1, y), terrainAtCell(x, y + 1), terrainAtCell(x, y - 1)].includes("stone");
+      if (nearWater) {
+        if (hash(x, y, 1) < 0.3) {
+          decorations.push({ assetId: "deco.reeds.1", position: { x, y } });
+        }
+        continue;
+      }
+      if (nearStone) {
+        if (hash(x, y, 2) < 0.22) {
+          decorations.push({ assetId: "deco.rock.1", position: { x, y } });
+        }
+        continue;
+      }
+      const roll = hash(x, y, 3);
+      if (roll < 0.028) {
+        const pick = hash(x, y, 4);
+        const assetId =
+          pick < 0.3 ? "deco.tree.pine.1" :
+          pick < 0.5 ? "deco.tree.pine.2" :
+          pick < 0.7 ? "deco.tree.cedar.1" :
+          pick < 0.92 ? "deco.tree.broadleaf.1" : "deco.bamboo.1";
+        decorations.push({ assetId, position: { x, y } });
+      }
+    }
+  }
+  return decorations;
 }
 
 function createTerrainCell(coord: CellCoord): TerrainCellState {

@@ -544,10 +544,28 @@ def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
     x0 = -0.5 - (TERRAIN_BLEED if same["W"] else 0.0)
     add_flat_quad(scene, "Surface", (x0, y0), (x1, y1), 0.0, style["surface"]())
     edge_material = make_material("TerrainEdge", (*style["edge"], 1.0))
+    wet_material = make_material("TerrainWet", (0.030, 0.062, 0.080, 1.0)) if terrain == "water" else None
     for index, name in enumerate(("N", "E", "S", "W")):
         if same[name]:
             continue
         low, high = TERRAIN_EDGE_QUADS[name]
+        if wet_material is not None:
+            # Shoreline: outer half is dry sand, inner half is the wet band.
+            (ox0, oy0), (ox1, oy1) = low, high
+            half = TERRAIN_EDGE_WIDTH / 2.0
+            if name == "N":
+                add_flat_quad(scene, f"Edge{name}", (ox0, oy0), (ox1, oy0 + half), 0.002 + 0.0005 * index, edge_material)
+                add_flat_quad(scene, f"Wet{name}", (ox0, oy0 + half), (ox1, oy1), 0.002 + 0.0005 * index, wet_material)
+            elif name == "S":
+                add_flat_quad(scene, f"Edge{name}", (ox0, oy1 - half), (ox1, oy1), 0.002 + 0.0005 * index, edge_material)
+                add_flat_quad(scene, f"Wet{name}", (ox0, oy0), (ox1, oy1 - half), 0.002 + 0.0005 * index, wet_material)
+            elif name == "W":
+                add_flat_quad(scene, f"Edge{name}", (ox0, oy0), (ox0 + half, oy1), 0.002 + 0.0005 * index, edge_material)
+                add_flat_quad(scene, f"Wet{name}", (ox0 + half, oy0), (ox1, oy1), 0.002 + 0.0005 * index, wet_material)
+            else:
+                add_flat_quad(scene, f"Edge{name}", (ox1 - half, oy0), (ox1, oy1), 0.002 + 0.0005 * index, edge_material)
+                add_flat_quad(scene, f"Wet{name}", (ox0, oy0), (ox1 - half, oy1), 0.002 + 0.0005 * index, wet_material)
+            continue
         add_flat_quad(scene, f"Edge{name}", low, high, 0.002 + 0.0005 * index, edge_material)
 
 
@@ -586,13 +604,82 @@ STORY_WALL_HEIGHT = 0.95
 YARD_PAD_HEIGHT = 0.02
 
 
-def add_yard_pad(scene: bpy.types.Scene, lot_width: float, lot_height: float, material: bpy.types.Material) -> None:
-    """Flat pad covering the full map [-lot_width..0]x[-lot_height..0] lot.
+def make_fringed_pad_material(lot_width: float, lot_height: float, dark: tuple[float, float, float], light: tuple[float, float, float]) -> bpy.types.Material:
+    """Ground pad whose edges are eaten by noise so the lot blends into the
+    surrounding terrain instead of ending on a hard diamond line. The south
+    corner region stays opaque so the contact pixel still lands on the
+    anchor."""
+    material = bpy.data.materials.new("FringedPad")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
 
-    The pad reaches the exact lot boundary so the sprite's south contact
-    pixel lands on the anchor (large buildings are placed by their south
-    corner).
-    """
+    coords = nodes.new("ShaderNodeTexCoord")
+    separate = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(coords.outputs["Object"], separate.inputs["Vector"])
+
+    # World coords of the pad: x in [-lot_width, 0], y in [0, lot_height].
+    def math_node(op, a, b=None, const=None):
+        node = nodes.new("ShaderNodeMath")
+        node.operation = op
+        if isinstance(a, (int, float)):
+            node.inputs[0].default_value = a
+        else:
+            links.new(a, node.inputs[0])
+        if b is not None:
+            if isinstance(b, (int, float)):
+                node.inputs[1].default_value = b
+            else:
+                links.new(b, node.inputs[1])
+        return node.outputs["Value"]
+
+    edge_x0 = math_node("ADD", separate.outputs["X"], lot_width)
+    edge_x1 = math_node("MULTIPLY", separate.outputs["X"], -1.0)
+    edge_y0 = math_node("MAXIMUM", separate.outputs["Y"], 0.0)
+    edge_y1 = math_node("SUBTRACT", lot_height, separate.outputs["Y"])
+    edge = math_node("MINIMUM", math_node("MINIMUM", edge_x0, edge_x1), math_node("MINIMUM", edge_y0, edge_y1))
+
+    fringe_noise = nodes.new("ShaderNodeTexNoise")
+    fringe_noise.inputs["Scale"].default_value = 11.0
+    fringe_noise.inputs["Detail"].default_value = 2.0
+    jitter = math_node("MULTIPLY_ADD", fringe_noise.outputs["Fac"], 0.42, -0.21)
+    visible = math_node("GREATER_THAN", math_node("ADD", math_node("MULTIPLY", edge, 4.0), jitter), 0.16)
+
+    surface_noise = nodes.new("ShaderNodeTexNoise")
+    surface_noise.inputs["Scale"].default_value = 14.0
+    surface_noise.inputs["Detail"].default_value = 3.0
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "EASE"
+    ramp.color_ramp.elements[0].position = 0.3
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
+    ramp.color_ramp.elements[1].position = 0.75
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+    links.new(surface_noise.outputs["Fac"], ramp.inputs["Fac"])
+
+    emission = nodes.new("ShaderNodeEmission")
+    links.new(ramp.outputs["Color"], emission.inputs["Color"])
+    transparent = nodes.new("ShaderNodeBsdfTransparent")
+    mix = nodes.new("ShaderNodeMixShader")
+    links.new(visible, mix.inputs["Fac"])
+    links.new(transparent.outputs["BSDF"], mix.inputs[1])
+    links.new(emission.outputs["Emission"], mix.inputs[2])
+    output = nodes.new("ShaderNodeOutputMaterial")
+    links.new(mix.outputs["Shader"], output.inputs["Surface"])
+    return material
+
+
+PAD_PALETTES = {
+    "gravel": ((0.235, 0.210, 0.165), (0.320, 0.290, 0.235)),
+    "dirt": ((0.195, 0.160, 0.115), (0.265, 0.225, 0.165)),
+}
+
+
+def add_yard_pad(scene: bpy.types.Scene, lot_width: float, lot_height: float, kind: str = "gravel") -> None:
+    """Flat pad covering the map [-lot_width..0]x[-lot_height..0] lot with a
+    noise-fringed boundary."""
+    dark, light = PAD_PALETTES[kind]
+    material = make_fringed_pad_material(lot_width, lot_height, dark, light)
     add_box(scene, "YardPad", *map_box((-lot_width, -lot_height, 0.0), (0.0, 0.0, YARD_PAD_HEIGHT)), material)
 
 
@@ -730,7 +817,7 @@ def make_showcase_plaster() -> bpy.types.Material:
     return material
 
 
-def make_showcase_roof() -> bpy.types.Material:
+def make_showcase_roof(ridge_axis: str = "x") -> bpy.types.Material:
     """Kawara roof calibrated to the tenshu reference: warm dark tiles, tile
     COLUMNS running down the slope (sanigawara rows), horizontal course
     steps, per-column value jitter, and mud grime pooling in the joints."""
@@ -749,7 +836,7 @@ def make_showcase_roof() -> bpy.types.Material:
     col = nodes.new("ShaderNodeMath")
     col.operation = "MULTIPLY"
     col.inputs[1].default_value = 9.0
-    links.new(separate.outputs["X"], col.inputs[0])
+    links.new(separate.outputs["X" if ridge_axis == "x" else "Y"], col.inputs[0])
     col_id = nodes.new("ShaderNodeMath")
     col_id.operation = "FLOOR"
     links.new(col.outputs["Value"], col_id.inputs[0])
@@ -868,31 +955,45 @@ def add_kawara_roof(
     """Quality-standard kawara roof assembly (approved on the showcase kura):
     curved gable surface, noshi ridge stack with oni end tiles, eave fascia
     and per-column round tile ends, optional white-plaster gable verge.
-    Currently supports ridge_axis "x"; extend for "y" during rollout."""
-    x0, y0 = low_map
-    x1, y1 = high_map
-    low, high = map_box((x0, y0, 0.0), (x1, y1, 0.0))
-    add_gable_roof(scene, f"{name}Surface", (low[0], low[1]), (high[0], high[1]), base_z, ridge_z, ridge_axis, roof_material, end_material=verge_material)
+    Supports ridge_axis "x" and "y" in map coordinates."""
+    if ridge_axis == "y":
+        # Mirror the whole assembly through the map diagonal: build in a
+        # swapped coordinate frame and swap back when emitting boxes.
+        def swap(p):
+            return (p[1], p[0])
+        x0, y0 = swap(low_map)
+        x1, y1 = swap(high_map)
+    else:
+        x0, y0 = low_map
+        x1, y1 = high_map
+
+    def emit_box(name_suffix, a_map, b_map, z0, z1, material):
+        if ridge_axis == "y":
+            a_map = (a_map[1], a_map[0])
+            b_map = (b_map[1], b_map[0])
+        low_w, high_w = map_box((min(a_map[0], b_map[0]), min(a_map[1], b_map[1]), z0), (max(a_map[0], b_map[0]), max(a_map[1], b_map[1]), z1))
+        add_box(scene, f"{name}{name_suffix}", low_w, high_w, material)
+
+    if ridge_axis == "y":
+        low, high = map_box((y0, x0, 0.0), (y1, x1, 0.0))
+    else:
+        low, high = map_box((x0, y0, 0.0), (x1, y1, 0.0))
+    add_gable_roof(scene, f"{name}Surface", (low[0], low[1]), (high[0], high[1]), base_z, ridge_z, "x" if ridge_axis == "x" else "y", roof_material, end_material=verge_material)
 
     mid = (y0 + y1) / 2.0
-    noshi_low, noshi_high = map_box((x0 - 0.04, mid - 0.08, 0.0), (x1 + 0.04, mid + 0.08, 0.0))
-    add_box(scene, f"{name}Noshi", (noshi_low[0], noshi_low[1], ridge_z - 0.04), (noshi_high[0], noshi_high[1], ridge_z + 0.05), trim_material)
-    cap_low, cap_high = map_box((x0 - 0.02, mid - 0.045, 0.0), (x1 + 0.02, mid + 0.045, 0.0))
-    add_box(scene, f"{name}Cap", (cap_low[0], cap_low[1], ridge_z + 0.05), (cap_high[0], cap_high[1], ridge_z + 0.105), trim_material)
+    emit_box("Noshi", (x0 - 0.04, mid - 0.08), (x1 + 0.04, mid + 0.08), ridge_z - 0.04, ridge_z + 0.05, trim_material)
+    emit_box("Cap", (x0 - 0.02, mid - 0.045), (x1 + 0.02, mid + 0.045), ridge_z + 0.05, ridge_z + 0.105, trim_material)
     for ox in (x0 - 0.08, x1 - 0.04):
-        end_low, end_high = map_box((ox, mid - 0.09, 0.0), (ox + 0.12, mid + 0.09, 0.0))
-        add_box(scene, f"{name}Oni{ox:.2f}", (end_low[0], end_low[1], ridge_z - 0.06), (end_high[0], end_high[1], ridge_z + 0.14), trim_material)
+        emit_box(f"Oni{ox:.2f}", (ox, mid - 0.09), (ox + 0.12, mid + 0.09), ridge_z - 0.06, ridge_z + 0.14, trim_material)
 
     pitch = 1.0 / 9.0
     for ey in (y0, y1):
-        flow, fhigh = map_box((x0, ey - 0.04, 0.0), (x1, ey + 0.04, 0.0))
-        add_box(scene, f"{name}Fascia{ey:.2f}", (flow[0], flow[1], base_z - 0.055), (fhigh[0], fhigh[1], base_z - 0.005), trim_material)
+        emit_box(f"Fascia{ey:.2f}", (x0, ey - 0.04), (x1, ey + 0.04), base_z - 0.055, base_z - 0.005, trim_material)
     count = int((x1 - x0) / pitch)
     for index in range(count + 1):
         ex = x0 + index * pitch - 0.028
         for ey in (y0, y1):
-            elow, ehigh = map_box((ex, ey - 0.05, 0.0), (ex + 0.056, ey + 0.05, 0.0))
-            add_box(scene, f"{name}Eave{index}{ey:.2f}", (elow[0], elow[1], base_z - 0.07), (ehigh[0], ehigh[1], base_z + 0.005), trim_material)
+            emit_box(f"Eave{index}{ey:.2f}", (ex, ey - 0.05), (ex + 0.056, ey + 0.05), base_z - 0.07, base_z + 0.005, trim_material)
 
 
 def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
@@ -908,7 +1009,7 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     gravel = make_textured_material("ShowcaseGravel", (0.55, 0.50, 0.40), (0.68, 0.63, 0.52), scale=14.0)
     ridge_dark = make_material("RidgeTile", (0.045, 0.042, 0.045, 1.0))
 
-    add_yard_pad(scene, 3.0, 3.0, gravel)
+    add_yard_pad(scene, 3.0, 3.0, "gravel")
     # Ishigaki plinth.
     add_frustum(scene, "Plinth", (-2.62, -2.32), (-0.38, -0.68), 0.0, 0.24, 0.05, stone)
     # Namako lower band.
@@ -984,7 +1085,7 @@ def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
     mats = building_material_set()
     plaster, stone, roof, wood, gravel = mats["plaster"], mats["stone"], mats["roof"], mats["dark_wood"], mats["gravel"]
 
-    add_yard_pad(scene, 3.0, 3.0, gravel)
+    add_yard_pad(scene, 3.0, 3.0, "gravel")
     # Stone plinth under the building only.
     add_box(scene, "Plinth", *map_box((-2.65, -2.35, 0.0), (-0.35, -0.65, 0.22)), stone)
     # Plastered storehouse body, one tall storage story.
@@ -996,40 +1097,90 @@ def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
     add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 0.22 + STORY_WALL_HEIGHT, 1.75, "x", roof)
 
 
-def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
-    """Japanese pine: leaning trunk with layered foliage pads (matsu
-    silhouette). Decoration, tile-center origin. Canvas 64x96, anchor 32,80."""
-    bark = make_material("PineBark", (0.30, 0.22, 0.15, 1.0))
-    needle_dark = (0.14, 0.24, 0.16)
-    needle_light = (0.24, 0.37, 0.22)
-    foliage = make_noise_material("PineNeedles", needle_dark, needle_light, scale=9.0)
+def make_foliage_material(name: str, dark: tuple[float, float, float], light: tuple[float, float, float]) -> bpy.types.Material:
+    return make_noise_material(name, dark, light, scale=9.0)
 
-    lean = 0.10 if variant % 2 == 0 else -0.08
-    add_mesh(
-        scene,
-        "Trunk",
-        [(*map_xy(-0.05, -0.05), 0.0), (*map_xy(0.05, -0.05), 0.0), (*map_xy(0.05, 0.05), 0.0), (*map_xy(-0.05, 0.05), 0.0),
-         (*map_xy(-0.04 + lean, -0.04 + lean), 0.95), (*map_xy(0.04 + lean, -0.04 + lean), 0.95),
-         (*map_xy(0.04 + lean, 0.04 + lean), 0.95), (*map_xy(-0.04 + lean, 0.04 + lean), 0.95)],
-        [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)],
-        bark,
-    )
+
+def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
+    """Japanese pine: bent trunk, layered umbrella pads. Canvas 64x112,
+    anchor 32,96, tile-center origin."""
+    bark = make_textured_material("PineBark", (0.055, 0.040, 0.028), (0.105, 0.080, 0.052), scale=(14.0, 14.0, 3.0))
+    foliage = make_foliage_material("PineNeedles", (0.055, 0.105, 0.062), (0.115, 0.185, 0.100))
+    sign = 1.0 if variant % 2 == 0 else -1.0
+    lean1 = 0.09 * sign
+    lean2 = 0.20 * sign
+    add_mesh(scene, "TrunkLow",
+        [(*map_xy(-0.055, -0.055), 0.0), (*map_xy(0.055, -0.055), 0.0), (*map_xy(0.055, 0.055), 0.0), (*map_xy(-0.055, 0.055), 0.0),
+         (*map_xy(-0.045 + lean1, -0.045 + lean1), 0.65), (*map_xy(0.045 + lean1, -0.045 + lean1), 0.65),
+         (*map_xy(0.045 + lean1, 0.045 + lean1), 0.65), (*map_xy(-0.045 + lean1, 0.045 + lean1), 0.65)],
+        [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)], bark)
+    add_mesh(scene, "TrunkHigh",
+        [(*map_xy(-0.045 + lean1, -0.045 + lean1), 0.65), (*map_xy(0.045 + lean1, -0.045 + lean1), 0.65),
+         (*map_xy(0.045 + lean1, 0.045 + lean1), 0.65), (*map_xy(-0.045 + lean1, 0.045 + lean1), 0.65),
+         (*map_xy(-0.035 + lean2, -0.035 + lean2), 1.25), (*map_xy(0.035 + lean2, -0.035 + lean2), 1.25),
+         (*map_xy(0.035 + lean2, 0.035 + lean2), 1.25), (*map_xy(-0.035 + lean2, 0.035 + lean2), 1.25)],
+        [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)], bark)
     pads = [
-        ((lean * 3.0, lean * 3.0), 0.34, 0.62, 0.16),
-        ((lean * 5.0 - 0.10, lean * 5.0 + 0.06), 0.26, 0.86, 0.13),
-        ((lean * 7.0 + 0.06, lean * 7.0 - 0.04), 0.18, 1.04, 0.11),
+        ((lean1 * 2.2 - 0.16 * sign, lean1 * 2.2 + 0.10 * sign), 0.34, 0.72, 0.13),
+        ((lean2 * 1.4 + 0.12 * sign, lean2 * 1.4 - 0.08 * sign), 0.28, 1.02, 0.11),
+        ((lean2 * 1.6, lean2 * 1.6 + 0.05 * sign), 0.20, 1.28, 0.10),
     ]
     for index, ((cx, cy), radius, z, height) in enumerate(pads):
-        add_frustum(
-            scene,
-            f"Foliage{index}",
-            (cx - radius, cy - radius),
-            (cx + radius, cy + radius),
-            z,
-            z + height,
-            radius * 0.45,
-            foliage,
-        )
+        add_frustum(scene, f"Pad{index}", (cx - radius, cy - radius), (cx + radius, cy + radius), z, z + height, radius * 0.55, foliage)
+
+
+def build_tree_cedar(scene: bpy.types.Scene) -> None:
+    """Cedar: tall, narrow, stacked cones. Canvas 64x128, anchor 32,112."""
+    bark = make_textured_material("CedarBark", (0.060, 0.045, 0.032), (0.100, 0.078, 0.055), scale=(14.0, 14.0, 3.0))
+    foliage = make_foliage_material("CedarNeedles", (0.042, 0.085, 0.052), (0.090, 0.150, 0.085))
+    add_box(scene, "Trunk", *map_box((-0.05, -0.05, 0.0), (0.05, 0.05, 0.55)), bark)
+    tiers = [(0.30, 0.42, 0.55), (0.24, 0.92, 0.50), (0.17, 1.36, 0.45), (0.10, 1.74, 0.36)]
+    for index, (radius, z, height) in enumerate(tiers):
+        add_frustum(scene, f"Tier{index}", (-radius, -radius), (radius, radius), z, z + height, radius * 0.82, foliage)
+
+
+def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
+    """Broadleaf: rounded canopy. Canvas 64x112, anchor 32,96."""
+    bark = make_textured_material("BroadBark", (0.062, 0.048, 0.034), (0.110, 0.086, 0.060), scale=(14.0, 14.0, 3.0))
+    foliage = make_foliage_material("BroadLeaves", (0.070, 0.115, 0.052), (0.145, 0.205, 0.095))
+    add_box(scene, "Trunk", *map_box((-0.06, -0.06, 0.0), (0.06, 0.06, 0.62)), bark)
+    add_frustum(scene, "CanopyLow", (-0.36, -0.36), (0.36, 0.36), 0.52, 0.96, 0.10, foliage)
+    add_frustum(scene, "CanopyTop", (-0.28, -0.28), (0.28, 0.28), 0.96, 1.30, 0.16, foliage)
+
+
+def build_bamboo(scene: bpy.types.Scene) -> None:
+    """Bamboo cluster: thin bright culms with light tops. Canvas 64x128,
+    anchor 32,112."""
+    culm = make_material("BambooCulm", (0.135, 0.190, 0.075, 1.0))
+    leaves = make_foliage_material("BambooLeaves", (0.105, 0.170, 0.062), (0.190, 0.270, 0.105))
+    stalks = [(-0.18, -0.05, 1.9), (-0.02, -0.18, 2.15), (0.14, 0.02, 2.0), (0.02, 0.16, 1.75), (-0.13, 0.13, 1.95), (0.18, -0.14, 1.6)]
+    for index, (sx, sy, height) in enumerate(stalks):
+        lean = 0.06 if index % 2 == 0 else -0.05
+        add_mesh(scene, f"Culm{index}",
+            [(*map_xy(sx - 0.022, sy - 0.022), 0.0), (*map_xy(sx + 0.022, sy - 0.022), 0.0), (*map_xy(sx + 0.022, sy + 0.022), 0.0), (*map_xy(sx - 0.022, sy + 0.022), 0.0),
+             (*map_xy(sx - 0.018 + lean, sy - 0.018 + lean), height), (*map_xy(sx + 0.018 + lean, sy - 0.018 + lean), height),
+             (*map_xy(sx + 0.018 + lean, sy + 0.018 + lean), height), (*map_xy(sx - 0.018 + lean, sy + 0.018 + lean), height)],
+            [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)], culm)
+        add_frustum(scene, f"Top{index}", (sx + lean - 0.13, sy + lean - 0.13), (sx + lean + 0.13, sy + lean + 0.13), height - 0.28, height + 0.08, 0.06, leaves)
+
+
+def build_rock(scene: bpy.types.Scene) -> None:
+    """Weathered boulder cluster. Canvas 64x56, anchor 32,40."""
+    stone = make_noise_material("BoulderStone", (0.100, 0.100, 0.098), (0.185, 0.182, 0.172), scale=7.0)
+    add_frustum(scene, "RockBig", (-0.30, -0.16), (0.14, 0.30), 0.0, 0.42, 0.10, stone)
+    add_frustum(scene, "RockSmall", (0.02, -0.32), (0.36, 0.04), 0.0, 0.26, 0.07, stone)
+    add_frustum(scene, "RockTiny", (-0.38, 0.10), (-0.12, 0.34), 0.0, 0.16, 0.05, stone)
+
+
+def build_reeds(scene: bpy.types.Scene) -> None:
+    """Waterside reeds. Canvas 64x56, anchor 32,40."""
+    stem = make_material("ReedStem", (0.115, 0.145, 0.052, 1.0))
+    head = make_material("ReedHead", (0.240, 0.195, 0.105, 1.0))
+    tufts = [(-0.24, -0.10), (-0.05, -0.24), (0.16, -0.06), (0.04, 0.14), (-0.18, 0.18), (0.24, 0.18)]
+    for index, (sx, sy) in enumerate(tufts):
+        height = 0.34 + (index % 3) * 0.05
+        add_box(scene, f"Stem{index}", *map_box((sx - 0.012, sy - 0.012, 0.0), (sx + 0.012, sy + 0.012, height)), stem)
+        add_box(scene, f"Head{index}", *map_box((sx - 0.02, sy - 0.02, height), (sx + 0.02, sy + 0.02, height + 0.09)), head)
 
 
 def build_calibration_chirality(scene: bpy.types.Scene) -> None:
@@ -1156,15 +1307,18 @@ def make_roof_material(name: str = "RoofTiles") -> bpy.types.Material:
 
 
 def building_material_set() -> dict[str, bpy.types.Material]:
+    """Quality-standard materials (approved on the showcase kura)."""
     return {
-        "plaster": make_textured_material("Plaster", (0.82, 0.77, 0.66), (0.93, 0.89, 0.79), scale=5.0),
-        "wood": make_textured_material("Wood", (0.42, 0.30, 0.18), (0.58, 0.44, 0.28), scale=(18.0, 18.0, 2.5)),
-        "dark_wood": make_textured_material("DarkWood", (0.28, 0.20, 0.13), (0.42, 0.32, 0.21), scale=(18.0, 18.0, 2.5)),
-        "stone": make_ishigaki_material("StoneBase"),
-        "roof": make_roof_material("RoofTile"),
-        "thatch": make_textured_material("Thatch", (0.38, 0.31, 0.18), (0.52, 0.44, 0.27), scale=(3.0, 3.0, 22.0)),
-        "gravel": make_textured_material("YardGravel", (0.55, 0.50, 0.40), (0.68, 0.63, 0.52), scale=14.0),
-        "dirt": make_textured_material("YardDirt", (0.44, 0.36, 0.26), (0.57, 0.48, 0.36), scale=9.0),
+        "plaster": make_showcase_plaster(),
+        "wood": make_textured_material("Wood", (0.075, 0.055, 0.034), (0.135, 0.100, 0.062), scale=(18.0, 18.0, 2.5)),
+        "dark_wood": make_textured_material("DarkWood", (0.048, 0.034, 0.020), (0.095, 0.070, 0.042), scale=(18.0, 18.0, 2.5)),
+        "stone": make_ishigaki_material(),
+        "roof": make_showcase_roof(),
+        "roof_y": make_showcase_roof(ridge_axis="y"),
+        "trim": make_material("RoofTrim", (0.045, 0.042, 0.045, 1.0)),
+        "thatch": make_textured_material("Thatch", (0.150, 0.118, 0.062), (0.235, 0.190, 0.105), scale=(3.0, 3.0, 22.0)),
+        "gravel": make_textured_material("YardGravel", (0.235, 0.210, 0.165), (0.320, 0.290, 0.235), scale=14.0),
+        "dirt": make_textured_material("YardDirt", (0.195, 0.160, 0.115), (0.265, 0.225, 0.165), scale=9.0),
     }
 
 
@@ -1174,9 +1328,16 @@ def build_market_graybox(scene: bpy.types.Scene) -> None:
     Canvas 256x192, anchor 128,160. Low wooden sheds (ridge 1.3 units).
     """
     mats = building_material_set()
-    add_yard_pad(scene, 4.0, 3.0, mats["gravel"])
+    add_yard_pad(scene, 4.0, 3.0, "gravel")
     add_gabled_house(scene, "StallNorth", (-3.5, -2.6), (-0.5, -1.75), 0.8, 1.3, "x", mats["wood"], mats["thatch"], roof_overhang=0.15)
     add_gabled_house(scene, "StallSouth", (-3.5, -1.25), (-0.5, -0.4), 0.8, 1.3, "x", mats["wood"], mats["thatch"], roof_overhang=0.15)
+    # Market identifiers: an indigo nobori banner and noren cloth strips.
+    cloth = make_material("MarketCloth", (0.075, 0.105, 0.200, 1.0))
+    pole = mats["dark_wood"]
+    add_box(scene, "BannerPole", *map_box((-0.36, -2.90, 0.0), (-0.30, -2.84, 1.65)), pole)
+    add_box(scene, "Banner", *map_box((-0.335, -2.875, 0.85), (-0.10, -2.855, 1.58)), cloth)
+    for index, sx in enumerate((-3.3, -2.55, -1.8, -1.05)):
+        add_box(scene, f"Noren{index}", *map_box((sx, -0.395, 0.52), (sx + 0.55, -0.375, 0.78)), cloth)
 
 
 def build_barracks_graybox(scene: bpy.types.Scene) -> None:
@@ -1185,11 +1346,17 @@ def build_barracks_graybox(scene: bpy.types.Scene) -> None:
     Canvas 256x192, anchor 128,160. Single story (walls 0.9, ridge 1.65).
     """
     mats = building_material_set()
-    add_yard_pad(scene, 4.0, 3.0, mats["dirt"])
-    add_gabled_house(
-        scene, "Nagaya", (-3.6, -2.5), (-0.4, -1.4), 1.05, 1.65, "x",
-        mats["dark_wood"], mats["roof"], plinth_material=mats["stone"], plinth_height=0.15,
-    )
+    add_yard_pad(scene, 4.0, 3.0, "dirt")
+    add_box(scene, "NagayaPlinth", *map_box((-3.68, -2.58, 0.0), (-0.32, -1.32, 0.15)), mats["stone"])
+    add_box(scene, "NagayaBody", *map_box((-3.6, -2.5, 0.15), (-0.4, -1.4, 1.05)), mats["plaster"])
+    add_kawara_roof(scene, "NagayaRoof", (-3.78, -2.62), (-0.22, -1.28), 1.05, 1.55, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
+    # Identifier: a spear rack in the drill yard.
+    rack = mats["dark_wood"]
+    add_box(scene, "RackBar", *map_box((-2.6, -0.72, 0.55), (-1.4, -0.68, 0.62)), rack)
+    for px in (-2.58, -2.0, -1.46):
+        add_box(scene, f"RackLeg{px}", *map_box((px, -0.72, 0.0), (px + 0.05, -0.68, 0.58)), rack)
+    for sx in (-2.45, -2.25, -2.05, -1.85, -1.65):
+        add_box(scene, f"Spear{sx}", *map_box((sx, -0.715, 0.1), (sx + 0.03, -0.685, 0.95)), rack)
 
 
 def build_samurai_residence_graybox(scene: bpy.types.Scene) -> None:
@@ -1199,7 +1366,7 @@ def build_samurai_residence_graybox(scene: bpy.types.Scene) -> None:
     Canvas 288x224, anchor 144,192. Main house ridge 1.85 units.
     """
     mats = building_material_set()
-    add_yard_pad(scene, 4.0, 4.0, mats["gravel"])
+    add_yard_pad(scene, 4.0, 4.0, "gravel")
 
     wall_height = 0.55
     t = 0.15
@@ -1213,12 +1380,20 @@ def build_samurai_residence_graybox(scene: bpy.types.Scene) -> None:
     ):
         add_box(scene, name, *map_box(low, high), mats["plaster"])
 
-    add_gabled_house(
-        scene, "MainHouse", (-3.2, -3.3), (-1.2, -2.0), 1.13, 1.85, "x",
-        mats["plaster"], mats["roof"], plinth_material=mats["stone"], plinth_height=0.18, roof_overhang=0.25,
-    )
-    # Small storehouse annex in the east corner of the yard.
-    add_gabled_house(scene, "Annex", (-1.0, -2.6), (-0.3, -1.9), 0.75, 1.1, "y", mats["dark_wood"], mats["roof"], roof_overhang=0.1)
+    add_box(scene, "MainPlinth", *map_box((-3.28, -3.38, 0.0), (-1.12, -1.92, 0.18)), mats["stone"])
+    add_box(scene, "MainBody", *map_box((-3.2, -3.3, 0.18), (-1.2, -2.0, 1.13)), mats["plaster"])
+    add_kawara_roof(scene, "MainRoof", (-3.42, -3.5), (-0.98, -1.8), 1.13, 1.78, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
+    # Small annex in the east corner of the yard.
+    add_gabled_house(scene, "Annex", (-1.0, -2.6), (-0.3, -1.9), 0.75, 1.1, "y", mats["dark_wood"], mats["roof_y"], roof_overhang=0.1)
+    # Tile coping caps the compound wall.
+    for cname, clow, chigh in (
+        ("CopeN", (-3.99, -4.04), (-0.01, -3.81)),
+        ("CopeW", (-4.04, -3.99), (-3.81, -0.01)),
+        ("CopeE", (-0.19, -3.99), (0.04, -0.01)),
+        ("CopeS1", (-3.99, -0.19), (-2.31, 0.04)),
+        ("CopeS2", (-1.69, -0.19), (-0.01, 0.04)),
+    ):
+        add_box(scene, cname, *map_box((clow[0], clow[1], 0.55), (chigh[0], chigh[1], 0.62)), mats["trim"])
 
 
 def build_town_block_graybox(scene: bpy.types.Scene) -> None:
@@ -1228,7 +1403,7 @@ def build_town_block_graybox(scene: bpy.types.Scene) -> None:
     Canvas 416x304, anchor 208,272.
     """
     mats = building_material_set()
-    add_yard_pad(scene, 6.0, 6.0, mats["dirt"])
+    add_yard_pad(scene, 6.0, 6.0, "dirt")
 
     houses = (
         # name, low, high, wall_top, ridge_top, ridge_axis, wall_mat
@@ -1238,7 +1413,20 @@ def build_town_block_graybox(scene: bpy.types.Scene) -> None:
         ("MachiyaSE", (-2.5, -2.3), (-0.4, -0.6), 0.95, 1.7, "y", "wood"),
     )
     for name, low, high, wall_top, ridge_top, axis, wall in houses:
-        add_gabled_house(scene, name, low, high, wall_top, ridge_top, axis, mats[wall], mats["roof"], roof_overhang=0.18)
+        add_box(scene, f"{name}Body", *map_box((low[0], low[1], 0.0), (high[0], high[1], wall_top)), mats[wall])
+        roof_mat = mats["roof"] if axis == "x" else mats["roof_y"]
+        add_kawara_roof(
+            scene,
+            f"{name}Roof",
+            (low[0] - 0.16, low[1] - 0.16),
+            (high[0] + 0.16, high[1] + 0.16),
+            wall_top,
+            ridge_top,
+            axis,
+            roof_mat,
+            mats["trim"],
+            verge_material=mats["plaster"],
+        )
 
 
 def build_unit_engineer(scene: bpy.types.Scene) -> None:
@@ -1389,14 +1577,22 @@ def build_yagura_small_graybox(scene: bpy.types.Scene) -> None:
     plaster, stone, roof, wood = mats["plaster"], mats["stone"], mats["roof"], mats["dark_wood"]
 
     add_frustum(scene, "Base", (-2.0, -2.0), (0.0, 0.0), 0.0, 0.95, 0.28, stone)
+    # Skirt roof gets tile trim color via mats below.
     add_box(scene, "Story1", *map_box((-1.72, -1.72, 0.95), (-0.28, -0.28, 1.85)), plaster)
     # Skirt roof between stories.
     add_box(scene, "Skirt", *map_box((-1.88, -1.88, 1.82), (-0.12, -0.12, 1.92)), roof)
     add_box(scene, "Story2", *map_box((-1.45, -1.45, 1.92), (-0.55, -0.55, 2.72)), plaster)
     # Open watch band under the top roof.
     add_box(scene, "WatchBand", *map_box((-1.48, -1.48, 2.52), (-0.52, -0.52, 2.72)), wood)
-    low, high = map_box((-1.65, -1.65, 0.0), (-0.35, -0.35, 0.0))
-    add_gable_roof(scene, "TopRoof", (low[0], low[1]), (high[0], high[1]), 2.72, 3.15, "x", roof)
+    # Watch slits (monomi windows) on both visible faces of the top storey.
+    trim = mats["trim"]
+    for sy in (-0.545, ):
+        for wx in (-1.30, -1.02, -0.74):
+            add_box(scene, f"Slit{wx}", *map_box((wx, sy - 0.02, 2.30), (wx + 0.14, sy + 0.02, 2.50)), trim)
+    for sx in (-0.545, ):
+        for wy in (-1.30, -1.02, -0.74):
+            add_box(scene, f"SlitY{wy}", *map_box((sx - 0.02, wy, 2.30), (sx + 0.02, wy + 0.14, 2.50)), trim)
+    add_kawara_roof(scene, "TopRoof", (-1.68, -1.62), (-0.32, -0.38), 2.72, 3.12, "x", roof, trim, verge_material=plaster)
 
 
 def build_farm_paddy(scene: bpy.types.Scene) -> None:
@@ -1460,7 +1656,7 @@ def gate_box(axis: str, along0: float, along1: float, across_half: float, z0: fl
 
 def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, doors_closed: bool = True) -> None:
     mats = building_material_set()
-    wood, door, roof, plaster, stone = mats["dark_wood"], mats["wood"], mats["roof"], mats["plaster"], mats["stone"]
+    wood, door, plaster, stone = mats["dark_wood"], mats["wood"], mats["plaster"], mats["stone"]
 
     half = float(width) / 2.0
     # Stone threshold sill covering the full footprint; grounds the sprite
@@ -1488,11 +1684,22 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, do
     low, high = gate_box(axis, -half + 0.06, half - 0.06, 0.17, GATE_BEAM_BOTTOM, GATE_BEAM_TOP)
     add_box(scene, "Beam", *map_box(low, high), wood)
 
-    # Gabled roof over the full span, ridge along the gate axis.
+    # Kawara roof over the full span, ridge along the gate axis.
     roof_low, roof_high = gate_box(axis, -half - 0.12, half + 0.12, 0.42, 0.0, 0.0)
-    low, high = map_box(roof_low, roof_high)
     ridge_axis = "x" if axis == "nw_se" else "y"
-    add_gable_roof(scene, "GateRoof", (low[0], low[1]), (high[0], high[1]), GATE_BEAM_TOP, GATE_ROOF_TOP, ridge_axis, roof)
+    roof_mat = mats["roof"] if ridge_axis == "x" else mats["roof_y"]
+    add_kawara_roof(
+        scene,
+        "GateRoof",
+        (min(roof_low[0], roof_high[0]), min(roof_low[1], roof_high[1])),
+        (max(roof_low[0], roof_high[0]), max(roof_low[1], roof_high[1])),
+        GATE_BEAM_TOP,
+        GATE_ROOF_TOP,
+        ridge_axis,
+        roof_mat,
+        mats["trim"],
+        verge_material=plaster,
+    )
 
     # Wall stubs on connected ends, matching the wall-kit profile so the
     # socket at the end tile edge midpoint lines up with neighbor walls.
@@ -1507,7 +1714,7 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, do
         add_box(scene, f"Stub{name}Body", *map_box(low, high), plaster)
         low, high = gate_box(axis, along0, along1, WALL_COPING_THICKNESS / 2.0, 0.0, 0.0)
         wlow, whigh = map_box(low, high)
-        add_gable_roof(scene, f"Stub{name}Coping", (wlow[0], wlow[1]), (whigh[0], whigh[1]), WALL_BODY_TOP, WALL_COPING_TOP, ridge_axis, roof)
+        add_gable_roof(scene, f"Stub{name}Coping", (wlow[0], wlow[1]), (whigh[0], whigh[1]), WALL_BODY_TOP, WALL_COPING_TOP, ridge_axis, roof_mat)
 
 
 # Connected surface kits (road, moats) ---------------------------------------
@@ -1552,32 +1759,32 @@ def build_surface_arm_kit(
 
 
 def build_road_mask(scene: bpy.types.Scene, mask: str) -> None:
-    dirt = make_material("RoadDirt", (0.54, 0.47, 0.36, 1.0))
+    dirt = make_material("RoadDirt", (0.225, 0.190, 0.140, 1.0))
     build_surface_arm_kit(scene, mask, dirt, 0.014, 0.27)
 
 
 def build_dry_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
-    floor = make_material("MoatFloor", (0.30, 0.25, 0.19, 1.0))
-    bank = make_material("MoatBank", (0.48, 0.42, 0.32, 1.0))
+    floor = make_material("MoatFloor", (0.115, 0.095, 0.070, 1.0))
+    bank = make_material("MoatBank", (0.215, 0.185, 0.140, 1.0))
     build_surface_arm_kit(scene, mask, floor, 0.010, 0.33, bank_material=bank)
 
 
 def build_water_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
-    water = make_material("MoatWater", (0.09, 0.17, 0.21, 1.0))
-    bank = make_material("MoatBank", (0.48, 0.42, 0.32, 1.0))
+    water = make_material("MoatWater", (0.045, 0.095, 0.125, 1.0))
+    bank = make_material("MoatBank", (0.215, 0.185, 0.140, 1.0))
     build_surface_arm_kit(scene, mask, water, 0.010, 0.33, bank_material=bank)
 
 
 def build_earth_bridge(scene: bpy.types.Scene) -> None:
     """Earthen causeway crossing along map x. Canvas 64x32, anchor 32,16."""
-    dirt = make_material("CausewayDirt", (0.50, 0.43, 0.32, 1.0))
+    dirt = make_material("CausewayDirt", (0.205, 0.175, 0.130, 1.0))
     add_box(scene, "Causeway", *map_box((-0.5, -0.30, 0.0), (0.5, 0.30, 0.07)), dirt)
 
 
 def build_wood_bridge(scene: bpy.types.Scene) -> None:
     """Plank bridge crossing along map x with side rails."""
-    plank = make_material("BridgePlank", (0.47, 0.36, 0.24, 1.0))
-    rail = make_material("BridgeRail", (0.34, 0.26, 0.17, 1.0))
+    plank = make_material("BridgePlank", (0.140, 0.100, 0.060, 1.0))
+    rail = make_material("BridgeRail", (0.080, 0.058, 0.036, 1.0))
     add_box(scene, "Deck", *map_box((-0.5, -0.28, 0.05), (0.5, 0.28, 0.10)), plank)
     for side in (-1.0, 1.0):
         y = side * 0.30
@@ -1727,6 +1934,11 @@ MODEL_REGISTRY = {
     "wall-ladder": build_wall_ladder,
     "tree-pine": build_tree_pine,
     "tree-pine-2": lambda scene: build_tree_pine(scene, variant=1),
+    "tree-cedar": build_tree_cedar,
+    "tree-broadleaf": build_tree_broadleaf,
+    "bamboo-cluster": build_bamboo,
+    "rock-cluster": build_rock,
+    "reeds": build_reeds,
 }
 
 

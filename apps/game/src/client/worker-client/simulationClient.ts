@@ -23,12 +23,14 @@ export function createSimulationClient(): SimulationClient {
   const errorListeners = new Set<ErrorListener>();
   const saveStateListeners = new Set<SaveStateListener>();
   let cachedMapCells: WorldSnapshot["map"]["cells"] | null = null;
+  let cachedDecorations: WorldSnapshot["map"]["decorations"] | null = null;
 
   worker.addEventListener("message", (event: MessageEvent<WorkerToMainMessage>) => {
     const message = event.data;
     if (message.type === "ready" || message.type === "snapshot") {
-      const snapshot = hydrateSnapshotMap(message.snapshot, cachedMapCells);
+      const snapshot = hydrateSnapshotMap(message.snapshot, cachedMapCells, cachedDecorations);
       cachedMapCells = snapshot.map.cells;
+      cachedDecorations = snapshot.map.decorations;
       for (const listener of listeners) {
         listener(snapshot);
       }
@@ -99,7 +101,11 @@ export function createSimulationClient(): SimulationClient {
   };
 }
 
-function hydrateSnapshotMap(snapshot: WorldSnapshot, cachedMapCells: WorldSnapshot["map"]["cells"] | null): WorldSnapshot {
+function hydrateSnapshotMap(
+  snapshot: WorldSnapshot,
+  cachedMapCells: WorldSnapshot["map"]["cells"] | null,
+  cachedDecorations: WorldSnapshot["map"]["decorations"] | null
+): WorldSnapshot {
   if (snapshot.map.cells.length > 0) {
     return snapshot;
   }
@@ -108,7 +114,8 @@ function hydrateSnapshotMap(snapshot: WorldSnapshot, cachedMapCells: WorldSnapsh
     ...snapshot,
     map: {
       ...snapshot.map,
-      cells: cachedMapCells ?? []
+      cells: cachedMapCells ?? [],
+      decorations: cachedDecorations ?? []
     }
   };
 }

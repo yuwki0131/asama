@@ -43,6 +43,11 @@ export interface CellCoord {
   readonly y: number;
 }
 
+export interface MapDecoration {
+  readonly assetId: string;
+  readonly position: CellCoord;
+}
+
 export interface TerrainCellSnapshot {
   readonly coord: CellCoord;
   readonly terrain: TerrainType;
@@ -171,6 +176,7 @@ export interface WorldSnapshot {
     readonly width: number;
     readonly height: number;
     readonly cells: readonly TerrainCellSnapshot[];
+    readonly decorations: readonly MapDecoration[];
   };
   readonly units: readonly UnitSnapshot[];
   readonly buildings: readonly BuildingSnapshot[];

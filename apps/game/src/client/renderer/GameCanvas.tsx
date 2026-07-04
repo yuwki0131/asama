@@ -7,6 +7,7 @@ import type {
   BuildingType,
   CellCoord,
   EntityId,
+  MapDecoration,
   TerrainCellSnapshot,
   UnitId,
   UnitSnapshot,
@@ -689,8 +690,29 @@ function renderScene(
     addOverlaySprite(overlayLayer, invalidMoveTarget, "overlay.cell.blocked", assets);
   }
 
+  // Cells covered by intact buildings hide their decorations.
+  const occupiedCells = new Set<string>();
+  for (const building of snapshot.buildings) {
+    if (building.lifecycleState !== "intact") {
+      continue;
+    }
+    for (const cell of building.footprint) {
+      occupiedCells.add(`${cell.x},${cell.y}`);
+    }
+  }
+
   for (const building of [...snapshot.buildings].sort(compareBuildingsForDraw)) {
     addBuildingSprite(unitLayer, building, assets, camera.zoom);
+  }
+
+  for (const decoration of snapshot.map.decorations) {
+    if (occupiedCells.has(`${decoration.position.x},${decoration.position.y}`)) {
+      continue;
+    }
+    if (!isVisibleCell(decoration.position, camera, app.screen.width, app.screen.height)) {
+      continue;
+    }
+    addDecorationSprite(unitLayer, decoration, assets, camera.zoom);
   }
 
   for (const unit of [...snapshot.units].sort(compareUnitsForDraw)) {
@@ -891,6 +913,23 @@ function cellToWorld(cell: CellCoord): CellCoord {
     x: (cell.x - cell.y) * (TILE_WIDTH / 2),
     y: (cell.x + cell.y) * (TILE_HEIGHT / 2)
   };
+}
+
+function addDecorationSprite(
+  layer: Container,
+  decoration: MapDecoration,
+  assets: ReadonlyMap<string, LoadedAsset>,
+  zoom: number
+): void {
+  const asset = assets.get(decoration.assetId);
+  if (asset === undefined) {
+    return;
+  }
+  const sprite = new Sprite(asset.texture);
+  sprite.anchor.set(asset.anchor.x, asset.anchor.y);
+  const point = cellToWorld(decoration.position);
+  sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y, zoom));
+  layer.addChild(sprite);
 }
 
 function clearLayer(layer: Container): void {

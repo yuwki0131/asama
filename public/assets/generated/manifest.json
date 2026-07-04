@@ -2542,6 +2542,83 @@
         "x": 0.5,
         "y": 0.8333333333333334
       }
+    },
+    {
+      "assetId": "deco.tree.pine.1",
+      "kind": "building",
+      "file": "generated/deco-tree-pine-1.png",
+      "width": 64,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "deco.tree.pine.2",
+      "kind": "building",
+      "file": "generated/deco-tree-pine-2.png",
+      "width": 64,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "deco.tree.cedar.1",
+      "kind": "building",
+      "file": "generated/deco-tree-cedar-1.png",
+      "width": 64,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
+      }
+    },
+    {
+      "assetId": "deco.tree.broadleaf.1",
+      "kind": "building",
+      "file": "generated/deco-tree-broadleaf-1.png",
+      "width": 64,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "deco.bamboo.1",
+      "kind": "building",
+      "file": "generated/deco-bamboo-1.png",
+      "width": 64,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
+      }
+    },
+    {
+      "assetId": "deco.rock.1",
+      "kind": "building",
+      "file": "generated/deco-rock-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.reeds.1",
+      "kind": "building",
+      "file": "generated/deco-reeds-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
     }
   ]
 }

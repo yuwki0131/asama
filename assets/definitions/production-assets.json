@@ -5959,6 +5959,174 @@
           "sigma": 0.4
         }
       }
+    },
+    {
+      "assetId": "deco.tree.pine.1",
+      "kind": "building",
+      "output": "deco-tree-pine-1.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-pine",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 112,
+        "anchorX": 32,
+        "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.pine.2",
+      "kind": "building",
+      "output": "deco-tree-pine-2.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-pine-2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 112,
+        "anchorX": 32,
+        "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.cedar.1",
+      "kind": "building",
+      "output": "deco-tree-cedar-1.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-cedar",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.broadleaf.1",
+      "kind": "building",
+      "output": "deco-tree-broadleaf-1.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-broadleaf",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 112,
+        "anchorX": 32,
+        "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.bamboo.1",
+      "kind": "building",
+      "output": "deco-bamboo-1.png",
+      "source": {
+        "type": "blender",
+        "model": "bamboo-cluster",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.rock.1",
+      "kind": "building",
+      "output": "deco-rock-1.png",
+      "source": {
+        "type": "blender",
+        "model": "rock-cluster",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 56,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.reeds.1",
+      "kind": "building",
+      "output": "deco-reeds-1.png",
+      "source": {
+        "type": "blender",
+        "model": "reeds",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 56,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
     }
   ]
 }
