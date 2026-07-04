@@ -854,10 +854,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0000.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -865,10 +865,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0001.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -876,10 +876,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0010.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -887,10 +887,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0011.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -898,10 +898,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0100.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -909,10 +909,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0101.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -920,10 +920,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0110.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -931,10 +931,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0111.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -942,10 +942,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1000.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -953,10 +953,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1001.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -964,10 +964,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1010.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -975,10 +975,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1011.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -986,10 +986,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1100.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -997,10 +997,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1101.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1008,10 +1008,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1110.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1019,10 +1019,10 @@
       "kind": "building",
       "file": "generated/building-dry-moat-connected-1111.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1030,10 +1030,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0000.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1041,10 +1041,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0001.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1052,10 +1052,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0010.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1063,10 +1063,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0011.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1074,10 +1074,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0100.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1085,10 +1085,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0101.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1096,10 +1096,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0110.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1107,10 +1107,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-0111.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1118,10 +1118,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1000.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1129,10 +1129,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1001.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1140,10 +1140,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1010.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1151,10 +1151,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1011.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1162,10 +1162,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1100.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1173,10 +1173,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1101.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1184,10 +1184,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1110.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -1195,10 +1195,10 @@
       "kind": "building",
       "file": "generated/building-water-moat-connected-1111.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {

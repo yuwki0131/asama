@@ -644,7 +644,7 @@ def build_terrain_macro_tile(scene: bpy.types.Scene, terrain: str, variant: int,
     add_flat_quad(scene, "Surface", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), z, material)
 
 
-WATER_DEPTH = 0.14
+WATER_DEPTH = 0.17
 
 
 def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) -> None:
@@ -656,7 +656,7 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
     style = TERRAIN_STYLES["water"]
     rim = make_material("ShoreRim", (*style["edge"], 1.0))
-    bank = make_noise_material("ShoreBank", (0.082, 0.066, 0.046), (0.135, 0.110, 0.078), scale=9.0)
+    bank = make_bank_material()
     wet = make_material("ShoreWet", (0.030, 0.062, 0.080, 1.0))
 
     # Water floor: full tile, sunk.
@@ -1158,6 +1158,60 @@ def add_kawara_roof(
         ex = x0 + index * pitch - 0.028
         for ey in (y0, y1):
             emit_box(f"Eave{index}{ey:.2f}", (ex, ey - 0.05), (ex + 0.056, ey + 0.05), base_z - 0.07, base_z + 0.005, trim_material)
+
+
+def add_yosemune_roof(
+    scene: bpy.types.Scene,
+    name: str,
+    low_map: tuple[float, float],
+    high_map: tuple[float, float],
+    base_z: float,
+    ridge_z: float,
+    roof_material: bpy.types.Material,
+    trim_material: bpy.types.Material,
+) -> None:
+    """Hipped (yosemune) kawara roof, ridge along map x: four slopes, a short
+    ridge with oni ends, eave tile rows on all four edges. Breaks the plain
+    gable-triangle silhouette of long nagaya buildings."""
+    x0, y0 = low_map
+    x1, y1 = high_map
+    ym = (y0 + y1) / 2.0
+    hip = (y1 - y0) * 0.62
+    r0 = (x0 + hip, ym)
+    r1 = (x1 - hip, ym)
+    e = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    vertices = [(*map_xy(px, py), base_z) for px, py in e]
+    vertices.append((*map_xy(*r0), ridge_z))
+    vertices.append((*map_xy(*r1), ridge_z))
+    faces = [
+        (0, 1, 5, 4),  # north slope
+        (3, 2, 5, 4),  # south slope
+        (0, 4, 3),     # west hip
+        (1, 2, 5),     # east hip
+    ]
+    add_mesh(scene, f"{name}Surface", vertices, faces, roof_material)
+
+    # Ridge cap + oni ends.
+    cap_low, cap_high = map_box((r0[0] - 0.06, ym - 0.06, 0.0), (r1[0] + 0.06, ym + 0.06, 0.0))
+    add_box(scene, f"{name}Cap", (cap_low[0], cap_low[1], ridge_z - 0.02), (cap_high[0], cap_high[1], ridge_z + 0.06), trim_material)
+    for ox in (r0[0] - 0.10, r1[0] - 0.02):
+        end_low, end_high = map_box((ox, ym - 0.08, 0.0), (ox + 0.12, ym + 0.08, 0.0))
+        add_box(scene, f"{name}Oni{ox:.2f}", (end_low[0], end_low[1], ridge_z - 0.04), (end_high[0], end_high[1], ridge_z + 0.13), trim_material)
+
+    # Eave tile rows on all four edges.
+    pitch = 1.0 / 9.0
+    for ey in (y0, y1):
+        count = int((x1 - x0) / pitch)
+        for index in range(count + 1):
+            ex = x0 + index * pitch - 0.028
+            elow, ehigh = map_box((ex, ey - 0.045, 0.0), (ex + 0.056, ey + 0.045, 0.0))
+            add_box(scene, f"{name}EaveX{index}{ey:.2f}", (elow[0], elow[1], base_z - 0.06), (ehigh[0], ehigh[1], base_z + 0.005), trim_material)
+    for ex in (x0, x1):
+        count = int((y1 - y0) / pitch)
+        for index in range(count + 1):
+            ey = y0 + index * pitch - 0.028
+            elow, ehigh = map_box((ex - 0.045, ey, 0.0), (ex + 0.045, ey + 0.056, 0.0))
+            add_box(scene, f"{name}EaveY{index}{ex:.2f}", (elow[0], elow[1], base_z - 0.06), (ehigh[0], ehigh[1], base_z + 0.005), trim_material)
 
 
 def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
@@ -1961,7 +2015,7 @@ def build_barracks_graybox(scene: bpy.types.Scene) -> None:
     add_yard_pad(scene, 4.0, 3.0, "dirt")
     add_box(scene, "NagayaPlinth", *map_box((-3.68, -2.58, 0.0), (-0.32, -1.32, 0.15)), mats["stone"])
     add_box(scene, "NagayaBody", *map_box((-3.6, -2.5, 0.15), (-0.4, -1.4, 0.92)), mats["plaster"])
-    add_kawara_roof(scene, "NagayaRoof", (-3.78, -2.62), (-0.22, -1.28), 0.92, 1.18, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
+    add_yosemune_roof(scene, "NagayaRoof", (-3.78, -2.62), (-0.22, -1.28), 0.92, 1.18, mats["roof"], mats["trim"])
     # Openings: a sliding entry door and latticed windows on the yard face.
     rack = mats["dark_wood"]
     add_box(scene, "DoorFrame", *map_box((-2.24, -1.415, 0.15), (-1.76, -1.375, 0.82)), rack)
@@ -2489,7 +2543,14 @@ def build_surface_arm_kit(
     active = [name for name, on in bits.items() if on]
 
     pad_half = arm_half + 0.02
-    add_box(scene, "CenterPad", *map_box((-pad_half, -pad_half, 0.0), (pad_half, pad_half, floor_top)), floor_material)
+    # Rounded junction disc: corners of crossings and bends curve instead of
+    # meeting at hard squares.
+    import math as _math
+    disc = []
+    for i in range(16):
+        angle = i / 16 * 2 * _math.pi
+        disc.append((*map_xy(pad_half * 1.12 * _math.cos(angle), pad_half * 1.12 * _math.sin(angle)), floor_top))
+    add_mesh(scene, "CenterPad", disc, [tuple(range(16))], floor_material)
     for index, name in enumerate(active):
         direction = WALL_DIRECTIONS[name]
         inset = WALL_EPSILON * (index + 1)
@@ -2564,6 +2625,71 @@ def make_holdout_material() -> bpy.types.Material:
     return material
 
 
+def make_bank_material() -> bpy.types.Material:
+    """Excavated earth bank: horizontal strata, embedded stones, damp base."""
+    material = bpy.data.materials.new("BankEarth")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+
+    coords = nodes.new("ShaderNodeTexCoord")
+    separate = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(coords.outputs["Object"], separate.inputs["Vector"])
+
+    base_noise = nodes.new("ShaderNodeTexNoise")
+    base_noise.inputs["Scale"].default_value = 9.0
+    base_noise.inputs["Detail"].default_value = 3.0
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.32
+    ramp.color_ramp.elements[0].color = (0.062, 0.050, 0.036, 1.0)
+    ramp.color_ramp.elements[1].position = 0.75
+    ramp.color_ramp.elements[1].color = (0.135, 0.110, 0.078, 1.0)
+    links.new(base_noise.outputs["Fac"], ramp.inputs["Fac"])
+
+    # Horizontal strata bands down the face.
+    strata = nodes.new("ShaderNodeMath")
+    strata.operation = "MULTIPLY"
+    strata.inputs[1].default_value = 22.0
+    links.new(separate.outputs["Z"], strata.inputs[0])
+    strata_f = nodes.new("ShaderNodeMath")
+    strata_f.operation = "FRACT"
+    links.new(strata.outputs["Value"], strata_f.inputs[0])
+    strata_band = nodes.new("ShaderNodeMath")
+    strata_band.operation = "MULTIPLY_ADD"
+    strata_band.inputs[1].default_value = 0.18
+    strata_band.inputs[2].default_value = 0.86
+    links.new(strata_f.outputs["Value"], strata_band.inputs[0])
+
+    # Embedded stones: sparse voronoi cells brightened.
+    stones = nodes.new("ShaderNodeTexVoronoi")
+    stones.inputs["Scale"].default_value = 16.0
+    stone_ramp = nodes.new("ShaderNodeValToRGB")
+    stone_ramp.color_ramp.interpolation = "CONSTANT"
+    stone_ramp.color_ramp.elements[0].position = 0.0
+    stone_ramp.color_ramp.elements[0].color = (1.35, 1.32, 1.25, 1.0)
+    stone_ramp.color_ramp.elements[1].position = 0.14
+    stone_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    links.new(stones.outputs["Distance"], stone_ramp.inputs["Fac"])
+
+    strata_color = nodes.new("ShaderNodeCombineColor")
+    for channel in ("Red", "Green", "Blue"):
+        links.new(strata_band.outputs["Value"], strata_color.inputs[channel])
+
+    def multiply(a, b):
+        node = nodes.new("ShaderNodeMix")
+        node.data_type = "RGBA"
+        node.blend_type = "MULTIPLY"
+        node.inputs["Factor"].default_value = 1.0
+        links.new(a, node.inputs["A"])
+        links.new(b, node.inputs["B"])
+        return node.outputs["Result"]
+
+    shaded = multiply(ramp.outputs["Color"], strata_color.outputs["Color"])
+    shaded = multiply(shaded, stone_ramp.outputs["Color"])
+    finish_material(material, shaded)
+    return material
+
+
 def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool) -> None:
     """Moat as a real excavated trench: the full tile is sunk MOAT_DEPTH,
     with steep earthen banks only on edges NOT connected to another moat
@@ -2571,8 +2697,9 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool) -> None:
     lattice), and the depth reads as impassable. Holdout ground quads clip
     the underground view to this tile's own diamond."""
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
-    earth = make_noise_material("MoatEarth", (0.070, 0.056, 0.040), (0.130, 0.106, 0.076), scale=9.0)
+    earth = make_bank_material()
     rim = make_material("MoatRim", (0.150, 0.124, 0.088, 1.0))
+    lip = make_material("MoatGrassLip", (0.105, 0.150, 0.070, 1.0))
 
     if water:
         surface = make_noise_material("MoatWater", (0.022, 0.052, 0.075), (0.045, 0.088, 0.115), scale=4.0)
@@ -2607,6 +2734,10 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool) -> None:
         add_mesh(scene, f"BankFace{name}",
             [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), surface_z), (*map_xy(*p0), surface_z)],
             [(0, 1, 2, 3)], earth)
+        # Grass lip overhanging the cut, softening the rim edge.
+        add_mesh(scene, f"Lip{name}",
+            [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), -0.035), (*map_xy(*p0), -0.035)],
+            [(0, 1, 2, 3)], lip)
 
     # Holdout skirts occlude the underground view where the neighbour is
     # GROUND (mask=0). Where the neighbour is another moat tile there is no
