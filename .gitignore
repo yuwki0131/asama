@@ -8,3 +8,4 @@ saves/**/*.tmp
 assets/intermediate/
 public/assets/placeholders/
 !public/assets/.gitkeep
+future/
