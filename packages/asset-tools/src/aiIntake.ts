@@ -14,7 +14,7 @@ export interface AiIntakeEntry {
   readonly output: string;
   readonly canvas: { readonly width: number; readonly height: number };
   readonly anchor: { readonly x: number; readonly y: number };
-  readonly flatten?: { readonly kuwaharaRadius: number; readonly posterizeLevels: number };
+  readonly flatten?: { readonly kuwaharaRadius: number; readonly posterizeLevels: number; readonly passes?: number; readonly shadowThreshold?: number; readonly shadowLift?: number };
 }
 
 export interface AiIntakeConfig {
@@ -313,7 +313,7 @@ export async function intakeAiAsset(options: {
   readonly anchor: { readonly x: number; readonly y: number };
   readonly reference: ToneStats;
   readonly assetId: string;
-  readonly flatten?: { readonly kuwaharaRadius: number; readonly posterizeLevels: number };
+  readonly flatten?: { readonly kuwaharaRadius: number; readonly posterizeLevels: number; readonly passes?: number; readonly shadowThreshold?: number; readonly shadowLift?: number };
 }): Promise<AiIntakeResult> {
   const image = await loadRaw(options.inputPath);
   const { removed } = removeSolidBackground(image);
@@ -331,8 +331,10 @@ export async function intakeAiAsset(options: {
     const midH = Math.max(1, Math.round(((midMeta.height ?? 1) / Math.max(1, midMeta.width ?? 1)) * midW));
     const midRaw = await sharp(trimmed).resize(midW, midH, { kernel: "lanczos3" }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     let mid: RawImage = { data: midRaw.data, width: midRaw.info.width, height: midRaw.info.height };
-    mid = kuwahara(mid, options.flatten.kuwaharaRadius);
-    liftShadows(mid);
+    for (let pass = 0; pass < (options.flatten.passes ?? 1); pass += 1) {
+      mid = kuwahara(mid, options.flatten.kuwaharaRadius);
+    }
+    liftShadows(mid, options.flatten.shadowThreshold ?? 52, options.flatten.shadowLift ?? 0.55);
     posterize(mid, options.flatten.posterizeLevels);
     gains = calibrateTone(mid, options.reference);
     trimmed = await sharp(mid.data, { raw: { width: mid.width, height: mid.height, channels: 4 } }).png().toBuffer();
