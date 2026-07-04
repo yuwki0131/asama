@@ -671,7 +671,7 @@ def make_namako_material() -> bpy.types.Material:
     ramp.color_ramp.elements[0].position = 0.0
     ramp.color_ramp.elements[0].color = (0.055, 0.055, 0.062, 1.0)
     ramp.color_ramp.elements[1].position = 0.5
-    ramp.color_ramp.elements[1].color = (0.52, 0.48, 0.40, 1.0)
+    ramp.color_ramp.elements[1].color = (0.43, 0.40, 0.33, 1.0)
     links.new(either.outputs["Value"], ramp.inputs["Fac"])
     finish_material(material, ramp.outputs["Color"])
     return material
@@ -691,9 +691,9 @@ def make_showcase_plaster() -> bpy.types.Material:
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE"
     ramp.color_ramp.elements[0].position = 0.25
-    ramp.color_ramp.elements[0].color = (0.66, 0.61, 0.51, 1.0)
+    ramp.color_ramp.elements[0].color = (0.485, 0.445, 0.365, 1.0)
     ramp.color_ramp.elements[1].position = 0.8
-    ramp.color_ramp.elements[1].color = (0.80, 0.76, 0.66, 1.0)
+    ramp.color_ramp.elements[1].color = (0.615, 0.575, 0.485, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
 
     coords = nodes.new("ShaderNodeTexCoord")
@@ -880,8 +880,6 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
         while bar < wx1 - 0.02:
             add_box(scene, f"WinBar{index}{bar:.2f}", *map_box((bar, -0.81, 0.82), (bar + 0.035, -0.755, 1.00)), plaster)
             bar += 0.09
-    add_box(scene, "GableWinFrame", *map_box((-0.55, -1.71, 0.80), (-0.47, -1.29, 1.06)), plaster)
-    add_box(scene, "GableWin", *map_box((-0.52, -1.66, 0.84), (-0.44, -1.34, 1.02)), ridge_dark)
 
     # Kura walls are fully plastered (nurigome): no exposed timber. A thin
     # plaster drip ledge articulates the namako/upper boundary instead.
@@ -889,6 +887,36 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
 
     # Stone step before the door.
     add_box(scene, "DoorStep", *map_box((-1.70, -0.72, 0.0), (-1.30, -0.58, 0.12)), stone)
+
+    # Kura crest (white disc) on the visible gable-end wall.
+    crest_bright = make_material("CrestWhite", (0.72, 0.70, 0.62, 1.0))
+    crest_dark = make_material("CrestInk", (0.10, 0.095, 0.10, 1.0))
+    import math as _math
+    for radius, depth, mat in ((0.17, 0.045, crest_bright), (0.115, 0.055, crest_dark), (0.06, 0.065, crest_bright)):
+        ring = []
+        for i in range(8):
+            angle = i / 8 * 2 * _math.pi
+            ring.append((-1.5 + radius * _math.cos(angle), 0.92 + radius * _math.sin(angle)))
+        vertices = [(*map_xy(-0.53 + depth, ry), rz) for ry, rz in [(-1.5, 0.92)]]
+        vertices = []
+        for ry, rz in ring:
+            vertices.append((*map_xy(-0.53 - 0.0, ry), rz))
+        # place slightly proud of the +x gable wall
+        vertices = [((v[0] + depth), v[1], v[2]) for v in vertices]
+        add_mesh(scene, f"Crest{radius}", vertices, [tuple(range(8))], mat)
+
+    # Small tiled awnings over the mushiko windows.
+    for index, (wx0, wx1) in enumerate(((-2.28, -1.98), (-1.06, -0.76))):
+        alow, ahigh = map_box((wx0 - 0.07, -0.94, 0.0), (wx1 + 0.07, -0.76, 0.0))
+        add_box(scene, f"WinAwning{index}", (alow[0], alow[1], 1.055), (ahigh[0], ahigh[1], 1.095), ridge_dark)
+
+    # Door strap hardware.
+    for bz in (0.42, 0.72):
+        add_box(scene, f"DoorBand{bz}", *map_box((-1.71, -0.845, bz), (-1.29, -0.755, bz + 0.035)), crest_dark)
+
+    # Rain-splash grime band above the plinth.
+    splash = make_material("SplashGrime", (0.155, 0.145, 0.125, 1.0))
+    add_box(scene, "Splash", *map_box((-2.505, -2.205, 0.24), (-0.495, -0.795, 0.305)), splash)
 
     # Curved roof (tighter eaves than round 1), ridge cap and oni end tiles.
     low, high = map_box((-2.70, -2.40, 0.0), (-0.30, -0.60, 0.0))
@@ -1068,9 +1096,9 @@ def make_ishigaki_material(name: str = "IshigakiStone") -> bpy.types.Material:
     stone_noise.inputs["Scale"].default_value = 4.0
     stone_ramp = nodes.new("ShaderNodeValToRGB")
     stone_ramp.color_ramp.elements[0].position = 0.3
-    stone_ramp.color_ramp.elements[0].color = (0.190, 0.145, 0.085, 1.0)
+    stone_ramp.color_ramp.elements[0].color = (0.150, 0.130, 0.100, 1.0)
     stone_ramp.color_ramp.elements[1].position = 0.8
-    stone_ramp.color_ramp.elements[1].color = (0.330, 0.260, 0.160, 1.0)
+    stone_ramp.color_ramp.elements[1].color = (0.265, 0.235, 0.185, 1.0)
     links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
 
     mix = nodes.new("ShaderNodeMix")
