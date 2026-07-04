@@ -131,7 +131,15 @@ class Scene {
             return nt === undefined ? "0" : nt === t ? "1" : "0";
           })
           .join("");
-        cells.push({ x, y, assetId: `terrain.${t}.connected.${mask}` });
+        if (mask === "1111" && t !== "stone") {
+          const bx = x >> 2;
+          const by = y >> 2;
+          let h = (bx * 374761393 + by * 668265263 + 1013904223) >>> 0;
+          h = (h ^ (h >>> 13)) >>> 0;
+          cells.push({ x, y, assetId: `terrain.${t}.macro.v${h % 2}.${x % 4}.${y % 4}` });
+        } else {
+          cells.push({ x, y, assetId: `terrain.${t}.connected.${mask}` });
+        }
       }
     // Kit assetIds via NESW same-kit mask (gates count as connectors for walls/fences).
     const kitAsset = { wall: "building.wall.plaster", fence: "building.fence.wood", road: "building.road", dry_moat: "building.dry_moat", water_moat: "building.water_moat" };

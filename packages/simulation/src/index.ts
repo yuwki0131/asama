@@ -1648,6 +1648,18 @@ function connectedTerrainAssetId(
     })
     .join("");
 
+  // Interior tiles use the world-anchored macro field (continuous noise
+  // across tiles) so large surfaces stop reading as a 64px lattice. Stone
+  // keeps the connected sprites (no macro set rendered for it).
+  if (mask === "1111" && cell.terrain !== "stone") {
+    const bx = cell.coord.x >> 2;
+    const by = cell.coord.y >> 2;
+    let h = (bx * 374761393 + by * 668265263 + 1013904223) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    const variant = h % 2;
+    return `terrain.${cell.terrain}.macro.v${variant}.${cell.coord.x % 4}.${cell.coord.y % 4}`;
+  }
+
   return `terrain.${cell.terrain}.connected.${mask}`;
 }
 

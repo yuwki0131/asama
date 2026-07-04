@@ -535,6 +535,78 @@ def add_flat_quad(scene: bpy.types.Scene, name: str, low_map: tuple[float, float
 TERRAIN_BLEED = 0.03
 
 
+MACRO_TERRAIN_COLORS = {
+    "grass": ((0.205, 0.275, 0.120), (0.320, 0.395, 0.180)),
+    "dirt": ((0.235, 0.205, 0.150), (0.315, 0.275, 0.205)),
+    "water": ((0.050, 0.100, 0.130), (0.085, 0.145, 0.180)),
+}
+
+
+def make_macro_terrain_material(terrain: str, variant: int, tx: int, ty: int) -> bpy.types.Material:
+    """Terrain material whose noise is anchored to the map grid: tile (tx,
+    ty) samples the noise field at that offset, so adjacent tiles continue
+    the same pattern seamlessly and the 64px lattice disappears."""
+    dark, light = MACRO_TERRAIN_COLORS[terrain]
+    material = bpy.data.materials.new(f"Macro{terrain}{variant}")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    coords = nodes.new("ShaderNodeTexCoord")
+    shift = nodes.new("ShaderNodeMapping")
+    # World y = -map y (mirror convention).
+    shift.inputs["Location"].default_value = (float(tx), float(-ty), 0.0)
+    links.new(coords.outputs["Object"], shift.inputs["Vector"])
+
+    # Fine grain, same frequency family as the old tiles.
+    fine = nodes.new("ShaderNodeTexNoise")
+    fine.noise_dimensions = "4D"
+    fine.inputs["Scale"].default_value = 6.0 if terrain != "water" else 4.0
+    fine.inputs["Detail"].default_value = 4.0
+    fine.inputs["W"].default_value = variant * 7.77
+    links.new(shift.outputs["Vector"], fine.inputs["Vector"])
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.35
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
+    ramp.color_ramp.elements[1].position = 0.72
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+    links.new(fine.outputs["Fac"], ramp.inputs["Fac"])
+
+    # Low-frequency mottling spanning several tiles (meadow patchiness).
+    broad = nodes.new("ShaderNodeTexNoise")
+    broad.noise_dimensions = "4D"
+    broad.inputs["Scale"].default_value = 0.33
+    broad.inputs["Detail"].default_value = 2.0
+    broad.inputs["W"].default_value = variant * 7.77 + 3.1
+    links.new(shift.outputs["Vector"], broad.inputs["Vector"])
+    mottle = nodes.new("ShaderNodeMath")
+    mottle.operation = "MULTIPLY_ADD"
+    mottle.inputs[1].default_value = 0.22
+    mottle.inputs[2].default_value = 0.89
+    links.new(broad.outputs["Fac"], mottle.inputs[0])
+    mottle_color = nodes.new("ShaderNodeCombineColor")
+    for channel in ("Red", "Green", "Blue"):
+        links.new(mottle.outputs["Value"], mottle_color.inputs[channel])
+    mixed = nodes.new("ShaderNodeMix")
+    mixed.data_type = "RGBA"
+    mixed.blend_type = "MULTIPLY"
+    mixed.inputs["Factor"].default_value = 1.0
+    links.new(ramp.outputs["Color"], mixed.inputs["A"])
+    links.new(mottle_color.outputs["Color"], mixed.inputs["B"])
+    finish_material(material, mixed.outputs["Result"])
+    return material
+
+
+def build_terrain_macro_tile(scene: bpy.types.Scene, terrain: str, variant: int, tx: int, ty: int) -> None:
+    """Interior terrain tile sampling the continuous macro noise field at
+    grid offset (tx, ty). Same bleed geometry as the connected 1111 tile."""
+    material = make_macro_terrain_material(terrain, variant, tx, ty)
+    b = TERRAIN_BLEED
+    add_flat_quad(scene, "Surface", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), 0.0, material)
+
+
 def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
     style = TERRAIN_STYLES[terrain]
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
@@ -2441,6 +2513,10 @@ def resolve_model(name: str):
     if gate is not None:
         state, axis, width, mask = gate.group(1), gate.group(2), int(gate.group(3)), gate.group(4)
         return lambda scene: build_gate_wood(scene, axis, width, mask, doors_closed=state == "closed")
+    macro = re.fullmatch(r"terrain-(grass|dirt|water)-macro-v(\d)-(\d)-(\d)", name)
+    if macro is not None:
+        t, v, tx, ty = macro.group(1), int(macro.group(2)), int(macro.group(3)), int(macro.group(4))
+        return lambda scene: build_terrain_macro_tile(scene, t, v, tx, ty)
     terrain = re.fullmatch(r"terrain-(grass|dirt|stone|water)-connected-([01]{4})", name)
     if terrain is not None:
         kind, mask = terrain.group(1), terrain.group(2)
