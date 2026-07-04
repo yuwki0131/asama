@@ -492,13 +492,13 @@ def make_noise_material(name: str, dark: tuple[float, float, float], light: tupl
 
 TERRAIN_STYLES = {
     "grass": {
-        "surface": lambda: make_noise_material("GrassSurface", (0.205, 0.275, 0.120), (0.320, 0.395, 0.180)),
-        "variant": lambda: make_noise_material("GrassVariant", (0.190, 0.255, 0.112), (0.300, 0.370, 0.170), scale=10.0),
-        "edge": (0.34, 0.29, 0.21),
+        "surface": lambda: make_noise_material("GrassSurface", (0.105, 0.165, 0.072), (0.225, 0.300, 0.135)),
+        "variant": lambda: make_noise_material("GrassVariant", (0.098, 0.155, 0.068), (0.210, 0.280, 0.128), scale=10.0),
+        "edge": (0.215, 0.180, 0.125),
     },
     "dirt": {
-        "surface": lambda: make_noise_material("DirtSurface", (0.235, 0.205, 0.150), (0.315, 0.275, 0.205)),
-        "variant": lambda: make_noise_material("DirtVariant", (0.215, 0.190, 0.140), (0.295, 0.260, 0.195), scale=10.0),
+        "surface": lambda: make_noise_material("DirtSurface", (0.125, 0.100, 0.068), (0.225, 0.190, 0.140)),
+        "variant": lambda: make_noise_material("DirtVariant", (0.118, 0.094, 0.064), (0.210, 0.178, 0.132), scale=10.0),
         "edge": (0.185, 0.160, 0.120),
     },
     "stone": {
@@ -507,8 +507,8 @@ TERRAIN_STYLES = {
         "edge": (0.26, 0.27, 0.29),
     },
     "water": {
-        "surface": lambda: make_noise_material("WaterSurface", (0.050, 0.100, 0.130), (0.085, 0.145, 0.180), scale=4.0),
-        "variant": lambda: make_noise_material("WaterVariant", (0.047, 0.096, 0.126), (0.080, 0.140, 0.175), scale=7.0),
+        "surface": lambda: make_noise_material("WaterSurface", (0.032, 0.070, 0.098), (0.062, 0.115, 0.150), scale=4.0),
+        "variant": lambda: make_noise_material("WaterVariant", (0.030, 0.066, 0.094), (0.058, 0.110, 0.145), scale=7.0),
         "edge": (0.50, 0.45, 0.34),
     },
 }
@@ -535,18 +535,20 @@ def add_flat_quad(scene: bpy.types.Scene, name: str, low_map: tuple[float, float
 TERRAIN_BLEED = 0.03
 
 
-MACRO_TERRAIN_COLORS = {
-    "grass": ((0.205, 0.275, 0.120), (0.320, 0.395, 0.180)),
-    "dirt": ((0.235, 0.205, 0.150), (0.315, 0.275, 0.205)),
-    "water": ((0.050, 0.100, 0.130), (0.085, 0.145, 0.180)),
+MACRO_TERRAIN_PALETTES = {
+    # deep, mid, light, warm-accent (hue drift target)
+    "grass": ((0.085, 0.140, 0.060), (0.150, 0.215, 0.095), (0.235, 0.310, 0.140), (0.225, 0.245, 0.105)),
+    "dirt": ((0.110, 0.088, 0.058), (0.165, 0.135, 0.095), (0.235, 0.200, 0.150), (0.200, 0.140, 0.090)),
+    "water": ((0.028, 0.062, 0.090), (0.048, 0.095, 0.128), (0.080, 0.135, 0.170), (0.038, 0.085, 0.095)),
 }
 
 
 def make_macro_terrain_material(terrain: str, variant: int, tx: int, ty: int) -> bpy.types.Material:
-    """Terrain material whose noise is anchored to the map grid: tile (tx,
-    ty) samples the noise field at that offset, so adjacent tiles continue
-    the same pattern seamlessly and the 64px lattice disappears."""
-    dark, light = MACRO_TERRAIN_COLORS[terrain]
+    """Terrain material anchored to the map grid, with painterly depth: a
+    deep three-stop value ramp, a slow hue drift toward a warm accent, and
+    a fine blade/grain speckle — the leaf-litter treatment applied to the
+    open ground."""
+    deep, mid, light, accent = MACRO_TERRAIN_PALETTES[terrain]
     material = bpy.data.materials.new(f"Macro{terrain}{variant}")
     material.use_nodes = True
     nodes = material.node_tree.nodes
@@ -556,45 +558,79 @@ def make_macro_terrain_material(terrain: str, variant: int, tx: int, ty: int) ->
 
     coords = nodes.new("ShaderNodeTexCoord")
     shift = nodes.new("ShaderNodeMapping")
-    # World y = -map y (mirror convention).
     shift.inputs["Location"].default_value = (float(tx), float(-ty), 0.0)
     links.new(coords.outputs["Object"], shift.inputs["Vector"])
 
-    # Fine grain, same frequency family as the old tiles.
-    fine = nodes.new("ShaderNodeTexNoise")
-    fine.noise_dimensions = "4D"
-    fine.inputs["Scale"].default_value = 6.0 if terrain != "water" else 4.0
-    fine.inputs["Detail"].default_value = 4.0
-    fine.inputs["W"].default_value = variant * 7.77
-    links.new(shift.outputs["Vector"], fine.inputs["Vector"])
-    ramp = nodes.new("ShaderNodeValToRGB")
-    ramp.color_ramp.elements[0].position = 0.35
-    ramp.color_ramp.elements[0].color = (*dark, 1.0)
-    ramp.color_ramp.elements[1].position = 0.72
-    ramp.color_ramp.elements[1].color = (*light, 1.0)
-    links.new(fine.outputs["Fac"], ramp.inputs["Fac"])
+    def noise4d(scale, detail, w):
+        node = nodes.new("ShaderNodeTexNoise")
+        node.noise_dimensions = "4D"
+        node.inputs["Scale"].default_value = scale
+        node.inputs["Detail"].default_value = detail
+        node.inputs["W"].default_value = w
+        links.new(shift.outputs["Vector"], node.inputs["Vector"])
+        return node.outputs["Fac"]
 
-    # Low-frequency mottling spanning several tiles (meadow patchiness).
-    broad = nodes.new("ShaderNodeTexNoise")
-    broad.noise_dimensions = "4D"
-    broad.inputs["Scale"].default_value = 0.33
-    broad.inputs["Detail"].default_value = 2.0
-    broad.inputs["W"].default_value = variant * 7.77 + 3.1
-    links.new(shift.outputs["Vector"], broad.inputs["Vector"])
+    # Value structure: deep -> mid -> light across a three-stop ramp.
+    fine = noise4d(6.0 if terrain != "water" else 3.6, 4.0, variant * 7.77)
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.28
+    ramp.color_ramp.elements[0].color = (*deep, 1.0)
+    ramp.color_ramp.elements[1].position = 0.80
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+    mid_stop = ramp.color_ramp.elements.new(0.55)
+    mid_stop.color = (*mid, 1.0)
+    links.new(fine, ramp.inputs["Fac"])
+
+    # Hue drift: slow noise mixes the base toward the warm accent so the
+    # ground shifts in COLOR, not only in value.
+    drift = noise4d(0.9, 2.0, variant * 7.77 + 11.3)
+    drift_ramp = nodes.new("ShaderNodeValToRGB")
+    drift_ramp.color_ramp.elements[0].position = 0.42
+    drift_ramp.color_ramp.elements[0].color = (0.0, 0.0, 0.0, 1.0)
+    drift_ramp.color_ramp.elements[1].position = 0.78
+    drift_ramp.color_ramp.elements[1].color = (0.55, 0.55, 0.55, 1.0)
+    links.new(drift, drift_ramp.inputs["Fac"])
+    hue_mix = nodes.new("ShaderNodeMix")
+    hue_mix.data_type = "RGBA"
+    links.new(drift_ramp.outputs["Color"], hue_mix.inputs["Factor"])
+    links.new(ramp.outputs["Color"], hue_mix.inputs["A"])
+    accent_rgb = nodes.new("ShaderNodeRGB")
+    accent_rgb.outputs[0].default_value = (*accent, 1.0)
+    links.new(accent_rgb.outputs[0], hue_mix.inputs["B"])
+
+    # Broad mottling across several tiles.
+    broad = noise4d(0.33, 2.0, variant * 7.77 + 3.1)
     mottle = nodes.new("ShaderNodeMath")
     mottle.operation = "MULTIPLY_ADD"
-    mottle.inputs[1].default_value = 0.22
-    mottle.inputs[2].default_value = 0.89
-    links.new(broad.outputs["Fac"], mottle.inputs[0])
-    mottle_color = nodes.new("ShaderNodeCombineColor")
+    mottle.inputs[1].default_value = 0.26
+    mottle.inputs[2].default_value = 0.86
+    links.new(broad, mottle.inputs[0])
+
+    # Fine blade/grain speckle (skipped for water).
+    if terrain != "water":
+        speckle = noise4d(24.0, 2.0, variant * 7.77 + 21.7)
+        grain = nodes.new("ShaderNodeMath")
+        grain.operation = "MULTIPLY_ADD"
+        grain.inputs[1].default_value = 0.14
+        grain.inputs[2].default_value = 0.93
+        links.new(speckle, grain.inputs[0])
+        both = nodes.new("ShaderNodeMath")
+        both.operation = "MULTIPLY"
+        links.new(mottle.outputs["Value"], both.inputs[0])
+        links.new(grain.outputs["Value"], both.inputs[1])
+        value_out = both.outputs["Value"]
+    else:
+        value_out = mottle.outputs["Value"]
+
+    value_color = nodes.new("ShaderNodeCombineColor")
     for channel in ("Red", "Green", "Blue"):
-        links.new(mottle.outputs["Value"], mottle_color.inputs[channel])
+        links.new(value_out, value_color.inputs[channel])
     mixed = nodes.new("ShaderNodeMix")
     mixed.data_type = "RGBA"
     mixed.blend_type = "MULTIPLY"
     mixed.inputs["Factor"].default_value = 1.0
-    links.new(ramp.outputs["Color"], mixed.inputs["A"])
-    links.new(mottle_color.outputs["Color"], mixed.inputs["B"])
+    links.new(hue_mix.outputs["Result"], mixed.inputs["A"])
+    links.new(value_color.outputs["Color"], mixed.inputs["B"])
     finish_material(material, mixed.outputs["Result"])
     return material
 
@@ -2418,7 +2454,7 @@ def build_surface_arm_kit(
 
 
 def build_road_mask(scene: bpy.types.Scene, mask: str) -> None:
-    dirt = make_material("RoadDirt", (0.225, 0.190, 0.140, 1.0))
+    dirt = make_noise_material("RoadDirt", (0.130, 0.105, 0.072), (0.220, 0.185, 0.138), scale=13.0)
     build_surface_arm_kit(scene, mask, dirt, 0.014, 0.27)
 
 
@@ -2436,7 +2472,7 @@ def build_water_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
 
 def build_earth_bridge(scene: bpy.types.Scene) -> None:
     """Earthen causeway crossing along map x. Canvas 64x32, anchor 32,16."""
-    dirt = make_material("CausewayDirt", (0.205, 0.175, 0.130, 1.0))
+    dirt = make_noise_material("CausewayDirt", (0.120, 0.098, 0.068), (0.205, 0.172, 0.128), scale=13.0)
     add_box(scene, "Causeway", *map_box((-0.5, -0.30, 0.0), (0.5, 0.30, 0.07)), dirt)
 
 
