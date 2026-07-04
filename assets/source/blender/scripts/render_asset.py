@@ -1150,14 +1150,14 @@ def make_plank_material(name: str, dark: tuple[float, float, float], light: tupl
     return material
 
 
-def add_beam(scene: bpy.types.Scene, name: str, a: tuple[float, float, float], b: tuple[float, float, float], thickness: float, material: bpy.types.Material) -> None:
+def add_beam(scene: bpy.types.Scene, name: str, a: tuple[float, float, float], b: tuple[float, float, float], thickness: float, material: bpy.types.Material, tip_thickness: float | None = None) -> None:
     """Slanted square-section beam between two map-space points (trunks,
-    branches, bamboo culms)."""
+    branches, bamboo culms). tip_thickness tapers the far end."""
     ax, ay, az = a
     bx, by, bz = b
-    h = thickness / 2.0
+    halves = (thickness / 2.0, (tip_thickness if tip_thickness is not None else thickness) / 2.0)
     vertices = []
-    for px, py, pz in ((ax, ay, az), (bx, by, bz)):
+    for (px, py, pz), h in zip(((ax, ay, az), (bx, by, bz)), halves):
         for dx, dy in ((-h, -h), (h, -h), (h, h), (-h, h)):
             vertices.append((*map_xy(px + dx, py + dy), pz))
     faces = [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
@@ -1224,6 +1224,9 @@ def add_leaf_cards(
     materials: list[bpy.types.Material],
     seed: float,
     card_size: float = 0.085,
+    shade_bias: float = 0.75,
+    card_aspect: float = 1.0,
+    droop: float = 0.0,
 ) -> None:
     """Foliage as a cloud of small quads inside an ellipsoid. Each card takes
     the painterly light ramp individually, so canopies get dappled light in
@@ -1248,16 +1251,22 @@ def add_leaf_cards(
         px = cx + rx * radial * _math.sin(phi) * _math.cos(theta)
         py = cy + ry * radial * _math.sin(phi) * _math.sin(theta)
         pz = cz + rz * radial * _math.cos(phi)
-        # Card orientation: mostly horizontal (pine pads), some tilt.
-        tilt = (rand(i * 5.7) - 0.5) * 1.1
+        # Card orientation: mostly horizontal, some tilt; droop pulls the
+        # outer edge downward like hanging needle bundles.
+        tilt = (rand(i * 5.7) - 0.5) * 1.1 - droop * radial
         yaw = rand(i * 9.3) * 2.0 * _math.pi
         half = card_size * (0.7 + 0.6 * rand(i * 4.9))
-        ax = _math.cos(yaw) * half
-        ay = _math.sin(yaw) * half
+        long_half = half * card_aspect
+        ax = _math.cos(yaw) * long_half
+        ay = _math.sin(yaw) * long_half
         bx = -_math.sin(yaw) * half * _math.cos(tilt)
         by = _math.cos(yaw) * half * _math.cos(tilt)
         bz = half * _math.sin(tilt)
-        bucket = int(rand(i * 6.7) * len(materials)) % len(materials)
+        # Self-shadow: lower cards in the cloud lean dark, upper cards lean
+        # light (materials ordered dark -> light).
+        t_height = 0.5 + 0.5 * (pz - cz) / max(rz, 1e-5)
+        mix = t_height * shade_bias + rand(i * 6.7) * (1.0 - shade_bias)
+        bucket = min(len(materials) - 1, max(0, int(mix * len(materials))))
         vertices = buckets[bucket]
         base = len(vertices)
         for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
@@ -1277,37 +1286,42 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     needle_light = make_foliage_material("PineNeedlesL", (0.075, 0.130, 0.070), (0.130, 0.200, 0.105))
     s = 1.0 if variant % 2 == 0 else -1.0
 
-    # Bent trunk: three segments sweeping to one side then recurving.
+    # Bent trunk: three tapered segments sweeping to one side then recurving.
     p0 = (0.0, 0.0, 0.0)
     p1 = (0.10 * s, 0.06 * s, 0.55)
     p2 = (0.24 * s, 0.16 * s, 1.00)
     p3 = (0.16 * s, 0.10 * s, 1.34)
-    add_tree_base(scene, 0.0, 0.0, 0.11, bark)
-    add_beam(scene, "Trunk1", p0, p1, 0.11, bark)
-    add_beam(scene, "Trunk2", p1, p2, 0.09, bark)
-    add_beam(scene, "Trunk3", p2, p3, 0.07, bark)
+    add_beam(scene, "Trunk1", p0, p1, 0.145, bark, tip_thickness=0.105)
+    add_beam(scene, "Trunk2", p1, p2, 0.105, bark, tip_thickness=0.075)
+    add_beam(scene, "Trunk3", p2, p3, 0.075, bark, tip_thickness=0.05)
 
     # Branches leaving the trunk, each tipped with a leaf-card pad cloud.
     needle_deep = make_foliage_material("PineNeedlesDeep", (0.030, 0.062, 0.038), (0.055, 0.095, 0.055))
-    shades = [needle_deep, needle_dark, needle_light]
+    needle_sun = make_foliage_material("PineNeedlesSun", (0.105, 0.170, 0.088), (0.165, 0.235, 0.120))
+    shades = [needle_deep, needle_dark, needle_light, needle_sun]
     branches = [
-        (p1, (-0.38 * s, -0.22 * s, 0.78), 0.28, needle_dark),
-        (p2, (0.52 * s, 0.36 * s, 1.02), 0.25, needle_light),
-        (p2, (-0.16 * s, -0.44 * s, 1.22), 0.21, needle_dark),
-        (p3, (0.22 * s, 0.08 * s, 1.54), 0.23, needle_light),
+        (p1, (-0.38 * s, -0.22 * s, 0.78), 0.28),
+        (p2, (0.52 * s, 0.36 * s, 1.02), 0.25),
+        (p2, (-0.16 * s, -0.44 * s, 1.22), 0.21),
+        (p3, (0.22 * s, 0.08 * s, 1.54), 0.23),
+        (p3, (-0.12 * s, 0.20 * s, 1.42), 0.15),
     ]
-    for index, (base, tip, radius, _mat) in enumerate(branches):
-        add_beam(scene, f"Branch{index}", base, tip, 0.045, bark)
-        # Flat, separated pads with the trunk visible between them.
+    for index, (base, tip, radius) in enumerate(branches):
+        add_beam(scene, f"Branch{index}", base, tip, 0.05, bark, tip_thickness=0.028)
+        # Secondary twigs forking into the pad.
+        for t_index, (dx, dy) in enumerate(((radius * 0.5, radius * 0.2), (-radius * 0.3, radius * 0.45))):
+            twig_tip = (tip[0] + dx, tip[1] + dy, tip[2] + 0.05)
+            add_beam(scene, f"Twig{index}{t_index}", tip, twig_tip, 0.022, bark, tip_thickness=0.012)
         add_leaf_cards(
             scene,
             f"Pad{index}",
             (tip[0], tip[1], tip[2] + 0.05),
             (radius, radius, radius * 0.26),
-            72,
+            84,
             shades,
             seed=float(variant * 31 + index * 7 + 3),
-            card_size=0.075,
+            card_size=0.072,
+            droop=0.6,
         )
 
 
@@ -1319,7 +1333,7 @@ def build_tree_cedar(scene: bpy.types.Scene) -> None:
     dark = make_foliage_material("CedarNeedlesD", (0.035, 0.075, 0.048), (0.062, 0.110, 0.068))
     light = make_foliage_material("CedarNeedlesL", (0.052, 0.100, 0.058), (0.090, 0.150, 0.085))
     add_tree_base(scene, 0.0, 0.0, 0.09, bark)
-    add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.0, 0.0, 2.02), 0.09, bark)
+    add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.05, -0.03, 2.02), 0.13, bark, tip_thickness=0.045)
     tiers = [
         (0.33, 0.42, dark), (0.29, 0.76, light), (0.25, 1.10, dark),
         (0.20, 1.42, light), (0.14, 1.72, dark), (0.08, 1.98, light),
@@ -1332,9 +1346,11 @@ def build_tree_cedar(scene: bpy.types.Scene) -> None:
             (jx, -jx, z),
             (radius, radius, radius * 0.75),
             56,
-            [dark, light],
+            [dark, dark, light],
             seed=float(index * 13 + 5),
             card_size=0.07,
+            shade_bias=0.8,
+            droop=0.4,
         )
 
 
@@ -1343,13 +1359,22 @@ def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
     several overlapping leaf masses with light/dark variation.
     Canvas 64x112, anchor 32,96."""
     bark = make_textured_material("BroadBark", (0.070, 0.052, 0.036), (0.118, 0.090, 0.062), scale=(14.0, 14.0, 3.0))
+    deep = make_foliage_material("BroadLeavesDeep", (0.032, 0.062, 0.028), (0.060, 0.100, 0.045))
     dark = make_foliage_material("BroadLeavesD", (0.052, 0.095, 0.040), (0.095, 0.150, 0.065))
     light = make_foliage_material("BroadLeavesL", (0.085, 0.140, 0.058), (0.160, 0.225, 0.100))
+    sun = make_foliage_material("BroadLeavesSun", (0.125, 0.185, 0.080), (0.205, 0.270, 0.125))
     add_tree_base(scene, 0.0, 0.0, 0.12, bark)
-    add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.02, -0.02, 0.55), 0.13, bark)
-    limbs = [((0.02, -0.02, 0.50), (-0.22, 0.10, 0.85)), ((0.02, -0.02, 0.50), (0.24, -0.14, 0.90)), ((0.02, -0.02, 0.52), (0.02, 0.20, 0.95))]
+    add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.02, -0.02, 0.55), 0.16, bark, tip_thickness=0.11)
+    limbs = [
+        ((0.02, -0.02, 0.50), (-0.24, 0.11, 0.88)),
+        ((0.02, -0.02, 0.50), (0.26, -0.15, 0.92)),
+        ((0.02, -0.02, 0.52), (0.02, 0.22, 0.98)),
+        ((0.02, -0.02, 0.52), (-0.10, -0.20, 0.95)),
+    ]
     for index, (base, tip) in enumerate(limbs):
-        add_beam(scene, f"Limb{index}", base, tip, 0.06, bark)
+        add_beam(scene, f"Limb{index}", base, tip, 0.06, bark, tip_thickness=0.028)
+        for t_index, (dx, dy, dz) in enumerate(((0.10, 0.06, 0.14), (-0.07, 0.10, 0.16))):
+            add_beam(scene, f"LimbTwig{index}{t_index}", tip, (tip[0] + dx, tip[1] + dy, tip[2] + dz), 0.02, bark, tip_thickness=0.01)
     blobs = [
         (-0.22, 0.10, 0.80, 0.26), (0.24, -0.14, 0.86, 0.27), (0.03, 0.20, 0.90, 0.24),
         (-0.06, -0.05, 1.02, 0.30), (0.12, 0.08, 1.16, 0.22),
@@ -1361,9 +1386,10 @@ def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
             (cx, cy, z),
             (radius, radius, radius * 0.8),
             88,
-            [dark, light],
+            [deep, dark, light, sun],
             seed=float(index * 17 + 11),
-            card_size=0.08,
+            card_size=0.078,
+            shade_bias=0.8,
         )
 
 
@@ -1382,7 +1408,15 @@ def build_bamboo(scene: bpy.types.Scene) -> None:
     ]
     for index, (sx, sy, height, lean) in enumerate(stalks):
         mat = culm if index % 2 == 0 else culm_light
-        add_beam(scene, f"Culm{index}", (sx, sy, 0.0), (sx + lean, sy + lean * 0.7, height), 0.035, mat)
+        add_beam(scene, f"Culm{index}", (sx, sy, 0.0), (sx + lean, sy + lean * 0.7, height), 0.038, mat, tip_thickness=0.024)
+        # Culm nodes: brighter rings up the stalk.
+        node_z = 0.32
+        while node_z < height - 0.25:
+            f = node_z / height
+            nx = sx + lean * f
+            ny = sy + lean * 0.7 * f
+            add_box(scene, f"Node{index}{node_z:.2f}", *map_box((nx - 0.026, ny - 0.026, node_z), (nx + 0.026, ny + 0.026, node_z + 0.022)), culm_light)
+            node_z += 0.34
     # Shared feathery canopy: tall thin blobs bridging the culm tops.
     canopies = [
         (-0.10, -0.02, 1.55, 0.30), (0.10, 0.02, 1.80, 0.28),
@@ -1394,10 +1428,13 @@ def build_bamboo(scene: bpy.types.Scene) -> None:
             f"Canopy{index}",
             (cx, cy, z),
             (radius, radius, radius * 1.1),
-            64,
+            72,
             [leaves_dark, leaves_light],
             seed=float(index * 19 + 23),
-            card_size=0.065,
+            card_size=0.05,
+            card_aspect=2.6,
+            droop=0.9,
+            shade_bias=0.7,
         )
 
 
