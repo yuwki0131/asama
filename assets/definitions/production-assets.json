@@ -5965,10 +5965,8 @@
       "kind": "building",
       "output": "deco-tree-pine-1.png",
       "source": {
-        "type": "blender",
-        "model": "tree-pine",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-pine-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5989,10 +5987,8 @@
       "kind": "building",
       "output": "deco-tree-pine-2.png",
       "source": {
-        "type": "blender",
-        "model": "tree-pine-2",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-pine-2.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6013,10 +6009,8 @@
       "kind": "building",
       "output": "deco-tree-cedar-1.png",
       "source": {
-        "type": "blender",
-        "model": "tree-cedar",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-cedar-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6037,10 +6031,8 @@
       "kind": "building",
       "output": "deco-tree-broadleaf-1.png",
       "source": {
-        "type": "blender",
-        "model": "tree-broadleaf",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-broadleaf-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6133,10 +6125,8 @@
       "kind": "building",
       "output": "deco-bush-1.png",
       "source": {
-        "type": "blender",
-        "model": "deco-bush",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-bush-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
