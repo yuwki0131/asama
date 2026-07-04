@@ -1101,6 +1101,55 @@ def make_foliage_material(name: str, dark: tuple[float, float, float], light: tu
     return make_noise_material(name, dark, light, scale=9.0)
 
 
+def make_plank_material(name: str, dark: tuple[float, float, float], light: tuple[float, float, float], boards_per_unit: float = 5.0) -> bpy.types.Material:
+    """Wood with pronounced anisotropic grain and horizontal board seams."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    coords = nodes.new("ShaderNodeTexCoord")
+    stretch = nodes.new("ShaderNodeMapping")
+    stretch.inputs["Scale"].default_value = (26.0, 26.0, 2.2)
+    links.new(coords.outputs["Object"], stretch.inputs["Vector"])
+    grain = nodes.new("ShaderNodeTexNoise")
+    grain.inputs["Scale"].default_value = 1.0
+    grain.inputs["Detail"].default_value = 4.0
+    links.new(stretch.outputs["Vector"], grain.inputs["Vector"])
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "EASE"
+    ramp.color_ramp.elements[0].position = 0.28
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
+    ramp.color_ramp.elements[1].position = 0.72
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+    links.new(grain.outputs["Fac"], ramp.inputs["Fac"])
+
+    separate = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(coords.outputs["Object"], separate.inputs["Vector"])
+    seam = nodes.new("ShaderNodeMath")
+    seam.operation = "MULTIPLY"
+    seam.inputs[1].default_value = boards_per_unit
+    links.new(separate.outputs["Z"], seam.inputs[0])
+    seam_f = nodes.new("ShaderNodeMath")
+    seam_f.operation = "FRACT"
+    links.new(seam.outputs["Value"], seam_f.inputs[0])
+    seam_band = nodes.new("ShaderNodeMath")
+    seam_band.operation = "MULTIPLY_ADD"
+    seam_band.inputs[1].default_value = 0.18
+    seam_band.inputs[2].default_value = 0.82
+    links.new(seam_f.outputs["Value"], seam_band.inputs[0])
+    seam_color = nodes.new("ShaderNodeCombineColor")
+    for channel in ("Red", "Green", "Blue"):
+        links.new(seam_band.outputs["Value"], seam_color.inputs[channel])
+    mix = nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    mix.inputs["Factor"].default_value = 1.0
+    links.new(ramp.outputs["Color"], mix.inputs["A"])
+    links.new(seam_color.outputs["Color"], mix.inputs["B"])
+    finish_material(material, mix.outputs["Result"])
+    return material
+
+
 def add_beam(scene: bpy.types.Scene, name: str, a: tuple[float, float, float], b: tuple[float, float, float], thickness: float, material: bpy.types.Material) -> None:
     """Slanted square-section beam between two map-space points (trunks,
     branches, bamboo culms)."""
@@ -1123,11 +1172,17 @@ def add_foliage_blob(scene: bpy.types.Scene, name: str, cx: float, cy: float, z:
     h = height * squash
     ring_ts = (0.14, 0.42, 0.72, 0.92)
     ring_radii = tuple(radius * _math.sin(_math.pi * min(t, 0.97)) ** 0.72 for t in ring_ts)
+    seed = sum(ord(c) for c in name)
     vertices: list[tuple[float, float, float]] = []
-    for t, r in zip(ring_ts, ring_radii):
+    for ring, (t, r) in enumerate(zip(ring_ts, ring_radii)):
         for i in range(8):
             angle = (i + 0.5) / 8 * 2 * _math.pi
-            vertices.append((*map_xy(cx + r * _math.cos(angle), cy + r * _math.sin(angle)), z + h * t))
+            # Deterministic lumpiness: each vertex pushes in or out a little
+            # so the silhouette reads as leaf clumps, not a smooth solid.
+            jitter = 1.0 + 0.16 * _math.sin(seed * 3.7 + ring * 12.9898 + i * 78.233)
+            zj = h * 0.05 * _math.sin(seed * 1.3 + ring * 7.31 + i * 41.7)
+            rj = r * jitter
+            vertices.append((*map_xy(cx + rj * _math.cos(angle), cy + rj * _math.sin(angle)), z + h * t + zj))
     bottom = len(vertices)
     vertices.append((*map_xy(cx, cy), z))
     top = len(vertices)
@@ -1147,6 +1202,19 @@ def add_foliage_blob(scene: bpy.types.Scene, name: str, cx: float, cy: float, z:
     add_mesh(scene, name, vertices, faces, material)
 
 
+def add_tree_base(scene: bpy.types.Scene, cx: float, cy: float, trunk_r: float, bark: bpy.types.Material) -> None:
+    """Root flare plus a few grass tufts so trunks grow out of the ground
+    instead of standing on it."""
+    grass = make_material("BaseGrass", (0.200, 0.240, 0.095, 1.0))
+    roots = ((0.16, 0.02), (-0.13, 0.10), (0.03, -0.16), (-0.09, -0.12))
+    for index, (rx, ry) in enumerate(roots):
+        add_beam(scene, f"Root{cx}{index}", (cx + rx, cy + ry, 0.0), (cx + rx * 0.25, cy + ry * 0.25, 0.10), trunk_r * 0.7, bark)
+    tufts = ((0.22, -0.08), (-0.20, 0.14), (0.08, 0.22), (-0.16, -0.18), (0.24, 0.12))
+    for index, (tx, ty) in enumerate(tufts):
+        height = 0.10 + (index % 3) * 0.03
+        add_beam(scene, f"BaseTuft{cx}{index}", (cx + tx, cy + ty, 0.0), (cx + tx + 0.02, cy + ty - 0.02, height), 0.016, grass)
+
+
 def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     """Akamatsu (Japanese red pine): a visibly bent trunk, bare lower bole,
     and asymmetric umbrella pads carried at the END of individual branches.
@@ -1161,6 +1229,7 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     p1 = (0.10 * s, 0.06 * s, 0.55)
     p2 = (0.24 * s, 0.16 * s, 1.00)
     p3 = (0.16 * s, 0.10 * s, 1.34)
+    add_tree_base(scene, 0.0, 0.0, 0.11, bark)
     add_beam(scene, "Trunk1", p0, p1, 0.11, bark)
     add_beam(scene, "Trunk2", p1, p2, 0.09, bark)
     add_beam(scene, "Trunk3", p2, p3, 0.07, bark)
@@ -1184,6 +1253,7 @@ def build_tree_cedar(scene: bpy.types.Scene) -> None:
     bark = make_textured_material("CedarBark", (0.062, 0.045, 0.032), (0.100, 0.078, 0.055), scale=(14.0, 14.0, 3.0))
     dark = make_foliage_material("CedarNeedlesD", (0.035, 0.075, 0.048), (0.062, 0.110, 0.068))
     light = make_foliage_material("CedarNeedlesL", (0.052, 0.100, 0.058), (0.090, 0.150, 0.085))
+    add_tree_base(scene, 0.0, 0.0, 0.09, bark)
     add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.0, 0.0, 2.30), 0.09, bark)
     tiers = [
         (0.34, 0.26, 0.52, dark), (0.30, 0.62, 0.50, light), (0.26, 0.98, 0.48, dark),
@@ -1201,6 +1271,7 @@ def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
     bark = make_textured_material("BroadBark", (0.070, 0.052, 0.036), (0.118, 0.090, 0.062), scale=(14.0, 14.0, 3.0))
     dark = make_foliage_material("BroadLeavesD", (0.052, 0.095, 0.040), (0.095, 0.150, 0.065))
     light = make_foliage_material("BroadLeavesL", (0.085, 0.140, 0.058), (0.160, 0.225, 0.100))
+    add_tree_base(scene, 0.0, 0.0, 0.12, bark)
     add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.02, -0.02, 0.55), 0.13, bark)
     limbs = [((0.02, -0.02, 0.50), (-0.22, 0.10, 0.85)), ((0.02, -0.02, 0.50), (0.24, -0.14, 0.90)), ((0.02, -0.02, 0.52), (0.02, 0.20, 0.95))]
     for index, (base, tip) in enumerate(limbs):
@@ -1465,8 +1536,8 @@ def building_material_set() -> dict[str, bpy.types.Material]:
     """Quality-standard materials (approved on the showcase kura)."""
     return {
         "plaster": make_showcase_plaster(),
-        "wood": make_textured_material("Wood", (0.075, 0.055, 0.034), (0.135, 0.100, 0.062), scale=(18.0, 18.0, 2.5)),
-        "dark_wood": make_textured_material("DarkWood", (0.048, 0.034, 0.020), (0.095, 0.070, 0.042), scale=(18.0, 18.0, 2.5)),
+        "wood": make_plank_material("Wood", (0.075, 0.055, 0.034), (0.140, 0.105, 0.065)),
+        "dark_wood": make_plank_material("DarkWood", (0.046, 0.032, 0.019), (0.098, 0.072, 0.044)),
         "stone": make_ishigaki_material(),
         "roof": make_showcase_roof(),
         "roof_y": make_showcase_roof(ridge_axis="y"),
@@ -1514,18 +1585,18 @@ def build_barracks_graybox(scene: bpy.types.Scene) -> None:
     mats = building_material_set()
     add_yard_pad(scene, 4.0, 3.0, "dirt")
     add_box(scene, "NagayaPlinth", *map_box((-3.68, -2.58, 0.0), (-0.32, -1.32, 0.15)), mats["stone"])
-    add_box(scene, "NagayaBody", *map_box((-3.6, -2.5, 0.15), (-0.4, -1.4, 1.05)), mats["plaster"])
-    add_kawara_roof(scene, "NagayaRoof", (-3.78, -2.62), (-0.22, -1.28), 1.05, 1.55, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
+    add_box(scene, "NagayaBody", *map_box((-3.6, -2.5, 0.15), (-0.4, -1.4, 0.92)), mats["plaster"])
+    add_kawara_roof(scene, "NagayaRoof", (-3.78, -2.62), (-0.22, -1.28), 0.92, 1.40, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
     # Openings: a sliding entry door and latticed windows on the yard face.
     rack = mats["dark_wood"]
-    add_box(scene, "DoorFrame", *map_box((-2.24, -1.415, 0.15), (-1.76, -1.375, 0.92)), rack)
-    add_box(scene, "DoorPanel", *map_box((-2.18, -1.405, 0.15), (-1.82, -1.385, 0.86)), mats["wood"])
+    add_box(scene, "DoorFrame", *map_box((-2.24, -1.415, 0.15), (-1.76, -1.375, 0.82)), rack)
+    add_box(scene, "DoorPanel", *map_box((-2.18, -1.405, 0.15), (-1.82, -1.385, 0.76)), mats["wood"])
     for index, (wx0, wx1) in enumerate(((-3.35, -2.85), (-1.35, -0.85))):
-        add_box(scene, f"BWinFrame{index}", *map_box((wx0 - 0.04, -1.42, 0.48), (wx1 + 0.04, -1.38, 0.86)), rack)
-        add_box(scene, f"BWin{index}", *map_box((wx0, -1.415, 0.52), (wx1, -1.385, 0.82)), mats["trim"])
+        add_box(scene, f"BWinFrame{index}", *map_box((wx0 - 0.04, -1.42, 0.42), (wx1 + 0.04, -1.38, 0.76)), rack)
+        add_box(scene, f"BWin{index}", *map_box((wx0, -1.415, 0.46), (wx1, -1.385, 0.72)), mats["trim"])
         bar = wx0 + 0.05
         while bar < wx1 - 0.02:
-            add_box(scene, f"BWinBar{index}{bar:.2f}", *map_box((bar, -1.41, 0.52), (bar + 0.035, -1.38, 0.82)), rack)
+            add_box(scene, f"BWinBar{index}{bar:.2f}", *map_box((bar, -1.41, 0.46), (bar + 0.035, -1.38, 0.72)), rack)
             bar += 0.10
     # Drill-yard clutter: spear rack, rice bales, firewood.
     add_box(scene, "RackBar", *map_box((-2.6, -0.72, 0.55), (-1.4, -0.68, 0.62)), rack)
@@ -1541,69 +1612,106 @@ def build_barracks_graybox(scene: bpy.types.Scene) -> None:
 
 
 def build_samurai_residence_graybox(scene: bpy.types.Scene) -> None:
-    """Buke-yashiki: exposed-timber shoin-style main house (no plaster
-    cladding) with an engawa veranda, shoji panels, and a small garden with
-    stone lantern, stepping stones, garden pine and a well.
-    Canvas 288x224, anchor 144,192."""
+    """Buke-yashiki: exposed-timber shoin house behind a wooden board fence,
+    with an engawa, shoji panels and a small garden (pond, lantern, stepping
+    stones, garden pine, well). Canvas 288x224, anchor 144,192."""
     mats = building_material_set()
     props = prop_materials()
     wood = mats["wood"]
     dark = mats["dark_wood"]
     add_yard_pad(scene, 4.0, 4.0, "gravel")
 
-    # Perimeter wall (plastered) with tile coping and a south gate gap.
+    # Itabei: wooden board fence with a narrow rain cap, gate gap on south.
     for name, low, high in (
-        ("CompoundWallN", (-3.95, -4.0, 0.0), (-0.05, -3.85, 0.55)),
-        ("CompoundWallW", (-4.0, -3.95, 0.0), (-3.85, -0.05, 0.55)),
-        ("CompoundWallE", (-0.15, -3.95, 0.0), (0.0, -0.05, 0.55)),
-        ("CompoundWallS1", (-3.95, -0.15, 0.0), (-2.35, 0.0, 0.55)),
-        ("CompoundWallS2", (-1.65, -0.15, 0.0), (-0.05, 0.0, 0.55)),
+        ("FenceN", (-3.95, -4.0, 0.0), (-0.05, -3.88, 0.52)),
+        ("FenceW", (-4.0, -3.95, 0.0), (-3.88, -0.05, 0.52)),
+        ("FenceE", (-0.12, -3.95, 0.0), (0.0, -0.05, 0.52)),
+        ("FenceS1", (-3.95, -0.12, 0.0), (-2.35, 0.0, 0.52)),
+        ("FenceS2", (-1.65, -0.12, 0.0), (-0.05, 0.0, 0.52)),
     ):
-        add_box(scene, name, *map_box(low, high), mats["plaster"])
+        add_box(scene, name, *map_box(low, high), dark)
     for cname, clow, chigh in (
-        ("CopeN", (-3.99, -4.04), (-0.01, -3.81)),
-        ("CopeW", (-4.04, -3.99), (-3.81, -0.01)),
-        ("CopeE", (-0.19, -3.99), (0.04, -0.01)),
-        ("CopeS1", (-3.99, -0.19), (-2.31, 0.04)),
-        ("CopeS2", (-1.69, -0.19), (-0.01, 0.04)),
+        ("FCapN", (-3.99, -4.03), (-0.01, -3.85)),
+        ("FCapW", (-4.03, -3.99), (-3.85, -0.01)),
+        ("FCapE", (-0.15, -3.99), (0.03, -0.01)),
+        ("FCapS1", (-3.99, -0.15), (-2.31, 0.03)),
+        ("FCapS2", (-1.69, -0.15), (-0.01, 0.03)),
     ):
-        add_box(scene, cname, *map_box((clow[0], clow[1], 0.55), (chigh[0], chigh[1], 0.62)), mats["trim"])
+        add_box(scene, cname, *map_box((clow[0], clow[1], 0.52), (chigh[0], chigh[1], 0.575)), wood)
 
-    # Main house: raised timber floor, wooden posts and dark siding, with a
-    # band of shoji panels on the visible faces.
-    add_box(scene, "FloorFrame", *map_box((-3.30, -3.40, 0.0), (-1.10, -1.90, 0.30)), dark)
-    add_box(scene, "MainBody", *map_box((-3.2, -3.3, 0.30), (-1.2, -2.0, 1.13)), wood)
-    # Shoji panels between posts on the two visible faces.
+    # Main house (lowered): raised floor, posts + siding, shoji band.
+    add_box(scene, "FloorFrame", *map_box((-3.30, -3.40, 0.0), (-1.10, -1.90, 0.26)), dark)
+    add_box(scene, "MainBody", *map_box((-3.2, -3.3, 0.26), (-1.2, -2.0, 1.00)), wood)
     for index, sx in enumerate((-3.05, -2.62, -2.19, -1.76)):
-        add_box(scene, f"ShojiS{index}", *map_box((sx, -2.03, 0.42), (sx + 0.34, -1.985, 1.00)), props["shoji"])
+        add_box(scene, f"ShojiS{index}", *map_box((sx, -2.03, 0.36), (sx + 0.34, -1.985, 0.88)), props["shoji"])
     for index, sy in enumerate((-3.10, -2.72)):
-        add_box(scene, f"ShojiE{index}", *map_box((-1.23, sy, 0.42), (-1.185, sy + 0.30, 1.00)), props["shoji"])
+        add_box(scene, f"ShojiE{index}", *map_box((-1.23, sy, 0.36), (-1.185, sy + 0.30, 0.88)), props["shoji"])
     for px, py in ((-3.2, -2.0), (-2.55, -2.0), (-1.9, -2.0), (-1.2, -2.0), (-1.2, -2.65), (-1.2, -3.3)):
-        add_box(scene, f"HousePost{px}{py}", *map_box((px - 0.045, py - 0.045, 0.30), (px + 0.045, py + 0.045, 1.13)), dark)
-
-    # Engawa veranda with support posts along the garden face.
-    add_box(scene, "Engawa", *map_box((-3.25, -2.0, 0.24), (-1.15, -1.72, 0.34)), props["wood"])
+        add_box(scene, f"HousePost{px}{py}", *map_box((px - 0.045, py - 0.045, 0.26), (px + 0.045, py + 0.045, 1.00)), dark)
+    add_box(scene, "Engawa", *map_box((-3.25, -2.0, 0.20), (-1.15, -1.72, 0.30)), props["wood"])
     for ex in (-3.15, -2.55, -1.95, -1.35):
-        add_box(scene, f"EngawaPost{ex}", *map_box((ex - 0.03, -1.78, 0.0), (ex + 0.03, -1.72, 0.30)), dark)
+        add_box(scene, f"EngawaPost{ex}", *map_box((ex - 0.03, -1.78, 0.0), (ex + 0.03, -1.72, 0.26)), dark)
+    add_kawara_roof(scene, "MainRoof", (-3.42, -3.5), (-0.98, -1.8), 1.00, 1.58, "x", mats["roof"], mats["trim"], verge_material=dark)
+    # Annex with a wooden shingle roof.
+    add_box(scene, "AnnexBody", *map_box((-1.0, -2.6, 0.0), (-0.3, -1.9, 0.68)), dark)
+    add_itabuki_roof(scene, "AnnexRoof", (-1.08, -2.68), (-0.22, -1.82), 0.68, 0.98, "y", dark, props["stone"])
 
-    add_kawara_roof(scene, "MainRoof", (-3.42, -3.5), (-0.98, -1.8), 1.13, 1.78, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
-    # Annex.
-    add_gabled_house(scene, "Annex", (-1.0, -2.6), (-0.3, -1.9), 0.75, 1.1, "y", dark, mats["roof_y"], roof_overhang=0.1)
-
-    # Garden: lantern, stepping stones toward the gate, garden pine, well,
-    # bushes and weeds along the wall.
-    add_prop_lantern(scene, -2.35, -1.15, props)
-    for index, (tx, ty) in enumerate(((-2.05, -0.55), (-2.2, -0.95), (-2.15, -1.35))):
+    # Garden: small pond with stone rim, lantern, stepping stones, pine,
+    # bushes; well against the north fence.
+    pond = make_material("GardenPond", (0.040, 0.085, 0.105, 1.0))
+    add_flat_quad(scene, "Pond", (-1.75, -1.35), (-0.85, -0.75), 0.012, pond)
+    rim_stones = ((-1.8, -1.1), (-1.55, -1.42), (-1.1, -1.45), (-0.8, -1.2), (-0.82, -0.85), (-1.2, -0.68), (-1.65, -0.72))
+    for index, (rx, ry) in enumerate(rim_stones):
+        add_box(scene, f"PondRim{index}", *map_box((rx - 0.06, ry - 0.05, 0.0), (rx + 0.06, ry + 0.05, 0.075)), props["stone"])
+    add_prop_lantern(scene, -2.05, -1.15, props)
+    for index, (tx, ty) in enumerate(((-2.0, -0.45), (-2.15, -0.85), (-2.35, -1.3), (-2.6, -1.6))):
         add_box(scene, f"StepStone{index}", *map_box((tx - 0.09, ty - 0.07, 0.0), (tx + 0.09, ty + 0.07, 0.035)), props["stone"])
     add_prop_well(scene, -0.55, -3.35, props)
     add_prop_bush(scene, -3.5, -1.0, props)
-    add_prop_bush(scene, -0.6, -1.5, props, scale=0.8)
+    add_prop_bush(scene, -0.45, -1.75, props, scale=0.75)
     add_prop_weeds(scene, -3.6, -0.35, props)
-    # Garden pine: small matsu by the engawa.
+    add_prop_weeds(scene, -0.3, -0.4, props)
     bark = props["wood"]
     add_beam(scene, "GardenPineTrunk", (-3.45, -1.35, 0.0), (-3.32, -1.22, 0.72), 0.07, bark)
     add_foliage_blob(scene, "GardenPinePad1", -3.32, -1.22, 0.62, 0.24, 0.20, props["bushD"], squash=0.7)
     add_foliage_blob(scene, "GardenPinePad2", -3.5, -1.42, 0.44, 0.17, 0.16, props["bushD"], squash=0.7)
+
+
+def add_itabuki_roof(scene: bpy.types.Scene, name: str, low_map: tuple[float, float], high_map: tuple[float, float], base_z: float, ridge_z: float, ridge_axis: str, wood: bpy.types.Material, stone: bpy.types.Material) -> None:
+    """Ishioki-itabuki: wooden plank roof weighted with rows of stones, the
+    common townhouse roof before kawara spread."""
+    x0, y0 = low_map
+    x1, y1 = high_map
+    low, high = map_box((x0, y0, 0.0), (x1, y1, 0.0))
+    add_gable_roof(scene, f"{name}Surface", (low[0], low[1]), (high[0], high[1]), base_z, ridge_z, ridge_axis, wood)
+    # Ridge board.
+    if ridge_axis == "x":
+        mid = (y0 + y1) / 2.0
+        rlow, rhigh = map_box((x0 - 0.03, mid - 0.06, 0.0), (x1 + 0.03, mid + 0.06, 0.0))
+    else:
+        mid = (x0 + x1) / 2.0
+        rlow, rhigh = map_box((mid - 0.06, y0 - 0.03, 0.0), (mid + 0.06, y1 + 0.03, 0.0))
+    add_box(scene, f"{name}RidgeBoard", (rlow[0], rlow[1], ridge_z - 0.03), (rhigh[0], rhigh[1], ridge_z + 0.045), wood)
+    # Weight stones scattered on both slopes in loose rows.
+    import math as _math
+    seed = sum(ord(c) for c in name)
+    span = (x1 - x0) if ridge_axis == "x" else (y1 - y0)
+    count = max(3, int(span / 0.34))
+    slope_len = ((y1 - y0) if ridge_axis == "x" else (x1 - x0)) / 2.0
+    rise = ridge_z - base_z
+    for row, frac in ((0, 0.36), (1, 0.68)):
+        for i in range(count):
+            along = (i + 0.5) / count * span + 0.05 * _math.sin(seed + row * 9.1 + i * 5.7)
+            offset = slope_len * frac
+            z = base_z + rise * (1.0 - frac) * 0.92
+            for side in (-1, 1):
+                if ridge_axis == "x":
+                    sx = x0 + along
+                    sy = (y0 + y1) / 2.0 + side * offset
+                else:
+                    sx = (x0 + x1) / 2.0 + side * offset
+                    sy = y0 + along
+                add_box(scene, f"{name}Stone{row}{i}{side}", *map_box((sx - 0.055, sy - 0.045, z), (sx + 0.055, sy + 0.045, z + 0.07)), stone)
 
 
 def build_town_block_graybox(scene: bpy.types.Scene) -> None:
@@ -1616,60 +1724,65 @@ def build_town_block_graybox(scene: bpy.types.Scene) -> None:
     add_yard_pad(scene, 6.0, 6.0, "dirt")
 
     houses = (
-        # name, low, high, wall_top, ridge_top, ridge_axis, wall_mat
-        ("MachiyaNW", (-5.6, -5.5), (-3.4, -4.0), 1.9, 2.35, "x", "plaster"),
-        ("MachiyaNE", (-2.6, -5.5), (-0.4, -4.1), 0.95, 1.6, "x", "wood"),
-        ("MachiyaSW", (-5.6, -2.2), (-3.5, -0.7), 0.95, 1.5, "y", "dark_wood"),
-        ("MachiyaSE", (-2.5, -2.3), (-0.4, -0.6), 0.95, 1.7, "y", "wood"),
+        # name, low, high, wall_top, ridge_top, axis, wall_mat, roof_kind
+        ("MachiyaNW", (-5.6, -5.5), (-3.4, -4.0), 1.62, 2.02, "x", "plaster", "kawara"),
+        ("MachiyaNE", (-2.6, -5.5), (-0.4, -4.1), 0.80, 1.32, "x", "wood", "itabuki"),
+        ("MachiyaSW", (-5.6, -2.2), (-3.5, -0.7), 0.80, 1.26, "y", "dark_wood", "itabuki"),
+        ("MachiyaSE", (-2.5, -2.3), (-0.4, -0.6), 0.80, 1.38, "y", "wood", "kawara"),
     )
     props = prop_materials()
     cloth = make_material("MachiyaNoren", (0.075, 0.105, 0.200, 1.0))
-    for name, low, high, wall_top, ridge_top, axis, wall in houses:
+    for name, low, high, wall_top, ridge_top, axis, wall, roof_kind in houses:
         add_box(scene, f"{name}Body", *map_box((low[0], low[1], 0.0), (high[0], high[1], wall_top)), mats[wall])
-        roof_mat = mats["roof"] if axis == "x" else mats["roof_y"]
-        add_kawara_roof(
-            scene,
-            f"{name}Roof",
-            (low[0] - 0.16, low[1] - 0.16),
-            (high[0] + 0.16, high[1] + 0.16),
-            wall_top,
-            ridge_top,
-            axis,
-            roof_mat,
-            mats["trim"],
-            verge_material=mats["plaster"],
-        )
-        # Street front: koshi lattice band, doorway, and a noren on plaster
-        # or wood shopfronts. The face toward map +y is the visible street.
+        if roof_kind == "itabuki":
+            add_itabuki_roof(scene, f"{name}Roof", (low[0] - 0.14, low[1] - 0.14), (high[0] + 0.14, high[1] + 0.14), wall_top, ridge_top, axis, mats["dark_wood"], props["stone"])
+        else:
+            roof_mat = mats["roof"] if axis == "x" else mats["roof_y"]
+            # Wooden houses get wooden verge boards; only plastered walls
+            # carry the white shikkui verge.
+            verge = mats["plaster"] if wall == "plaster" else mats["dark_wood"]
+            add_kawara_roof(
+                scene,
+                f"{name}Roof",
+                (low[0] - 0.16, low[1] - 0.16),
+                (high[0] + 0.16, high[1] + 0.16),
+                wall_top,
+                ridge_top,
+                axis,
+                roof_mat,
+                mats["trim"],
+                verge_material=verge,
+            )
+        # Street front: koshi lattice band, doorway, and a noren.
         fy = high[1]
         x0, x1 = low[0], high[0]
         door_x = (x0 + x1) / 2.0
-        add_box(scene, f"{name}Door", *map_box((door_x - 0.20, fy - 0.01, 0.0), (door_x + 0.20, fy + 0.025, 0.72)), mats["dark_wood"])
-        add_box(scene, f"{name}Noren", *map_box((door_x - 0.24, fy + 0.025, 0.50), (door_x + 0.24, fy + 0.045, 0.74)), cloth)
+        add_box(scene, f"{name}Door", *map_box((door_x - 0.20, fy - 0.01, 0.0), (door_x + 0.20, fy + 0.025, 0.66)), mats["dark_wood"])
+        add_box(scene, f"{name}Noren", *map_box((door_x - 0.24, fy + 0.025, 0.46), (door_x + 0.24, fy + 0.045, 0.68)), cloth)
         for side, (kx0, kx1) in enumerate(((x0 + 0.12, door_x - 0.30), (door_x + 0.30, x1 - 0.12))):
             if kx1 - kx0 < 0.2:
                 continue
-            add_box(scene, f"{name}KoshiBack{side}", *map_box((kx0, fy - 0.005, 0.10), (kx1, fy + 0.015, 0.68)), mats["trim"])
+            add_box(scene, f"{name}KoshiBack{side}", *map_box((kx0, fy - 0.005, 0.10), (kx1, fy + 0.015, 0.62)), mats["trim"])
             bar = kx0 + 0.03
             while bar < kx1 - 0.03:
-                add_box(scene, f"{name}Koshi{side}{bar:.2f}", *map_box((bar, fy + 0.015, 0.10), (bar + 0.035, fy + 0.035, 0.68)), mats["dark_wood"])
+                add_box(scene, f"{name}Koshi{side}{bar:.2f}", *map_box((bar, fy + 0.015, 0.10), (bar + 0.035, fy + 0.035, 0.62)), mats["dark_wood"])
                 bar += 0.10
-        # Upper-floor mushiko window for the two-story house.
-        if wall_top > 1.5:
-            add_box(scene, f"{name}UpWin", *map_box((door_x - 0.35, fy - 0.005, 1.25), (door_x + 0.35, fy + 0.02, 1.55)), mats["trim"])
+        if wall_top > 1.4:
+            add_box(scene, f"{name}UpWin", *map_box((door_x - 0.35, fy - 0.005, 1.08), (door_x + 0.35, fy + 0.02, 1.36)), mats["trim"])
             bar = door_x - 0.31
             while bar < door_x + 0.31:
-                add_box(scene, f"{name}UpBar{bar:.2f}", *map_box((bar, fy + 0.02, 1.25), (bar + 0.035, fy + 0.035, 1.55)), mats["plaster"])
+                add_box(scene, f"{name}UpBar{bar:.2f}", *map_box((bar, fy + 0.02, 1.08), (bar + 0.035, fy + 0.035, 1.36)), mats["plaster"])
                 bar += 0.09
-    # Alley clutter: barrels, firewood, a well shared by the block, weeds.
-    add_prop_barrel(scene, -3.05, -4.3, props)
-    add_prop_barrel(scene, -2.85, -4.05, props)
-    add_prop_firewood(scene, -3.0, -2.6, props)
-    add_prop_well(scene, -0.75, -3.2, props)
-    add_prop_bale(scene, -5.1, -3.3, True, props)
-    add_prop_weeds(scene, -5.5, -0.35, props)
-    add_prop_weeds(scene, -0.4, -0.3, props)
-    add_prop_bush(scene, -5.75, -6.1, props, scale=0.7)
+    # Clutter along the street fronts (screen-facing sides) where it reads.
+    add_prop_barrel(scene, -3.15, -0.35, props)
+    add_prop_barrel(scene, -2.9, -0.22, props)
+    add_prop_bale(scene, -0.9, -0.3, True, props)
+    add_prop_firewood(scene, -0.22, -1.5, props)
+    add_prop_well(scene, -3.0, -3.15, props)
+    add_prop_bale(scene, -0.25, -3.3, False, props)
+    add_prop_weeds(scene, -5.55, -0.3, props)
+    add_prop_weeds(scene, -0.35, -5.8, props)
+    add_prop_bush(scene, -5.8, -6.05, props, scale=0.7)
 
 
 def build_unit_engineer(scene: bpy.types.Scene) -> None:

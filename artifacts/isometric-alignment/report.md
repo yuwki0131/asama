@@ -5,9 +5,9 @@
 | `terrain.grass.base` | present | 64x32 | 32,16 | 0,0-63,31 | 1x1 center | - | none |
 | `building.storehouse` | present | 224x176 | 112,144 | 15,8-208,143 | 3x3 south | blender yard-pad foundation | none |
 | `building.market` | present | 256x192 | 144,160 | 15,15-240,159 | 4x3 south | blender yard-pad foundation | none |
-| `building.barracks` | present | 256x192 | 144,160 | 15,0-240,159 | 4x3 south | blender yard-pad foundation | none |
-| `building.samurai_residence` | present | 288x224 | 144,192 | 14,16-273,191 | 4x4 south | blender yard-pad foundation | none |
-| `building.town_block` | present | 416x304 | 208,272 | 15,3-400,271 | 6x6 south | blender yard-pad foundation | none |
+| `building.barracks` | present | 256x192 | 144,160 | 15,5-240,159 | 4x3 south | blender yard-pad foundation | none |
+| `building.samurai_residence` | present | 288x224 | 144,192 | 15,24-272,191 | 4x4 south | blender yard-pad foundation | none |
+| `building.town_block` | present | 416x304 | 208,272 | 15,16-400,271 | 6x6 south | blender yard-pad foundation | none |
 | `building.gate.wood.closed` | present | 96x128 | 48,104 | 12,18-83,119 | 1x1 south | blender gate kit | bottom alpha differs from south anchor by 15px |
 | `building.yagura.small.normal` | present | 160x200 | 80,168 | 16,0-143,167 | 2x2 south | blender tower kit | none |
 | `building.wall.plaster.connected.1010` | present | 64x96 | 32,80 | 9,27-54,90 | 1x1 center | - | none |
