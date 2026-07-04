@@ -734,16 +734,14 @@ def make_showcase_roof() -> bpy.types.Material:
     coords = nodes.new("ShaderNodeTexCoord")
     separate = nodes.new("ShaderNodeSeparateXYZ")
     links.new(coords.outputs["Object"], separate.inputs["Vector"])
-    run = nodes.new("ShaderNodeMath")
-    run.operation = "ADD"
-    links.new(separate.outputs["X"], run.inputs[0])
-    links.new(separate.outputs["Y"], run.inputs[1])
 
-    # Tile columns along the roof run.
+    # Tile columns are indexed by the position ALONG the ridge so the seams
+    # run straight down the slope; indexing by any in-plane diagonal reads
+    # as slanted planking instead of kawara.
     col = nodes.new("ShaderNodeMath")
     col.operation = "MULTIPLY"
     col.inputs[1].default_value = 9.0
-    links.new(run.outputs["Value"], col.inputs[0])
+    links.new(separate.outputs["X"], col.inputs[0])
     col_id = nodes.new("ShaderNodeMath")
     col_id.operation = "FLOOR"
     links.new(col.outputs["Value"], col_id.inputs[0])
@@ -760,10 +758,14 @@ def make_showcase_roof() -> bpy.types.Material:
     # Joint shadow between columns (dark near the seam, rounded highlight mid-tile).
     col_shade = nodes.new("ShaderNodeValToRGB")
     col_shade.color_ramp.interpolation = "EASE"
-    col_shade.color_ramp.elements[0].position = 0.30
-    col_shade.color_ramp.elements[0].color = (1.04, 1.04, 1.04, 1.0)
-    col_shade.color_ramp.elements[1].position = 0.5
-    col_shade.color_ramp.elements[1].color = (0.52, 0.50, 0.48, 1.0)
+    # tri=0 at tile center, 0.5 at the seam: bright rounded cap at the
+    # center (ibushi silver catch-light), falling to a dark seam shadow.
+    col_shade.color_ramp.elements[0].position = 0.0
+    col_shade.color_ramp.elements[0].color = (1.30, 1.30, 1.34, 1.0)
+    col_shade.color_ramp.elements[1].position = 0.24
+    col_shade.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    seam = col_shade.color_ramp.elements.new(0.46)
+    seam.color = (0.42, 0.40, 0.40, 1.0)
     links.new(col_tri.outputs["Value"], col_shade.inputs["Fac"])
 
     # Per-column value jitter (aged tiles differ slightly).
@@ -799,7 +801,7 @@ def make_showcase_roof() -> bpy.types.Material:
     base_ramp.color_ramp.elements[0].position = 0.3
     base_ramp.color_ramp.elements[0].color = (0.052, 0.048, 0.046, 1.0)
     base_ramp.color_ramp.elements[1].position = 0.75
-    base_ramp.color_ramp.elements[1].color = (0.115, 0.105, 0.095, 1.0)
+    base_ramp.color_ramp.elements[1].color = (0.125, 0.120, 0.115, 1.0)
     links.new(base_noise.outputs["Fac"], base_ramp.inputs["Fac"])
 
     # Mud grime patches.
@@ -876,15 +878,14 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
         add_box(scene, f"Win{index}", *map_box((wx0, -0.82, 0.82), (wx1, -0.77, 1.00)), ridge_dark)
         bar = wx0 + 0.05
         while bar < wx1 - 0.02:
-            add_box(scene, f"WinBar{index}{bar:.2f}", *map_box((bar, -0.81, 0.82), (bar + 0.035, -0.755, 1.00)), wood)
+            add_box(scene, f"WinBar{index}{bar:.2f}", *map_box((bar, -0.81, 0.82), (bar + 0.035, -0.755, 1.00)), plaster)
             bar += 0.09
     add_box(scene, "GableWinFrame", *map_box((-0.55, -1.71, 0.80), (-0.47, -1.29, 1.06)), plaster)
     add_box(scene, "GableWin", *map_box((-0.52, -1.66, 0.84), (-0.44, -1.34, 1.02)), ridge_dark)
 
-    # Corner posts and the nageshi beam between namako and plaster bands.
-    for px, py in ((-2.5, -2.2), (-0.5, -2.2), (-2.5, -0.8), (-0.5, -0.8)):
-        add_box(scene, f"Post{px}{py}", *map_box((px - 0.05, py - 0.05, 0.24), (px + 0.05, py + 0.05, 1.17)), wood)
-    add_box(scene, "Nageshi", *map_box((-2.53, -2.23, 0.54), (-0.47, -0.77, 0.60)), wood)
+    # Kura walls are fully plastered (nurigome): no exposed timber. A thin
+    # plaster drip ledge articulates the namako/upper boundary instead.
+    add_box(scene, "DripLedge", *map_box((-2.53, -2.23, 0.545), (-0.47, -0.77, 0.585)), plaster)
 
     # Stone step before the door.
     add_box(scene, "DoorStep", *map_box((-1.70, -0.72, 0.0), (-1.30, -0.58, 0.12)), stone)
@@ -892,20 +893,27 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     # Curved roof (tighter eaves than round 1), ridge cap and oni end tiles.
     low, high = map_box((-2.70, -2.40, 0.0), (-0.30, -0.60, 0.0))
     add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.68, "x", roof)
-    ridge_low, ridge_high = map_box((-2.74, -1.56, 0.0), (-0.26, -1.44, 0.0))
-    add_box(scene, "RidgeCap", (ridge_low[0], ridge_low[1], 1.66), (ridge_high[0], ridge_high[1], 1.75), ridge_dark)
-    for ox in (-2.74, -0.38):
-        end_low, end_high = map_box((ox, -1.60, 0.0), (ox + 0.12, -1.40, 0.0))
-        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.64), (end_high[0], end_high[1], 1.82), ridge_dark)
+    # Noshi ridge stack: broad lower tier, narrow upper tier, oni end tiles.
+    noshi_low, noshi_high = map_box((-2.76, -1.60, 0.0), (-0.24, -1.40, 0.0))
+    add_box(scene, "RidgeNoshi", (noshi_low[0], noshi_low[1], 1.64), (noshi_high[0], noshi_high[1], 1.72), ridge_dark)
+    cap_low, cap_high = map_box((-2.74, -1.545, 0.0), (-0.26, -1.455, 0.0))
+    add_box(scene, "RidgeCap", (cap_low[0], cap_low[1], 1.72), (cap_high[0], cap_high[1], 1.79), ridge_dark)
+    for ox in (-2.80, -0.34):
+        end_low, end_high = map_box((ox, -1.62, 0.0), (ox + 0.14, -1.38, 0.0))
+        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.62), (end_high[0], end_high[1], 1.86), ridge_dark)
 
-    # Round eave-edge tiles (gargawa): a row of stubs along both eaves.
-    step = 0.16
-    x = -2.66
-    while x < -0.34:
+    # Eave fascia and round tile ends, aligned to the 1/9-unit tile pitch so
+    # each stub caps one tile column.
+    for ey in (-2.40, -0.60):
+        flow, fhigh = map_box((-2.70, ey - 0.04, 0.0), (-0.30, ey + 0.04, 0.0))
+        add_box(scene, f"Fascia{ey}", (flow[0], flow[1], 1.115), (fhigh[0], fhigh[1], 1.165), ridge_dark)
+    pitch = 1.0 / 9.0
+    count = int(2.40 / pitch)
+    for index in range(count + 1):
+        x = -2.70 + index * pitch - 0.028
         for ey in (-2.40, -0.60):
-            elow, ehigh = map_box((x, ey - 0.05, 0.0), (x + 0.07, ey + 0.05, 0.0))
-            add_box(scene, f"Eave{x:.2f}{ey}", (elow[0], elow[1], 1.13), (ehigh[0], ehigh[1], 1.20), ridge_dark)
-        x += step
+            elow, ehigh = map_box((x, ey - 0.05, 0.0), (x + 0.056, ey + 0.05, 0.0))
+            add_box(scene, f"Eave{index}{ey}", (elow[0], elow[1], 1.10), (ehigh[0], ehigh[1], 1.175), ridge_dark)
 
 
 def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
@@ -1060,9 +1068,9 @@ def make_ishigaki_material(name: str = "IshigakiStone") -> bpy.types.Material:
     stone_noise.inputs["Scale"].default_value = 4.0
     stone_ramp = nodes.new("ShaderNodeValToRGB")
     stone_ramp.color_ramp.elements[0].position = 0.3
-    stone_ramp.color_ramp.elements[0].color = (0.135, 0.098, 0.055, 1.0)
+    stone_ramp.color_ramp.elements[0].color = (0.190, 0.145, 0.085, 1.0)
     stone_ramp.color_ramp.elements[1].position = 0.8
-    stone_ramp.color_ramp.elements[1].color = (0.235, 0.180, 0.110, 1.0)
+    stone_ramp.color_ramp.elements[1].color = (0.330, 0.260, 0.160, 1.0)
     links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
 
     mix = nodes.new("ShaderNodeMix")
