@@ -366,7 +366,7 @@ ROOF_CURVE_SEGMENTS = 4
 ROOF_CURVE_EXPONENT = 1.55
 
 
-def add_gable_roof(scene: bpy.types.Scene, name: str, low: tuple[float, float], high: tuple[float, float], base_z: float, ridge_z: float, ridge_axis: str, material: bpy.types.Material) -> bpy.types.Object:
+def add_gable_roof(scene: bpy.types.Scene, name: str, low: tuple[float, float], high: tuple[float, float], base_z: float, ridge_z: float, ridge_axis: str, material: bpy.types.Material, end_material: bpy.types.Material | None = None) -> bpy.types.Object:
     """Gabled roof with a concave Japanese sori curve: shallow at the eaves,
     steepening toward the ridge. Ridge runs along ridge_axis ('x' or 'y')."""
     x0, y0 = low
@@ -400,11 +400,19 @@ def add_gable_roof(scene: bpy.types.Scene, name: str, low: tuple[float, float], 
             faces.append((a0, b0, b1, a1))
 
     # Gable end caps: the curved profile down one slope and up the other.
+    end_face_start = len(faces)
     for end in (0, 1):
         loop = [south[i][end] for i in range(len(south))] + [north[i][end] for i in range(len(north) - 2, -1, -1)]
         faces.append(tuple(loop))
 
-    return add_mesh(scene, name, vertices, faces, material)
+    obj = add_mesh(scene, name, vertices, faces, material)
+    if end_material is not None:
+        # Real kura roofs plaster the gable verge white; assign the second
+        # material to the two end-cap polygons.
+        obj.data.materials.append(end_material)
+        for index in range(end_face_start, len(faces)):
+            obj.data.polygons[index].material_index = 1
+    return obj
 
 
 def make_grass_material() -> bpy.types.Material:
@@ -892,11 +900,11 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     crest_bright = make_material("CrestWhite", (0.72, 0.70, 0.62, 1.0))
     crest_dark = make_material("CrestInk", (0.10, 0.095, 0.10, 1.0))
     import math as _math
-    for radius, depth, mat in ((0.17, 0.045, crest_bright), (0.115, 0.055, crest_dark), (0.06, 0.065, crest_bright)):
+    for radius, depth, mat in ((0.095, 0.045, crest_bright), (0.062, 0.055, crest_dark), (0.032, 0.065, crest_bright)):
         ring = []
         for i in range(8):
             angle = i / 8 * 2 * _math.pi
-            ring.append((-1.5 + radius * _math.cos(angle), 0.92 + radius * _math.sin(angle)))
+            ring.append((-1.5 + radius * _math.cos(angle), 1.00 + radius * _math.sin(angle)))
         vertices = [(*map_xy(-0.53 + depth, ry), rz) for ry, rz in [(-1.5, 0.92)]]
         vertices = []
         for ry, rz in ring:
@@ -918,28 +926,28 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     splash = make_material("SplashGrime", (0.155, 0.145, 0.125, 1.0))
     add_box(scene, "Splash", *map_box((-2.505, -2.205, 0.24), (-0.495, -0.795, 0.305)), splash)
 
-    # Curved roof (tighter eaves than round 1), ridge cap and oni end tiles.
-    low, high = map_box((-2.70, -2.40, 0.0), (-0.30, -0.60, 0.0))
-    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.68, "x", roof)
-    # Noshi ridge stack: broad lower tier, narrow upper tier, oni end tiles.
-    noshi_low, noshi_high = map_box((-2.76, -1.60, 0.0), (-0.24, -1.40, 0.0))
-    add_box(scene, "RidgeNoshi", (noshi_low[0], noshi_low[1], 1.64), (noshi_high[0], noshi_high[1], 1.72), ridge_dark)
-    cap_low, cap_high = map_box((-2.74, -1.545, 0.0), (-0.26, -1.455, 0.0))
-    add_box(scene, "RidgeCap", (cap_low[0], cap_low[1], 1.72), (cap_high[0], cap_high[1], 1.79), ridge_dark)
-    for ox in (-2.80, -0.34):
-        end_low, end_high = map_box((ox, -1.62, 0.0), (ox + 0.14, -1.38, 0.0))
-        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.62), (end_high[0], end_high[1], 1.86), ridge_dark)
+    # Curved roof with modest kura eaves; the gable verge is plastered white
+    # like a real storehouse, and the ridge is a white shikkui-wrapped stack.
+    low, high = map_box((-2.62, -2.32, 0.0), (-0.38, -0.68, 0.0))
+    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.58, "x", roof, end_material=plaster)
+    noshi_low, noshi_high = map_box((-2.66, -1.58, 0.0), (-0.34, -1.42, 0.0))
+    add_box(scene, "RidgeNoshi", (noshi_low[0], noshi_low[1], 1.54), (noshi_high[0], noshi_high[1], 1.63), crest_bright)
+    cap_low, cap_high = map_box((-2.64, -1.535, 0.0), (-0.36, -1.465, 0.0))
+    add_box(scene, "RidgeCap", (cap_low[0], cap_low[1], 1.63), (cap_high[0], cap_high[1], 1.685), ridge_dark)
+    for ox in (-2.70, -0.42):
+        end_low, end_high = map_box((ox, -1.59, 0.0), (ox + 0.12, -1.41, 0.0))
+        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.52), (end_high[0], end_high[1], 1.72), ridge_dark)
 
     # Eave fascia and round tile ends, aligned to the 1/9-unit tile pitch so
     # each stub caps one tile column.
-    for ey in (-2.40, -0.60):
-        flow, fhigh = map_box((-2.70, ey - 0.04, 0.0), (-0.30, ey + 0.04, 0.0))
+    for ey in (-2.32, -0.68):
+        flow, fhigh = map_box((-2.62, ey - 0.04, 0.0), (-0.38, ey + 0.04, 0.0))
         add_box(scene, f"Fascia{ey}", (flow[0], flow[1], 1.115), (fhigh[0], fhigh[1], 1.165), ridge_dark)
     pitch = 1.0 / 9.0
-    count = int(2.40 / pitch)
+    count = int(2.24 / pitch)
     for index in range(count + 1):
-        x = -2.70 + index * pitch - 0.028
-        for ey in (-2.40, -0.60):
+        x = -2.62 + index * pitch - 0.028
+        for ey in (-2.32, -0.68):
             elow, ehigh = map_box((x, ey - 0.05, 0.0), (x + 0.056, ey + 0.05, 0.0))
             add_box(scene, f"Eave{index}{ey}", (elow[0], elow[1], 1.10), (ehigh[0], ehigh[1], 1.175), ridge_dark)
 
