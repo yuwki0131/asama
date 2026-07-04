@@ -1215,6 +1215,59 @@ def add_tree_base(scene: bpy.types.Scene, cx: float, cy: float, trunk_r: float, 
         add_beam(scene, f"BaseTuft{cx}{index}", (cx + tx, cy + ty, 0.0), (cx + tx + 0.02, cy + ty - 0.02, height), 0.016, grass)
 
 
+def add_leaf_cards(
+    scene: bpy.types.Scene,
+    name: str,
+    center: tuple[float, float, float],
+    radii: tuple[float, float, float],
+    count: int,
+    materials: list[bpy.types.Material],
+    seed: float,
+    card_size: float = 0.085,
+) -> None:
+    """Foliage as a cloud of small quads inside an ellipsoid. Each card takes
+    the painterly light ramp individually, so canopies get dappled light in
+    the same shading language as the rest of the world."""
+    import math as _math
+
+    def rand(k: float) -> float:
+        return (_math.sin(seed * 7.13 + k) * 43758.5453) % 1.0
+
+    cx, cy, cz = center
+    rx, ry, rz = radii
+    buckets: list[list[tuple[float, float, float]]] = [[] for _ in materials]
+    faces_per_bucket: list[list[tuple[int, ...]]] = [[] for _ in materials]
+    for i in range(count):
+        u = rand(i * 3.1)
+        v = rand(i * 3.1 + 1.0)
+        w = rand(i * 3.1 + 2.0)
+        # Bias toward the shell so silhouettes stay leafy, centers stay full.
+        radial = 0.45 + 0.55 * (u ** 0.4)
+        theta = v * 2.0 * _math.pi
+        phi = _math.acos(2.0 * w - 1.0)
+        px = cx + rx * radial * _math.sin(phi) * _math.cos(theta)
+        py = cy + ry * radial * _math.sin(phi) * _math.sin(theta)
+        pz = cz + rz * radial * _math.cos(phi)
+        # Card orientation: mostly horizontal (pine pads), some tilt.
+        tilt = (rand(i * 5.7) - 0.5) * 1.1
+        yaw = rand(i * 9.3) * 2.0 * _math.pi
+        half = card_size * (0.7 + 0.6 * rand(i * 4.9))
+        ax = _math.cos(yaw) * half
+        ay = _math.sin(yaw) * half
+        bx = -_math.sin(yaw) * half * _math.cos(tilt)
+        by = _math.cos(yaw) * half * _math.cos(tilt)
+        bz = half * _math.sin(tilt)
+        bucket = int(rand(i * 6.7) * len(materials)) % len(materials)
+        vertices = buckets[bucket]
+        base = len(vertices)
+        for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+            vertices.append((*map_xy(px + sx * ax + sy * bx, py + sx * ay + sy * by), pz + sy * bz))
+        faces_per_bucket[bucket].append((base, base + 1, base + 2, base + 3))
+    for index, material in enumerate(materials):
+        if faces_per_bucket[index]:
+            add_mesh(scene, f"{name}Cards{index}", buckets[index], faces_per_bucket[index], material)
+
+
 def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     """Akamatsu (Japanese red pine): a visibly bent trunk, bare lower bole,
     and asymmetric umbrella pads carried at the END of individual branches.
@@ -1234,16 +1287,28 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     add_beam(scene, "Trunk2", p1, p2, 0.09, bark)
     add_beam(scene, "Trunk3", p2, p3, 0.07, bark)
 
-    # Branches leaving the trunk, each carrying a flat pad at its tip.
+    # Branches leaving the trunk, each tipped with a leaf-card pad cloud.
+    needle_deep = make_foliage_material("PineNeedlesDeep", (0.030, 0.062, 0.038), (0.055, 0.095, 0.055))
+    shades = [needle_deep, needle_dark, needle_light]
     branches = [
-        (p1, (-0.26 * s, -0.14 * s, 0.86), 0.30, 0.09, needle_dark),
-        (p2, (0.44 * s, 0.30 * s, 1.06), 0.26, 0.08, needle_light),
-        (p2, (-0.06 * s, -0.30 * s, 1.18), 0.22, 0.08, needle_dark),
-        (p3, (0.20 * s, 0.06 * s, 1.46), 0.24, 0.09, needle_light),
+        (p1, (-0.38 * s, -0.22 * s, 0.78), 0.28, needle_dark),
+        (p2, (0.52 * s, 0.36 * s, 1.02), 0.25, needle_light),
+        (p2, (-0.16 * s, -0.44 * s, 1.22), 0.21, needle_dark),
+        (p3, (0.22 * s, 0.08 * s, 1.54), 0.23, needle_light),
     ]
-    for index, (base, tip, radius, pad_h, mat) in enumerate(branches):
+    for index, (base, tip, radius, _mat) in enumerate(branches):
         add_beam(scene, f"Branch{index}", base, tip, 0.045, bark)
-        add_foliage_blob(scene, f"Pad{index}", tip[0], tip[1], tip[2] - pad_h * 0.3, radius, pad_h * 2.6, mat, squash=0.55)
+        # Flat, separated pads with the trunk visible between them.
+        add_leaf_cards(
+            scene,
+            f"Pad{index}",
+            (tip[0], tip[1], tip[2] + 0.05),
+            (radius, radius, radius * 0.26),
+            72,
+            shades,
+            seed=float(variant * 31 + index * 7 + 3),
+            card_size=0.075,
+        )
 
 
 def build_tree_cedar(scene: bpy.types.Scene) -> None:
@@ -1254,14 +1319,23 @@ def build_tree_cedar(scene: bpy.types.Scene) -> None:
     dark = make_foliage_material("CedarNeedlesD", (0.035, 0.075, 0.048), (0.062, 0.110, 0.068))
     light = make_foliage_material("CedarNeedlesL", (0.052, 0.100, 0.058), (0.090, 0.150, 0.085))
     add_tree_base(scene, 0.0, 0.0, 0.09, bark)
-    add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.0, 0.0, 2.30), 0.09, bark)
+    add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.0, 0.0, 2.02), 0.09, bark)
     tiers = [
-        (0.34, 0.26, 0.52, dark), (0.30, 0.62, 0.50, light), (0.26, 0.98, 0.48, dark),
-        (0.21, 1.32, 0.46, light), (0.15, 1.64, 0.44, dark), (0.09, 1.94, 0.40, light),
+        (0.33, 0.42, dark), (0.29, 0.76, light), (0.25, 1.10, dark),
+        (0.20, 1.42, light), (0.14, 1.72, dark), (0.08, 1.98, light),
     ]
-    for index, (radius, z, height, mat) in enumerate(tiers):
+    for index, (radius, z, mat) in enumerate(tiers):
         jx = 0.03 if index % 2 == 0 else -0.03
-        add_foliage_blob(scene, f"Tier{index}", jx, -jx, z, radius, height, mat, squash=1.0)
+        add_leaf_cards(
+            scene,
+            f"Tier{index}",
+            (jx, -jx, z),
+            (radius, radius, radius * 0.75),
+            56,
+            [dark, light],
+            seed=float(index * 13 + 5),
+            card_size=0.07,
+        )
 
 
 def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
@@ -1277,11 +1351,20 @@ def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
     for index, (base, tip) in enumerate(limbs):
         add_beam(scene, f"Limb{index}", base, tip, 0.06, bark)
     blobs = [
-        (-0.22, 0.10, 0.72, 0.26, dark), (0.24, -0.14, 0.78, 0.27, dark), (0.03, 0.20, 0.82, 0.24, dark),
-        (-0.06, -0.05, 0.92, 0.30, light), (0.12, 0.08, 1.06, 0.22, light),
+        (-0.22, 0.10, 0.80, 0.26), (0.24, -0.14, 0.86, 0.27), (0.03, 0.20, 0.90, 0.24),
+        (-0.06, -0.05, 1.02, 0.30), (0.12, 0.08, 1.16, 0.22),
     ]
-    for index, (cx, cy, z, radius, mat) in enumerate(blobs):
-        add_foliage_blob(scene, f"Blob{index}", cx, cy, z, radius, radius * 1.5, mat)
+    for index, (cx, cy, z, radius) in enumerate(blobs):
+        add_leaf_cards(
+            scene,
+            f"Blob{index}",
+            (cx, cy, z),
+            (radius, radius, radius * 0.8),
+            88,
+            [dark, light],
+            seed=float(index * 17 + 11),
+            card_size=0.08,
+        )
 
 
 def build_bamboo(scene: bpy.types.Scene) -> None:
@@ -1302,11 +1385,20 @@ def build_bamboo(scene: bpy.types.Scene) -> None:
         add_beam(scene, f"Culm{index}", (sx, sy, 0.0), (sx + lean, sy + lean * 0.7, height), 0.035, mat)
     # Shared feathery canopy: tall thin blobs bridging the culm tops.
     canopies = [
-        (-0.10, -0.02, 1.55, 0.30, leaves_dark), (0.10, 0.02, 1.80, 0.28, leaves_light),
-        (-0.02, -0.08, 2.05, 0.24, leaves_dark), (0.02, 0.08, 2.22, 0.18, leaves_light),
+        (-0.10, -0.02, 1.55, 0.30), (0.10, 0.02, 1.80, 0.28),
+        (-0.02, -0.08, 2.05, 0.24), (0.02, 0.08, 2.22, 0.18),
     ]
-    for index, (cx, cy, z, radius, mat) in enumerate(canopies):
-        add_foliage_blob(scene, f"Canopy{index}", cx, cy, z, radius, radius * 2.0, mat, squash=1.15)
+    for index, (cx, cy, z, radius) in enumerate(canopies):
+        add_leaf_cards(
+            scene,
+            f"Canopy{index}",
+            (cx, cy, z),
+            (radius, radius, radius * 1.1),
+            64,
+            [leaves_dark, leaves_light],
+            seed=float(index * 19 + 23),
+            card_size=0.065,
+        )
 
 
 # --- Prop library: period exterior clutter -----------------------------------
@@ -1365,8 +1457,9 @@ def add_prop_firewood(scene: bpy.types.Scene, cx: float, cy: float, mats: dict) 
 
 
 def add_prop_bush(scene: bpy.types.Scene, cx: float, cy: float, mats: dict, scale: float = 1.0) -> None:
-    add_foliage_blob(scene, f"Bush{cx}{cy}", cx, cy, 0.0, 0.22 * scale, 0.30 * scale, mats["bushD"])
-    add_foliage_blob(scene, f"Bush2{cx}{cy}", cx + 0.14 * scale, cy - 0.10 * scale, 0.0, 0.15 * scale, 0.22 * scale, mats["bushD"])
+    light = make_foliage_material("PropBushL", (0.075, 0.125, 0.058), (0.130, 0.190, 0.090))
+    add_leaf_cards(scene, f"Bush{cx}{cy}", (cx, cy, 0.14 * scale), (0.24 * scale, 0.24 * scale, 0.15 * scale), 46, [mats["bushD"], light], seed=cx * 7 + cy * 3 + 41, card_size=0.07 * scale)
+    add_leaf_cards(scene, f"Bush2{cx}{cy}", (cx + 0.15 * scale, cy - 0.11 * scale, 0.10 * scale), (0.15 * scale, 0.15 * scale, 0.10 * scale), 26, [mats["bushD"], light], seed=cx * 5 + cy * 9 + 47, card_size=0.06 * scale)
 
 
 def add_prop_weeds(scene: bpy.types.Scene, cx: float, cy: float, mats: dict) -> None:
@@ -1673,8 +1766,8 @@ def build_samurai_residence_graybox(scene: bpy.types.Scene) -> None:
     add_prop_weeds(scene, -0.3, -0.4, props)
     bark = props["wood"]
     add_beam(scene, "GardenPineTrunk", (-3.45, -1.35, 0.0), (-3.32, -1.22, 0.72), 0.07, bark)
-    add_foliage_blob(scene, "GardenPinePad1", -3.32, -1.22, 0.62, 0.24, 0.20, props["bushD"], squash=0.7)
-    add_foliage_blob(scene, "GardenPinePad2", -3.5, -1.42, 0.44, 0.17, 0.16, props["bushD"], squash=0.7)
+    add_leaf_cards(scene, "GardenPinePad1", (-3.32, -1.22, 0.66), (0.24, 0.24, 0.08), 48, [props["bushD"]], seed=53.0, card_size=0.07)
+    add_leaf_cards(scene, "GardenPinePad2", (-3.5, -1.42, 0.47), (0.17, 0.17, 0.06), 30, [props["bushD"]], seed=59.0, card_size=0.06)
 
 
 def add_itabuki_roof(scene: bpy.types.Scene, name: str, low_map: tuple[float, float], high_map: tuple[float, float], base_z: float, ridge_z: float, ridge_axis: str, wood: bpy.types.Material, stone: bpy.types.Material) -> None:
