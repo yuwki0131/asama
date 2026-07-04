@@ -1373,17 +1373,18 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     s = 1.0 if variant % 2 == 0 else -1.0
 
     add_tree_base(scene, 0.0, 0.0, 0.12, bark)
-    # Byobu-e zigzag: the trunk is the protagonist. Four segments with hard
-    # alternating switchbacks and real horizontal travel.
+    # Trunk and pad layout traced from the approved AI pine reference
+    # (assets/source/ai/deco-tree-pine-1__raw.png): a thick S-curve with
+    # shelves alternating left-right and shrinking toward the crown.
     p0 = (0.0, 0.0, 0.0)
-    p1 = (0.22 * s, 0.13 * s, 0.42)
-    p2 = (-0.10 * s, -0.08 * s, 0.82)
-    p3 = (0.30 * s, 0.18 * s, 1.18)
-    p4 = (0.06 * s, 0.00, 1.50)
-    add_beam(scene, "Trunk1", p0, p1, 0.15, bark, tip_thickness=0.105)
-    add_beam(scene, "Trunk2", p1, p2, 0.105, bark, tip_thickness=0.08)
-    add_beam(scene, "Trunk3", p2, p3, 0.08, bark, tip_thickness=0.055)
-    add_beam(scene, "Trunk4", p3, p4, 0.055, bark, tip_thickness=0.035)
+    p1 = (0.16 * s, 0.10 * s, 0.35)
+    p2 = (-0.06 * s, -0.04 * s, 0.72)
+    p3 = (0.22 * s, 0.12 * s, 1.10)
+    p4 = (-0.02 * s, 0.02 * s, 1.45)
+    add_beam(scene, "Trunk1", p0, p1, 0.15, bark, tip_thickness=0.11)
+    add_beam(scene, "Trunk2", p1, p2, 0.11, bark, tip_thickness=0.085)
+    add_beam(scene, "Trunk3", p2, p3, 0.085, bark, tip_thickness=0.06)
+    add_beam(scene, "Trunk4", p3, p4, 0.06, bark, tip_thickness=0.035)
 
     # Shelf pads (tana): thin, wide clouds held out at the switchback
     # elbows so the trunk line stays readable between them.
@@ -1391,21 +1392,17 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     needle_lit = make_material("PineCloudLit", (0.100, 0.160, 0.082, 1.0))
     accent_lit = make_material("PineAccentLit", (0.155, 0.225, 0.115, 1.0))
     import math as _math
-    # Foliage in horizontal TIERS: each tier is several overlapping pads
-    # forming a wide shelf hugging the trunk (how pine needles actually
-    # attach), instead of isolated balls at branch tips. Lower tier spreads
-    # wide to one side, mid tier answers to the other, a small crown caps
-    # the apex.
+    # Alternating shelf rhythm (the pine symbol): left, right, left, right,
+    # crown — each shelf smaller than the one below, trunk visible between.
     tiers = [
-        # (attach_point, pad_center, radius)
-        (p2, (-0.44 * s, -0.24 * s, 0.80), 0.26),
-        (p2, (-0.16 * s, -0.38 * s, 0.85), 0.22),
-        (p2, (0.10 * s, -0.12 * s, 0.78), 0.19),
-        (p3, (0.44 * s, 0.26 * s, 1.16), 0.24),
-        (p3, (0.64 * s, 0.08 * s, 1.10), 0.17),
-        (p3, (0.18 * s, 0.42 * s, 1.22), 0.17),
-        (p4, (0.06 * s, 0.02, 1.56), 0.21),
-        (p4, (-0.16 * s, 0.14 * s, 1.48), 0.14),
+        (p2, (-0.50 * s, -0.30 * s, 0.72), 0.30),
+        (p2, (-0.20 * s, -0.42 * s, 0.80), 0.23),
+        (p2, (0.48 * s, 0.30 * s, 0.88), 0.26),
+        (p2, (0.66 * s, 0.10 * s, 0.80), 0.17),
+        (p3, (-0.34 * s, -0.12 * s, 1.10), 0.22),
+        (p3, (0.30 * s, 0.18 * s, 1.28), 0.19),
+        (p4, (0.16 * s, 0.08 * s, 1.44), 0.13),
+        (p4, (0.0, 0.0, 1.58), 0.22),
     ]
     for index, (base, tip, radius) in enumerate(tiers):
         add_beam(scene, f"Branch{index}", base, (tip[0], tip[1], tip[2] - 0.06), 0.04, bark, tip_thickness=0.02)
