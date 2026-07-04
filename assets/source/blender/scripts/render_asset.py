@@ -2168,8 +2168,10 @@ def build_farm_paddy(scene: bpy.types.Scene) -> None:
     Canvas 256x128, anchor 128,64. Border and cross ridges (aze) around
     four water paddies; surface class, flat relief only.
     """
-    ridge = make_material("AzeDirt", (0.42, 0.36, 0.27, 1.0))
-    water = make_material("PaddyWater", (0.20, 0.30, 0.29, 1.0))
+    ridge = make_textured_material("AzeDirt", (0.185, 0.150, 0.105, 1.0)[:3], (0.265, 0.220, 0.160), scale=9.0)
+    water = make_noise_material("PaddyWater", (0.055, 0.105, 0.115), (0.085, 0.140, 0.150), scale=5.0)
+    seedling = make_material("PaddySeedling", (0.140, 0.205, 0.080, 1.0))
+    seedling_dark = make_material("PaddySeedlingD", (0.100, 0.160, 0.062, 1.0))
 
     add_box(scene, "FieldBase", *map_box((-2.0, -2.0, 0.0), (2.0, 2.0, 0.02)), ridge)
     add_box(scene, "Water", *map_box((-1.86, -1.86, 0.021), (1.86, 1.86, 0.045)), water)
@@ -2185,6 +2187,24 @@ def build_farm_paddy(scene: bpy.types.Scene) -> None:
     )):
         top = 0.078 - 0.0028 * index
         add_box(scene, name, *map_box((low[0], low[1], 0.0), (high[0], high[1], top)), ridge)
+
+    # Rice seedling rows in each paddy: staggered lines of small tufts.
+    import math as _math
+    for qx, qy in ((-1.0, -1.0), (1.0, -1.0), (-1.0, 1.0), (1.0, 1.0)):
+        for row in range(5):
+            ry = qy - 0.75 + row * 0.32
+            for col in range(6):
+                rx = qx - 0.72 + col * 0.29 + (0.07 if row % 2 else 0.0)
+                if abs(rx - qx) > 0.8 or abs(ry - qy) > 0.8:
+                    continue
+                mat = seedling if (row + col) % 3 else seedling_dark
+                jitter = 0.03 * _math.sin(rx * 12.7 + ry * 7.3)
+                add_box(
+                    scene,
+                    f"Rice{qx}{qy}{row}{col}",
+                    *map_box((rx - 0.028 + jitter, ry - 0.028, 0.045), (rx + 0.028 + jitter, ry + 0.028, 0.13 + 0.02 * ((row + col) % 2))),
+                    mat,
+                )
 
 
 # Gate kit -------------------------------------------------------------------

@@ -66,6 +66,45 @@
         "x": 32,
         "y": 40
       }
+    },
+    {
+      "input": "deco-rock-1__paintover.png",
+      "assetId": "deco.rock.1",
+      "output": "deco-rock-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 56
+      },
+      "anchor": {
+        "x": 32,
+        "y": 40
+      }
+    },
+    {
+      "input": "deco-reeds-1__paintover.png",
+      "assetId": "deco.reeds.1",
+      "output": "deco-reeds-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 56
+      },
+      "anchor": {
+        "x": 32,
+        "y": 40
+      }
+    },
+    {
+      "input": "deco-weeds-1__paintover.png",
+      "assetId": "deco.weeds.1",
+      "output": "deco-weeds-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 48
+      },
+      "anchor": {
+        "x": 32,
+        "y": 32
+      }
     }
   ]
 }

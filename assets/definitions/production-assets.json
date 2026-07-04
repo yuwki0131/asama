@@ -430,10 +430,8 @@
       "kind": "building",
       "output": "building-farm.png",
       "source": {
-        "type": "blender",
-        "model": "building-farm-paddy",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-farm.png"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -6077,10 +6075,8 @@
       "kind": "building",
       "output": "deco-rock-1.png",
       "source": {
-        "type": "blender",
-        "model": "rock-cluster",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-rock-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6101,10 +6097,8 @@
       "kind": "building",
       "output": "deco-reeds-1.png",
       "source": {
-        "type": "blender",
-        "model": "reeds",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-reeds-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6147,10 +6141,8 @@
       "kind": "building",
       "output": "deco-weeds-1.png",
       "source": {
-        "type": "blender",
-        "model": "deco-weeds",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-weeds-1.png"
       },
       "geometry": {
         "footprintWidth": 1,
