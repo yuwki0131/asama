@@ -931,7 +931,7 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     low, high = map_box((-2.62, -2.32, 0.0), (-0.38, -0.68, 0.0))
     add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.58, "x", roof, end_material=plaster)
     noshi_low, noshi_high = map_box((-2.66, -1.58, 0.0), (-0.34, -1.42, 0.0))
-    add_box(scene, "RidgeNoshi", (noshi_low[0], noshi_low[1], 1.54), (noshi_high[0], noshi_high[1], 1.63), crest_bright)
+    add_box(scene, "RidgeNoshi", (noshi_low[0], noshi_low[1], 1.54), (noshi_high[0], noshi_high[1], 1.63), ridge_dark)
     cap_low, cap_high = map_box((-2.64, -1.535, 0.0), (-0.36, -1.465, 0.0))
     add_box(scene, "RidgeCap", (cap_low[0], cap_low[1], 1.63), (cap_high[0], cap_high[1], 1.685), ridge_dark)
     for ox in (-2.70, -0.42):
