@@ -5965,10 +5965,8 @@
       "kind": "building",
       "output": "deco-tree-pine-1.png",
       "source": {
-        "type": "blender",
-        "model": "tree-pine",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-pine-1.png"
       },
       "geometry": {
         "footprintWidth": 1,

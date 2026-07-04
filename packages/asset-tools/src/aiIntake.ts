@@ -89,6 +89,57 @@ export function removeSolidBackground(image: RawImage, tolerance = 26): { remove
     if (y > 0) queue.push(p - width);
     if (y < height - 1) queue.push(p + width);
   }
+
+  // Enclosed pockets: gaps between foliage aren't reachable from the
+  // border, so also clear any remaining pixel that closely matches the
+  // background color.
+  const tight = tolerance * 0.75;
+  for (let p = 0; p < width * height; p += 1) {
+    const i = p * 4;
+    if (
+      (data[i + 3] ?? 0) > 0 &&
+      Math.abs((data[i] ?? 0) - (bg[0] ?? 0)) <= tight &&
+      Math.abs((data[i + 1] ?? 0) - (bg[1] ?? 0)) <= tight &&
+      Math.abs((data[i + 2] ?? 0) - (bg[2] ?? 0)) <= tight
+    ) {
+      data[i + 3] = 0;
+    }
+  }
+
+  // Defringe: anti-aliased edge pixels still carry background bleed; erode
+  // boundary pixels that lean toward the background color so downscaling
+  // doesn't smear white into the sprite.
+  const loose = tolerance * 2.2;
+  for (let pass = 0; pass < 2; pass += 1) {
+    const clear: number[] = [];
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const p = y * width + x;
+        const i = p * 4;
+        if ((data[i + 3] ?? 0) === 0) {
+          continue;
+        }
+        const nearBg =
+          Math.abs((data[i] ?? 0) - (bg[0] ?? 0)) <= loose &&
+          Math.abs((data[i + 1] ?? 0) - (bg[1] ?? 0)) <= loose &&
+          Math.abs((data[i + 2] ?? 0) - (bg[2] ?? 0)) <= loose;
+        if (!nearBg) {
+          continue;
+        }
+        const neighborTransparent =
+          (x > 0 && (data[i - 4 + 3] ?? 0) === 0) ||
+          (x < width - 1 && (data[i + 4 + 3] ?? 0) === 0) ||
+          (y > 0 && (data[i - width * 4 + 3] ?? 0) === 0) ||
+          (y < height - 1 && (data[i + width * 4 + 3] ?? 0) === 0);
+        if (neighborTransparent) {
+          clear.push(i);
+        }
+      }
+    }
+    for (const i of clear) {
+      data[i + 3] = 0;
+    }
+  }
   return { removed: true };
 }
 

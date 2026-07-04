@@ -157,6 +157,17 @@
       }
     },
     {
+      "assetId": "deco.tree.pine.1",
+      "kind": "building",
+      "file": "generated/deco-tree-pine-1.png",
+      "width": 64,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
       "assetId": "terrain.grass.base",
       "kind": "terrain",
       "file": "generated/terrain-grass-base.png",
@@ -2541,17 +2552,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "deco.tree.pine.1",
-      "kind": "building",
-      "file": "generated/deco-tree-pine-1.png",
-      "width": 64,
-      "height": 112,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8571428571428571
       }
     },
     {
