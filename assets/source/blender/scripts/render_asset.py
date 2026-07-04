@@ -106,9 +106,9 @@ def finish_material(material: bpy.types.Material, color_output) -> None:
     else:  # painterly
         ramp.color_ramp.interpolation = "EASE"
         ramp.color_ramp.elements[0].position = 0.0
-        ramp.color_ramp.elements[0].color = (0.50, 0.50, 0.66, 1.0)
+        ramp.color_ramp.elements[0].color = (0.38, 0.38, 0.52, 1.0)
         ramp.color_ramp.elements[1].position = 0.72
-        ramp.color_ramp.elements[1].color = (1.14, 1.08, 0.96, 1.0)
+        ramp.color_ramp.elements[1].color = (0.98, 0.94, 0.86, 1.0)
     links.new(to_light.outputs["Value"], ramp.inputs["Fac"])
 
     shade = nodes.new("ShaderNodeMix")
@@ -669,78 +669,177 @@ def make_namako_material() -> bpy.types.Material:
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "CONSTANT"
     ramp.color_ramp.elements[0].position = 0.0
-    ramp.color_ramp.elements[0].color = (0.16, 0.17, 0.21, 1.0)
+    ramp.color_ramp.elements[0].color = (0.055, 0.055, 0.062, 1.0)
     ramp.color_ramp.elements[1].position = 0.5
-    ramp.color_ramp.elements[1].color = (0.88, 0.86, 0.80, 1.0)
+    ramp.color_ramp.elements[1].color = (0.52, 0.48, 0.40, 1.0)
     links.new(either.outputs["Value"], ramp.inputs["Fac"])
     finish_material(material, ramp.outputs["Color"])
     return material
 
 
 def make_showcase_plaster() -> bpy.types.Material:
-    """Warm plaster with soft painterly blotches instead of pure noise."""
+    """Aged plaster: subdued warm base, painterly blotches, and vertical
+    rain-streak grime (noise stretched along z)."""
     material = bpy.data.materials.new("ShowcasePlaster")
     material.use_nodes = True
     nodes = material.node_tree.nodes
     links = material.node_tree.links
+
     noise = nodes.new("ShaderNodeTexNoise")
     noise.inputs["Scale"].default_value = 1.6
     noise.inputs["Detail"].default_value = 2.0
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE"
     ramp.color_ramp.elements[0].position = 0.25
-    ramp.color_ramp.elements[0].color = (0.86, 0.81, 0.70, 1.0)
+    ramp.color_ramp.elements[0].color = (0.66, 0.61, 0.51, 1.0)
     ramp.color_ramp.elements[1].position = 0.8
-    ramp.color_ramp.elements[1].color = (0.96, 0.93, 0.85, 1.0)
+    ramp.color_ramp.elements[1].color = (0.80, 0.76, 0.66, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
-    finish_material(material, ramp.outputs["Color"])
+
+    coords = nodes.new("ShaderNodeTexCoord")
+    stretch = nodes.new("ShaderNodeMapping")
+    stretch.inputs["Scale"].default_value = (9.0, 9.0, 0.7)
+    links.new(coords.outputs["Object"], stretch.inputs["Vector"])
+    streaks = nodes.new("ShaderNodeTexNoise")
+    streaks.inputs["Scale"].default_value = 1.0
+    streaks.inputs["Detail"].default_value = 2.0
+    links.new(stretch.outputs["Vector"], streaks.inputs["Vector"])
+    streak_ramp = nodes.new("ShaderNodeValToRGB")
+    streak_ramp.color_ramp.interpolation = "EASE"
+    streak_ramp.color_ramp.elements[0].position = 0.28
+    streak_ramp.color_ramp.elements[0].color = (0.72, 0.70, 0.64, 1.0)
+    streak_ramp.color_ramp.elements[1].position = 0.55
+    streak_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    links.new(streaks.outputs["Fac"], streak_ramp.inputs["Fac"])
+
+    grimed = nodes.new("ShaderNodeMix")
+    grimed.data_type = "RGBA"
+    grimed.blend_type = "MULTIPLY"
+    grimed.inputs["Factor"].default_value = 1.0
+    links.new(ramp.outputs["Color"], grimed.inputs["A"])
+    links.new(streak_ramp.outputs["Color"], grimed.inputs["B"])
+    finish_material(material, grimed.outputs["Result"])
     return material
 
 
 def make_showcase_roof() -> bpy.types.Material:
-    """Kawara roof with soft horizontal course bands plus painterly mottle."""
+    """Kawara roof calibrated to the tenshu reference: warm dark tiles, tile
+    COLUMNS running down the slope (sanigawara rows), horizontal course
+    steps, per-column value jitter, and mud grime pooling in the joints."""
     material = bpy.data.materials.new("ShowcaseRoof")
     material.use_nodes = True
     nodes = material.node_tree.nodes
     links = material.node_tree.links
+
     coords = nodes.new("ShaderNodeTexCoord")
     separate = nodes.new("ShaderNodeSeparateXYZ")
     links.new(coords.outputs["Object"], separate.inputs["Vector"])
-    courses = nodes.new("ShaderNodeMath")
-    courses.operation = "MULTIPLY"
-    courses.inputs[1].default_value = 16.0
-    links.new(separate.outputs["Z"], courses.inputs[0])
-    band0 = nodes.new("ShaderNodeMath")
-    band0.operation = "FRACT"
-    links.new(courses.outputs["Value"], band0.inputs[0])
-    band = nodes.new("ShaderNodeMath")
-    band.operation = "MULTIPLY_ADD"
-    band.inputs[1].default_value = 0.28
-    band.inputs[2].default_value = 0.74
-    links.new(band0.outputs["Value"], band.inputs[0])
+    run = nodes.new("ShaderNodeMath")
+    run.operation = "ADD"
+    links.new(separate.outputs["X"], run.inputs[0])
+    links.new(separate.outputs["Y"], run.inputs[1])
 
-    noise = nodes.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 2.2
-    noise.inputs["Detail"].default_value = 2.0
-    ramp = nodes.new("ShaderNodeValToRGB")
-    ramp.color_ramp.interpolation = "EASE"
-    ramp.color_ramp.elements[0].position = 0.3
-    ramp.color_ramp.elements[0].color = (0.15, 0.17, 0.23, 1.0)
-    ramp.color_ramp.elements[1].position = 0.75
-    ramp.color_ramp.elements[1].color = (0.26, 0.29, 0.37, 1.0)
-    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    # Tile columns along the roof run.
+    col = nodes.new("ShaderNodeMath")
+    col.operation = "MULTIPLY"
+    col.inputs[1].default_value = 9.0
+    links.new(run.outputs["Value"], col.inputs[0])
+    col_id = nodes.new("ShaderNodeMath")
+    col_id.operation = "FLOOR"
+    links.new(col.outputs["Value"], col_id.inputs[0])
+    col_fract = nodes.new("ShaderNodeMath")
+    col_fract.operation = "FRACT"
+    links.new(col.outputs["Value"], col_fract.inputs[0])
+    col_tri0 = nodes.new("ShaderNodeMath")
+    col_tri0.operation = "SUBTRACT"
+    links.new(col_fract.outputs["Value"], col_tri0.inputs[0])
+    col_tri0.inputs[1].default_value = 0.5
+    col_tri = nodes.new("ShaderNodeMath")
+    col_tri.operation = "ABSOLUTE"
+    links.new(col_tri0.outputs["Value"], col_tri.inputs[0])
+    # Joint shadow between columns (dark near the seam, rounded highlight mid-tile).
+    col_shade = nodes.new("ShaderNodeValToRGB")
+    col_shade.color_ramp.interpolation = "EASE"
+    col_shade.color_ramp.elements[0].position = 0.30
+    col_shade.color_ramp.elements[0].color = (1.04, 1.04, 1.04, 1.0)
+    col_shade.color_ramp.elements[1].position = 0.5
+    col_shade.color_ramp.elements[1].color = (0.52, 0.50, 0.48, 1.0)
+    links.new(col_tri.outputs["Value"], col_shade.inputs["Fac"])
 
-    banded = nodes.new("ShaderNodeMix")
-    banded.data_type = "RGBA"
-    banded.blend_type = "MULTIPLY"
-    banded.inputs["Factor"].default_value = 1.0
-    links.new(ramp.outputs["Color"], banded.inputs["A"])
-    course_color = nodes.new("ShaderNodeCombineColor")
-    links.new(band.outputs["Value"], course_color.inputs["Red"])
-    links.new(band.outputs["Value"], course_color.inputs["Green"])
-    links.new(band.outputs["Value"], course_color.inputs["Blue"])
-    links.new(course_color.outputs["Color"], banded.inputs["B"])
-    finish_material(material, banded.outputs["Result"])
+    # Per-column value jitter (aged tiles differ slightly).
+    jitter_noise = nodes.new("ShaderNodeTexWhiteNoise")
+    jitter_noise.noise_dimensions = "1D"
+    links.new(col_id.outputs["Value"], jitter_noise.inputs["W"])
+    jitter = nodes.new("ShaderNodeMath")
+    jitter.operation = "MULTIPLY_ADD"
+    jitter.inputs[1].default_value = 0.30
+    jitter.inputs[2].default_value = 0.82
+    links.new(jitter_noise.outputs["Value"], jitter.inputs[0])
+
+    # Horizontal course steps down the slope.
+    course = nodes.new("ShaderNodeMath")
+    course.operation = "MULTIPLY"
+    course.inputs[1].default_value = 15.0
+    links.new(separate.outputs["Z"], course.inputs[0])
+    course_fract = nodes.new("ShaderNodeMath")
+    course_fract.operation = "FRACT"
+    links.new(course.outputs["Value"], course_fract.inputs[0])
+    course_step = nodes.new("ShaderNodeMath")
+    course_step.operation = "MULTIPLY_ADD"
+    course_step.inputs[1].default_value = 0.34
+    course_step.inputs[2].default_value = 0.70
+    links.new(course_fract.outputs["Value"], course_step.inputs[0])
+
+    # Base tile color: warm dark gray-brown (tenshu reference).
+    base_noise = nodes.new("ShaderNodeTexNoise")
+    base_noise.inputs["Scale"].default_value = 2.4
+    base_noise.inputs["Detail"].default_value = 2.0
+    base_ramp = nodes.new("ShaderNodeValToRGB")
+    base_ramp.color_ramp.interpolation = "EASE"
+    base_ramp.color_ramp.elements[0].position = 0.3
+    base_ramp.color_ramp.elements[0].color = (0.052, 0.048, 0.046, 1.0)
+    base_ramp.color_ramp.elements[1].position = 0.75
+    base_ramp.color_ramp.elements[1].color = (0.115, 0.105, 0.095, 1.0)
+    links.new(base_noise.outputs["Fac"], base_ramp.inputs["Fac"])
+
+    # Mud grime patches.
+    grime_noise = nodes.new("ShaderNodeTexNoise")
+    grime_noise.inputs["Scale"].default_value = 4.5
+    grime_noise.inputs["Detail"].default_value = 3.0
+    grime_fac = nodes.new("ShaderNodeValToRGB")
+    grime_fac.color_ramp.elements[0].position = 0.42
+    grime_fac.color_ramp.elements[0].color = (0.0, 0.0, 0.0, 1.0)
+    grime_fac.color_ramp.elements[1].position = 0.72
+    grime_fac.color_ramp.elements[1].color = (0.55, 0.55, 0.55, 1.0)
+    links.new(grime_noise.outputs["Fac"], grime_fac.inputs["Fac"])
+    grimed = nodes.new("ShaderNodeMix")
+    grimed.data_type = "RGBA"
+    links.new(grime_fac.outputs["Color"], grimed.inputs["Factor"])
+    links.new(base_ramp.outputs["Color"], grimed.inputs["A"])
+    mud = nodes.new("ShaderNodeRGB")
+    mud.outputs[0].default_value = (0.075, 0.058, 0.038, 1.0)
+    links.new(mud.outputs[0], grimed.inputs["B"])
+
+    def multiply(a, b):
+        node = nodes.new("ShaderNodeMix")
+        node.data_type = "RGBA"
+        node.blend_type = "MULTIPLY"
+        node.inputs["Factor"].default_value = 1.0
+        links.new(a, node.inputs["A"])
+        links.new(b, node.inputs["B"])
+        return node.outputs["Result"]
+
+    def scalar_color(value_socket):
+        node = nodes.new("ShaderNodeCombineColor")
+        links.new(value_socket, node.inputs["Red"])
+        links.new(value_socket, node.inputs["Green"])
+        links.new(value_socket, node.inputs["Blue"])
+        return node.outputs["Color"]
+
+    shaded = multiply(grimed.outputs["Result"], col_shade.outputs["Color"])
+    shaded = multiply(shaded, scalar_color(jitter.outputs["Value"]))
+    shaded = multiply(shaded, scalar_color(course_step.outputs["Value"]))
+    finish_material(material, shaded)
     return material
 
 
@@ -753,9 +852,9 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     namako = make_namako_material()
     roof = make_showcase_roof()
     stone = make_ishigaki_material("ShowcaseIshigaki")
-    wood = make_textured_material("ShowcaseWood", (0.30, 0.21, 0.13), (0.44, 0.33, 0.21), scale=(18.0, 18.0, 2.5))
+    wood = make_textured_material("ShowcaseWood", (0.048, 0.034, 0.020), (0.095, 0.070, 0.042), scale=(18.0, 18.0, 2.5))
     gravel = make_textured_material("ShowcaseGravel", (0.55, 0.50, 0.40), (0.68, 0.63, 0.52), scale=14.0)
-    ridge_dark = make_material("RidgeTile", (0.13, 0.14, 0.19, 1.0))
+    ridge_dark = make_material("RidgeTile", (0.045, 0.042, 0.045, 1.0))
 
     add_yard_pad(scene, 3.0, 3.0, gravel)
     # Ishigaki plinth.
@@ -775,17 +874,38 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     for index, (wx0, wx1) in enumerate(((-2.28, -1.98), (-1.06, -0.76))):
         add_box(scene, f"WinFrame{index}", *map_box((wx0 - 0.04, -0.85, 0.78), (wx1 + 0.04, -0.79, 1.04)), plaster)
         add_box(scene, f"Win{index}", *map_box((wx0, -0.82, 0.82), (wx1, -0.77, 1.00)), ridge_dark)
+        bar = wx0 + 0.05
+        while bar < wx1 - 0.02:
+            add_box(scene, f"WinBar{index}{bar:.2f}", *map_box((bar, -0.81, 0.82), (bar + 0.035, -0.755, 1.00)), wood)
+            bar += 0.09
     add_box(scene, "GableWinFrame", *map_box((-0.55, -1.71, 0.80), (-0.47, -1.29, 1.06)), plaster)
     add_box(scene, "GableWin", *map_box((-0.52, -1.66, 0.84), (-0.44, -1.34, 1.02)), ridge_dark)
 
-    # Curved roof with deeper eaves, ridge cap and oni end tiles.
-    low, high = map_box((-2.82, -2.5, 0.0), (-0.18, -0.5, 0.0))
-    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.80, "x", roof)
-    ridge_low, ridge_high = map_box((-2.86, -1.56, 0.0), (-0.14, -1.44, 0.0))
-    add_box(scene, "RidgeCap", (ridge_low[0], ridge_low[1], 1.78), (ridge_high[0], ridge_high[1], 1.87), ridge_dark)
-    for ox in (-2.86, -0.26):
+    # Corner posts and the nageshi beam between namako and plaster bands.
+    for px, py in ((-2.5, -2.2), (-0.5, -2.2), (-2.5, -0.8), (-0.5, -0.8)):
+        add_box(scene, f"Post{px}{py}", *map_box((px - 0.05, py - 0.05, 0.24), (px + 0.05, py + 0.05, 1.17)), wood)
+    add_box(scene, "Nageshi", *map_box((-2.53, -2.23, 0.54), (-0.47, -0.77, 0.60)), wood)
+
+    # Stone step before the door.
+    add_box(scene, "DoorStep", *map_box((-1.70, -0.72, 0.0), (-1.30, -0.58, 0.12)), stone)
+
+    # Curved roof (tighter eaves than round 1), ridge cap and oni end tiles.
+    low, high = map_box((-2.70, -2.40, 0.0), (-0.30, -0.60, 0.0))
+    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.68, "x", roof)
+    ridge_low, ridge_high = map_box((-2.74, -1.56, 0.0), (-0.26, -1.44, 0.0))
+    add_box(scene, "RidgeCap", (ridge_low[0], ridge_low[1], 1.66), (ridge_high[0], ridge_high[1], 1.75), ridge_dark)
+    for ox in (-2.74, -0.38):
         end_low, end_high = map_box((ox, -1.60, 0.0), (ox + 0.12, -1.40, 0.0))
-        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.76), (end_high[0], end_high[1], 1.94), ridge_dark)
+        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.64), (end_high[0], end_high[1], 1.82), ridge_dark)
+
+    # Round eave-edge tiles (gargawa): a row of stubs along both eaves.
+    step = 0.16
+    x = -2.66
+    while x < -0.34:
+        for ey in (-2.40, -0.60):
+            elow, ehigh = map_box((x, ey - 0.05, 0.0), (x + 0.07, ey + 0.05, 0.0))
+            add_box(scene, f"Eave{x:.2f}{ey}", (elow[0], elow[1], 1.13), (ehigh[0], ehigh[1], 1.20), ridge_dark)
+        x += step
 
 
 def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
@@ -940,9 +1060,9 @@ def make_ishigaki_material(name: str = "IshigakiStone") -> bpy.types.Material:
     stone_noise.inputs["Scale"].default_value = 4.0
     stone_ramp = nodes.new("ShaderNodeValToRGB")
     stone_ramp.color_ramp.elements[0].position = 0.3
-    stone_ramp.color_ramp.elements[0].color = (0.48, 0.42, 0.33, 1.0)
+    stone_ramp.color_ramp.elements[0].color = (0.135, 0.098, 0.055, 1.0)
     stone_ramp.color_ramp.elements[1].position = 0.8
-    stone_ramp.color_ramp.elements[1].color = (0.66, 0.59, 0.47, 1.0)
+    stone_ramp.color_ramp.elements[1].color = (0.235, 0.180, 0.110, 1.0)
     links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
 
     mix = nodes.new("ShaderNodeMix")
