@@ -60,6 +60,79 @@ CAMERA_DISTANCE = 50.0
 
 ISO_ROTATION = Euler((math.radians(60.0), 0.0, math.radians(45.0)), "XYZ")
 
+# Rendering style, set from --render-spec before models are built.
+#   "pbr"       -> Principled BSDF under the fixed sun (current look)
+#   "toon"      -> emission cel bands from the fixed light direction + outlines
+#   "painterly" -> emission with a soft painterly ramp, no outlines
+CURRENT_STYLE = "pbr"
+
+# Fixed light direction shared by the sun and the stylized shading, so all
+# three styles agree on where the light comes from.
+LIGHT_DIRECTION = Vector((1.0, -0.2, -1.4)).normalized()
+
+
+def finish_material(material: bpy.types.Material, color_output) -> None:
+    """Route a computed base-color socket into the style's shading model.
+
+    PBR keeps the Principled BSDF. The stylized modes replace it with an
+    emission shader whose brightness is a function of dot(N, L) against the
+    fixed light: hard bands for toon, a smooth ramp for painterly. Emission
+    makes the shading fully deterministic and independent of scene lights.
+    """
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+
+    if CURRENT_STYLE == "pbr":
+        if bsdf is not None:
+            links.new(color_output, bsdf.inputs["Base Color"])
+        return
+
+    geometry = nodes.new("ShaderNodeNewGeometry")
+    to_light = nodes.new("ShaderNodeVectorMath")
+    to_light.operation = "DOT_PRODUCT"
+    to_light.inputs[1].default_value = tuple(-LIGHT_DIRECTION)
+    links.new(geometry.outputs["Normal"], to_light.inputs[0])
+
+    ramp = nodes.new("ShaderNodeValToRGB")
+    if CURRENT_STYLE == "toon":
+        ramp.color_ramp.interpolation = "CONSTANT"
+        ramp.color_ramp.elements[0].position = 0.0
+        ramp.color_ramp.elements[0].color = (0.42, 0.40, 0.50, 1.0)
+        ramp.color_ramp.elements[1].position = 0.25
+        ramp.color_ramp.elements[1].color = (0.74, 0.72, 0.76, 1.0)
+        lit = ramp.color_ramp.elements.new(0.58)
+        lit.color = (1.12, 1.09, 1.02, 1.0)
+    else:  # painterly
+        ramp.color_ramp.interpolation = "EASE"
+        ramp.color_ramp.elements[0].position = 0.0
+        ramp.color_ramp.elements[0].color = (0.50, 0.50, 0.66, 1.0)
+        ramp.color_ramp.elements[1].position = 0.72
+        ramp.color_ramp.elements[1].color = (1.14, 1.08, 0.96, 1.0)
+    links.new(to_light.outputs["Value"], ramp.inputs["Fac"])
+
+    shade = nodes.new("ShaderNodeMix")
+    shade.data_type = "RGBA"
+    shade.blend_type = "MULTIPLY"
+    shade.inputs["Factor"].default_value = 1.0
+    links.new(color_output, shade.inputs["A"])
+    links.new(ramp.outputs["Color"], shade.inputs["B"])
+
+    emission = nodes.new("ShaderNodeEmission")
+    links.new(shade.outputs["Result"], emission.inputs["Color"])
+
+    output = nodes.get("Material Output")
+    if output is None:
+        output = nodes.new("ShaderNodeOutputMaterial")
+    links.new(emission.outputs["Emission"], output.inputs["Surface"])
+
+
+def make_flat_color_node(material: bpy.types.Material, rgba: tuple[float, float, float, float]):
+    """RGB constant node usable as a color socket for finish_material."""
+    node = material.node_tree.nodes.new("ShaderNodeRGB")
+    node.outputs[0].default_value = rgba
+    return node.outputs[0]
+
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="asama isometric asset renderer")
@@ -134,10 +207,12 @@ def setup_render(scene: bpy.types.Scene, canvas_w: int, canvas_h: int, spec_name
         shading.light = "FLAT"
         shading.color_type = "MATERIAL"
         scene.display.render_aa = "8"
-    elif spec_name == "cycles-cpu":
+    elif spec_name in ("cycles-cpu", "toon-cel", "painterly"):
         render.engine = "CYCLES"
         scene.cycles.device = "CPU"
-        scene.cycles.samples = 64
+        # The stylized modes shade via emission and ignore lights, so fewer
+        # samples suffice there.
+        scene.cycles.samples = 64 if spec_name == "cycles-cpu" else 32
         scene.cycles.seed = seed
         scene.cycles.use_denoising = False
         setup_production_lighting(scene)
@@ -180,6 +255,9 @@ def make_material(name: str, rgba: tuple[float, float, float, float]) -> bpy.typ
     bsdf = material.node_tree.nodes.get("Principled BSDF")
     if bsdf is not None:
         bsdf.inputs["Base Color"].default_value = rgba
+        bsdf.inputs["Roughness"].default_value = 1.0
+    if CURRENT_STYLE != "pbr":
+        finish_material(material, make_flat_color_node(material, rgba))
     return material
 
 
@@ -263,26 +341,48 @@ def add_box(scene: bpy.types.Scene, name: str, low: tuple[float, float, float], 
     )
 
 
+ROOF_CURVE_SEGMENTS = 4
+ROOF_CURVE_EXPONENT = 1.55
+
+
 def add_gable_roof(scene: bpy.types.Scene, name: str, low: tuple[float, float], high: tuple[float, float], base_z: float, ridge_z: float, ridge_axis: str, material: bpy.types.Material) -> bpy.types.Object:
-    """Gabled prism roof. Ridge runs along ridge_axis ('x' or 'y')."""
+    """Gabled roof with a concave Japanese sori curve: shallow at the eaves,
+    steepening toward the ridge. Ridge runs along ridge_axis ('x' or 'y')."""
     x0, y0 = low
     x1, y1 = high
+
+    def profile(t: float) -> float:
+        return base_z + (ridge_z - base_z) * (t ** ROOF_CURVE_EXPONENT)
+
+    steps = [i / ROOF_CURVE_SEGMENTS for i in range(ROOF_CURVE_SEGMENTS + 1)]
+
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+
+    def row(a: tuple[float, float, float], b: tuple[float, float, float]) -> tuple[int, int]:
+        index = len(vertices)
+        vertices.append(a)
+        vertices.append(b)
+        return index, index + 1
+
     if ridge_axis == "x":
-        ridge_a = ((x0, (y0 + y1) / 2.0, ridge_z))
-        ridge_b = ((x1, (y0 + y1) / 2.0, ridge_z))
-        vertices = [
-            (x0, y0, base_z), (x1, y0, base_z), (x1, y1, base_z), (x0, y1, base_z),
-            ridge_a, ridge_b,
-        ]
-        faces = [(0, 1, 5, 4), (2, 3, 4, 5), (0, 4, 3), (1, 2, 5), (0, 3, 2, 1)]
+        mid = (y0 + y1) / 2.0
+        south = [row((x0, y1 + (mid - y1) * t, profile(t)), (x1, y1 + (mid - y1) * t, profile(t))) for t in steps]
+        north = [row((x0, y0 + (mid - y0) * t, profile(t)), (x1, y0 + (mid - y0) * t, profile(t))) for t in steps]
     else:
-        ridge_a = (((x0 + x1) / 2.0, y0, ridge_z))
-        ridge_b = (((x0 + x1) / 2.0, y1, ridge_z))
-        vertices = [
-            (x0, y0, base_z), (x1, y0, base_z), (x1, y1, base_z), (x0, y1, base_z),
-            ridge_a, ridge_b,
-        ]
-        faces = [(0, 4, 5, 3), (1, 2, 5, 4), (0, 1, 4), (2, 3, 5), (0, 3, 2, 1)]
+        mid = (x0 + x1) / 2.0
+        south = [row((x1 + (mid - x1) * t, y0, profile(t)), (x1 + (mid - x1) * t, y1, profile(t))) for t in steps]
+        north = [row((x0 + (mid - x0) * t, y0, profile(t)), (x0 + (mid - x0) * t, y1, profile(t))) for t in steps]
+
+    for slope in (south, north):
+        for (a0, b0), (a1, b1) in zip(slope, slope[1:]):
+            faces.append((a0, b0, b1, a1))
+
+    # Gable end caps: the curved profile down one slope and up the other.
+    for end in (0, 1):
+        loop = [south[i][end] for i in range(len(south))] + [north[i][end] for i in range(len(north) - 2, -1, -1)]
+        faces.append(tuple(loop))
+
     return add_mesh(scene, name, vertices, faces, material)
 
 
@@ -306,7 +406,10 @@ def make_grass_material() -> bpy.types.Material:
     ramp.color_ramp.elements[1].color = (0.322, 0.412, 0.204, 1.0)
 
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
-    links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    if CURRENT_STYLE == "pbr":
+        links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    else:
+        finish_material(material, ramp.outputs["Color"])
     return material
 
 
@@ -351,14 +454,17 @@ def make_noise_material(name: str, dark: tuple[float, float, float], light: tupl
     ramp.color_ramp.elements[1].color = (*light, 1.0)
 
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
-    links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    if CURRENT_STYLE == "pbr":
+        links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    else:
+        finish_material(material, ramp.outputs["Color"])
     return material
 
 
 TERRAIN_STYLES = {
     "grass": {
-        "surface": lambda: make_noise_material("GrassSurface", (0.208, 0.294, 0.157), (0.322, 0.412, 0.204)),
-        "variant": lambda: make_noise_material("GrassVariant", (0.190, 0.270, 0.145), (0.300, 0.380, 0.190), scale=10.0),
+        "surface": lambda: make_noise_material("GrassSurface", (0.27, 0.35, 0.16), (0.41, 0.49, 0.23)),
+        "variant": lambda: make_noise_material("GrassVariant", (0.25, 0.33, 0.15), (0.39, 0.46, 0.22), scale=10.0),
         "edge": (0.34, 0.29, 0.21),
     },
     "dirt": {
@@ -515,6 +621,42 @@ def build_storehouse_graybox(scene: bpy.types.Scene) -> None:
     add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 0.22 + STORY_WALL_HEIGHT, 1.75, "x", roof)
 
 
+def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
+    """Japanese pine: leaning trunk with layered foliage pads (matsu
+    silhouette). Decoration, tile-center origin. Canvas 64x96, anchor 32,80."""
+    bark = make_material("PineBark", (0.30, 0.22, 0.15, 1.0))
+    needle_dark = (0.14, 0.24, 0.16)
+    needle_light = (0.24, 0.37, 0.22)
+    foliage = make_noise_material("PineNeedles", needle_dark, needle_light, scale=9.0)
+
+    lean = 0.10 if variant % 2 == 0 else -0.08
+    add_mesh(
+        scene,
+        "Trunk",
+        [(*map_xy(-0.05, -0.05), 0.0), (*map_xy(0.05, -0.05), 0.0), (*map_xy(0.05, 0.05), 0.0), (*map_xy(-0.05, 0.05), 0.0),
+         (*map_xy(-0.04 + lean, -0.04 + lean), 0.95), (*map_xy(0.04 + lean, -0.04 + lean), 0.95),
+         (*map_xy(0.04 + lean, 0.04 + lean), 0.95), (*map_xy(-0.04 + lean, 0.04 + lean), 0.95)],
+        [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)],
+        bark,
+    )
+    pads = [
+        ((lean * 3.0, lean * 3.0), 0.34, 0.62, 0.16),
+        ((lean * 5.0 - 0.10, lean * 5.0 + 0.06), 0.26, 0.86, 0.13),
+        ((lean * 7.0 + 0.06, lean * 7.0 - 0.04), 0.18, 1.04, 0.11),
+    ]
+    for index, ((cx, cy), radius, z, height) in enumerate(pads):
+        add_frustum(
+            scene,
+            f"Foliage{index}",
+            (cx - radius, cy - radius),
+            (cx + radius, cy + radius),
+            z,
+            z + height,
+            radius * 0.45,
+            foliage,
+        )
+
+
 def build_calibration_chirality(scene: bpy.types.Scene) -> None:
     """Asymmetric marker that locks the map-to-world mirror convention.
 
@@ -576,7 +718,10 @@ def make_textured_material(
     ramp.color_ramp.elements[1].position = light_stop
     ramp.color_ramp.elements[1].color = (*light, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
-    links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    if CURRENT_STYLE == "pbr":
+        links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    else:
+        finish_material(material, ramp.outputs["Color"])
     return material
 
 
@@ -604,9 +749,9 @@ def make_ishigaki_material(name: str = "IshigakiStone") -> bpy.types.Material:
     stone_noise.inputs["Scale"].default_value = 4.0
     stone_ramp = nodes.new("ShaderNodeValToRGB")
     stone_ramp.color_ramp.elements[0].position = 0.3
-    stone_ramp.color_ramp.elements[0].color = (0.40, 0.37, 0.32, 1.0)
+    stone_ramp.color_ramp.elements[0].color = (0.48, 0.42, 0.33, 1.0)
     stone_ramp.color_ramp.elements[1].position = 0.8
-    stone_ramp.color_ramp.elements[1].color = (0.56, 0.52, 0.45, 1.0)
+    stone_ramp.color_ramp.elements[1].color = (0.66, 0.59, 0.47, 1.0)
     links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
 
     mix = nodes.new("ShaderNodeMix")
@@ -615,7 +760,10 @@ def make_ishigaki_material(name: str = "IshigakiStone") -> bpy.types.Material:
     mix.inputs["Factor"].default_value = 1.0
     links.new(stone_ramp.outputs["Color"], mix.inputs["A"])
     links.new(seam_ramp.outputs["Color"], mix.inputs["B"])
-    links.new(mix.outputs["Result"], bsdf.inputs["Base Color"])
+    if CURRENT_STYLE == "pbr":
+        links.new(mix.outputs["Result"], bsdf.inputs["Base Color"])
+    else:
+        finish_material(material, mix.outputs["Result"])
     return material
 
 
@@ -634,14 +782,14 @@ def make_roof_material(name: str = "RoofTiles") -> bpy.types.Material:
 
 def building_material_set() -> dict[str, bpy.types.Material]:
     return {
-        "plaster": make_textured_material("Plaster", (0.74, 0.71, 0.64), (0.83, 0.81, 0.75), scale=5.0),
-        "wood": make_textured_material("Wood", (0.35, 0.26, 0.17), (0.48, 0.38, 0.26), scale=(18.0, 18.0, 2.5)),
-        "dark_wood": make_textured_material("DarkWood", (0.24, 0.18, 0.12), (0.36, 0.28, 0.19), scale=(18.0, 18.0, 2.5)),
+        "plaster": make_textured_material("Plaster", (0.82, 0.77, 0.66), (0.93, 0.89, 0.79), scale=5.0),
+        "wood": make_textured_material("Wood", (0.42, 0.30, 0.18), (0.58, 0.44, 0.28), scale=(18.0, 18.0, 2.5)),
+        "dark_wood": make_textured_material("DarkWood", (0.28, 0.20, 0.13), (0.42, 0.32, 0.21), scale=(18.0, 18.0, 2.5)),
         "stone": make_ishigaki_material("StoneBase"),
         "roof": make_roof_material("RoofTile"),
         "thatch": make_textured_material("Thatch", (0.38, 0.31, 0.18), (0.52, 0.44, 0.27), scale=(3.0, 3.0, 22.0)),
-        "gravel": make_textured_material("YardGravel", (0.46, 0.42, 0.35), (0.58, 0.54, 0.46), scale=14.0),
-        "dirt": make_textured_material("YardDirt", (0.38, 0.32, 0.24), (0.50, 0.43, 0.33), scale=9.0),
+        "gravel": make_textured_material("YardGravel", (0.55, 0.50, 0.40), (0.68, 0.63, 0.52), scale=14.0),
+        "dirt": make_textured_material("YardDirt", (0.44, 0.36, 0.26), (0.57, 0.48, 0.36), scale=9.0),
     }
 
 
@@ -1135,6 +1283,55 @@ def resolve_model(name: str):
     return None
 
 
+OUTLINE_THICKNESS = 0.028
+
+
+def add_outline_hulls(scene: bpy.types.Scene) -> None:
+    """Inverted-hull outlines for the toon style.
+
+    Each mesh gets a slightly inflated copy with flipped normals whose
+    material is dark on camera-facing polygons and transparent on backfacing
+    ones, which in Cycles leaves only a thin silhouette ring visible. Flat
+    ground pieces (terrain, pads) are skipped: outlining the ground reads as
+    a grid, not as line art.
+    """
+    outline = bpy.data.materials.new("OutlineInk")
+    outline.use_nodes = True
+    nodes = outline.node_tree.nodes
+    links = outline.node_tree.links
+    nodes.clear()
+    geometry = nodes.new("ShaderNodeNewGeometry")
+    dark = nodes.new("ShaderNodeEmission")
+    dark.inputs["Color"].default_value = (0.09, 0.07, 0.06, 1.0)
+    transparent = nodes.new("ShaderNodeBsdfTransparent")
+    mix = nodes.new("ShaderNodeMixShader")
+    output = nodes.new("ShaderNodeOutputMaterial")
+    links.new(geometry.outputs["Backfacing"], mix.inputs["Fac"])
+    links.new(dark.outputs["Emission"], mix.inputs[1])
+    links.new(transparent.outputs["BSDF"], mix.inputs[2])
+    links.new(mix.outputs["Shader"], output.inputs["Surface"])
+
+    for obj in list(scene.collection.objects):
+        if obj.type != "MESH" or obj.dimensions.z < 0.09:
+            continue
+        hull = obj.copy()
+        hull.data = obj.data.copy()
+        hull.data.materials.clear()
+        hull.data.materials.append(outline)
+        # Inflate along vertex normals and flip: a single shell whose
+        # camera-facing side is transparent and whose far side draws the
+        # silhouette ring. (Solidify would add an inner surface that covers
+        # the object in ink.)
+        mesh = hull.data
+        offsets = [(v.co + v.normal * OUTLINE_THICKNESS) for v in mesh.vertices]
+        for vertex, position in zip(mesh.vertices, offsets):
+            vertex.co = position
+        for polygon in mesh.polygons:
+            polygon.flip()
+        mesh.update()
+        scene.collection.objects.link(hull)
+
+
 MODEL_REGISTRY = {
     "calibration-tile": build_calibration_tile,
     "calibration-cube": build_calibration_cube,
@@ -1152,6 +1349,8 @@ MODEL_REGISTRY = {
     "building-wood-bridge": build_wood_bridge,
     "unit-engineer": build_unit_engineer,
     "wall-ladder": build_wall_ladder,
+    "tree-pine": build_tree_pine,
+    "tree-pine-2": lambda scene: build_tree_pine(scene, variant=1),
 }
 
 
@@ -1169,8 +1368,13 @@ def main() -> None:
     if builder is None:
         raise SystemExit(f"unknown model: {args.model}; known: {sorted(MODEL_REGISTRY)} plus wall-plaster-connected-<NESW mask>")
 
+    global CURRENT_STYLE
+    CURRENT_STYLE = {"toon-cel": "toon", "painterly": "painterly"}.get(args.render_spec, "pbr")
+
     scene = reset_scene()
     builder(scene)
+    if CURRENT_STYLE == "toon":
+        add_outline_hulls(scene)
     setup_camera(scene, canvas_w, canvas_h, anchor_x, anchor_y)
 
     output_name = args.output_name or args.model
