@@ -80,12 +80,14 @@ function parseSource(value: unknown, index: number): AssetSource {
       assertString(source.scene, `assets[${index}].source.scene`);
     }
     assertString(source.renderSpec, `assets[${index}].source.renderSpec`);
+    const supersample = parseSupersample(source.supersample, index);
     return {
       type: "blender",
       ...(source.model === undefined ? {} : { model: source.model }),
       ...(source.scene === undefined ? {} : { scene: source.scene }),
       ...(source.collection === undefined ? {} : { collection: source.collection }),
-      renderSpec: source.renderSpec
+      renderSpec: source.renderSpec,
+      ...(supersample === undefined ? {} : { supersample })
     };
   }
   if (source.type === "raster") {
@@ -179,6 +181,14 @@ function assertNumber(value: unknown, label: string): asserts value is number {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new Error(`Invalid ${label}`);
   }
+}
+
+function parseSupersample(value: unknown, index: number): number | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  assertPositiveInteger(value, `assets[${index}].source.supersample`);
+  return value;
 }
 
 function assertPositiveInteger(value: unknown, label: string): asserts value is number {

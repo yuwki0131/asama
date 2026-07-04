@@ -17,6 +17,7 @@ export interface RenderCacheMetadata {
   };
   readonly renderSpec: string;
   readonly transparentBackground: boolean;
+  readonly supersample: number;
   readonly renderScriptSha256: string;
 }
 
@@ -55,6 +56,7 @@ export async function computeRenderCacheKey(
     },
     renderSpec: spec.renderSpec,
     transparentBackground: spec.transparentBackground,
+    supersample: spec.supersample ?? 1,
     renderScriptSha256
   };
 
@@ -64,7 +66,8 @@ export async function computeRenderCacheKey(
     canvas: metadata.canvas,
     anchor: metadata.anchor,
     renderSpec: metadata.renderSpec,
-    transparentBackground: metadata.transparentBackground
+    transparentBackground: metadata.transparentBackground,
+    supersample: metadata.supersample
   };
 
   return {
@@ -155,6 +158,7 @@ function parseRenderCacheMetadata(value: unknown): RenderCacheMetadata {
     anchor: parsePoint(record.anchor, "anchor", "x", "y"),
     renderSpec: requiredString(record.renderSpec, "renderSpec"),
     transparentBackground: requiredBoolean(record.transparentBackground, "transparentBackground"),
+    supersample: typeof record.supersample === "number" ? record.supersample : 1,
     renderScriptSha256: requiredString(record.renderScriptSha256, "renderScriptSha256")
   };
 }

@@ -29,6 +29,7 @@ describe("Blender render cache", () => {
         anchor: { x: 96, y: 156 },
         renderSpec: "iso-building-default",
         transparentBackground: true,
+      supersample: 1,
         renderScriptSha256: expect.stringMatching(/^[0-9a-f]{64}$/)
       });
     } finally {

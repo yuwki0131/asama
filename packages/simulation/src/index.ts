@@ -1548,7 +1548,9 @@ function terrainAt(coord: CellCoord): TerrainType {
     return "stone";
   }
 
-  if ((coord.x + coord.y * 3) % 11 === 0 || (coord.x > 46 && coord.x < 72 && coord.y > 72 && coord.y < 86)) {
+  // Dirt appears as coherent zones only; the old regular per-cell sprinkle
+  // read as polka dots on the painterly terrain.
+  if (coord.x > 46 && coord.x < 72 && coord.y > 72 && coord.y < 86) {
     return "dirt";
   }
 

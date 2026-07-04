@@ -90,6 +90,7 @@ export function toHeadlessBlenderRenderSpec(
     },
     transparentBackground: true,
     renderSpec: asset.source.renderSpec,
+    ...(asset.source.supersample === undefined ? {} : { supersample: asset.source.supersample }),
     ...(reportDirectory === undefined ? {} : { reportJson: join(reportDirectory, `${outputName}.json`) })
   };
 }
@@ -117,6 +118,7 @@ export function buildHeadlessBlenderArgs(spec: BlenderRenderSpec, pythonScript: 
 
   appendOptional(args, "--output-name", spec.outputName);
   appendOptional(args, "--report-json", spec.reportJson);
+  appendOptional(args, "--supersample", spec.supersample);
 
   if (spec.model === undefined || spec.model.length === 0) {
     throw new Error("render_asset.py requires --model");
@@ -348,11 +350,6 @@ export async function writeCalibrationReport(path: string, results: readonly Cal
   await writeFile(path, `${lines.join("\n")}\n`, "utf8");
 }
 
-// Reduced-palette default for Blender-rendered sprites (art direction:
-// 疑似ドット絵・減色調). Per-asset quantization, applied after the raw render,
-// so tuning it does not invalidate the render cache.
-const blenderPaletteDefault = { colors: 64, dither: 0.5 };
-
 function toBlenderRasterImportSpec(asset: ProductionAssetSpec, sourceFile: string, outputFile: string): RasterImportSpec {
   return {
     sourceFile,
@@ -364,8 +361,7 @@ function toBlenderRasterImportSpec(asset: ProductionAssetSpec, sourceFile: strin
     trim: false,
     resizeMode: "exact",
     category: asset.category ?? categoryForKind(asset.kind),
-    ...(asset.postprocess?.sharpen === undefined ? {} : { sharpen: asset.postprocess.sharpen }),
-    palette: blenderPaletteDefault
+    ...(asset.postprocess?.sharpen === undefined ? {} : { sharpen: asset.postprocess.sharpen })
   };
 }
 

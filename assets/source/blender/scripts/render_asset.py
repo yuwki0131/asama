@@ -492,14 +492,14 @@ def make_noise_material(name: str, dark: tuple[float, float, float], light: tupl
 
 TERRAIN_STYLES = {
     "grass": {
-        "surface": lambda: make_noise_material("GrassSurface", (0.27, 0.35, 0.16), (0.41, 0.49, 0.23)),
-        "variant": lambda: make_noise_material("GrassVariant", (0.25, 0.33, 0.15), (0.39, 0.46, 0.22), scale=10.0),
+        "surface": lambda: make_noise_material("GrassSurface", (0.205, 0.275, 0.120), (0.320, 0.395, 0.180)),
+        "variant": lambda: make_noise_material("GrassVariant", (0.190, 0.255, 0.112), (0.300, 0.370, 0.170), scale=10.0),
         "edge": (0.34, 0.29, 0.21),
     },
     "dirt": {
-        "surface": lambda: make_noise_material("DirtSurface", (0.36, 0.30, 0.22), (0.48, 0.41, 0.30)),
-        "variant": lambda: make_noise_material("DirtVariant", (0.33, 0.27, 0.20), (0.45, 0.38, 0.28), scale=10.0),
-        "edge": (0.29, 0.24, 0.18),
+        "surface": lambda: make_noise_material("DirtSurface", (0.235, 0.205, 0.150), (0.315, 0.275, 0.205)),
+        "variant": lambda: make_noise_material("DirtVariant", (0.215, 0.190, 0.140), (0.295, 0.260, 0.195), scale=10.0),
+        "edge": (0.185, 0.160, 0.120),
     },
     "stone": {
         "surface": lambda: make_noise_material("StoneSurface", (0.36, 0.37, 0.38), (0.52, 0.53, 0.54), scale=8.0),
@@ -507,8 +507,8 @@ TERRAIN_STYLES = {
         "edge": (0.26, 0.27, 0.29),
     },
     "water": {
-        "surface": lambda: make_noise_material("WaterSurface", (0.075, 0.145, 0.185), (0.115, 0.195, 0.235), scale=4.0),
-        "variant": lambda: make_noise_material("WaterVariant", (0.070, 0.140, 0.180), (0.110, 0.190, 0.230), scale=7.0),
+        "surface": lambda: make_noise_material("WaterSurface", (0.050, 0.100, 0.130), (0.085, 0.145, 0.180), scale=4.0),
+        "variant": lambda: make_noise_material("WaterVariant", (0.047, 0.096, 0.126), (0.080, 0.140, 0.175), scale=7.0),
         "edge": (0.50, 0.45, 0.34),
     },
 }
@@ -853,6 +853,48 @@ def make_showcase_roof() -> bpy.types.Material:
     return material
 
 
+def add_kawara_roof(
+    scene: bpy.types.Scene,
+    name: str,
+    low_map: tuple[float, float],
+    high_map: tuple[float, float],
+    base_z: float,
+    ridge_z: float,
+    ridge_axis: str,
+    roof_material: bpy.types.Material,
+    trim_material: bpy.types.Material,
+    verge_material: bpy.types.Material | None = None,
+) -> None:
+    """Quality-standard kawara roof assembly (approved on the showcase kura):
+    curved gable surface, noshi ridge stack with oni end tiles, eave fascia
+    and per-column round tile ends, optional white-plaster gable verge.
+    Currently supports ridge_axis "x"; extend for "y" during rollout."""
+    x0, y0 = low_map
+    x1, y1 = high_map
+    low, high = map_box((x0, y0, 0.0), (x1, y1, 0.0))
+    add_gable_roof(scene, f"{name}Surface", (low[0], low[1]), (high[0], high[1]), base_z, ridge_z, ridge_axis, roof_material, end_material=verge_material)
+
+    mid = (y0 + y1) / 2.0
+    noshi_low, noshi_high = map_box((x0 - 0.04, mid - 0.08, 0.0), (x1 + 0.04, mid + 0.08, 0.0))
+    add_box(scene, f"{name}Noshi", (noshi_low[0], noshi_low[1], ridge_z - 0.04), (noshi_high[0], noshi_high[1], ridge_z + 0.05), trim_material)
+    cap_low, cap_high = map_box((x0 - 0.02, mid - 0.045, 0.0), (x1 + 0.02, mid + 0.045, 0.0))
+    add_box(scene, f"{name}Cap", (cap_low[0], cap_low[1], ridge_z + 0.05), (cap_high[0], cap_high[1], ridge_z + 0.105), trim_material)
+    for ox in (x0 - 0.08, x1 - 0.04):
+        end_low, end_high = map_box((ox, mid - 0.09, 0.0), (ox + 0.12, mid + 0.09, 0.0))
+        add_box(scene, f"{name}Oni{ox:.2f}", (end_low[0], end_low[1], ridge_z - 0.06), (end_high[0], end_high[1], ridge_z + 0.14), trim_material)
+
+    pitch = 1.0 / 9.0
+    for ey in (y0, y1):
+        flow, fhigh = map_box((x0, ey - 0.04, 0.0), (x1, ey + 0.04, 0.0))
+        add_box(scene, f"{name}Fascia{ey:.2f}", (flow[0], flow[1], base_z - 0.055), (fhigh[0], fhigh[1], base_z - 0.005), trim_material)
+    count = int((x1 - x0) / pitch)
+    for index in range(count + 1):
+        ex = x0 + index * pitch - 0.028
+        for ey in (y0, y1):
+            elow, ehigh = map_box((ex, ey - 0.05, 0.0), (ex + 0.056, ey + 0.05, 0.0))
+            add_box(scene, f"{name}Eave{index}{ey:.2f}", (elow[0], elow[1], base_z - 0.07), (ehigh[0], ehigh[1], base_z + 0.005), trim_material)
+
+
 def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     """Production-quality kura for the painterly style gate. Same 3x3 lot and
     massing as the approved graybox; detail: ishigaki plinth, namako-kabe
@@ -926,30 +968,8 @@ def build_storehouse_showcase(scene: bpy.types.Scene) -> None:
     splash = make_material("SplashGrime", (0.155, 0.145, 0.125, 1.0))
     add_box(scene, "Splash", *map_box((-2.505, -2.205, 0.24), (-0.495, -0.795, 0.305)), splash)
 
-    # Curved roof with modest kura eaves; the gable verge is plastered white
-    # like a real storehouse, and the ridge is a white shikkui-wrapped stack.
-    low, high = map_box((-2.62, -2.32, 0.0), (-0.38, -0.68, 0.0))
-    add_gable_roof(scene, "Roof", (low[0], low[1]), (high[0], high[1]), 1.17, 1.58, "x", roof, end_material=plaster)
-    noshi_low, noshi_high = map_box((-2.66, -1.58, 0.0), (-0.34, -1.42, 0.0))
-    add_box(scene, "RidgeNoshi", (noshi_low[0], noshi_low[1], 1.54), (noshi_high[0], noshi_high[1], 1.63), ridge_dark)
-    cap_low, cap_high = map_box((-2.64, -1.535, 0.0), (-0.36, -1.465, 0.0))
-    add_box(scene, "RidgeCap", (cap_low[0], cap_low[1], 1.63), (cap_high[0], cap_high[1], 1.685), ridge_dark)
-    for ox in (-2.70, -0.42):
-        end_low, end_high = map_box((ox, -1.59, 0.0), (ox + 0.12, -1.41, 0.0))
-        add_box(scene, f"Oni{ox}", (end_low[0], end_low[1], 1.52), (end_high[0], end_high[1], 1.72), ridge_dark)
-
-    # Eave fascia and round tile ends, aligned to the 1/9-unit tile pitch so
-    # each stub caps one tile column.
-    for ey in (-2.32, -0.68):
-        flow, fhigh = map_box((-2.62, ey - 0.04, 0.0), (-0.38, ey + 0.04, 0.0))
-        add_box(scene, f"Fascia{ey}", (flow[0], flow[1], 1.115), (fhigh[0], fhigh[1], 1.165), ridge_dark)
-    pitch = 1.0 / 9.0
-    count = int(2.24 / pitch)
-    for index in range(count + 1):
-        x = -2.62 + index * pitch - 0.028
-        for ey in (-2.32, -0.68):
-            elow, ehigh = map_box((x, ey - 0.05, 0.0), (x + 0.056, ey + 0.05, 0.0))
-            add_box(scene, f"Eave{index}{ey}", (elow[0], elow[1], 1.10), (ehigh[0], ehigh[1], 1.175), ridge_dark)
+    # Quality-standard kawara roof (see add_kawara_roof).
+    add_kawara_roof(scene, "KuraRoof", (-2.62, -2.32), (-0.38, -0.68), 1.17, 1.58, "x", roof, ridge_dark, verge_material=plaster)
 
 
 def build_storehouse_graybox(scene: bpy.types.Scene) -> None:

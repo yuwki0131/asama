@@ -86,6 +86,7 @@ export type AssetSource =
       readonly scene?: string;
       readonly collection?: string;
       readonly renderSpec: string;
+      readonly supersample?: number;
     }
   | {
       readonly type: "raster";
@@ -165,6 +166,7 @@ export interface BlenderRenderSpec {
   readonly renderSeed?: number;
   readonly renderSpec: string;
   readonly reportJson?: string;
+  readonly supersample?: number;
 }
 
 export interface AtlasBuildSpec {
