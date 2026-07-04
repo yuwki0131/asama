@@ -14,6 +14,7 @@ export interface AiIntakeEntry {
   readonly output: string;
   readonly canvas: { readonly width: number; readonly height: number };
   readonly anchor: { readonly x: number; readonly y: number };
+  readonly flatten?: { readonly kuwaharaRadius: number; readonly posterizeLevels: number };
 }
 
 export interface AiIntakeConfig {
@@ -200,6 +201,100 @@ function clampByte(value: number): number {
   return Math.min(255, Math.max(0, Math.round(value)));
 }
 
+/** Edge-preserving Kuwahara filter over raw RGBA (alpha preserved). Flattens
+ * micro-detail into painterly color fields while keeping mass boundaries. */
+export function kuwahara(image: RawImage, radius: number): RawImage {
+  const { data, width, height } = image;
+  const out = Buffer.from(data);
+  const quadrants: Array<[number, number, number, number]> = [
+    [-radius, -radius, 0, 0],
+    [0, -radius, radius, 0],
+    [-radius, 0, 0, radius],
+    [0, 0, radius, radius]
+  ];
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const centerIdx = (y * width + x) * 4;
+      if ((data[centerIdx + 3] ?? 0) === 0) {
+        continue;
+      }
+      let bestVar = Infinity;
+      let bestR = 0;
+      let bestG = 0;
+      let bestB = 0;
+      for (const [x0, y0, x1, y1] of quadrants) {
+        let sumR = 0;
+        let sumG = 0;
+        let sumB = 0;
+        let sumL = 0;
+        let sumL2 = 0;
+        let count = 0;
+        for (let dy = y0; dy <= y1; dy += 1) {
+          const py = y + dy;
+          if (py < 0 || py >= height) continue;
+          for (let dx = x0; dx <= x1; dx += 1) {
+            const px = x + dx;
+            if (px < 0 || px >= width) continue;
+            const i = (py * width + px) * 4;
+            if ((data[i + 3] ?? 0) < 128) continue;
+            const r = data[i] ?? 0;
+            const g = data[i + 1] ?? 0;
+            const b = data[i + 2] ?? 0;
+            const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            sumR += r;
+            sumG += g;
+            sumB += b;
+            sumL += luma;
+            sumL2 += luma * luma;
+            count += 1;
+          }
+        }
+        if (count === 0) continue;
+        const variance = sumL2 / count - (sumL / count) ** 2;
+        if (variance < bestVar) {
+          bestVar = variance;
+          bestR = sumR / count;
+          bestG = sumG / count;
+          bestB = sumB / count;
+        }
+      }
+      if (bestVar !== Infinity) {
+        out[centerIdx] = Math.round(bestR);
+        out[centerIdx + 1] = Math.round(bestG);
+        out[centerIdx + 2] = Math.round(bestB);
+      }
+    }
+  }
+  return { data: out, width, height };
+}
+
+/** Lift near-black shadows toward the world's lavender shadow tone; the
+ * painterly ramp never reaches black, so AI darks must not either. */
+export function liftShadows(image: RawImage, threshold = 52, lift = 0.55): void {
+  const { data } = image;
+  const target = [96, 96, 120];
+  for (let i = 0; i < data.length; i += 4) {
+    if ((data[i + 3] ?? 0) === 0) continue;
+    const luma = 0.2126 * (data[i] ?? 0) + 0.7152 * (data[i + 1] ?? 0) + 0.0722 * (data[i + 2] ?? 0);
+    if (luma >= threshold) continue;
+    const amount = lift * (1 - luma / threshold);
+    for (let c = 0; c < 3; c += 1) {
+      data[i + c] = Math.round((data[i + c] ?? 0) * (1 - amount) + (target[c] ?? 0) * amount);
+    }
+  }
+}
+
+export function posterize(image: RawImage, levels: number): void {
+  const { data } = image;
+  const step = 255 / (levels - 1);
+  for (let i = 0; i < data.length; i += 4) {
+    if ((data[i + 3] ?? 0) === 0) continue;
+    for (let c = 0; c < 3; c += 1) {
+      data[i + c] = Math.round(Math.round((data[i + c] ?? 0) / step) * step);
+    }
+  }
+}
+
 export interface AiIntakeResult {
   readonly assetId: string;
   readonly output: string;
@@ -218,13 +313,36 @@ export async function intakeAiAsset(options: {
   readonly anchor: { readonly x: number; readonly y: number };
   readonly reference: ToneStats;
   readonly assetId: string;
+  readonly flatten?: { readonly kuwaharaRadius: number; readonly posterizeLevels: number };
 }): Promise<AiIntakeResult> {
   const image = await loadRaw(options.inputPath);
   const { removed } = removeSolidBackground(image);
-  const gains = calibrateTone(image, options.reference);
 
   const cleaned = sharp(image.data, { raw: { width: image.width, height: image.height, channels: 4 } }).png();
-  const trimmed = await sharp(await cleaned.toBuffer()).trim({ threshold: 8 }).png().toBuffer();
+  let trimmed = await sharp(await cleaned.toBuffer()).trim({ threshold: 8 }).png().toBuffer();
+
+  let gains = { lumaGain: 1, satGain: 1 };
+  if (options.flatten) {
+    // Match the world's detail frequency: work at ~4x the target size, run
+    // an edge-preserving Kuwahara pass, flatten darks into the painterly
+    // shadow tone, quantize, THEN tone-calibrate the flattened result.
+    const midW = options.canvas.width * 4;
+    const midMeta = await sharp(trimmed).metadata();
+    const midH = Math.max(1, Math.round(((midMeta.height ?? 1) / Math.max(1, midMeta.width ?? 1)) * midW));
+    const midRaw = await sharp(trimmed).resize(midW, midH, { kernel: "lanczos3" }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let mid: RawImage = { data: midRaw.data, width: midRaw.info.width, height: midRaw.info.height };
+    mid = kuwahara(mid, options.flatten.kuwaharaRadius);
+    liftShadows(mid);
+    posterize(mid, options.flatten.posterizeLevels);
+    gains = calibrateTone(mid, options.reference);
+    trimmed = await sharp(mid.data, { raw: { width: mid.width, height: mid.height, channels: 4 } }).png().toBuffer();
+  } else {
+    const raw = await sharp(trimmed).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const flat: RawImage = { data: raw.data, width: raw.info.width, height: raw.info.height };
+    gains = calibrateTone(flat, options.reference);
+    trimmed = await sharp(flat.data, { raw: { width: flat.width, height: flat.height, channels: 4 } }).png().toBuffer();
+  }
+
   const meta = await sharp(trimmed).metadata();
   const srcW = meta.width ?? 1;
   const srcH = meta.height ?? 1;
@@ -320,7 +438,8 @@ export async function runAiIntake(repoRoot: string): Promise<readonly AiIntakeRe
         canvas: entry.canvas,
         anchor: entry.anchor,
         reference,
-        assetId: entry.assetId
+        assetId: entry.assetId,
+        ...(entry.flatten === undefined ? {} : { flatten: entry.flatten })
       })
     );
   }

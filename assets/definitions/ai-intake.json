@@ -2,11 +2,87 @@
   "version": 1,
   "reference": "public/assets/generated/building-tenshu-test.png",
   "entries": [
-    { "input": "deco-tree-pine-1__raw.png", "assetId": "deco.tree.pine.1", "output": "deco-tree-pine-1.png", "canvas": { "width": 64, "height": 112 }, "anchor": { "x": 32, "y": 96 } },
-    { "input": "deco-tree-pine-2__raw.png", "assetId": "deco.tree.pine.2", "output": "deco-tree-pine-2.png", "canvas": { "width": 64, "height": 112 }, "anchor": { "x": 32, "y": 96 } },
-    { "input": "deco-tree-cedar-1__raw.png", "assetId": "deco.tree.cedar.1", "output": "deco-tree-cedar-1.png", "canvas": { "width": 64, "height": 128 }, "anchor": { "x": 32, "y": 112 } },
-    { "input": "deco-tree-broadleaf-1__raw.png", "assetId": "deco.tree.broadleaf.1", "output": "deco-tree-broadleaf-1.png", "canvas": { "width": 64, "height": 112 }, "anchor": { "x": 32, "y": 96 } },
-    { "input": "deco-bamboo-1__raw.png", "assetId": "deco.bamboo.1", "output": "deco-bamboo-1.png", "canvas": { "width": 64, "height": 128 }, "anchor": { "x": 32, "y": 112 } },
-    { "input": "deco-bush-1__raw.png", "assetId": "deco.bush.1", "output": "deco-bush-1.png", "canvas": { "width": 64, "height": 56 }, "anchor": { "x": 32, "y": 40 } }
+    {
+      "input": "deco-tree-pine-1__raw.png",
+      "assetId": "deco.tree.pine.1",
+      "output": "deco-tree-pine-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 112
+      },
+      "anchor": {
+        "x": 32,
+        "y": 96
+      },
+      "flatten": {
+        "kuwaharaRadius": 4,
+        "posterizeLevels": 12
+      }
+    },
+    {
+      "input": "deco-tree-pine-2__raw.png",
+      "assetId": "deco.tree.pine.2",
+      "output": "deco-tree-pine-2.png",
+      "canvas": {
+        "width": 64,
+        "height": 112
+      },
+      "anchor": {
+        "x": 32,
+        "y": 96
+      }
+    },
+    {
+      "input": "deco-tree-cedar-1__raw.png",
+      "assetId": "deco.tree.cedar.1",
+      "output": "deco-tree-cedar-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 128
+      },
+      "anchor": {
+        "x": 32,
+        "y": 112
+      }
+    },
+    {
+      "input": "deco-tree-broadleaf-1__raw.png",
+      "assetId": "deco.tree.broadleaf.1",
+      "output": "deco-tree-broadleaf-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 112
+      },
+      "anchor": {
+        "x": 32,
+        "y": 96
+      }
+    },
+    {
+      "input": "deco-bamboo-1__raw.png",
+      "assetId": "deco.bamboo.1",
+      "output": "deco-bamboo-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 128
+      },
+      "anchor": {
+        "x": 32,
+        "y": 112
+      }
+    },
+    {
+      "input": "deco-bush-1__raw.png",
+      "assetId": "deco.bush.1",
+      "output": "deco-bush-1.png",
+      "canvas": {
+        "width": 64,
+        "height": 56
+      },
+      "anchor": {
+        "x": 32,
+        "y": 40
+      }
+    }
   ]
 }
