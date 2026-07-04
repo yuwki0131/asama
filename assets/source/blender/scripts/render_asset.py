@@ -1327,35 +1327,34 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     add_beam(scene, "Trunk2", p1, p2, 0.105, bark, tip_thickness=0.075)
     add_beam(scene, "Trunk3", p2, p3, 0.075, bark, tip_thickness=0.05)
 
-    # Branches leaving the trunk, each tipped with a leaf-card pad cloud.
-    needle_deep = make_foliage_material("PineNeedlesDeep", (0.030, 0.062, 0.038), (0.055, 0.095, 0.055))
-    needle_sun = make_foliage_material("PineNeedlesSun", (0.105, 0.170, 0.088), (0.165, 0.235, 0.120))
-    shades = [needle_deep, needle_dark, needle_light, needle_sun]
+    # Cloud-form pads (Kano-school idiom): smooth cloud masses, two-value
+    # shading from the geometry normals, sparse dot accents on the rims.
+    needle_shadow = make_material("PineCloudShadow", (0.045, 0.085, 0.050, 1.0))
+    needle_lit = make_material("PineCloudLit", (0.100, 0.160, 0.082, 1.0))
+    accent_lit = make_material("PineAccentLit", (0.155, 0.225, 0.115, 1.0))
     branches = [
-        (p1, (-0.38 * s, -0.22 * s, 0.78), 0.28),
-        (p2, (0.52 * s, 0.36 * s, 1.02), 0.25),
-        (p2, (-0.16 * s, -0.44 * s, 1.22), 0.21),
-        (p3, (0.22 * s, 0.08 * s, 1.54), 0.23),
-        (p3, (-0.12 * s, 0.20 * s, 1.42), 0.15),
+        (p1, (-0.38 * s, -0.22 * s, 0.80), 0.30),
+        (p2, (0.50 * s, 0.34 * s, 1.04), 0.27),
+        (p2, (-0.14 * s, -0.42 * s, 1.24), 0.22),
+        (p3, (0.20 * s, 0.08 * s, 1.54), 0.24),
     ]
+    import math as _math
     for index, (base, tip, radius) in enumerate(branches):
         add_beam(scene, f"Branch{index}", base, tip, 0.05, bark, tip_thickness=0.028)
-        # Secondary twigs forking into the pad.
-        for t_index, (dx, dy) in enumerate(((radius * 0.5, radius * 0.2), (-radius * 0.3, radius * 0.45))):
-            twig_tip = (tip[0] + dx, tip[1] + dy, tip[2] + 0.05)
-            add_beam(scene, f"Twig{index}{t_index}", tip, twig_tip, 0.022, bark, tip_thickness=0.012)
-        add_leaf_cards(
-            scene,
-            f"Pad{index}",
-            (tip[0], tip[1], tip[2] + 0.05),
-            (radius, radius, radius * 0.26),
-            116,
-            shades,
-            seed=float(variant * 31 + index * 7 + 3),
-            card_size=0.06,
-            droop=0.6,
-        )
-    # A single bare dead branch for age, and bark knots on the lower trunk.
+        # The cloud: a squat smooth blob; the painterly ramp splits it into
+        # a lit crown and a shaded underside on its own.
+        material = needle_lit if index % 2 else needle_shadow
+        add_foliage_blob(scene, f"Pad{index}", tip[0], tip[1], tip[2], radius, radius * 0.55, needle_lit, squash=0.85)
+        add_foliage_blob(scene, f"PadUnder{index}", tip[0] + 0.02, tip[1] + 0.02, tip[2] - radius * 0.10, radius * 0.9, radius * 0.35, needle_shadow, squash=0.8)
+        # Dot accents along the sunlit rim (map light direction (1, 0.2)).
+        for a_index in range(5):
+            angle = -0.5 + a_index * 0.45
+            ax = tip[0] + (radius * 0.95) * _math.cos(angle) * 0.98
+            ay = tip[1] + (radius * 0.95) * _math.sin(angle) * 0.98 + (radius * 0.2)
+            az = tip[2] + radius * 0.30 + 0.02 * _math.sin(a_index * 5.0 + index)
+            size = 0.030 + 0.012 * ((a_index + index) % 3)
+            add_box(scene, f"PadDot{index}{a_index}", *map_box((ax - size, ay - size, az), (ax + size, ay + size, az + size * 1.6)), accent_lit)
+    # A single bare dead branch, a byobu-e pine idiom.
     add_beam(scene, "DeadBranch", p2, (0.02 * s, 0.52 * s, 1.12), 0.03, bark, tip_thickness=0.008)
     for index, (kx, ky, kz) in enumerate(((0.05 * s, 0.02 * s, 0.34), (0.13 * s, 0.09 * s, 0.72))):
         add_box(scene, f"Knot{index}", *map_box((kx - 0.035, ky - 0.035, kz), (kx + 0.035, ky + 0.035, kz + 0.06)), bark)
@@ -1370,24 +1369,17 @@ def build_tree_cedar(scene: bpy.types.Scene) -> None:
     light = make_foliage_material("CedarNeedlesL", (0.052, 0.100, 0.058), (0.090, 0.150, 0.085))
     add_tree_base(scene, 0.0, 0.0, 0.09, bark)
     add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.05, -0.03, 2.02), 0.13, bark, tip_thickness=0.045)
+    # One-stroke cone: three smooth stacked masses, alternating shade bands.
+    mid = make_foliage_material("CedarNeedlesM", (0.048, 0.092, 0.055), (0.075, 0.125, 0.070))
+    # Heavy overlap so the tiers fuse into one cone silhouette; the shade
+    # bands come from the material change, not from separated masses.
     tiers = [
-        (0.33, 0.42, dark), (0.29, 0.76, light), (0.25, 1.10, dark),
-        (0.20, 1.42, light), (0.14, 1.72, dark), (0.08, 1.98, light),
+        (0.36, 0.24, 0.78, dark), (0.31, 0.56, 0.74, dark), (0.26, 0.90, 0.70, mid),
+        (0.21, 1.24, 0.64, mid), (0.15, 1.56, 0.56, light), (0.08, 1.86, 0.44, light),
     ]
-    for index, (radius, z, mat) in enumerate(tiers):
-        jx = 0.03 if index % 2 == 0 else -0.03
-        add_leaf_cards(
-            scene,
-            f"Tier{index}",
-            (jx, -jx, z),
-            (radius, radius, radius * 0.75),
-            78,
-            [dark, dark, light],
-            seed=float(index * 13 + 5),
-            card_size=0.058,
-            shade_bias=0.8,
-            droop=0.4,
-        )
+    for index, (radius, z, height, mat) in enumerate(tiers):
+        jx = 0.012 if index % 2 == 0 else -0.012
+        add_foliage_blob(scene, f"Tier{index}", jx, -jx, z, radius, height, mat, squash=1.0)
 
 
 def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
@@ -1411,22 +1403,12 @@ def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
         add_beam(scene, f"Limb{index}", base, tip, 0.06, bark, tip_thickness=0.028)
         for t_index, (dx, dy, dz) in enumerate(((0.10, 0.06, 0.14), (-0.07, 0.10, 0.16))):
             add_beam(scene, f"LimbTwig{index}{t_index}", tip, (tip[0] + dx, tip[1] + dy, tip[2] + dz), 0.02, bark, tip_thickness=0.01)
-    blobs = [
-        (-0.22, 0.10, 0.80, 0.26), (0.24, -0.14, 0.86, 0.27), (0.03, 0.20, 0.90, 0.24),
-        (-0.06, -0.05, 1.02, 0.30), (0.12, 0.08, 1.16, 0.22),
-    ]
-    for index, (cx, cy, z, radius) in enumerate(blobs):
-        add_leaf_cards(
-            scene,
-            f"Blob{index}",
-            (cx, cy, z),
-            (radius, radius, radius * 0.8),
-            124,
-            [deep, dark, light, sun],
-            seed=float(index * 17 + 11),
-            card_size=0.062,
-            shade_bias=0.8,
-        )
+    # Cloud dome split into a shaded mass and a sunlit mass offset toward
+    # the light (map direction (1, 0.2)).
+    add_foliage_blob(scene, "DomeShade", -0.05, -0.03, 0.62, 0.42, 0.62, dark)
+    add_foliage_blob(scene, "DomeShade2", 0.06, 0.14, 0.70, 0.33, 0.50, dark)
+    add_foliage_blob(scene, "DomeLit", 0.13, 0.02, 0.88, 0.33, 0.50, light)
+    add_foliage_blob(scene, "DomeLit2", 0.02, -0.12, 0.98, 0.26, 0.40, sun)
 
 
 def build_bamboo(scene: bpy.types.Scene) -> None:
@@ -1455,25 +1437,24 @@ def build_bamboo(scene: bpy.types.Scene) -> None:
             ny = sy + lean * 0.7 * f
             add_box(scene, f"Node{index}{node_z:.2f}", *map_box((nx - 0.026, ny - 0.026, node_z), (nx + 0.026, ny + 0.026, node_z + 0.022)), culm_light)
             node_z += 0.34
-    # Shared feathery canopy: tall thin blobs bridging the culm tops.
-    canopies = [
-        (-0.10, -0.02, 1.55, 0.30), (0.10, 0.02, 1.80, 0.28),
-        (-0.02, -0.08, 2.05, 0.24), (0.02, 0.08, 2.22, 0.18),
+    # Crescent sasa tufts: sparse fans of drooping elongated leaves at the
+    # culm tops, with sky showing between the tufts.
+    import math as _math
+    tuft_specs = [
+        (-0.14, -0.02, 1.92, 0.9), (0.10, -0.12, 2.16, -0.6), (0.16, 0.06, 1.98, 0.4),
+        (-0.05, 0.16, 1.78, -0.9), (-0.20, 0.10, 2.02, 0.7), (0.02, -0.04, 2.32, -0.3),
+        (0.20, -0.16, 1.66, 0.5), (-0.24, -0.06, 1.58, -0.5),
     ]
-    for index, (cx, cy, z, radius) in enumerate(canopies):
-        add_leaf_cards(
-            scene,
-            f"Canopy{index}",
-            (cx, cy, z),
-            (radius, radius, radius * 1.1),
-            72,
-            [leaves_dark, leaves_light],
-            seed=float(index * 19 + 23),
-            card_size=0.05,
-            card_aspect=2.6,
-            droop=0.9,
-            shade_bias=0.7,
-        )
+    for index, (tx, ty, tz, spin) in enumerate(tuft_specs):
+        mat = leaves_dark if index % 2 == 0 else leaves_light
+        # A fan of 4 drooping blade cards per tuft.
+        for blade in range(4):
+            angle = spin + (blade - 1.5) * 0.55
+            length = 0.16 + 0.04 * ((blade + index) % 2)
+            ex = tx + length * _math.cos(angle)
+            ey = ty + length * _math.sin(angle)
+            ez = tz - 0.10 - 0.03 * blade
+            add_beam(scene, f"Blade{index}{blade}", (tx, ty, tz), (ex, ey, ez), 0.035, mat, tip_thickness=0.008)
 
 
 # --- Prop library: period exterior clutter -----------------------------------
