@@ -2619,6 +2619,28 @@
         "x": 0.5,
         "y": 0.7142857142857143
       }
+    },
+    {
+      "assetId": "deco.bush.1",
+      "kind": "building",
+      "file": "generated/deco-bush-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.weeds.1",
+      "kind": "building",
+      "file": "generated/deco-weeds-1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6666666666666666
+      }
     }
   ]
 }

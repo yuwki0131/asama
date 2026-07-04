@@ -6127,6 +6127,54 @@
         "trim": false,
         "resizeMode": "exact"
       }
+    },
+    {
+      "assetId": "deco.bush.1",
+      "kind": "building",
+      "output": "deco-bush-1.png",
+      "source": {
+        "type": "blender",
+        "model": "deco-bush",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 56,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.weeds.1",
+      "kind": "building",
+      "output": "deco-weeds-1.png",
+      "source": {
+        "type": "blender",
+        "model": "deco-weeds",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 32
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
     }
   ]
 }

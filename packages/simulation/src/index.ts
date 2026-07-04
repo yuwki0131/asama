@@ -1574,6 +1574,10 @@ function scatterDecorations(cells: readonly TerrainCellState[]): MapDecoration[]
           pick < 0.7 ? "deco.tree.cedar.1" :
           pick < 0.92 ? "deco.tree.broadleaf.1" : "deco.bamboo.1";
         decorations.push({ assetId, position: { x, y } });
+      } else if (roll < 0.042) {
+        decorations.push({ assetId: "deco.bush.1", position: { x, y } });
+      } else if (roll < 0.078) {
+        decorations.push({ assetId: "deco.weeds.1", position: { x, y } });
       }
     }
   }
