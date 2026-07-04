@@ -1391,14 +1391,24 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     needle_lit = make_material("PineCloudLit", (0.100, 0.160, 0.082, 1.0))
     accent_lit = make_material("PineAccentLit", (0.155, 0.225, 0.115, 1.0))
     import math as _math
-    pads = [
-        (p1, (-0.42 * s, -0.26 * s, 0.66), 0.30),
-        (p2, (0.30 * s, -0.42 * s, 0.98), 0.24),
-        (p3, (0.56 * s, 0.34 * s, 1.24), 0.27),
-        (p4, (0.06 * s, 0.02 * s, 1.62), 0.25),
+    # Foliage in horizontal TIERS: each tier is several overlapping pads
+    # forming a wide shelf hugging the trunk (how pine needles actually
+    # attach), instead of isolated balls at branch tips. Lower tier spreads
+    # wide to one side, mid tier answers to the other, a small crown caps
+    # the apex.
+    tiers = [
+        # (attach_point, pad_center, radius)
+        (p2, (-0.44 * s, -0.24 * s, 0.80), 0.26),
+        (p2, (-0.16 * s, -0.38 * s, 0.85), 0.22),
+        (p2, (0.10 * s, -0.12 * s, 0.78), 0.19),
+        (p3, (0.44 * s, 0.26 * s, 1.16), 0.24),
+        (p3, (0.64 * s, 0.08 * s, 1.10), 0.17),
+        (p3, (0.18 * s, 0.42 * s, 1.22), 0.17),
+        (p4, (0.06 * s, 0.02, 1.56), 0.21),
+        (p4, (-0.16 * s, 0.14 * s, 1.48), 0.14),
     ]
-    for index, (base, tip, radius) in enumerate(pads):
-        add_beam(scene, f"Branch{index}", base, tip, 0.045, bark, tip_thickness=0.024)
+    for index, (base, tip, radius) in enumerate(tiers):
+        add_beam(scene, f"Branch{index}", base, (tip[0], tip[1], tip[2] - 0.06), 0.04, bark, tip_thickness=0.02)
         add_cloud_pad(
             scene,
             f"Pad{index}",
