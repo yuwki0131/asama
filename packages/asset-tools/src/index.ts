@@ -39,6 +39,19 @@ try {
   } else if (command === "assets:import:raster") {
     const count = await importRasterAssets();
     console.log(`Imported ${count} raster production assets.`);
+  } else if (command === "assets:ai-intake") {
+    const { runAiIntake } = await import("./aiIntake");
+    const { repoRoot } = await import("./paths");
+    const results = await runAiIntake(repoRoot);
+    if (results.length === 0) {
+      console.log("No AI source images found in assets/source/ai/.");
+    } else {
+      for (const result of results) {
+        console.log(
+          `Intook ${result.assetId}: bg=${result.backgroundRemoved ? "removed" : "kept"} luma×${result.lumaGain.toFixed(2)} sat×${result.satGain.toFixed(2)} coverage=${(result.opaqueRatio * 100).toFixed(0)}%`
+        );
+      }
+    }
   } else if (command === "assets:postprocess") {
     const result = await postprocessProductionAssets();
     console.log(

@@ -27,7 +27,8 @@
     "clean": "tsx src/index.ts clean",
     "test": "vitest run --passWithNoTests",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "assets:ai-intake": "tsx src/index.ts assets:ai-intake"
   },
   "dependencies": {
     "sharp": "^0.33.5"

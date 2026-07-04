@@ -26,7 +26,8 @@
     "clean:assets": "pnpm --filter @asama/asset-tools clean",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "assets:ai-intake": "pnpm --filter @asama/asset-tools assets:ai-intake"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
