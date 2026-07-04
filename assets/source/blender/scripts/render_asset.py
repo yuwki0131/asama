@@ -1308,6 +1308,26 @@ def add_leaf_cards(
             add_mesh(scene, f"{name}Cards{index}", buckets[index], faces_per_bucket[index], material)
 
 
+def add_foliage_skirt(scene: bpy.types.Scene, name: str, cx: float, cy: float, z: float, radius: float, height: float, material: bpy.types.Material) -> None:
+    """Octagonal cone skirt (wide rim tapering to a point): the stylized
+    conifer tier with a visible layered hem."""
+    import math as _math
+    vertices: list[tuple[float, float, float]] = []
+    for i in range(8):
+        angle = (i + 0.5) / 8 * 2 * _math.pi
+        vertices.append((*map_xy(cx + radius * _math.cos(angle), cy + radius * _math.sin(angle)), z))
+    apex = len(vertices)
+    vertices.append((*map_xy(cx, cy), z + height))
+    bottom = len(vertices)
+    vertices.append((*map_xy(cx, cy), z - height * 0.12))
+    faces: list[tuple[int, ...]] = []
+    for i in range(8):
+        j = (i + 1) % 8
+        faces.append((i, j, apex))
+        faces.append((bottom, j, i))
+    add_mesh(scene, name, vertices, faces, material)
+
+
 def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     """Akamatsu (Japanese red pine): a visibly bent trunk, bare lower bole,
     and asymmetric umbrella pads carried at the END of individual branches.
@@ -1318,41 +1338,40 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     s = 1.0 if variant % 2 == 0 else -1.0
 
     add_tree_base(scene, 0.0, 0.0, 0.12, bark)
-    # Bent trunk: three tapered segments sweeping to one side then recurving.
+    # Byobu-e zigzag: the trunk is the protagonist. Four segments with hard
+    # alternating switchbacks and real horizontal travel.
     p0 = (0.0, 0.0, 0.0)
-    p1 = (0.10 * s, 0.06 * s, 0.55)
-    p2 = (0.24 * s, 0.16 * s, 1.00)
-    p3 = (0.16 * s, 0.10 * s, 1.34)
-    add_beam(scene, "Trunk1", p0, p1, 0.145, bark, tip_thickness=0.105)
-    add_beam(scene, "Trunk2", p1, p2, 0.105, bark, tip_thickness=0.075)
-    add_beam(scene, "Trunk3", p2, p3, 0.075, bark, tip_thickness=0.05)
+    p1 = (0.22 * s, 0.13 * s, 0.42)
+    p2 = (-0.10 * s, -0.08 * s, 0.82)
+    p3 = (0.30 * s, 0.18 * s, 1.18)
+    p4 = (0.06 * s, 0.00, 1.50)
+    add_beam(scene, "Trunk1", p0, p1, 0.15, bark, tip_thickness=0.105)
+    add_beam(scene, "Trunk2", p1, p2, 0.105, bark, tip_thickness=0.08)
+    add_beam(scene, "Trunk3", p2, p3, 0.08, bark, tip_thickness=0.055)
+    add_beam(scene, "Trunk4", p3, p4, 0.055, bark, tip_thickness=0.035)
 
-    # Cloud-form pads (Kano-school idiom): smooth cloud masses, two-value
-    # shading from the geometry normals, sparse dot accents on the rims.
+    # Shelf pads (tana): thin, wide clouds held out at the switchback
+    # elbows so the trunk line stays readable between them.
     needle_shadow = make_material("PineCloudShadow", (0.045, 0.085, 0.050, 1.0))
     needle_lit = make_material("PineCloudLit", (0.100, 0.160, 0.082, 1.0))
     accent_lit = make_material("PineAccentLit", (0.155, 0.225, 0.115, 1.0))
-    branches = [
-        (p1, (-0.38 * s, -0.22 * s, 0.80), 0.30),
-        (p2, (0.50 * s, 0.34 * s, 1.04), 0.27),
-        (p2, (-0.14 * s, -0.42 * s, 1.24), 0.22),
-        (p3, (0.20 * s, 0.08 * s, 1.54), 0.24),
-    ]
     import math as _math
-    for index, (base, tip, radius) in enumerate(branches):
-        add_beam(scene, f"Branch{index}", base, tip, 0.05, bark, tip_thickness=0.028)
-        # The cloud: a squat smooth blob; the painterly ramp splits it into
-        # a lit crown and a shaded underside on its own.
-        material = needle_lit if index % 2 else needle_shadow
-        add_foliage_blob(scene, f"Pad{index}", tip[0], tip[1], tip[2], radius, radius * 0.55, needle_lit, squash=0.85)
-        add_foliage_blob(scene, f"PadUnder{index}", tip[0] + 0.02, tip[1] + 0.02, tip[2] - radius * 0.10, radius * 0.9, radius * 0.35, needle_shadow, squash=0.8)
-        # Dot accents along the sunlit rim (map light direction (1, 0.2)).
+    pads = [
+        (p1, (-0.42 * s, -0.26 * s, 0.66), 0.30),
+        (p2, (0.30 * s, -0.42 * s, 0.98), 0.24),
+        (p3, (0.56 * s, 0.34 * s, 1.24), 0.27),
+        (p4, (0.06 * s, 0.02 * s, 1.62), 0.25),
+    ]
+    for index, (base, tip, radius) in enumerate(pads):
+        add_beam(scene, f"Branch{index}", base, tip, 0.045, bark, tip_thickness=0.024)
+        add_foliage_blob(scene, f"Pad{index}", tip[0], tip[1], tip[2], radius, radius * 0.30, needle_lit, squash=0.9)
+        add_foliage_blob(scene, f"PadUnder{index}", tip[0] + 0.02, tip[1] + 0.02, tip[2] - radius * 0.08, radius * 0.86, radius * 0.18, needle_shadow, squash=0.9)
         for a_index in range(5):
             angle = -0.5 + a_index * 0.45
             ax = tip[0] + (radius * 0.95) * _math.cos(angle) * 0.98
             ay = tip[1] + (radius * 0.95) * _math.sin(angle) * 0.98 + (radius * 0.2)
-            az = tip[2] + radius * 0.30 + 0.02 * _math.sin(a_index * 5.0 + index)
-            size = 0.030 + 0.012 * ((a_index + index) % 3)
+            az = tip[2] + radius * 0.18 + 0.02 * _math.sin(a_index * 5.0 + index)
+            size = 0.028 + 0.011 * ((a_index + index) % 3)
             add_box(scene, f"PadDot{index}{a_index}", *map_box((ax - size, ay - size, az), (ax + size, ay + size, az + size * 1.6)), accent_lit)
     # A single bare dead branch, a byobu-e pine idiom.
     add_beam(scene, "DeadBranch", p2, (0.02 * s, 0.52 * s, 1.12), 0.03, bark, tip_thickness=0.008)
@@ -1371,15 +1390,16 @@ def build_tree_cedar(scene: bpy.types.Scene) -> None:
     add_beam(scene, "Trunk", (0.0, 0.0, 0.0), (0.05, -0.03, 2.02), 0.13, bark, tip_thickness=0.045)
     # One-stroke cone: three smooth stacked masses, alternating shade bands.
     mid = make_foliage_material("CedarNeedlesM", (0.048, 0.092, 0.055), (0.075, 0.125, 0.070))
-    # Heavy overlap so the tiers fuse into one cone silhouette; the shade
-    # bands come from the material change, not from separated masses.
+    # Layered cone skirts: each tier is a wide-hemmed cone overlapping the
+    # one above, ending in a sharp apex — the stylized sugi silhouette.
     tiers = [
-        (0.36, 0.24, 0.78, dark), (0.31, 0.56, 0.74, dark), (0.26, 0.90, 0.70, mid),
-        (0.21, 1.24, 0.64, mid), (0.15, 1.56, 0.56, light), (0.08, 1.86, 0.44, light),
+        (0.36, 0.28, 0.55, dark), (0.30, 0.62, 0.52, mid), (0.24, 0.96, 0.50, dark),
+        (0.18, 1.30, 0.48, mid), (0.12, 1.62, 0.46, light),
     ]
     for index, (radius, z, height, mat) in enumerate(tiers):
         jx = 0.012 if index % 2 == 0 else -0.012
-        add_foliage_blob(scene, f"Tier{index}", jx, -jx, z, radius, height, mat, squash=1.0)
+        add_foliage_skirt(scene, f"Tier{index}", jx, -jx, z, radius, height, mat)
+    add_foliage_skirt(scene, "Apex", 0.0, 0.0, 1.92, 0.07, 0.34, light)
 
 
 def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
