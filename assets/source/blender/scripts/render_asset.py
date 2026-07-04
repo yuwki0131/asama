@@ -1203,16 +1203,44 @@ def add_foliage_blob(scene: bpy.types.Scene, name: str, cx: float, cy: float, z:
 
 
 def add_tree_base(scene: bpy.types.Scene, cx: float, cy: float, trunk_r: float, bark: bpy.types.Material) -> None:
-    """Root flare plus a few grass tufts so trunks grow out of the ground
-    instead of standing on it."""
-    grass = make_material("BaseGrass", (0.200, 0.240, 0.095, 1.0))
-    roots = ((0.16, 0.02), (-0.13, 0.10), (0.03, -0.16), (-0.09, -0.12))
+    """Ground treatment under a tree: tapered root flare, a leaf-litter and
+    undergrowth patch, grass tufts in two shades, and a few pebbles."""
+    grass_dark = make_material("BaseGrassD", (0.130, 0.165, 0.062, 1.0))
+    grass_light = make_material("BaseGrassL", (0.215, 0.255, 0.100, 1.0))
+    litter_soil = make_foliage_material("BaseLitterSoil", (0.085, 0.068, 0.042), (0.130, 0.105, 0.062))
+    litter_leaf = make_foliage_material("BaseLitterLeaf", (0.060, 0.085, 0.038), (0.100, 0.130, 0.058))
+    pebble = make_noise_material("BasePebble", (0.105, 0.102, 0.095), (0.180, 0.175, 0.160), scale=7.0)
+
+    # Leaf-litter / shaded undergrowth patch: flat cards hugging the ground,
+    # denser near the trunk. Reads as the shadowed, mulched foot of a tree.
+    add_leaf_cards(
+        scene,
+        f"Litter{cx}",
+        (cx, cy, 0.015),
+        (0.34, 0.34, 0.012),
+        44,
+        [litter_soil, litter_leaf],
+        seed=cx * 11 + cy * 5 + 71,
+        card_size=0.085,
+        shade_bias=0.35,
+    )
+
+    # Tapered roots, slightly sinking into the ground.
+    roots = ((0.19, 0.03), (-0.15, 0.12), (0.04, -0.19), (-0.11, -0.14), (0.13, 0.15))
     for index, (rx, ry) in enumerate(roots):
-        add_beam(scene, f"Root{cx}{index}", (cx + rx, cy + ry, 0.0), (cx + rx * 0.25, cy + ry * 0.25, 0.10), trunk_r * 0.7, bark)
-    tufts = ((0.22, -0.08), (-0.20, 0.14), (0.08, 0.22), (-0.16, -0.18), (0.24, 0.12))
-    for index, (tx, ty) in enumerate(tufts):
-        height = 0.10 + (index % 3) * 0.03
-        add_beam(scene, f"BaseTuft{cx}{index}", (cx + tx, cy + ty, 0.0), (cx + tx + 0.02, cy + ty - 0.02, height), 0.016, grass)
+        add_beam(scene, f"Root{cx}{index}", (cx + rx, cy + ry, -0.01), (cx + rx * 0.2, cy + ry * 0.2, 0.11), trunk_r * 0.5, bark, tip_thickness=trunk_r * 0.95)
+
+    # Grass tufts in two shades and heights.
+    tufts = ((0.26, -0.09, 0), (-0.24, 0.16, 1), (0.09, 0.26, 0), (-0.19, -0.21, 1), (0.28, 0.14, 1), (-0.30, 0.02, 0), (0.02, -0.30, 1))
+    for index, (tx, ty, shade) in enumerate(tufts):
+        height = 0.11 + (index % 3) * 0.035
+        material = grass_light if shade else grass_dark
+        add_beam(scene, f"BaseTuft{cx}{index}", (cx + tx, cy + ty, 0.0), (cx + tx + 0.025, cy + ty - 0.02, height), 0.02, material, tip_thickness=0.006)
+        add_beam(scene, f"BaseTuftB{cx}{index}", (cx + tx + 0.02, cy + ty + 0.02, 0.0), (cx + tx - 0.01, cy + ty + 0.04, height * 0.7), 0.016, material, tip_thickness=0.005)
+
+    # Pebbles.
+    for index, (bx, by, size) in enumerate(((0.31, 0.05, 0.045), (-0.27, -0.12, 0.035))):
+        add_frustum(scene, f"BasePebble{cx}{index}", (cx + bx - size, cy + by - size), (cx + bx + size, cy + by + size), 0.0, size * 1.3, size * 0.5, pebble)
 
 
 def add_leaf_cards(
@@ -1262,10 +1290,13 @@ def add_leaf_cards(
         bx = -_math.sin(yaw) * half * _math.cos(tilt)
         by = _math.cos(yaw) * half * _math.cos(tilt)
         bz = half * _math.sin(tilt)
-        # Self-shadow: lower cards in the cloud lean dark, upper cards lean
-        # light (materials ordered dark -> light).
+        # Self-shadow + sun side: cards high in the cloud and on the lit
+        # side (map direction (1, 0.2), matching LIGHT_DIRECTION) lean
+        # bright; low shaded cards lean dark (materials ordered dark->light).
         t_height = 0.5 + 0.5 * (pz - cz) / max(rz, 1e-5)
-        mix = t_height * shade_bias + rand(i * 6.7) * (1.0 - shade_bias)
+        t_light = 0.5 + 0.5 * ((px - cx) * 0.98 + (py - cy) * 0.196) / max(rx, 1e-5)
+        t_shade = 0.6 * t_height + 0.4 * t_light
+        mix = t_shade * shade_bias + rand(i * 6.7) * (1.0 - shade_bias)
         bucket = min(len(materials) - 1, max(0, int(mix * len(materials))))
         vertices = buckets[bucket]
         base = len(vertices)
@@ -1286,6 +1317,7 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     needle_light = make_foliage_material("PineNeedlesL", (0.075, 0.130, 0.070), (0.130, 0.200, 0.105))
     s = 1.0 if variant % 2 == 0 else -1.0
 
+    add_tree_base(scene, 0.0, 0.0, 0.12, bark)
     # Bent trunk: three tapered segments sweeping to one side then recurving.
     p0 = (0.0, 0.0, 0.0)
     p1 = (0.10 * s, 0.06 * s, 0.55)
@@ -1317,12 +1349,16 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
             f"Pad{index}",
             (tip[0], tip[1], tip[2] + 0.05),
             (radius, radius, radius * 0.26),
-            84,
+            116,
             shades,
             seed=float(variant * 31 + index * 7 + 3),
-            card_size=0.072,
+            card_size=0.06,
             droop=0.6,
         )
+    # A single bare dead branch for age, and bark knots on the lower trunk.
+    add_beam(scene, "DeadBranch", p2, (0.02 * s, 0.52 * s, 1.12), 0.03, bark, tip_thickness=0.008)
+    for index, (kx, ky, kz) in enumerate(((0.05 * s, 0.02 * s, 0.34), (0.13 * s, 0.09 * s, 0.72))):
+        add_box(scene, f"Knot{index}", *map_box((kx - 0.035, ky - 0.035, kz), (kx + 0.035, ky + 0.035, kz + 0.06)), bark)
 
 
 def build_tree_cedar(scene: bpy.types.Scene) -> None:
@@ -1345,10 +1381,10 @@ def build_tree_cedar(scene: bpy.types.Scene) -> None:
             f"Tier{index}",
             (jx, -jx, z),
             (radius, radius, radius * 0.75),
-            56,
+            78,
             [dark, dark, light],
             seed=float(index * 13 + 5),
-            card_size=0.07,
+            card_size=0.058,
             shade_bias=0.8,
             droop=0.4,
         )
@@ -1385,10 +1421,10 @@ def build_tree_broadleaf(scene: bpy.types.Scene) -> None:
             f"Blob{index}",
             (cx, cy, z),
             (radius, radius, radius * 0.8),
-            88,
+            124,
             [deep, dark, light, sun],
             seed=float(index * 17 + 11),
-            card_size=0.078,
+            card_size=0.062,
             shade_bias=0.8,
         )
 
@@ -1406,6 +1442,8 @@ def build_bamboo(scene: bpy.types.Scene) -> None:
         (0.03, 0.15, 1.90, 0.12), (-0.12, 0.12, 2.15, -0.10), (0.17, -0.13, 1.80, 0.06),
         (-0.22, 0.02, 1.70, -0.13), (0.08, -0.08, 2.30, -0.02),
     ]
+    bark = make_textured_material("BambooBark", (0.075, 0.055, 0.034), (0.135, 0.100, 0.062), scale=(14.0, 14.0, 3.0))
+    add_tree_base(scene, 0.0, 0.0, 0.0, bark)
     for index, (sx, sy, height, lean) in enumerate(stalks):
         mat = culm if index % 2 == 0 else culm_light
         add_beam(scene, f"Culm{index}", (sx, sy, 0.0), (sx + lean, sy + lean * 0.7, height), 0.038, mat, tip_thickness=0.024)
