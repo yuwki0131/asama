@@ -137,6 +137,11 @@ class Scene {
           let h = (bx * 374761393 + by * 668265263 + 1013904223) >>> 0;
           h = (h ^ (h >>> 13)) >>> 0;
           cells.push({ x, y, assetId: `terrain.${t}.macro.v${h % 2}.${x % 4}.${y % 4}` });
+        } else if (t === "water") {
+          let h = (x * 374761393 + y * 668265263 + 40503) >>> 0;
+          h = (h ^ (h >>> 13)) >>> 0;
+          const pick = h % 3;
+          cells.push({ x, y, assetId: pick === 0 ? `terrain.water.connected.${mask}` : `terrain.water.connected.${mask}.v${pick}` });
         } else {
           cells.push({ x, y, assetId: `terrain.${t}.connected.${mask}` });
         }

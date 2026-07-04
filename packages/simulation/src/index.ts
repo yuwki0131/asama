@@ -1660,6 +1660,15 @@ function connectedTerrainAssetId(
     return `terrain.${cell.terrain}.macro.v${variant}.${cell.coord.x % 4}.${cell.coord.y % 4}`;
   }
 
+  // Water shores get wavy-bank variants so straight runs don't repeat the
+  // same wave every 64px.
+  if (cell.terrain === "water") {
+    let h = (cell.coord.x * 374761393 + cell.coord.y * 668265263 + 40503) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    const pick = h % 3;
+    return pick === 0 ? `terrain.water.connected.${mask}` : `terrain.water.connected.${mask}.v${pick}`;
+  }
+
   return `terrain.${cell.terrain}.connected.${mask}`;
 }
 

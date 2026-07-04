@@ -637,13 +637,87 @@ def make_macro_terrain_material(terrain: str, variant: int, tx: int, ty: int) ->
 
 def build_terrain_macro_tile(scene: bpy.types.Scene, terrain: str, variant: int, tx: int, ty: int) -> None:
     """Interior terrain tile sampling the continuous macro noise field at
-    grid offset (tx, ty). Same bleed geometry as the connected 1111 tile."""
+    grid offset (tx, ty). Water sits WATER_DEPTH below ground level."""
     material = make_macro_terrain_material(terrain, variant, tx, ty)
     b = TERRAIN_BLEED
-    add_flat_quad(scene, "Surface", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), 0.0, material)
+    z = -WATER_DEPTH if terrain == "water" else 0.0
+    add_flat_quad(scene, "Surface", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), z, material)
+
+
+WATER_DEPTH = 0.14
+
+
+def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) -> None:
+    """Water tile with real depth: the water surface sits WATER_DEPTH below
+    ground, and every land-facing edge gets a wavy bank — dry rim at ground
+    level, an earthen bank face dropping to the water, and a wet lap line.
+    The waviness is a deterministic per-variant jitter."""
+    import math as _math
+    same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    style = TERRAIN_STYLES["water"]
+    rim = make_material("ShoreRim", (*style["edge"], 1.0))
+    bank = make_noise_material("ShoreBank", (0.082, 0.066, 0.046), (0.135, 0.110, 0.078), scale=9.0)
+    wet = make_material("ShoreWet", (0.030, 0.062, 0.080, 1.0))
+
+    # Water floor: full tile, sunk.
+    b = TERRAIN_BLEED
+    water = make_noise_material("ShoreWater", (0.032, 0.070, 0.098), (0.062, 0.115, 0.150), scale=4.0)
+    add_flat_quad(scene, "Water", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), -WATER_DEPTH, water)
+
+    def jitter(name, i, count):
+        seed = sum(ord(c) for c in name) + variant * 97
+        return 0.05 * _math.sin(seed * 2.13 + i * 2.9) + 0.03 * _math.sin(seed * 5.7 + i * 6.1)
+
+    segments = 6
+    depth_base = 0.17
+    for name in ("N", "E", "S", "W"):
+        if same[name]:
+            continue
+        # Edge runs along the tile border; build a wavy inner boundary.
+        for i in range(segments):
+            t0 = i / segments
+            t1 = (i + 1) / segments
+            d0 = depth_base + jitter(name + str(variant), i, segments)
+            d1 = depth_base + jitter(name + str(variant), i + 1, segments)
+            if name == "N":
+                o0, o1 = (-0.5 + t0, -0.5), (-0.5 + t1, -0.5)
+                p0, p1 = (-0.5 + t0, -0.5 + d0), (-0.5 + t1, -0.5 + d1)
+            elif name == "S":
+                o0, o1 = (-0.5 + t0, 0.5), (-0.5 + t1, 0.5)
+                p0, p1 = (-0.5 + t0, 0.5 - d0), (-0.5 + t1, 0.5 - d1)
+            elif name == "W":
+                o0, o1 = (-0.5, -0.5 + t0), (-0.5, -0.5 + t1)
+                p0, p1 = (-0.5 + d0, -0.5 + t0), (-0.5 + d1, -0.5 + t1)
+            else:
+                o0, o1 = (0.5, -0.5 + t0), (0.5, -0.5 + t1)
+                p0, p1 = (0.5 - d0, -0.5 + t0), (0.5 - d1, -0.5 + t1)
+            # Dry rim at ground level (tile border to wavy line).
+            add_mesh(scene, f"Rim{name}{variant}{i}",
+                [(*map_xy(*o0), 0.0), (*map_xy(*o1), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p0), 0.0)],
+                [(0, 1, 2, 3)], rim)
+            # Bank face dropping from ground to the water level.
+            add_mesh(scene, f"Bank{name}{variant}{i}",
+                [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), -WATER_DEPTH), (*map_xy(*p0), -WATER_DEPTH)],
+                [(0, 1, 2, 3)], bank)
+            # Wet lap line hugging the bank foot.
+            lap = 0.06
+            if name == "N":
+                q0, q1 = (p0[0], p0[1] + lap), (p1[0], p1[1] + lap)
+            elif name == "S":
+                q0, q1 = (p0[0], p0[1] - lap), (p1[0], p1[1] - lap)
+            elif name == "W":
+                q0, q1 = (p0[0] + lap, p0[1]), (p1[0] + lap, p1[1])
+            else:
+                q0, q1 = (p0[0] - lap, p0[1]), (p1[0] - lap, p1[1])
+            add_mesh(scene, f"Wet{name}{variant}{i}",
+                [(*map_xy(*p0), -WATER_DEPTH + 0.004), (*map_xy(*p1), -WATER_DEPTH + 0.004), (*map_xy(*q1), -WATER_DEPTH + 0.004), (*map_xy(*q0), -WATER_DEPTH + 0.004)],
+                [(0, 1, 2, 3)], wet)
 
 
 def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
+    if terrain == "water":
+        build_water_shore_tile(scene, mask, variant=0)
+        return
     style = TERRAIN_STYLES[terrain]
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
     y0 = -0.5 - (TERRAIN_BLEED if same["N"] else 0.0)
@@ -652,28 +726,10 @@ def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
     x0 = -0.5 - (TERRAIN_BLEED if same["W"] else 0.0)
     add_flat_quad(scene, "Surface", (x0, y0), (x1, y1), 0.0, style["surface"]())
     edge_material = make_material("TerrainEdge", (*style["edge"], 1.0))
-    wet_material = make_material("TerrainWet", (0.030, 0.062, 0.080, 1.0)) if terrain == "water" else None
     for index, name in enumerate(("N", "E", "S", "W")):
         if same[name]:
             continue
         low, high = TERRAIN_EDGE_QUADS[name]
-        if wet_material is not None:
-            # Shoreline: outer half is dry sand, inner half is the wet band.
-            (ox0, oy0), (ox1, oy1) = low, high
-            half = TERRAIN_EDGE_WIDTH / 2.0
-            if name == "N":
-                add_flat_quad(scene, f"Edge{name}", (ox0, oy0), (ox1, oy0 + half), 0.002 + 0.0005 * index, edge_material)
-                add_flat_quad(scene, f"Wet{name}", (ox0, oy0 + half), (ox1, oy1), 0.002 + 0.0005 * index, wet_material)
-            elif name == "S":
-                add_flat_quad(scene, f"Edge{name}", (ox0, oy1 - half), (ox1, oy1), 0.002 + 0.0005 * index, edge_material)
-                add_flat_quad(scene, f"Wet{name}", (ox0, oy0), (ox1, oy1 - half), 0.002 + 0.0005 * index, wet_material)
-            elif name == "W":
-                add_flat_quad(scene, f"Edge{name}", (ox0, oy0), (ox0 + half, oy1), 0.002 + 0.0005 * index, edge_material)
-                add_flat_quad(scene, f"Wet{name}", (ox0 + half, oy0), (ox1, oy1), 0.002 + 0.0005 * index, wet_material)
-            else:
-                add_flat_quad(scene, f"Edge{name}", (ox1 - half, oy0), (ox1, oy1), 0.002 + 0.0005 * index, edge_material)
-                add_flat_quad(scene, f"Wet{name}", (ox0, oy0), (ox1 - half, oy1), 0.002 + 0.0005 * index, wet_material)
-            continue
         add_flat_quad(scene, f"Edge{name}", low, high, 0.002 + 0.0005 * index, edge_material)
 
 
@@ -2549,6 +2605,10 @@ def resolve_model(name: str):
     if gate is not None:
         state, axis, width, mask = gate.group(1), gate.group(2), int(gate.group(3)), gate.group(4)
         return lambda scene: build_gate_wood(scene, axis, width, mask, doors_closed=state == "closed")
+    shore_v = re.fullmatch(r"terrain-water-connected-([01]{4})-v([12])", name)
+    if shore_v is not None:
+        mask, v = shore_v.group(1), int(shore_v.group(2))
+        return lambda scene: build_water_shore_tile(scene, mask, variant=v)
     macro = re.fullmatch(r"terrain-(grass|dirt|water)-macro-v(\d)-(\d)-(\d)", name)
     if macro is not None:
         t, v, tx, ty = macro.group(1), int(macro.group(2)), int(macro.group(3)), int(macro.group(4))
