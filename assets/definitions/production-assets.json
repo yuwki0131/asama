@@ -324,10 +324,8 @@
       "kind": "building",
       "output": "building-barracks.png",
       "source": {
-        "type": "blender",
-        "model": "building-barracks-graybox",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-barracks.png"
       },
       "geometry": {
         "footprintWidth": 4,

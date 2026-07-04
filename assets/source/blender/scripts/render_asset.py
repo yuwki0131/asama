@@ -807,8 +807,8 @@ def make_fringed_pad_material(lot_width: float, lot_height: float, dark: tuple[f
     fringe_noise = nodes.new("ShaderNodeTexNoise")
     fringe_noise.inputs["Scale"].default_value = 11.0
     fringe_noise.inputs["Detail"].default_value = 2.0
-    jitter = math_node("MULTIPLY_ADD", fringe_noise.outputs["Fac"], 0.42, -0.21)
-    visible = math_node("GREATER_THAN", math_node("ADD", math_node("MULTIPLY", edge, 4.0), jitter), 0.16)
+    jitter = math_node("MULTIPLY_ADD", fringe_noise.outputs["Fac"], 0.62, -0.31)
+    visible = math_node("GREATER_THAN", math_node("ADD", math_node("MULTIPLY", edge, 2.4), jitter), 0.14)
 
     surface_noise = nodes.new("ShaderNodeTexNoise")
     surface_noise.inputs["Scale"].default_value = 14.0
@@ -834,8 +834,8 @@ def make_fringed_pad_material(lot_width: float, lot_height: float, dark: tuple[f
 
 
 PAD_PALETTES = {
-    "gravel": ((0.235, 0.210, 0.165), (0.320, 0.290, 0.235)),
-    "dirt": ((0.195, 0.160, 0.115), (0.265, 0.225, 0.165)),
+    "gravel": ((0.140, 0.126, 0.096), (0.215, 0.196, 0.155)),
+    "dirt": ((0.118, 0.096, 0.066), (0.185, 0.155, 0.112)),
 }
 
 
@@ -1961,7 +1961,7 @@ def build_barracks_graybox(scene: bpy.types.Scene) -> None:
     add_yard_pad(scene, 4.0, 3.0, "dirt")
     add_box(scene, "NagayaPlinth", *map_box((-3.68, -2.58, 0.0), (-0.32, -1.32, 0.15)), mats["stone"])
     add_box(scene, "NagayaBody", *map_box((-3.6, -2.5, 0.15), (-0.4, -1.4, 0.92)), mats["plaster"])
-    add_kawara_roof(scene, "NagayaRoof", (-3.78, -2.62), (-0.22, -1.28), 0.92, 1.40, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
+    add_kawara_roof(scene, "NagayaRoof", (-3.78, -2.62), (-0.22, -1.28), 0.92, 1.18, "x", mats["roof"], mats["trim"], verge_material=mats["plaster"])
     # Openings: a sliding entry door and latticed windows on the yard face.
     rack = mats["dark_wood"]
     add_box(scene, "DoorFrame", *map_box((-2.24, -1.415, 0.15), (-1.76, -1.375, 0.82)), rack)
@@ -2509,26 +2509,132 @@ def build_surface_arm_kit(
                 add_box(scene, f"Bank{name}{side}", *map_box(blow, bhigh), bank_material)
 
 
+def make_mud_material(name: str = "RoadMud") -> bpy.types.Material:
+    """Trodden mud: deep wet browns, a slow dampness mottle and fine grit."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    fine = nodes.new("ShaderNodeTexNoise")
+    fine.inputs["Scale"].default_value = 13.0
+    fine.inputs["Detail"].default_value = 4.0
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.32
+    ramp.color_ramp.elements[0].color = (0.070, 0.054, 0.036, 1.0)
+    ramp.color_ramp.elements[1].position = 0.75
+    ramp.color_ramp.elements[1].color = (0.155, 0.125, 0.090, 1.0)
+    links.new(fine.outputs["Fac"], ramp.inputs["Fac"])
+    damp = nodes.new("ShaderNodeTexNoise")
+    damp.inputs["Scale"].default_value = 1.6
+    damp.inputs["Detail"].default_value = 2.0
+    damp_band = nodes.new("ShaderNodeMath")
+    damp_band.operation = "MULTIPLY_ADD"
+    damp_band.inputs[1].default_value = 0.30
+    damp_band.inputs[2].default_value = 0.76
+    links.new(damp.outputs["Fac"], damp_band.inputs[0])
+    damp_color = nodes.new("ShaderNodeCombineColor")
+    for channel in ("Red", "Green", "Blue"):
+        links.new(damp_band.outputs["Value"], damp_color.inputs[channel])
+    mixed = nodes.new("ShaderNodeMix")
+    mixed.data_type = "RGBA"
+    mixed.blend_type = "MULTIPLY"
+    mixed.inputs["Factor"].default_value = 1.0
+    links.new(ramp.outputs["Color"], mixed.inputs["A"])
+    links.new(damp_color.outputs["Color"], mixed.inputs["B"])
+    finish_material(material, mixed.outputs["Result"])
+    return material
+
+
 def build_road_mask(scene: bpy.types.Scene, mask: str) -> None:
-    dirt = make_noise_material("RoadDirt", (0.130, 0.105, 0.072), (0.220, 0.185, 0.138), scale=13.0)
-    build_surface_arm_kit(scene, mask, dirt, 0.014, 0.27)
+    build_surface_arm_kit(scene, mask, make_mud_material(), 0.014, 0.27)
+
+
+MOAT_DEPTH = 0.30
+
+
+def make_holdout_material() -> bpy.types.Material:
+    material = bpy.data.materials.new("Holdout")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
+    holdout = nodes.new("ShaderNodeHoldout")
+    output = nodes.new("ShaderNodeOutputMaterial")
+    links.new(holdout.outputs["Holdout"], output.inputs["Surface"])
+    return material
+
+
+def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool) -> None:
+    """Moat as a real excavated trench: the full tile is sunk MOAT_DEPTH,
+    with steep earthen banks only on edges NOT connected to another moat
+    tile — adjacent moat tiles merge into one continuous channel (kills the
+    lattice), and the depth reads as impassable. Holdout ground quads clip
+    the underground view to this tile's own diamond."""
+    same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    earth = make_noise_material("MoatEarth", (0.070, 0.056, 0.040), (0.130, 0.106, 0.076), scale=9.0)
+    rim = make_material("MoatRim", (0.150, 0.124, 0.088, 1.0))
+
+    if water:
+        surface = make_noise_material("MoatWater", (0.022, 0.052, 0.075), (0.045, 0.088, 0.115), scale=4.0)
+        surface_z = -MOAT_DEPTH + 0.08
+    else:
+        surface = make_noise_material("MoatFloor", (0.058, 0.046, 0.032), (0.105, 0.085, 0.060), scale=7.0)
+        surface_z = -MOAT_DEPTH
+
+    b = TERRAIN_BLEED
+    add_flat_quad(scene, "TrenchFloor", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), surface_z, surface)
+
+    # Steep bank faces + a narrow packed rim on unconnected edges.
+    rim_w = 0.09
+    for name in ("N", "E", "S", "W"):
+        if same[name]:
+            continue
+        if name == "N":
+            p0, p1 = (-0.5, -0.5 + rim_w), (0.5, -0.5 + rim_w)
+            r0, r1 = (-0.5, -0.5), (0.5, -0.5)
+        elif name == "S":
+            p0, p1 = (-0.5, 0.5 - rim_w), (0.5, 0.5 - rim_w)
+            r0, r1 = (-0.5, 0.5), (0.5, 0.5)
+        elif name == "W":
+            p0, p1 = (-0.5 + rim_w, -0.5), (-0.5 + rim_w, 0.5)
+            r0, r1 = (-0.5, -0.5), (-0.5, 0.5)
+        else:
+            p0, p1 = (0.5 - rim_w, -0.5), (0.5 - rim_w, 0.5)
+            r0, r1 = (0.5, -0.5), (0.5, 0.5)
+        add_mesh(scene, f"Rim{name}",
+            [(*map_xy(*r0), 0.0), (*map_xy(*r1), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p0), 0.0)],
+            [(0, 1, 2, 3)], rim)
+        add_mesh(scene, f"BankFace{name}",
+            [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), surface_z), (*map_xy(*p0), surface_z)],
+            [(0, 1, 2, 3)], earth)
+
+    # Holdout skirts occlude the underground view where the neighbour is
+    # GROUND (mask=0). Where the neighbour is another moat tile there is no
+    # ground to occlude with — the trench continues, and the neighbour's own
+    # sprite covers any projection spill via draw order.
+    holdout = make_holdout_material()
+    for name, low, high in (
+        ("N", (-3.0, -3.0), (3.0, -0.5)),
+        ("S", (-3.0, 0.5), (3.0, 3.0)),
+        ("W", (-3.0, -0.5), (-0.5, 0.5)),
+        ("E", (0.5, -0.5), (3.0, 0.5)),
+    ):
+        if same[name]:
+            continue
+        add_flat_quad(scene, f"Skirt{name}", low, high, 0.0005, holdout)
 
 
 def build_dry_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
-    floor = make_material("MoatFloor", (0.115, 0.095, 0.070, 1.0))
-    bank = make_material("MoatBank", (0.215, 0.185, 0.140, 1.0))
-    build_surface_arm_kit(scene, mask, floor, 0.010, 0.33, bank_material=bank)
+    build_trench_moat(scene, mask, water=False)
 
 
 def build_water_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
-    water = make_material("MoatWater", (0.045, 0.095, 0.125, 1.0))
-    bank = make_material("MoatBank", (0.215, 0.185, 0.140, 1.0))
-    build_surface_arm_kit(scene, mask, water, 0.010, 0.33, bank_material=bank)
+    build_trench_moat(scene, mask, water=True)
 
 
 def build_earth_bridge(scene: bpy.types.Scene) -> None:
     """Earthen causeway crossing along map x. Canvas 64x32, anchor 32,16."""
-    dirt = make_noise_material("CausewayDirt", (0.120, 0.098, 0.068), (0.205, 0.172, 0.128), scale=13.0)
+    dirt = make_mud_material("CausewayDirt")
     add_box(scene, "Causeway", *map_box((-0.5, -0.30, 0.0), (0.5, 0.30, 0.07)), dirt)
 
 
