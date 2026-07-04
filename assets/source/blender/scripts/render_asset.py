@@ -1328,6 +1328,41 @@ def add_foliage_skirt(scene: bpy.types.Scene, name: str, cx: float, cy: float, z
     add_mesh(scene, name, vertices, faces, material)
 
 
+def add_cloud_pad(
+    scene: bpy.types.Scene,
+    name: str,
+    center: tuple[float, float, float],
+    radius: float,
+    lit_material: bpy.types.Material,
+    shadow_material: bpy.types.Material,
+    seed: float,
+) -> None:
+    """Pine cloud pad drawn the nihonga way: overlapping arcs. A rosette of
+    bumps (center + ring) whose scalloped outline reads as a needle cloud;
+    a thin dark under-layer gives the shaded base."""
+    import math as _math
+
+    def rand(k: float) -> float:
+        return (_math.sin(seed * 5.77 + k) * 43758.5453) % 1.0
+
+    cx, cy, cz = center
+    bump_r = radius * 0.46
+    # Shadow base: slightly wider, thin, tucked under.
+    add_foliage_blob(scene, f"{name}Base", cx + 0.02, cy + 0.02, cz - bump_r * 0.30, radius * 0.95, bump_r * 0.55, shadow_material, squash=0.8)
+    # Center crown bump.
+    add_foliage_blob(scene, f"{name}C", cx, cy, cz + bump_r * 0.10, bump_r * 1.15, bump_r * 0.95, lit_material, squash=0.85)
+    # Ring of scallop bumps.
+    count = 6
+    for i in range(count):
+        angle = (i + rand(i * 2.3) * 0.5) / count * 2.0 * _math.pi
+        dist = radius * (0.58 + 0.10 * rand(i * 3.7))
+        bx = cx + dist * _math.cos(angle)
+        by = cy + dist * _math.sin(angle)
+        bz = cz + bump_r * (0.05 - 0.18 * rand(i * 1.9))
+        size = bump_r * (0.78 + 0.28 * rand(i * 4.1))
+        add_foliage_blob(scene, f"{name}B{i}", bx, by, bz, size, size * 0.9, lit_material, squash=0.8)
+
+
 def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     """Akamatsu (Japanese red pine): a visibly bent trunk, bare lower bole,
     and asymmetric umbrella pads carried at the END of individual branches.
@@ -1364,17 +1399,17 @@ def build_tree_pine(scene: bpy.types.Scene, variant: int = 0) -> None:
     ]
     for index, (base, tip, radius) in enumerate(pads):
         add_beam(scene, f"Branch{index}", base, tip, 0.045, bark, tip_thickness=0.024)
-        add_foliage_blob(scene, f"Pad{index}", tip[0], tip[1], tip[2], radius, radius * 0.30, needle_lit, squash=0.9)
-        add_foliage_blob(scene, f"PadUnder{index}", tip[0] + 0.02, tip[1] + 0.02, tip[2] - radius * 0.08, radius * 0.86, radius * 0.18, needle_shadow, squash=0.9)
-        for a_index in range(5):
-            angle = -0.5 + a_index * 0.45
-            ax = tip[0] + (radius * 0.95) * _math.cos(angle) * 0.98
-            ay = tip[1] + (radius * 0.95) * _math.sin(angle) * 0.98 + (radius * 0.2)
-            az = tip[2] + radius * 0.18 + 0.02 * _math.sin(a_index * 5.0 + index)
-            size = 0.028 + 0.011 * ((a_index + index) % 3)
-            add_box(scene, f"PadDot{index}{a_index}", *map_box((ax - size, ay - size, az), (ax + size, ay + size, az + size * 1.6)), accent_lit)
+        add_cloud_pad(
+            scene,
+            f"Pad{index}",
+            (tip[0], tip[1], tip[2] + 0.03),
+            radius,
+            needle_lit,
+            needle_shadow,
+            seed=float(variant * 37 + index * 11 + 7),
+        )
     # A single bare dead branch, a byobu-e pine idiom.
-    add_beam(scene, "DeadBranch", p2, (0.02 * s, 0.52 * s, 1.12), 0.03, bark, tip_thickness=0.008)
+    add_beam(scene, "DeadBranch", p2, (-0.04 * s, 0.30 * s, 1.04), 0.035, bark, tip_thickness=0.014)
     for index, (kx, ky, kz) in enumerate(((0.05 * s, 0.02 * s, 0.34), (0.13 * s, 0.09 * s, 0.72))):
         add_box(scene, f"Knot{index}", *map_box((kx - 0.035, ky - 0.035, kz), (kx + 0.035, ky + 0.035, kz + 0.06)), bark)
 
