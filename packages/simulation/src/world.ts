@@ -60,6 +60,11 @@ export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScen
       lastProcessedMonth: 0,
       lastProcessedSeason: 0
     },
+    supplyState: {
+      hasHadCart: false,
+      retreatTimerActive: false,
+      retreatTimerRemaining: 0
+    },
     map: createInitialMap(),
     units: [],
     buildings: []
@@ -309,6 +314,8 @@ export function updateWorld(world: WorldState): void {
   }
 
   updateEnemyAi(world);
+  // Track supply carts before combat removes dead units this tick.
+  updateSupplyState(world);
 
   for (const unit of world.units) {
     if (unit.path.length === 0) {
@@ -342,8 +349,34 @@ export function updateWorld(world: WorldState): void {
   world.currentTick += 1;
 }
 
+function updateSupplyState(world: WorldState): void {
+  const hasAliveCarts = world.units.some(
+    (u) => u.owner === "enemy" && u.type === "supply_cart" && u.hp > 0
+  );
+
+  if (hasAliveCarts) {
+    world.supplyState.hasHadCart = true;
+    world.supplyState.retreatTimerActive = false;
+    world.supplyState.retreatTimerRemaining = 0;
+  } else if (world.supplyState.hasHadCart) {
+    if (!world.supplyState.retreatTimerActive) {
+      world.supplyState.retreatTimerActive = true;
+      world.supplyState.retreatTimerRemaining = SIEGE_BALANCE.supplyRetreatTicks;
+    } else {
+      world.supplyState.retreatTimerRemaining -= 1;
+    }
+  }
+}
+
 function checkOutcome(world: WorldState): void {
   if (world.outcome !== null) {
+    return;
+  }
+
+  // Supply-cut victory: retreat timer expired after all supply carts were destroyed.
+  if (world.supplyState.retreatTimerActive && world.supplyState.retreatTimerRemaining <= 0) {
+    world.units = world.units.filter((unit) => unit.owner !== "enemy");
+    world.outcome = { winner: "player", reason: "supply_cut", tick: world.currentTick };
     return;
   }
 
@@ -399,6 +432,10 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
     outcome: world.outcome,
     food: snapshotFood(world),
     economy: snapshotEconomy(world),
+    supplyRetreat: {
+      active: world.supplyState.retreatTimerActive,
+      remainingTicks: world.supplyState.retreatTimerRemaining
+    },
     map: {
       width: world.map.width,
       height: world.map.height,

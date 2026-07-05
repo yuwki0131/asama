@@ -271,8 +271,50 @@ export const unitSpecs: Record<UnitType, UnitSpec> = {
     attackCooldownSeconds: 1.5,
     ticksPerStep: 7,
     assetId: "unit.engineer.idle.south"
+  },
+  // assetId is provisional; art team will supply final sprites (renderer falls
+  // back to the placeholder asset if the key is not found).
+  musketeer: {
+    type: "musketeer",
+    maxHp: 60,
+    attackDamage: 20,
+    attackRange: 4,
+    attackCooldownSeconds: 2.5,
+    ticksPerStep: 7,
+    assetId: "unit.spear_ashigaru.idle.south"
+  },
+  cavalry: {
+    type: "cavalry",
+    maxHp: 140,
+    attackDamage: 16,
+    attackRange: 1,
+    attackCooldownSeconds: 1.2,
+    ticksPerStep: 3,
+    assetId: "unit.spear_ashigaru.idle.south"
+  },
+  supply_cart: {
+    type: "supply_cart",
+    maxHp: 80,
+    attackDamage: 0,
+    attackRange: 0,
+    attackCooldownSeconds: 999,
+    ticksPerStep: 10,
+    assetId: "unit.spear_ashigaru.idle.south"
   }
 };
+
+/** Damage multiplier table for unit type affinity.
+ *  attacker type → defender type → multiplier.
+ *  Missing entries default to 1.0. */
+export const UNIT_TYPE_AFFINITY: Partial<Record<UnitType, Partial<Record<UnitType, number>>>> = {
+  // 槍→騎兵: 槍が騎兵に対して有利
+  spear_ashigaru: { cavalry: 1.5 },
+  // 騎兵→弓・鉄砲: 騎兵が射撃兵種に対して有利
+  cavalry: { archer: 1.5, musketeer: 1.5 },
+  // 弓・鉄砲→歩兵(槍・刀・工兵): 射撃が近接歩兵に対して有利
+  archer: { spear_ashigaru: 1.25, sword_ashigaru: 1.25, engineer: 1.25 },
+  musketeer: { spear_ashigaru: 1.25, sword_ashigaru: 1.25, engineer: 1.25 }
+} as const;
 
 
 /**

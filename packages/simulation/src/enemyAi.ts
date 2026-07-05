@@ -20,6 +20,11 @@ export function updateEnemyAi(world: WorldState): void {
       continue;
     }
 
+    // Non-combatant: stays at spawn position, provides supply presence only.
+    if (unit.type === "supply_cart") {
+      continue;
+    }
+
     // Defenders in aggro range always take priority, even while the unit is
     // marching or breaching a wall. An existing unit target is kept so the
     // AI does not flip-flop between defenders every decision tick.

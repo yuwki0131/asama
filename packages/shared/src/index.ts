@@ -7,7 +7,7 @@ export type EntityId = string;
 export type UnitId = EntityId;
 export type BuildingId = EntityId;
 export type OwnerId = "player" | "enemy" | "neutral";
-export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer" | "engineer";
+export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer" | "engineer" | "musketeer" | "cavalry" | "supply_cart";
 
 export type EngineerTaskKind = "ladder" | "fillMoat";
 export type TerrainType = "grass" | "dirt" | "water" | "stone";
@@ -102,7 +102,7 @@ export interface BuildingSnapshot {
   readonly fillProgress: number;
 }
 
-export type GameOutcomeReason = "honmaru_fallen" | "starvation" | "enemy_annihilated" | "time_held";
+export type GameOutcomeReason = "honmaru_fallen" | "starvation" | "enemy_annihilated" | "time_held" | "supply_cut";
 
 export interface ScenarioBuildingPlacement {
   readonly type: BuildingType;
@@ -166,6 +166,11 @@ export interface EconomySnapshot {
   readonly plantedFarms: number;
 }
 
+export interface SupplyRetreatSnapshot {
+  readonly active: boolean;
+  readonly remainingTicks: number;
+}
+
 export interface WorldSnapshot {
   readonly currentTick: number;
   readonly invalidMoveTarget: CellCoord | null;
@@ -180,6 +185,7 @@ export interface WorldSnapshot {
   };
   readonly units: readonly UnitSnapshot[];
   readonly buildings: readonly BuildingSnapshot[];
+  readonly supplyRetreat: SupplyRetreatSnapshot;
 }
 
 export type PlayerCommand =
