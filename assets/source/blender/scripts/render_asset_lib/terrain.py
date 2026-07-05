@@ -238,19 +238,80 @@ def build_water_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
     build_trench_moat(scene, mask, water=True)
 
 
-def build_earth_bridge(scene: bpy.types.Scene) -> None:
-    """Earthen causeway crossing along map x. Canvas 64x32, anchor 32,16."""
+def _bridge_axes(axis: str):
+    """Map (along, across) coordinates to map (x, y) per deck axis."""
+    if axis == "x":
+        return lambda a, c: (a, c)
+    return lambda a, c: (c, a)
+
+
+def build_earth_bridge(scene: bpy.types.Scene, axis: str = "x") -> None:
+    """Dobashi (earthen causeway): packed-earth ramp with stone revetment
+    sides and grass-tufted shoulders, crossing sunken water. Canvas 64x48,
+    anchor 32,16."""
+    from .materials import make_ishigaki_material
+    pt = _bridge_axes(axis)
     dirt = make_mud_material("CausewayDirt")
-    add_box(scene, "Causeway", *map_box((-0.5, -0.30, 0.0), (0.5, 0.30, 0.07)), dirt)
-
-
-def build_wood_bridge(scene: bpy.types.Scene) -> None:
-    """Plank bridge crossing along map x with side rails."""
-    plank = make_material("BridgePlank", (0.140, 0.100, 0.060, 1.0))
-    rail = make_material("BridgeRail", (0.080, 0.058, 0.036, 1.0))
-    add_box(scene, "Deck", *map_box((-0.5, -0.28, 0.05), (0.5, 0.28, 0.10)), plank)
+    stone = make_ishigaki_material("CausewayStone")
+    grass_lip = make_material("CausewayGrass", (0.105, 0.150, 0.070, 1.0))
+    # Stone revetment descending into the water.
     for side in (-1.0, 1.0):
-        y = side * 0.30
-        add_box(scene, f"Rail{side}", *map_box((-0.5, y - 0.03, 0.10), (0.5, y + 0.03, 0.32)), rail)
-        for px in (-0.42, 0.0, 0.42):
-            add_box(scene, f"RailPost{side}{px}", *map_box((px - 0.035, y - 0.035, 0.0), (px + 0.035, y + 0.035, 0.34)), rail)
+        c0, c1 = side * 0.24, side * 0.34
+        lo = pt(-0.56, min(c0, c1))
+        hi = pt(0.56, max(c0, c1))
+        add_box(scene, f"Revet{side}", *map_box((lo[0], lo[1], -0.20), (hi[0], hi[1], 0.05)), stone)
+        glo = pt(-0.56, min(c0, c1))
+        ghi = pt(0.56, max(side * 0.24, side * 0.27))
+        add_box(scene, f"Lip{side}", *map_box((glo[0], glo[1], 0.05), (ghi[0], ghi[1], 0.075)), grass_lip)
+    # Packed earth deck.
+    lo = pt(-0.56, -0.26)
+    hi = pt(0.56, 0.26)
+    add_box(scene, "Causeway", *map_box((lo[0], lo[1], 0.0), (hi[0], hi[1], 0.07)), dirt)
+
+
+def build_wood_bridge(scene: bpy.types.Scene, axis: str = "x") -> None:
+    """Wooden bridge: planked deck on log stringers, trestle posts standing
+    in the sunken water, railings with posts, stone abutments. Canvas 64x48,
+    anchor 32,16."""
+    from .materials import make_plank_material, make_ishigaki_material
+    pt = _bridge_axes(axis)
+    plank = make_plank_material("BridgePlank", (0.110, 0.078, 0.046), (0.185, 0.140, 0.088), boards_per_unit=12.0)
+    beam = make_material("BridgeBeam", (0.070, 0.050, 0.030, 1.0))
+    rail = make_material("BridgeRail", (0.085, 0.062, 0.038, 1.0))
+    stone = make_ishigaki_material("BridgeAbutment")
+
+    # Stone abutments at both banks.
+    for end in (-1.0, 1.0):
+        a0, a1 = end * 0.56, end * 0.42
+        lo = pt(min(a0, a1), -0.30)
+        hi = pt(max(a0, a1), 0.30)
+        add_box(scene, f"Abutment{end}", *map_box((lo[0], lo[1], -0.12), (hi[0], hi[1], 0.045)), stone)
+    # Trestle posts standing in the water (visible over the sunken river).
+    for a in (-0.18, 0.18):
+        for c in (-0.20, 0.20):
+            p = pt(a, c)
+            add_box(scene, f"Trestle{a}{c}", *map_box((p[0] - 0.035, p[1] - 0.035, -0.20), (p[0] + 0.035, p[1] + 0.035, 0.06)), beam)
+    # Log stringers under the deck.
+    for c in (-0.20, 0.0, 0.20):
+        lo = pt(-0.52, c - 0.035)
+        hi = pt(0.52, c + 0.035)
+        add_box(scene, f"Stringer{c}", *map_box((lo[0], lo[1], 0.045), (hi[0], hi[1], 0.085)), beam)
+    # Planked deck (plank grain runs across the walking direction).
+    lo = pt(-0.56, -0.28)
+    hi = pt(0.56, 0.28)
+    add_box(scene, "Deck", *map_box((lo[0], lo[1], 0.085), (hi[0], hi[1], 0.125)), plank)
+    # Kamachi edge beams along the deck sides.
+    for side in (-1.0, 1.0):
+        lo = pt(-0.56, side * 0.28 - 0.02)
+        hi = pt(0.56, side * 0.28 + 0.02)
+        add_box(scene, f"Kamachi{side}", *map_box((lo[0], min(lo[1], hi[1]), 0.125), (hi[0], max(lo[1], hi[1]), 0.15)), beam)
+    # Railings: posts + two horizontal rails.
+    for side in (-1.0, 1.0):
+        c = side * 0.30
+        for a in (-0.46, -0.15, 0.15, 0.46):
+            p = pt(a, c)
+            add_box(scene, f"RailPost{side}{a}", *map_box((p[0] - 0.028, p[1] - 0.028, 0.125), (p[0] + 0.028, p[1] + 0.028, 0.42)), rail)
+        for rz in (0.26, 0.38):
+            lo = pt(-0.48, c - 0.02)
+            hi = pt(0.48, c + 0.02)
+            add_box(scene, f"Rail{side}{rz}", *map_box((lo[0], min(lo[1], hi[1]), rz), (hi[0], max(lo[1], hi[1]), rz + 0.035)), rail)

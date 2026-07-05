@@ -381,10 +381,10 @@
       "kind": "building",
       "file": "generated/building-earth-bridge.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -392,10 +392,10 @@
       "kind": "building",
       "file": "generated/building-wood-bridge.png",
       "width": 64,
-      "height": 32,
+      "height": 48,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.3333333333333333
       }
     },
     {
@@ -2327,6 +2327,28 @@
       "assetId": "building.water_moat.connected.1111.v1",
       "kind": "building",
       "file": "generated/water-moat-connected-1111-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-y.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y.png",
       "width": 64,
       "height": 48,
       "anchor": {
