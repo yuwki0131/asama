@@ -10,7 +10,21 @@ export function unitTypeLabel(type: UnitType): string {
       return "弓兵";
     case "engineer":
       return "工兵";
+    case "musketeer":
+      return "鉄砲兵";
+    case "cavalry":
+      return "騎兵";
+    case "supply_cart":
+      return "補給荷車";
   }
+}
+
+/** Converts a simulation tick count to a mm:ss display string. */
+export function ticksToMmSs(ticks: number): string {
+  const totalSeconds = Math.ceil(ticks / 20);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
 export function buildingTypeLabel(type: BuildingType): string {

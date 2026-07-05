@@ -43,6 +43,7 @@ function makeSnapshot(units: Partial<UnitSnapshot>[]): WorldSnapshot {
     map: { width: 128, height: 128, cells: [], decorations: [] },
     units: fullUnits,
     buildings: [],
+    supplyRetreat: { active: false, remainingTicks: 0 },
   };
 }
 

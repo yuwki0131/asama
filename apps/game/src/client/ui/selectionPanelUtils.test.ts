@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { UnitSnapshot } from "@asama/shared";
-import { aggregateSelectedUnits, buildingTypeLabel, unitTypeLabel } from "./selectionPanelUtils";
+import { aggregateSelectedUnits, buildingTypeLabel, ticksToMmSs, unitTypeLabel } from "./selectionPanelUtils";
 
 function makeUnit(overrides: Partial<UnitSnapshot>): UnitSnapshot {
   return {
@@ -30,6 +30,35 @@ describe("unitTypeLabel", () => {
     expect(unitTypeLabel("sword_ashigaru")).toBe("刀足軽");
     expect(unitTypeLabel("archer")).toBe("弓兵");
     expect(unitTypeLabel("engineer")).toBe("工兵");
+    expect(unitTypeLabel("musketeer")).toBe("鉄砲兵");
+    expect(unitTypeLabel("cavalry")).toBe("騎兵");
+    expect(unitTypeLabel("supply_cart")).toBe("補給荷車");
+  });
+});
+
+describe("ticksToMmSs", () => {
+  it("converts 4800 ticks (4 min) to 04:00", () => {
+    expect(ticksToMmSs(4800)).toBe("04:00");
+  });
+
+  it("converts 20 ticks (1 sec) to 00:01", () => {
+    expect(ticksToMmSs(20)).toBe("00:01");
+  });
+
+  it("converts 1 tick (ceil to 1 sec) to 00:01", () => {
+    expect(ticksToMmSs(1)).toBe("00:01");
+  });
+
+  it("converts 0 ticks to 00:00", () => {
+    expect(ticksToMmSs(0)).toBe("00:00");
+  });
+
+  it("converts 90 ticks (4.5 sec, ceil to 5 sec) to 00:05", () => {
+    expect(ticksToMmSs(90)).toBe("00:05");
+  });
+
+  it("converts 2400 ticks (2 min) to 02:00", () => {
+    expect(ticksToMmSs(2400)).toBe("02:00");
   });
 });
 
