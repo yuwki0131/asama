@@ -5,6 +5,12 @@ describe("connected terrain asset masks", () => {
   it("assigns a connected-mask or macro asset id to every terrain cell", () => {
     const snapshot = snapshotWorld(createInitialWorld());
 
+    // Cells under lot building footprints receive a dirt visual override;
+    // exempt them from the terrain-prefix check.
+    const buildingFootprint = new Set(
+      snapshot.buildings.flatMap(b => b.footprint.map(fc => `${fc.x},${fc.y}`))
+    );
+
     // Border cells carry NESW connection masks (water shores also carry a
     // wavy-bank variant suffix); interior cells sample the world-anchored
     // macro field except for stone, which has no macro set.
@@ -13,7 +19,9 @@ describe("connected terrain asset masks", () => {
     for (const cell of snapshot.map.cells) {
       const ok = connected.test(cell.assetId) || macro.test(cell.assetId);
       expect(ok, `unexpected terrain assetId: ${cell.assetId}`).toBe(true);
-      expect(cell.assetId.startsWith(`terrain.${cell.terrain}.`)).toBe(true);
+      if (!buildingFootprint.has(`${cell.coord.x},${cell.coord.y}`)) {
+        expect(cell.assetId.startsWith(`terrain.${cell.terrain}.`)).toBe(true);
+      }
     }
   });
 

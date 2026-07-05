@@ -12,7 +12,58 @@ import {
   sameCell
 } from "./types";
 import type { BuildingDefinition, BuildingState, TerrainCellState, WorldState } from "./types";
-import { getCell } from "./map";
+import { connectedTerrainAssetId, getCell } from "./map";
+
+const LOT_BUILDING_TYPES = new Set<BuildingType>([
+  "tenshu", "storehouse", "market", "barracks",
+  "samurai_residence", "town_block", "farm", "yagura", "honmaru"
+]);
+
+export function isLotBuilding(type: BuildingType): boolean {
+  return LOT_BUILDING_TYPES.has(type);
+}
+
+export function applyLotCourtyard(world: WorldState, footprint: readonly CellCoord[]): void {
+  const footprintSet = new Set(footprint.map(c => `${c.x},${c.y}`));
+  for (const coord of footprint) {
+    const index = coord.y * world.map.width + coord.x;
+    const cell = world.map.cells[index];
+    if (cell === undefined) continue;
+    world.map.cells[index] = { ...cell, assetId: dirtAssetIdForCell(world, coord, footprintSet) };
+  }
+}
+
+export function restoreLotCourtyard(world: WorldState, footprint: readonly CellCoord[]): void {
+  for (const coord of footprint) {
+    const index = coord.y * world.map.width + coord.x;
+    const cell = world.map.cells[index];
+    if (cell === undefined) continue;
+    world.map.cells[index] = {
+      ...cell,
+      assetId: connectedTerrainAssetId(world.map.cells, world.map.width, world.map.height, cell)
+    };
+  }
+}
+
+function dirtAssetIdForCell(world: WorldState, coord: CellCoord, footprintSet: Set<string>): string {
+  const mask = cardinalDirections.map(d => {
+    const nx = coord.x + d.x;
+    const ny = coord.y + d.y;
+    if (nx < 0 || ny < 0 || nx >= world.map.width || ny >= world.map.height) return "0";
+    if (footprintSet.has(`${nx},${ny}`)) return "1";
+    return world.map.cells[ny * world.map.width + nx]?.terrain === "dirt" ? "1" : "0";
+  }).join("");
+
+  if (mask === "1111") {
+    const bx = coord.x >> 2;
+    const by = coord.y >> 2;
+    let h = (bx * 374761393 + by * 668265263 + 1013904223) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    return `terrain.dirt.macro.v${h % 2}.${coord.x % 4}.${coord.y % 4}`;
+  }
+
+  return `terrain.dirt.connected.${mask}`;
+}
 
 function rectangularFootprint(width: number, height: number): readonly CellCoord[] {
   const footprint: CellCoord[] = [];
@@ -56,7 +107,11 @@ export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefini
       throw new Error(`Cannot place initial building ${placement.type} at ${placement.position.x},${placement.position.y}`);
     }
 
-    world.buildings.push(createBuildingState(world, placement.type, placement.position, definition, placement.owner ?? "player"));
+    const building = createBuildingState(world, placement.type, placement.position, definition, placement.owner ?? "player");
+    world.buildings.push(building);
+    if (isLotBuilding(building.type)) {
+      applyLotCourtyard(world, building.footprint);
+    }
     world.nextBuildingId += 1;
   }
 }
@@ -167,6 +222,10 @@ export function snapshotBuilding(world: WorldState, building: BuildingState): Bu
 export function connectedBuildingAssetId(world: WorldState, building: BuildingState): string {
   if (isGate(building.type)) {
     return connectedGateAssetId(world, building);
+  }
+
+  if (isBridge(building.type)) {
+    return bridgeOrientedAssetId(world, building);
   }
 
   const family = connectedAssetFamily(building.type);
@@ -307,6 +366,23 @@ function connectsTo(building: BuildingState, neighbor: BuildingState | null): bo
     building.type === neighbor.type &&
     (building.type === "dry_moat" || building.type === "water_moat" || building.type === "road")
   );
+}
+
+function bridgeOrientedAssetId(world: WorldState, building: BuildingState): string {
+  const east = { x: building.position.x + 1, y: building.position.y };
+  const west = { x: building.position.x - 1, y: building.position.y };
+  const useY = [east, west].some(coord => isWaterNeighbor(world, coord));
+  return useY ? `${building.assetId}.y` : building.assetId;
+}
+
+function isWaterNeighbor(world: WorldState, coord: CellCoord): boolean {
+  if (coord.x < 0 || coord.y < 0 || coord.x >= world.map.width || coord.y >= world.map.height) {
+    return false;
+  }
+  if (getCell(world, coord).terrain === "water") return true;
+  const neighbor = getBuildingAt(world, coord);
+  return neighbor !== null && neighbor.lifecycleState === "intact" &&
+    (neighbor.type === "water_moat" || neighbor.type === "dry_moat");
 }
 
 export function attachLadder(wall: BuildingState): void {

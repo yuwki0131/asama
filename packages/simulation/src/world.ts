@@ -1,7 +1,7 @@
 import { mvpDefenseScenario } from "@asama/content";
 import type { CellCoord, EconomySnapshot, FoodSnapshot, PlayerCommand, WorldSnapshot } from "@asama/shared";
 import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
-import { buildingDefinitions, absoluteFootprint, canPlaceBuilding, clearUnitPathsThrough, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
+import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
 import { getAttackTarget, areEnemies, updateAttackMoveBehavior, updateCombat } from "./combat";
 import { updateEconomy, applyMarketTrade, applyRecruitCommand, populationCapacity, currentApproval, maxRecruitPool } from "./economy";
 import { updateEnemyAi } from "./enemyAi";
@@ -189,13 +189,14 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       return "Cannot place building there";
     }
 
+    const footprint = absoluteFootprint(position, definition.footprint);
     world.buildings.push({
       id: `building:${world.nextBuildingId}`,
       owner: "player",
       type: command.buildingType,
       category: definition.category,
       position,
-      footprint: absoluteFootprint(position, definition.footprint),
+      footprint,
       hp: definition.maxHp,
       maxHp: definition.maxHp,
       lifecycleState: "intact",
@@ -212,7 +213,10 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     });
     world.nextBuildingId += 1;
     world.invalidMoveTarget = null;
-    clearUnitPathsThrough(world, absoluteFootprint(position, definition.footprint));
+    clearUnitPathsThrough(world, footprint);
+    if (isLotBuilding(command.buildingType)) {
+      applyLotCourtyard(world, footprint);
+    }
     return null;
   }
 
@@ -231,6 +235,9 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       return "Honmaru cannot be demolished";
     }
 
+    if (building !== undefined && isLotBuilding(building.type)) {
+      restoreLotCourtyard(world, building.footprint);
+    }
     world.invalidMoveTarget = null;
     return null;
   }
