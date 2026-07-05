@@ -137,4 +137,38 @@ describe("concentricCastleScenario", () => {
     );
     expect(playerUnits.length).toBeGreaterThan(0);
   });
+
+  it("has no enemy-owned buildings (clean intro layout)", () => {
+    for (const b of concentricCastleScenario.initialBuildings) {
+      expect(b.owner).not.toBe("enemy");
+    }
+  });
+
+  it("has fence ring (ninomaru enclosure)", () => {
+    const fences = concentricCastleScenario.initialBuildings.filter(
+      (b) => b.type === "fence"
+    );
+    expect(fences.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it("has at least 2 yagura (corner watchtowers)", () => {
+    const yagura = concentricCastleScenario.initialBuildings.filter(
+      (b) => b.type === "yagura"
+    );
+    expect(yagura.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("wave 1 spawns only spears and supply_cart (entry-level escalation)", () => {
+    const w1 = concentricCastleScenario.waves[0]!;
+    const allowedTypes = new Set(["spear_ashigaru", "supply_cart"]);
+    for (const spawn of w1.spawns) {
+      expect(allowedTypes.has(spawn.type)).toBe(true);
+    }
+  });
+
+  it("wave 3 includes cavalry (escalation teaching)", () => {
+    const w3 = concentricCastleScenario.waves[2]!;
+    const types = w3.spawns.map((s) => s.type);
+    expect(types).toContain("cavalry");
+  });
 });

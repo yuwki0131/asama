@@ -103,7 +103,12 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     // destination so the group arrives arranged instead of stacking.
     const movers = world.units.filter((unit) => command.unitIds.includes(unit.id));
     movers.sort((a, b) => manhattan(a.position, destination) - manhattan(b.position, destination));
-    const slots = formationSlots(world, destination, movers.length);
+
+    // Exclude the moving units themselves from passability checks so that
+    // units packed together do not block each other's computed paths.
+    const moverIds = new Set(command.unitIds);
+    const worldForPaths: WorldState = { ...world, units: world.units.filter((u) => !moverIds.has(u.id)) };
+    const slots = formationSlots(worldForPaths, destination, movers.length);
 
     let assignedPath = false;
     let slotIndex = 0;
@@ -115,8 +120,8 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
         if (slot === undefined) {
           break;
         }
-        const path = findPath(world, unit.position, slot);
-        if (path.length === 0) {
+        const path = findPath(worldForPaths, unit.position, slot);
+        if (path.length === 0 && !sameCell(unit.position, slot)) {
           continue;
         }
         unit.destination = slot;
@@ -425,6 +430,8 @@ function checkOutcome(world: WorldState): void {
 
 export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}): WorldSnapshot {
   const includeMapCells = options.includeMapCells ?? true;
+  const nextWave = world.scenario.waves[world.nextWaveIndex];
+  const nextWaveTick = nextWave !== undefined ? nextWave.tick : null;
 
   return {
     currentTick: world.currentTick,
@@ -461,8 +468,7 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
       task: unit.task
     })),
     buildings: world.buildings.map((building) => snapshotBuilding(world, building)),
-    holdDeadlineTick: world.scenario.victory.holdTicks,
-    nextWaveTick: world.scenario.waves[world.nextWaveIndex]?.tick ?? null
+    nextWaveTick
   };
 }
 

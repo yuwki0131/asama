@@ -643,6 +643,10 @@ def build_tenshu_graybox(scene: bpy.types.Scene) -> None:
     stone = make_ishigaki_material("TenshuIshigaki")
     gold = make_material("Shachi", (0.55, 0.42, 0.12, 1.0))
 
+    # Courtyard apron: the full 8x8 lot is blocked terrain, so it must READ
+    # as castle ground (gravel court) instead of walkable grass.
+    add_yard_pad(scene, 8.0, 8.0, "gravel")
+
     cx, cy = -4.0, -4.0  # lot center
 
     def centered(w: float):
