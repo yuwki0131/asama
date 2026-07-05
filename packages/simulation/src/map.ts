@@ -43,33 +43,67 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
       if (terrain !== "grass") {
         continue;
       }
-      const nearWater = [terrainAtCell(x + 1, y), terrainAtCell(x - 1, y), terrainAtCell(x, y + 1), terrainAtCell(x, y - 1)].includes("water");
-      const nearStone = [terrainAtCell(x + 1, y), terrainAtCell(x - 1, y), terrainAtCell(x, y + 1), terrainAtCell(x, y - 1)].includes("stone");
+      const neighbors = [terrainAtCell(x + 1, y), terrainAtCell(x - 1, y), terrainAtCell(x, y + 1), terrainAtCell(x, y - 1)];
+      const nearWater = neighbors.includes("water");
+      const nearStone = neighbors.includes("stone");
+
       if (nearWater) {
-        if (hash(x, y, 1) < 0.3) {
+        const r = hash(x, y, 1);
+        if (r < 0.3) {
           decorations.push({ assetId: "deco.reeds.1", position: { x, y } });
+        } else if (r < 0.38) {
+          // Bamboo clusters along waterways
+          decorations.push({ assetId: "deco.bamboo.1", position: { x, y } });
         }
         continue;
       }
+
       if (nearStone) {
         if (hash(x, y, 2) < 0.22) {
           decorations.push({ assetId: "deco.rock.1", position: { x, y } });
         }
         continue;
       }
-      const roll = hash(x, y, 3);
-      if (roll < 0.028) {
-        const pick = hash(x, y, 4);
-        const assetId =
-          pick < 0.3 ? "deco.tree.pine.1" :
-          pick < 0.5 ? "deco.tree.pine.2" :
-          pick < 0.7 ? "deco.tree.cedar.1" :
-          pick < 0.92 ? "deco.tree.broadleaf.1" : "deco.bamboo.1";
-        decorations.push({ assetId, position: { x, y } });
-      } else if (roll < 0.042) {
-        decorations.push({ assetId: "deco.bush.1", position: { x, y } });
-      } else if (roll < 0.078) {
-        decorations.push({ assetId: "deco.weeds.1", position: { x, y } });
+
+      // Low-frequency patch noise: 8×8 blocks define forest-patch character
+      const px = Math.floor(x / 8);
+      const py = Math.floor(y / 8);
+      const patchDensity = hash(px, py, 10);
+      const inPatch = patchDensity < 0.35;
+
+      if (inPatch) {
+        // Species bias is fixed per patch so the grove reads as one type
+        const patchSpecies = hash(px, py, 11);
+        const roll = hash(x, y, 3);
+        if (roll < 0.13) {
+          const pick = hash(x, y, 4);
+          let assetId: string;
+          if (patchSpecies < 0.33) {
+            // Pine grove (松林)
+            assetId = pick < 0.75 ? "deco.tree.pine.1" : "deco.tree.pine.2";
+          } else if (patchSpecies < 0.66) {
+            // Cedar grove (杉林)
+            assetId = pick < 0.8 ? "deco.tree.cedar.1" : pick < 0.95 ? "deco.tree.pine.1" : "deco.tree.broadleaf.1";
+          } else {
+            // Broadleaf grove (広葉樹林)
+            assetId = pick < 0.7 ? "deco.tree.broadleaf.1" : pick < 0.9 ? "deco.tree.cedar.1" : "deco.tree.pine.1";
+          }
+          decorations.push({ assetId, position: { x, y } });
+        } else if (roll < 0.15) {
+          decorations.push({ assetId: "deco.bush.1", position: { x, y } });
+        }
+      } else {
+        // Sparse scatter outside forest patches
+        const roll = hash(x, y, 3);
+        if (roll < 0.018) {
+          const pick = hash(x, y, 4);
+          const assetId = pick < 0.35 ? "deco.tree.pine.1" : pick < 0.6 ? "deco.tree.cedar.1" : "deco.tree.broadleaf.1";
+          decorations.push({ assetId, position: { x, y } });
+        } else if (roll < 0.032) {
+          decorations.push({ assetId: "deco.bush.1", position: { x, y } });
+        } else if (roll < 0.068) {
+          decorations.push({ assetId: "deco.weeds.1", position: { x, y } });
+        }
       }
     }
   }
@@ -92,7 +126,7 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
 
 function terrainAt(coord: CellCoord): TerrainType {
   const riverDistance = Math.abs(coord.y - 42 - Math.round(Math.sin(coord.x / 9) * 4));
-  if (riverDistance <= 1 && coord.x > 12 && coord.x < MAP_WIDTH - 10) {
+  if (riverDistance === 0 && coord.x > 12 && coord.x < MAP_WIDTH - 10) {
     return "water";
   }
 
