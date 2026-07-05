@@ -240,3 +240,62 @@ button {
   image-rendering: pixelated;
   cursor: pointer;
 }
+
+.selection-info-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 6px 14px;
+  background: rgba(18, 22, 28, 0.86);
+  border-top: 1px solid #343a40;
+  color: #f4efe6;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.sip-title {
+  font-weight: 700;
+  color: #d8c88a;
+  white-space: nowrap;
+}
+
+.sip-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 8px;
+  border: 1px solid #46515c;
+  border-radius: 4px;
+  background: rgba(37, 43, 50, 0.7);
+  white-space: nowrap;
+}
+
+.sip-type {
+  font-weight: 600;
+}
+
+.sip-count {
+  color: #9bd8ff;
+}
+
+.sip-hp {
+  color: #7fd08a;
+}
+
+.sip-stat {
+  color: #c8c0b0;
+}
+
+.sip-connected {
+  color: #7fd08a;
+}
+
+.sip-disconnected {
+  color: #ff8f7e;
+}
