@@ -7,7 +7,7 @@ import {
   stepZoom,
   type CameraState
 } from "./camera";
-import { findBuildingAtCell, getSnapshotCell, isSnapshotPassable } from "./gameRules";
+import { canPreviewPlaceBuildingCell, findBuildingAtCell, getSnapshotCell, isSnapshotPassable } from "./gameRules";
 import { findUnitAtScreenPoint, unitScreenPoint } from "./sceneLayer";
 import type { ToolMode } from "./GameCanvas";
 
@@ -17,12 +17,19 @@ const DOUBLE_PRESS_MS = 600;
 
 interface DragState {
   pointerId: number;
-  mode: "select" | "pan";
+  mode: "select" | "pan" | "build";
   startX: number;
   startY: number;
   lastX: number;
   lastY: number;
   moved: boolean;
+}
+
+/** Building types that support drag-to-place (1×1 connection-kit pieces). */
+const DRAG_BUILD_TYPES = new Set<ToolMode>(["fence", "wall", "road", "dry_moat", "water_moat"]);
+
+function isDragBuildTool(tool: ToolMode): tool is BuildingType {
+  return DRAG_BUILD_TYPES.has(tool);
 }
 
 export interface InputRefs {
@@ -41,6 +48,7 @@ export interface InputRefs {
   readonly onStopSelectedRef: MutableRefObject<() => void>;
   readonly onGroupSaveRef: MutableRefObject<(groupNum: number, unitIds: readonly UnitId[]) => void>;
   readonly onGroupRecallRef: MutableRefObject<(groupNum: number, jump: boolean) => void>;
+  readonly onCancelBuildToolRef: MutableRefObject<() => void>;
 }
 
 export interface PointerInputOptions {
@@ -164,6 +172,8 @@ export function registerPointerInput({
   let lastClickTime = 0;
   let lastClickScreenX = -Infinity;
   let lastClickScreenY = -Infinity;
+  // Tracks the last cell placed during a drag-build gesture to avoid duplicate placement.
+  let lastBuildCell: { x: number; y: number } | null = null;
 
   const handlePointerDown = (event: PointerEvent) => {
     // Left button drags a selection box (per controls spec); middle button
@@ -174,6 +184,31 @@ export function registerPointerInput({
     if (event.button === 1) {
       event.preventDefault();
     }
+
+    // Drag-to-build: for 1×1 connection-kit types, fire placement on pointer
+    // down and again for each new cell the pointer enters while held.
+    if (event.button === 0 && isDragBuildTool(refs.buildToolRef.current)) {
+      const rect = canvas.getBoundingClientRect();
+      const clickedCell = screenToCell(event.clientX - rect.left, event.clientY - rect.top, refs.cameraRef.current);
+      const activeTool = refs.buildToolRef.current as BuildingType;
+      const snapshot = refs.snapshotRef.current;
+      if (snapshot !== null && canPreviewPlaceBuildingCell(snapshot, clickedCell, activeTool)) {
+        refs.onPlaceBuildingRef.current(activeTool, clickedCell);
+      }
+      lastBuildCell = clickedCell;
+      refs.dragRef.current = {
+        pointerId: event.pointerId,
+        mode: "build",
+        startX: event.clientX,
+        startY: event.clientY,
+        lastX: event.clientX,
+        lastY: event.clientY,
+        moved: false
+      };
+      canvas.setPointerCapture(event.pointerId);
+      return;
+    }
+
     refs.dragRef.current = {
       pointerId: event.pointerId,
       mode: event.button === 1 ? "pan" : "select",
@@ -194,6 +229,23 @@ export function registerPointerInput({
       if (!drag.moved && Math.hypot(totalDx, totalDy) > 6) {
         drag.moved = true;
       }
+
+      if (drag.mode === "build") {
+        const rect = canvas.getBoundingClientRect();
+        const currentCell = screenToCell(event.clientX - rect.left, event.clientY - rect.top, refs.cameraRef.current);
+        if (lastBuildCell === null || currentCell.x !== lastBuildCell.x || currentCell.y !== lastBuildCell.y) {
+          const activeTool = refs.buildToolRef.current;
+          const snapshot = refs.snapshotRef.current;
+          if (isDragBuildTool(activeTool) && snapshot !== null && canPreviewPlaceBuildingCell(snapshot, currentCell, activeTool as BuildingType)) {
+            refs.onPlaceBuildingRef.current(activeTool as BuildingType, currentCell);
+          }
+          lastBuildCell = currentCell;
+        }
+        drag.lastX = event.clientX;
+        drag.lastY = event.clientY;
+        return;
+      }
+
       if (drag.moved && drag.mode === "pan") {
         const dx = event.clientX - drag.lastX;
         const dy = event.clientY - drag.lastY;
@@ -228,6 +280,12 @@ export function registerPointerInput({
     refs.dragRef.current = null;
     canvas.releasePointerCapture(event.pointerId);
     setSelectionBox(null);
+
+    // Drag-build gesture ends: placement already fired on down/move, skip up.
+    if (drag.mode === "build") {
+      lastBuildCell = null;
+      return;
+    }
 
     const rect = canvas.getBoundingClientRect();
 
@@ -365,6 +423,8 @@ export function registerPointerInput({
     };
     const destination = screenToCell(screenPoint.x, screenPoint.y, refs.cameraRef.current);
     if (refs.buildToolRef.current !== null) {
+      // Right-click during build mode cancels the tool and returns to Select.
+      refs.onCancelBuildToolRef.current();
       return;
     }
 

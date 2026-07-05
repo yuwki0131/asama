@@ -14,9 +14,9 @@ import {
   buildingPreviewFootprint,
   canPreviewPlaceBuildingCell,
   findBuildingAtCell,
-  isInsideSnapshotMap,
-  isCenterAnchoredBuilding
+  isInsideSnapshotMap
 } from "./gameRules";
+import { buildingRenderPoint } from "./renderGeometry";
 import type { ToolMode } from "./GameCanvas";
 
 export function addPathSprites(layer: Container, unit: UnitSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
@@ -101,51 +101,15 @@ export function addAlignmentDebugOverlay(
   layer.addChild(grid);
 }
 
-export function buildingRenderPoint(building: BuildingSnapshot): CellCoord {
-  if (building.footprint.length === 0) {
-    return cellToWorld(building.position);
-  }
-
-  if (!isCenterAnchoredBuilding(building.type)) {
-    return footprintSouthWorld(building.footprint);
-  }
-
-  return footprintCenterWorld(building.footprint);
-}
-
-function footprintCenterWorld(footprint: readonly CellCoord[]): CellCoord {
-  const bounds = footprintBounds(footprint);
-  const centerCell = {
-    x: (bounds.minX + bounds.maxX) / 2,
-    y: (bounds.minY + bounds.maxY) / 2
-  };
-  return cellToWorld(centerCell);
-}
-
-function footprintSouthWorld(footprint: readonly CellCoord[]): CellCoord {
-  const bounds = footprintBounds(footprint);
-  return gridCornerToWorld({ x: bounds.maxX + 1, y: bounds.maxY + 1 });
-}
-
-function footprintBounds(footprint: readonly CellCoord[]): {
-  readonly minX: number;
-  readonly maxX: number;
-  readonly minY: number;
-  readonly maxY: number;
-} {
+function footprintBounds(footprint: readonly CellCoord[]) {
   return footprint.reduce(
-    (bounds, cell) => ({
-      minX: Math.min(bounds.minX, cell.x),
-      maxX: Math.max(bounds.maxX, cell.x),
-      minY: Math.min(bounds.minY, cell.y),
-      maxY: Math.max(bounds.maxY, cell.y)
+    (b, cell) => ({
+      minX: Math.min(b.minX, cell.x),
+      maxX: Math.max(b.maxX, cell.x),
+      minY: Math.min(b.minY, cell.y),
+      maxY: Math.max(b.maxY, cell.y)
     }),
-    {
-      minX: Number.POSITIVE_INFINITY,
-      maxX: Number.NEGATIVE_INFINITY,
-      minY: Number.POSITIVE_INFINITY,
-      maxY: Number.NEGATIVE_INFINITY
-    }
+    { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity }
   );
 }
 

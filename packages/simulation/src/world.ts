@@ -432,6 +432,7 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
   const includeMapCells = options.includeMapCells ?? true;
   const nextWave = world.scenario.waves[world.nextWaveIndex];
   const nextWaveTick = nextWave !== undefined ? nextWave.tick : null;
+  const holdDeadlineTick = world.scenario.victory.holdTicks;
 
   return {
     currentTick: world.currentTick,
@@ -468,7 +469,8 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
       task: unit.task
     })),
     buildings: world.buildings.map((building) => snapshotBuilding(world, building)),
-    nextWaveTick
+    nextWaveTick,
+    holdDeadlineTick
   };
 }
 
