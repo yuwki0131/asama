@@ -11,6 +11,10 @@ import { findBuildingAtCell, getSnapshotCell, isSnapshotPassable } from "./gameR
 import { findUnitAtScreenPoint, unitScreenPoint } from "./sceneLayer";
 import type { ToolMode } from "./GameCanvas";
 
+const DOUBLE_CLICK_MS = 350;
+const DOUBLE_CLICK_RADIUS_PX = 8;
+const DOUBLE_PRESS_MS = 600;
+
 interface DragState {
   pointerId: number;
   mode: "select" | "pan";
@@ -35,6 +39,8 @@ export interface InputRefs {
   readonly onEngineerTaskRef: MutableRefObject<(task: "ladder" | "fillMoat", position: CellCoord) => void>;
   readonly onAttackMoveRef: MutableRefObject<(destination: CellCoord) => void>;
   readonly onStopSelectedRef: MutableRefObject<() => void>;
+  readonly onGroupSaveRef: MutableRefObject<(groupNum: number, unitIds: readonly UnitId[]) => void>;
+  readonly onGroupRecallRef: MutableRefObject<(groupNum: number, jump: boolean) => void>;
 }
 
 export interface PointerInputOptions {
@@ -56,9 +62,20 @@ export interface PointerInputOptions {
 }
 
 export function registerKeyboardInput(
-  refs: Pick<InputRefs, "cameraRef" | "heldKeysRef" | "onStopSelectedRef">,
+  refs: Pick<
+    InputRefs,
+    | "cameraRef"
+    | "heldKeysRef"
+    | "onStopSelectedRef"
+    | "snapshotRef"
+    | "onGroupSaveRef"
+    | "onGroupRecallRef"
+  >,
   scheduleCameraRender: () => void
 ): () => void {
+  let lastGroupKeyNum = -1;
+  let lastGroupKeyTime = 0;
+
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
       return;
@@ -71,6 +88,35 @@ export function registerKeyboardInput(
       refs.onStopSelectedRef.current();
       return;
     }
+
+    // Group save: Ctrl+1~9
+    if (event.ctrlKey && !event.repeat) {
+      const digit = parseInt(event.key, 10);
+      if (digit >= 1 && digit <= 9) {
+        event.preventDefault();
+        const selectedIds =
+          refs.snapshotRef.current?.units
+            .filter((u) => u.selected && u.owner === "player")
+            .map((u) => u.id) ?? [];
+        refs.onGroupSaveRef.current(digit, selectedIds);
+        return;
+      }
+    }
+
+    // Group recall: 1~9 (no Ctrl, no repeat)
+    if (!event.ctrlKey && !event.repeat) {
+      const digit = parseInt(event.key, 10);
+      if (digit >= 1 && digit <= 9) {
+        const now = performance.now();
+        const isDoublePress =
+          lastGroupKeyNum === digit && now - lastGroupKeyTime < DOUBLE_PRESS_MS;
+        refs.onGroupRecallRef.current(digit, isDoublePress);
+        lastGroupKeyNum = digit;
+        lastGroupKeyTime = now;
+        return;
+      }
+    }
+
     // Camera scroll lives on the arrow keys: the controls spec assigns
     // WASD to the camera but also S=stop and A=attack-move, so the letter
     // keys go to unit commands and arrows drive the camera.
@@ -115,6 +161,10 @@ export function registerPointerInput({
   setSelectionBox,
   onMoveSelected
 }: PointerInputOptions): () => void {
+  let lastClickTime = 0;
+  let lastClickScreenX = -Infinity;
+  let lastClickScreenY = -Infinity;
+
   const handlePointerDown = (event: PointerEvent) => {
     // Left button drags a selection box (per controls spec); middle button
     // pans the camera. Right button issues commands via contextmenu.
@@ -242,6 +292,35 @@ export function registerPointerInput({
 
     const hitUnit = findUnitAtScreenPoint(screenPoint, refs.snapshotRef.current, refs.cameraRef.current);
     if (hitUnit !== null && hitUnit.owner === "player") {
+      const now = performance.now();
+      const isDoubleClick =
+        now - lastClickTime < DOUBLE_CLICK_MS &&
+        Math.hypot(event.clientX - lastClickScreenX, event.clientY - lastClickScreenY) <
+          DOUBLE_CLICK_RADIUS_PX;
+
+      if (isDoubleClick) {
+        const snapshot = refs.snapshotRef.current;
+        const camera = refs.cameraRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+        const sameTypeIds =
+          snapshot?.units
+            .filter((u) => u.owner === "player" && u.type === hitUnit.type)
+            .filter((u) => {
+              const pt = unitScreenPoint(u, camera);
+              return pt.x >= 0 && pt.x <= w && pt.y >= 0 && pt.y <= h;
+            })
+            .map((u) => u.id) ?? [];
+        refs.onSelectUnitsRef.current(sameTypeIds, false);
+        lastClickTime = 0;
+        setSelectedCell(null);
+        return;
+      }
+
+      lastClickTime = now;
+      lastClickScreenX = event.clientX;
+      lastClickScreenY = event.clientY;
       refs.onSelectUnitsRef.current([hitUnit.id], event.shiftKey);
       setSelectedCell(null);
       return;
