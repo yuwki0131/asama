@@ -8,6 +8,28 @@ function resetBuildings(world: WorldState): void {
   world.buildings.splice(0, world.buildings.length);
 }
 
+function normalizeMap(world: WorldState): void {
+  world.map.cells = world.map.cells.map((cell) => ({
+    ...cell,
+    terrain: "grass" as const,
+    movementCost: 1,
+    passable: true,
+    assetId: "terrain.grass.test"
+  }));
+}
+
+function setWaterCell(world: WorldState, coord: CellCoord): void {
+  const index = coord.y * world.map.width + coord.x;
+  const cell = world.map.cells[index];
+  if (cell === undefined) return;
+  world.map.cells[index] = {
+    ...cell,
+    terrain: "water" as const,
+    passable: false,
+    assetId: "terrain.water.test"
+  };
+}
+
 function place(world: WorldState, type: BuildingType, position: CellCoord): void {
   const error = applyCommand(world, {
     type: "placeBuilding",
@@ -141,5 +163,60 @@ describe("connected building asset masks", () => {
     place(world, "road", { x: 60, y: 61 });
 
     expect(buildingAt(world, { x: 60, y: 60 }).assetId).toBe("building.road.connected.1110");
+  });
+});
+
+describe("bridge orientation", () => {
+  it("uses base assetId (x orientation) when no water neighbors", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+
+    place(world, "earth_bridge", { x: 20, y: 20 });
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge");
+
+    place(world, "wood_bridge", { x: 22, y: 20 });
+    expect(buildingAt(world, { x: 22, y: 20 }).assetId).toBe("building.wood_bridge");
+  });
+
+  it("uses .y suffix when east neighbor is water terrain", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 21, y: 20 });
+
+    place(world, "earth_bridge", { x: 20, y: 20 });
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge.y");
+  });
+
+  it("uses .y suffix when west neighbor is water terrain", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 19, y: 20 });
+
+    place(world, "wood_bridge", { x: 20, y: 20 });
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.wood_bridge.y");
+  });
+
+  it("uses .y suffix when east neighbor has a moat building", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+
+    place(world, "dry_moat", { x: 21, y: 20 });
+    place(world, "earth_bridge", { x: 20, y: 20 });
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge.y");
+  });
+
+  it("does not use .y suffix when only north/south neighbors are water", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 20, y: 19 });
+    setWaterCell(world, { x: 20, y: 21 });
+
+    place(world, "earth_bridge", { x: 20, y: 20 });
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge");
   });
 });
