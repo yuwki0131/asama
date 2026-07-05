@@ -15,7 +15,7 @@ from .materials import (
 import bpy
 
 TERRAIN_BLEED = 0.03
-WATER_DEPTH = 0.17
+WATER_DEPTH = 0.11
 MOAT_DEPTH = 0.30
 
 
@@ -46,7 +46,7 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
     style = TERRAIN_STYLES["water"]
     rim = make_material("ShoreRim", (*style["edge"], 1.0))
-    bank = make_bank_material()
+    bank = make_noise_material("ShoreBankSand", (0.150, 0.126, 0.088), (0.235, 0.205, 0.150), scale=9.0)
     wet = make_material("ShoreWet", (0.030, 0.062, 0.080, 1.0))
 
     b = TERRAIN_BLEED
@@ -63,7 +63,7 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
         return raw * envelope
 
     segments = 6
-    depth_base = 0.17
+    depth_base = 0.10
     for name in ("N", "E", "S", "W"):
         if same[name]:
             continue
@@ -90,7 +90,7 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
             add_mesh(scene, f"Bank{name}{variant}{i}",
                 [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), -WATER_DEPTH), (*map_xy(*p0), -WATER_DEPTH)],
                 [(0, 1, 2, 3)], bank)
-            lap = 0.06
+            lap = 0.035
             if name == "N":
                 q0, q1 = (p0[0], p0[1] + lap), (p1[0], p1[1] + lap)
             elif name == "S":
