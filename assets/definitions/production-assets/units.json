@@ -102,6 +102,72 @@
           "sigma": 0.45
         }
       }
+    },
+    {
+      "assetId": "unit.musketeer.idle.south",
+      "kind": "unit",
+      "output": "unit-musketeer-idle-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/unit-musketeer-idle-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "unit.cavalry.idle.south",
+      "kind": "unit",
+      "output": "unit-cavalry-idle-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/unit-cavalry-idle-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 56
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "unit.supply_cart.idle.south",
+      "kind": "unit",
+      "output": "unit-supply-cart-idle-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/unit-supply-cart-idle-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 56
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
     }
   ]
 }

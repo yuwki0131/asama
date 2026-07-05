@@ -174,18 +174,23 @@ function parseRenderCacheIndex(value: unknown): RenderCacheIndex {
     if (!/^[0-9a-f]{64}$/.test(sha256)) {
       throw new Error(`Invalid render cache key: ${sha256}`);
     }
-    index[sha256] = parseRenderCacheMetadata(metadata);
+    // Entries written by older cache versions are simply misses, not errors:
+    // the key scheme changed, so they can never match a v2 key anyway.
+    const parsed = parseRenderCacheMetadata(metadata);
+    if (parsed !== null) {
+      index[sha256] = parsed;
+    }
   }
   return index;
 }
 
-function parseRenderCacheMetadata(value: unknown): RenderCacheMetadata {
+function parseRenderCacheMetadata(value: unknown): RenderCacheMetadata | null {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     throw new Error("Render cache metadata must be an object");
   }
   const record = value as Record<string, unknown>;
   if (record.cacheVersion !== 2) {
-    throw new Error("Unsupported render cache metadata version");
+    return null;
   }
   return {
     cacheVersion: 2,

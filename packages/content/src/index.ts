@@ -281,7 +281,7 @@ export const unitSpecs: Record<UnitType, UnitSpec> = {
     attackRange: 4,
     attackCooldownSeconds: 2.5,
     ticksPerStep: 7,
-    assetId: "unit.spear_ashigaru.idle.south"
+    assetId: "unit.musketeer.idle.south"
   },
   cavalry: {
     type: "cavalry",
@@ -290,7 +290,7 @@ export const unitSpecs: Record<UnitType, UnitSpec> = {
     attackRange: 1,
     attackCooldownSeconds: 1.2,
     ticksPerStep: 3,
-    assetId: "unit.spear_ashigaru.idle.south"
+    assetId: "unit.cavalry.idle.south"
   },
   supply_cart: {
     type: "supply_cart",
@@ -299,7 +299,7 @@ export const unitSpecs: Record<UnitType, UnitSpec> = {
     attackRange: 0,
     attackCooldownSeconds: 999,
     ticksPerStep: 10,
-    assetId: "unit.spear_ashigaru.idle.south"
+    assetId: "unit.supply_cart.idle.south"
   }
 };
 
