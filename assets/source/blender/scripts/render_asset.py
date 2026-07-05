@@ -2709,7 +2709,13 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool) -> None:
         surface_z = -MOAT_DEPTH
 
     b = TERRAIN_BLEED
-    add_flat_quad(scene, "TrenchFloor", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), surface_z, surface)
+    # The floor reaches far into OPEN north/west neighbours: at 4-corner
+    # junctions the south-east tile is the one whose projection stays inside
+    # its own visible opening, so it must paint the junction area that the
+    # corner holdouts blank out on the other three tiles.
+    fx0 = -0.5 - (0.45 if same["W"] else b)
+    fy0 = -0.5 - (0.45 if same["N"] else b)
+    add_flat_quad(scene, "TrenchFloor", (fx0, fy0), (0.5 + b, 0.5 + b), surface_z, surface)
 
     # Steep bank faces + a narrow packed rim on unconnected edges.
     rim_w = 0.09
@@ -2740,19 +2746,29 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool) -> None:
             [(0, 1, 2, 3)], lip)
 
     # Holdout skirts occlude the underground view where the neighbour is
-    # GROUND (mask=0). Where the neighbour is another moat tile there is no
-    # ground to occlude with — the trench continues, and the neighbour's own
-    # sprite covers any projection spill via draw order.
+    # GROUND (mask=0). Where the neighbour is another moat tile the trench
+    # continues and that neighbour's sprite covers the projection spill.
+    # The four DIAGONAL corners are always occluded: the cardinal mask says
+    # nothing about them, and any diagonal moat neighbour draws its own
+    # square anyway — without this, trench pixels leak onto the ground tile
+    # to the lower-right of the moat.
     holdout = make_holdout_material()
     for name, low, high in (
-        ("N", (-3.0, -3.0), (3.0, -0.5)),
-        ("S", (-3.0, 0.5), (3.0, 3.0)),
+        ("N", (-0.5, -3.0), (0.5, -0.5)),
+        ("S", (-0.5, 0.5), (0.5, 3.0)),
         ("W", (-3.0, -0.5), (-0.5, 0.5)),
         ("E", (0.5, -0.5), (3.0, 0.5)),
     ):
         if same[name]:
             continue
         add_flat_quad(scene, f"Skirt{name}", low, high, 0.0005, holdout)
+    for name, low, high in (
+        ("NW", (-3.0, -3.0), (-0.5, -0.5)),
+        ("NE", (0.5, -3.0), (3.0, -0.5)),
+        ("SW", (-3.0, 0.5), (-0.5, 3.0)),
+        ("SE", (0.5, 0.5), (3.0, 3.0)),
+    ):
+        add_flat_quad(scene, f"SkirtCorner{name}", low, high, 0.0005, holdout)
 
 
 def build_dry_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
