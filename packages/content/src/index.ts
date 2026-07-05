@@ -366,4 +366,188 @@ export const mvpDefenseScenario: ScenarioDefinition = {
   }
 };
 
-export const scenarios: readonly ScenarioDefinition[] = [mvpDefenseScenario];
+/**
+ * Riverside defense scenario (docs/07_scenarios/riverside-defense.md).
+ * A river acts as the primary barrier; two bridges are the key chokepoints.
+ */
+export const riversideDefenseScenario: ScenarioDefinition = {
+  id: "riverside-defense",
+  name: "川沿いの城",
+  initialBuildings: [
+    // === Castle core (west bank) ===
+    { type: "tenshu", position: { x: 30, y: 46 } },
+    { type: "honmaru", position: { x: 42, y: 57 } },
+
+    // Watchtower guarding the NE approach
+    { type: "yagura", position: { x: 46, y: 43 } },
+
+    // Military and economy
+    { type: "barracks", position: { x: 35, y: 58 } },
+    { type: "storehouse", position: { x: 35, y: 63 } },
+    { type: "market", position: { x: 40, y: 63 } },
+    { type: "samurai_residence", position: { x: 44, y: 63 } },
+    { type: "town_block", position: { x: 38, y: 67 } },
+
+    // Farms on the safe western flank
+    { type: "farm", position: { x: 24, y: 50 } },
+    { type: "farm", position: { x: 24, y: 56 } },
+
+    // === Outer fence line (north perimeter) ===
+    { type: "fence", position: { x: 28, y: 43 } },
+    { type: "fence", position: { x: 30, y: 43 } },
+    { type: "fence", position: { x: 32, y: 43 } },
+    { type: "fence", position: { x: 34, y: 43 } },
+    { type: "fence", position: { x: 36, y: 43 } },
+    { type: "fence", position: { x: 38, y: 43 } },
+    { type: "fence", position: { x: 40, y: 43 } },
+    { type: "fence", position: { x: 42, y: 43 } },
+    { type: "fence", position: { x: 44, y: 43 } },
+
+    // === East wall (castle perimeter facing the river) ===
+    // Continuous wall y=44-55, then 3-wide vertical gate, then y=59-70
+    { type: "wall", position: { x: 52, y: 44 } },
+    { type: "wall", position: { x: 52, y: 45 } },
+    { type: "wall", position: { x: 52, y: 46 } },
+    { type: "wall", position: { x: 52, y: 47 } },
+    { type: "wall", position: { x: 52, y: 48 } },
+    { type: "wall", position: { x: 52, y: 49 } },
+    { type: "wall", position: { x: 52, y: 50 } },
+    { type: "wall", position: { x: 52, y: 51 } },
+    { type: "wall", position: { x: 52, y: 52 } },
+    { type: "wall", position: { x: 52, y: 53 } },
+    { type: "wall", position: { x: 52, y: 54 } },
+    { type: "wall", position: { x: 52, y: 55 } },
+    // Main gate: 3-wide vertical opening (occupies x=52, y=56-58)
+    { type: "gate_wide_3_ne_sw", position: { x: 52, y: 56 } },
+    { type: "wall", position: { x: 52, y: 59 } },
+    { type: "wall", position: { x: 52, y: 60 } },
+    { type: "wall", position: { x: 52, y: 61 } },
+    { type: "wall", position: { x: 52, y: 62 } },
+    { type: "wall", position: { x: 52, y: 63 } },
+    { type: "wall", position: { x: 52, y: 64 } },
+    { type: "wall", position: { x: 52, y: 65 } },
+    { type: "wall", position: { x: 52, y: 66 } },
+    { type: "wall", position: { x: 52, y: 67 } },
+    { type: "wall", position: { x: 52, y: 68 } },
+    { type: "wall", position: { x: 52, y: 69 } },
+    { type: "wall", position: { x: 52, y: 70 } },
+
+    // === Bridge approach gates (west shore — choke the exits) ===
+    { type: "gate", position: { x: 56, y: 50 } },
+    { type: "gate", position: { x: 56, y: 66 } },
+
+    // Roads connecting castle gate to bridge approach gates
+    { type: "road", position: { x: 54, y: 57 } },
+    { type: "road", position: { x: 55, y: 50 } },
+    { type: "road", position: { x: 55, y: 66 } },
+
+    // === River (water moat at x=58 — natural barrier) ===
+    // North section: above north bridge
+    { type: "water_moat", position: { x: 58, y: 44 } },
+    { type: "water_moat", position: { x: 58, y: 46 } },
+    { type: "water_moat", position: { x: 58, y: 48 } },
+    // North bridge crossing (wood — less durable)
+    { type: "wood_bridge", position: { x: 58, y: 50 } },
+    // Middle section: between the two bridges
+    { type: "water_moat", position: { x: 58, y: 52 } },
+    { type: "water_moat", position: { x: 58, y: 54 } },
+    { type: "water_moat", position: { x: 58, y: 56 } },
+    { type: "water_moat", position: { x: 58, y: 58 } },
+    { type: "water_moat", position: { x: 58, y: 60 } },
+    { type: "water_moat", position: { x: 58, y: 62 } },
+    { type: "water_moat", position: { x: 58, y: 64 } },
+    // South bridge crossing (earth — more durable)
+    { type: "earth_bridge", position: { x: 58, y: 66 } },
+    // South section: below south bridge
+    { type: "water_moat", position: { x: 58, y: 68 } },
+    { type: "water_moat", position: { x: 58, y: 70 } },
+    { type: "water_moat", position: { x: 58, y: 72 } },
+
+    // === East bank (enemy approach roads) ===
+    { type: "road", position: { x: 60, y: 50 } },
+    { type: "road", position: { x: 62, y: 50 } },
+    { type: "road", position: { x: 60, y: 66 } },
+    { type: "road", position: { x: 62, y: 66 } },
+
+    // Enemy staging area
+    { type: "gate", position: { x: 80, y: 58 }, owner: "enemy" },
+  ],
+  initialUnits: [
+    // Player garrison at honmaru
+    { type: "spear_ashigaru", position: { x: 42, y: 57 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 43, y: 57 }, owner: "player" },
+    // Player archers covering bridge exits
+    { type: "archer", position: { x: 55, y: 50 }, owner: "player" },
+    { type: "archer", position: { x: 55, y: 66 }, owner: "player" },
+    // Player spear guard in front of castle gate
+    { type: "spear_ashigaru", position: { x: 50, y: 57 }, owner: "player" },
+
+    // Enemy advance scouts on east bank
+    { type: "spear_ashigaru", position: { x: 78, y: 56 }, owner: "enemy" },
+    { type: "archer", position: { x: 78, y: 60 }, owner: "enemy" },
+  ],
+  waves: [
+    {
+      // Wave 1 (tick 1800): Light probe — tests north bridge
+      tick: 1800,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 90, y: 50 } },
+        { type: "spear_ashigaru", position: { x: 90, y: 52 } },
+      ],
+    },
+    {
+      // Wave 2 (tick 5400): Coordinated assault with archer fire support
+      tick: 5400,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 90, y: 48 } },
+        { type: "spear_ashigaru", position: { x: 90, y: 52 } },
+        { type: "archer", position: { x: 92, y: 50 } },
+      ],
+    },
+    {
+      // Wave 3 (tick 9000): First engineer; dual bridge pressure begins
+      tick: 9000,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 90, y: 50 } },
+        { type: "sword_ashigaru", position: { x: 90, y: 54 } },
+        { type: "engineer", position: { x: 92, y: 52 } },
+        { type: "spear_ashigaru", position: { x: 90, y: 66 } },
+        { type: "archer", position: { x: 92, y: 68 } },
+      ],
+    },
+    {
+      // Wave 4 (tick 13200): Coordinated two-bridge assault with engineers
+      tick: 13200,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 90, y: 48 } },
+        { type: "sword_ashigaru", position: { x: 90, y: 50 } },
+        { type: "engineer", position: { x: 92, y: 50 } },
+        { type: "archer", position: { x: 90, y: 52 } },
+        { type: "spear_ashigaru", position: { x: 90, y: 64 } },
+        { type: "sword_ashigaru", position: { x: 90, y: 66 } },
+        { type: "engineer", position: { x: 92, y: 66 } },
+        { type: "archer", position: { x: 90, y: 68 } },
+      ],
+    },
+    {
+      // Wave 5 (tick 18000): Elite final assault — heavy swords and full engineer support
+      tick: 18000,
+      spawns: [
+        { type: "sword_ashigaru", position: { x: 90, y: 46 } },
+        { type: "sword_ashigaru", position: { x: 90, y: 50 } },
+        { type: "engineer", position: { x: 92, y: 48 } },
+        { type: "engineer", position: { x: 92, y: 52 } },
+        { type: "archer", position: { x: 90, y: 54 } },
+        { type: "sword_ashigaru", position: { x: 90, y: 64 } },
+        { type: "spear_ashigaru", position: { x: 90, y: 66 } },
+        { type: "archer", position: { x: 90, y: 68 } },
+        { type: "archer", position: { x: 90, y: 70 } },
+      ],
+    },
+  ],
+  victory: {
+    holdTicks: 30000,
+  },
+};
+
+export const scenarios: readonly ScenarioDefinition[] = [mvpDefenseScenario, riversideDefenseScenario];
