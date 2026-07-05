@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "assetId": "unit.spear_ashigaru.idle.south",
+      "kind": "unit",
+      "output": "unit-spear-ashigaru-idle-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/unit-spear-ashigaru-idle-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "unit.sword_ashigaru.idle.south",
+      "kind": "unit",
+      "output": "unit-sword-ashigaru-idle-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/unit-sword-ashigaru-idle-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "unit.archer.idle.south",
+      "kind": "unit",
+      "output": "unit-archer-idle-south.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/approved-production/terrain-units-runtime-gap/unit-archer-idle-south.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    },
+    {
+      "assetId": "unit.engineer.idle.south",
+      "kind": "unit",
+      "output": "unit-engineer-idle-south.png",
+      "source": {
+        "type": "blender",
+        "model": "unit-engineer",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 48,
+        "canvasHeight": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "category": "unit",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.45
+        }
+      }
+    }
+  ]
+}

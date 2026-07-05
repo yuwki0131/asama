@@ -1,4 +1,5 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
+import { join } from "node:path";
 import type {
   AssetGeometry,
   AssetKind,
@@ -12,7 +13,19 @@ import type {
 const assetKinds = new Set<AssetKind>(["terrain", "unit", "building", "overlay"]);
 const categories = new Set<RasterPostprocessCategory>(["terrain", "building", "unit", "vegetation", "effect"]);
 
-export async function readProductionAssetConfig(path: string): Promise<ProductionAssetConfig> {
+export async function readProductionAssetConfigDir(dir: string): Promise<ProductionAssetConfig> {
+  const entries = await readdir(dir);
+  const jsonFiles = entries.filter((f) => f.endsWith(".json")).sort();
+  const seen = new Set<string>();
+  const merged: ProductionAssetSpec[] = [];
+  for (const file of jsonFiles) {
+    const config = await readProductionAssetConfig(join(dir, file), seen);
+    merged.push(...config.assets);
+  }
+  return { version: 1, assets: merged };
+}
+
+export async function readProductionAssetConfig(path: string, seen = new Set<string>()): Promise<ProductionAssetConfig> {
   const raw = await readFile(path, "utf8");
   const parsed = JSON.parse(raw) as Partial<ProductionAssetConfig>;
 
@@ -20,7 +33,6 @@ export async function readProductionAssetConfig(path: string): Promise<Productio
     throw new Error(`Invalid production asset config: ${path}`);
   }
 
-  const seen = new Set<string>();
   return {
     version: 1,
     assets: parsed.assets.map((asset, index) => parseProductionAsset(asset, index, seen))

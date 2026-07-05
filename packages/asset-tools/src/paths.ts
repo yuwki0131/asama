@@ -7,6 +7,7 @@ export const repoRoot = resolve(thisDir, "../../..");
 export const placeholderConfigPath = join(repoRoot, "assets/source/placeholder-assets.json");
 export const generatedConfigPath = join(repoRoot, "assets/source/phase1-2-assets.json");
 export const productionConfigPath = join(repoRoot, "assets/definitions/production-assets.json");
+export const productionConfigDir = join(repoRoot, "assets/definitions/production-assets");
 export const sourceAssetsDir = join(repoRoot, "assets/source");
 export const rasterSourceDir = join(sourceAssetsDir, "raster");
 export const blenderSourceDir = join(sourceAssetsDir, "blender");

@@ -9,14 +9,14 @@ import {
 } from "./blenderRender";
 import { defaultBlenderRenderScript } from "./blenderAdapter";
 import { readManifest } from "./manifest";
-import { readProductionAssetConfig } from "./productionConfig";
+import { readProductionAssetConfigDir } from "./productionConfig";
 import { importRasterAsset } from "./postprocess";
 import {
   atlasOutputDir,
   generatedManifestPath,
   generatedOutputDir,
   intermediateAssetsDir,
-  productionConfigPath,
+  productionConfigDir,
   renderCacheDir,
   repoRoot
 } from "./paths";
@@ -42,7 +42,7 @@ export interface ProductionPostprocessResult {
 }
 
 export async function importRasterAssets(): Promise<number> {
-  const config = await readProductionAssetConfig(productionConfigPath);
+  const config = await readProductionAssetConfigDir(productionConfigDir);
   const rasterAssets = config.assets.filter((asset) => asset.source.type === "raster");
   await mkdir(generatedOutputDir, { recursive: true });
   for (const asset of rasterAssets) {
@@ -76,7 +76,7 @@ async function readExistingGeneratedManifest(): Promise<{ readonly assets: reado
 }
 
 export async function renderBlenderAssets(): Promise<BlenderRenderBatchResult> {
-  const config = await readProductionAssetConfig(productionConfigPath);
+  const config = await readProductionAssetConfigDir(productionConfigDir);
   const blenderAssets = config.assets.filter((asset) => asset.source.type === "blender");
   if (blenderAssets.length === 0) {
     return { total: 0, rendered: 0, cachedHit: 0 };
@@ -162,7 +162,7 @@ export async function buildAtlas(spec: AtlasBuildSpec = { padding: 2 }): Promise
 }
 
 export async function validateProductionAssetDefinitions(): Promise<void> {
-  const config = await readProductionAssetConfig(productionConfigPath);
+  const config = await readProductionAssetConfigDir(productionConfigDir);
   const seenOutputs = new Set<string>();
   for (const asset of config.assets) {
     if (seenOutputs.has(asset.output)) {
