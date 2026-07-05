@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { riversideDefenseScenario } from "./index";
+import { linearFortressScenario } from "./index";
 
 const MAP_WIDTH = 128;
 const MAP_HEIGHT = 128;
@@ -17,20 +17,20 @@ const VALID_UNIT_TYPES = new Set([
   "musketeer", "cavalry", "supply_cart",
 ]);
 
-describe("riversideDefenseScenario", () => {
+describe("linearFortressScenario", () => {
   it("has a non-empty id and name", () => {
-    expect(riversideDefenseScenario.id.length).toBeGreaterThan(0);
-    expect(riversideDefenseScenario.name.length).toBeGreaterThan(0);
+    expect(linearFortressScenario.id.length).toBeGreaterThan(0);
+    expect(linearFortressScenario.name.length).toBeGreaterThan(0);
   });
 
   it("all building types are valid BuildingType", () => {
-    for (const b of riversideDefenseScenario.initialBuildings) {
+    for (const b of linearFortressScenario.initialBuildings) {
       expect(VALID_BUILDING_TYPES.has(b.type)).toBe(true);
     }
   });
 
   it("all building positions are within map bounds", () => {
-    for (const b of riversideDefenseScenario.initialBuildings) {
+    for (const b of linearFortressScenario.initialBuildings) {
       expect(b.position.x).toBeGreaterThanOrEqual(0);
       expect(b.position.x).toBeLessThan(MAP_WIDTH);
       expect(b.position.y).toBeGreaterThanOrEqual(0);
@@ -39,13 +39,13 @@ describe("riversideDefenseScenario", () => {
   });
 
   it("all unit types are valid UnitType", () => {
-    for (const u of riversideDefenseScenario.initialUnits) {
+    for (const u of linearFortressScenario.initialUnits) {
       expect(VALID_UNIT_TYPES.has(u.type)).toBe(true);
     }
   });
 
   it("all initial unit positions are within map bounds", () => {
-    for (const u of riversideDefenseScenario.initialUnits) {
+    for (const u of linearFortressScenario.initialUnits) {
       expect(u.position.x).toBeGreaterThanOrEqual(0);
       expect(u.position.x).toBeLessThan(MAP_WIDTH);
       expect(u.position.y).toBeGreaterThanOrEqual(0);
@@ -53,25 +53,25 @@ describe("riversideDefenseScenario", () => {
     }
   });
 
-  it("has exactly 5 waves (advanced scenario)", () => {
-    expect(riversideDefenseScenario.waves).toHaveLength(5);
+  it("has exactly 4 waves (standard difficulty)", () => {
+    expect(linearFortressScenario.waves).toHaveLength(4);
   });
 
   it("wave ticks are strictly ascending", () => {
-    const ticks = riversideDefenseScenario.waves.map((w) => w.tick);
+    const ticks = linearFortressScenario.waves.map((w) => w.tick);
     for (let i = 1; i < ticks.length; i++) {
       expect(ticks[i]).toBeGreaterThan(ticks[i - 1]!);
     }
   });
 
   it("all wave ticks are positive", () => {
-    for (const wave of riversideDefenseScenario.waves) {
+    for (const wave of linearFortressScenario.waves) {
       expect(wave.tick).toBeGreaterThan(0);
     }
   });
 
   it("all wave spawn types are valid UnitType", () => {
-    for (const wave of riversideDefenseScenario.waves) {
+    for (const wave of linearFortressScenario.waves) {
       for (const spawn of wave.spawns) {
         expect(VALID_UNIT_TYPES.has(spawn.type)).toBe(true);
       }
@@ -79,7 +79,7 @@ describe("riversideDefenseScenario", () => {
   });
 
   it("all wave spawn positions are within map bounds", () => {
-    for (const wave of riversideDefenseScenario.waves) {
+    for (const wave of linearFortressScenario.waves) {
       for (const spawn of wave.spawns) {
         expect(spawn.position.x).toBeGreaterThanOrEqual(0);
         expect(spawn.position.x).toBeLessThan(MAP_WIDTH);
@@ -90,57 +90,63 @@ describe("riversideDefenseScenario", () => {
   });
 
   it("has exactly one honmaru", () => {
-    const honmarues = riversideDefenseScenario.initialBuildings.filter(
+    const honmarues = linearFortressScenario.initialBuildings.filter(
       (b) => b.type === "honmaru"
     );
     expect(honmarues).toHaveLength(1);
   });
 
   it("has exactly one tenshu", () => {
-    const tenshu = riversideDefenseScenario.initialBuildings.filter(
+    const tenshu = linearFortressScenario.initialBuildings.filter(
       (b) => b.type === "tenshu"
     );
     expect(tenshu).toHaveLength(1);
   });
 
-  it("has at least one water_moat (river feature)", () => {
-    const moats = riversideDefenseScenario.initialBuildings.filter(
-      (b) => b.type === "water_moat"
+  it("has dry_moat between compounds (renkaku feature)", () => {
+    const dryMoat = linearFortressScenario.initialBuildings.filter(
+      (b) => b.type === "dry_moat"
     );
-    expect(moats.length).toBeGreaterThanOrEqual(1);
+    expect(dryMoat.length).toBeGreaterThanOrEqual(4);
   });
 
-  it("has at least one bridge (crossing point)", () => {
-    const bridges = riversideDefenseScenario.initialBuildings.filter(
-      (b) => b.type === "wood_bridge" || b.type === "earth_bridge"
+  it("has earth_bridge crossing the dry moat", () => {
+    const bridges = linearFortressScenario.initialBuildings.filter(
+      (b) => b.type === "earth_bridge"
     );
     expect(bridges.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("has supply_cart in later waves (advanced logistics mechanic)", () => {
-    const allSpawnTypes = riversideDefenseScenario.waves.flatMap((w) =>
-      w.spawns.map((s) => s.type)
-    );
-    expect(allSpawnTypes).toContain("supply_cart");
-  });
-
-  it("has musketeer and cavalry in final waves (advanced unit types)", () => {
-    const lateWaveTypes = riversideDefenseScenario.waves
-      .slice(3)
+  it("has cavalry in later waves (cavalry mechanic introduction)", () => {
+    const lateWaveTypes = linearFortressScenario.waves
+      .slice(2)
       .flatMap((w) => w.spawns.map((s) => s.type));
-    expect(lateWaveTypes).toContain("musketeer");
     expect(lateWaveTypes).toContain("cavalry");
   });
 
+  it("has supply_cart in waves from wave 1 onwards", () => {
+    for (const wave of linearFortressScenario.waves) {
+      const types = wave.spawns.map((s) => s.type);
+      expect(types).toContain("supply_cart");
+    }
+  });
+
+  it("has multi-direction spawns from wave 2 (north + south)", () => {
+    // From wave 2, some spawns should come from south (y >= 90) to model flanking
+    const wave2 = linearFortressScenario.waves[1]!;
+    const southSpawns = wave2.spawns.filter((s) => s.position.y >= 90);
+    expect(southSpawns.length).toBeGreaterThan(0);
+  });
+
   it("victory holdTicks is positive", () => {
-    const { holdTicks } = riversideDefenseScenario.victory;
+    const { holdTicks } = linearFortressScenario.victory;
     if (holdTicks !== null) {
       expect(holdTicks).toBeGreaterThan(0);
     }
   });
 
   it("has player units", () => {
-    const playerUnits = riversideDefenseScenario.initialUnits.filter(
+    const playerUnits = linearFortressScenario.initialUnits.filter(
       (u) => u.owner === "player"
     );
     expect(playerUnits.length).toBeGreaterThan(0);
