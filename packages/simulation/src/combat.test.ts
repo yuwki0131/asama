@@ -28,7 +28,10 @@ function unit(
     spear_ashigaru: { hp: 100, damage: 14, range: 1, cooldown: 26, step: 6 },
     sword_ashigaru: { hp: 110, damage: 18, range: 1, cooldown: 22, step: 6 },
     archer: { hp: 70, damage: 12, range: 8, cooldown: 32, step: 7 },
-    engineer: { hp: 80, damage: 8, range: 1, cooldown: 30, step: 7 }
+    engineer: { hp: 80, damage: 8, range: 1, cooldown: 30, step: 7 },
+    musketeer: { hp: 60, damage: 20, range: 4, cooldown: 50, step: 7 },
+    cavalry: { hp: 140, damage: 16, range: 1, cooldown: 24, step: 3 },
+    supply_cart: { hp: 80, damage: 0, range: 0, cooldown: 19980, step: 10 }
   } satisfies Record<UnitType, { hp: number; damage: number; range: number; cooldown: number; step: number }>;
   const definition = definitions[type];
 
@@ -119,7 +122,8 @@ describe("combat", () => {
     attack(world, "unit:archer:1", "unit:enemy:1");
     updateWorld(world);
 
-    expect(snapshotUnit(world, "unit:enemy:1")?.hp).toBe(88);
+    // archer→spear_ashigaru: 1.25x affinity → 12*1.25=15 damage → 100-15=85
+    expect(snapshotUnit(world, "unit:enemy:1")?.hp).toBe(85);
     expect(snapshotUnit(world, "unit:archer:1")?.attackCooldownRemaining).toBe(32);
 
     const outOfRangeWorld = createInitialWorld();

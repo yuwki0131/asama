@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitType, WorldSnapshot } from "@asama/shared";
-import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type ToolMode } from "../renderer/GameCanvas";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitId, UnitType, WorldSnapshot } from "@asama/shared";
+import { unitSpecs } from "@asama/content";
+import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type GameCanvasHandle, type ToolMode } from "../renderer/GameCanvas";
+import { computeGroupCentroid } from "../renderer/groupManager";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
+import { SelectionInfoPanel } from "./SelectionInfoPanel";
+import { ticksToMmSs, unitTypeLabel } from "./selectionPanelUtils";
+
+const RECRUITABLE_UNIT_TYPES: readonly UnitType[] = (Object.values(unitSpecs) as (typeof unitSpecs)[keyof typeof unitSpecs][])
+  .filter((spec) => spec.type !== "supply_cart")
+  .map((spec) => spec.type);
 
 const DEBUG_STATUS_PANEL_ENABLED =
   import.meta.env.VITE_DEBUG_STATUS_PANEL === "true" ||
@@ -9,6 +17,7 @@ const DEBUG_STATUS_PANEL_ENABLED =
 
 export function App() {
   const simulationRef = useRef<SimulationClient | null>(null);
+  const gameCanvasRef = useRef<GameCanvasHandle | null>(null);
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [simulationStatus, setSimulationStatus] = useState("starting");
@@ -17,6 +26,23 @@ export function App() {
   const [speed, setSpeed] = useState<0 | 1 | 2 | 4>(1);
   const lastRunningSpeedRef = useRef<1 | 2 | 4>(1);
   const selectedUnits = snapshot?.units.filter((unit) => unit.selected) ?? [];
+
+  // Unit groups: Ctrl+1~9 saves, 1~9 recalls
+  const [groups, setGroups] = useState<ReadonlyMap<number, readonly UnitId[]>>(new Map());
+  const [selectedCell, setSelectedCell] = useState<CellCoord | null>(null);
+
+  const selectedBuilding = useMemo(() => {
+    if (selectedCell === null || snapshot === null || selectedUnits.length > 0) {
+      return null;
+    }
+    return (
+      snapshot.buildings.find(
+        (b) =>
+          b.lifecycleState === "intact" &&
+          b.footprint.some((c) => c.x === selectedCell.x && c.y === selectedCell.y)
+      ) ?? null
+    );
+  }, [selectedCell, snapshot, selectedUnits.length]);
 
   useEffect(() => {
     simulationRef.current?.setSpeed(speed);
@@ -273,6 +299,31 @@ export function App() {
     });
   }, [snapshot?.currentTick, snapshot?.units]);
 
+  const handleGroupSave = useCallback((groupNum: number, unitIds: readonly UnitId[]) => {
+    setGroups((prev) => new Map(prev).set(groupNum, unitIds));
+  }, []);
+
+  const handleGroupRecall = useCallback(
+    (groupNum: number, jump: boolean) => {
+      const ids = groups.get(groupNum) ?? [];
+      if (ids.length > 0) {
+        simulationRef.current?.enqueueCommand({
+          type: "selectUnits",
+          unitIds: ids,
+          issuedAtTick: snapshot?.currentTick ?? 0,
+          clientSequence: Date.now()
+        });
+      }
+      if (jump && ids.length > 0 && snapshot !== null) {
+        const centroid = computeGroupCentroid(ids, snapshot);
+        if (centroid !== null) {
+          gameCanvasRef.current?.jumpCameraToCell(centroid);
+        }
+      }
+    },
+    [groups, snapshot]
+  );
+
   const outcome = snapshot?.outcome ?? null;
   const food = snapshot?.food ?? null;
   const economy = snapshot?.economy ?? null;
@@ -391,18 +442,11 @@ export function App() {
           Demolish
         </button>
         <span className="bar-divider" />
-        <button type="button" onClick={() => handleRecruit("spear_ashigaru")}>
-          徴兵:槍
-        </button>
-        <button type="button" onClick={() => handleRecruit("sword_ashigaru")}>
-          徴兵:刀
-        </button>
-        <button type="button" onClick={() => handleRecruit("archer")}>
-          徴兵:弓
-        </button>
-        <button type="button" onClick={() => handleRecruit("engineer")}>
-          徴兵:工兵
-        </button>
+        {RECRUITABLE_UNIT_TYPES.map((type) => (
+          <button key={type} type="button" onClick={() => handleRecruit(type)}>
+            徴兵:{unitTypeLabel(type)}
+          </button>
+        ))}
         <span className="bar-divider" />
         <button className={buildTool === "ladder" ? "active" : ""} type="button" onClick={() => setBuildTool("ladder")}>
           梯子設置
@@ -422,6 +466,11 @@ export function App() {
         </button>
       </div>
       <section className="game-view">
+        {snapshot?.supplyRetreat.active === true ? (
+          <div className="retreat-timer-banner" role="alert">
+            敵兵站切断! 撤退まで {ticksToMmSs(snapshot.supplyRetreat.remainingTicks)}
+          </div>
+        ) : null}
         {alerts.length === 0 ? null : (
           <div className="alert-stack" aria-live="polite">
             {alerts.map((alert) => (
@@ -441,11 +490,14 @@ export function App() {
                   ? "兵糧が尽き、開城しました"
                   : outcome.reason === "time_held"
                     ? "規定時間、本丸を守り抜きました"
-                    : "敵軍を全滅させました"}
+                    : outcome.reason === "supply_cut"
+                      ? "敵兵站を断ち、敵軍を撤退させました"
+                      : "敵軍を全滅させました"}
             </span>
           </div>
         )}
         <GameCanvas
+          ref={gameCanvasRef}
           buildTool={buildTool}
           debugOverlayVisible={debugVisible}
           snapshot={snapshot}
@@ -458,7 +510,11 @@ export function App() {
           onSelectUnits={handleSelectUnits}
           onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}
+          onCellSelected={setSelectedCell}
+          onGroupSave={handleGroupSave}
+          onGroupRecall={handleGroupRecall}
         />
+        <SelectionInfoPanel selectedUnits={selectedUnits} selectedBuilding={selectedBuilding} />
         {debugVisible ? (
           <DebugStatusPanel
             buildTool={buildTool}
