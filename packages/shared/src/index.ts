@@ -186,6 +186,10 @@ export interface WorldSnapshot {
   readonly units: readonly UnitSnapshot[];
   readonly buildings: readonly BuildingSnapshot[];
   readonly supplyRetreat: SupplyRetreatSnapshot;
+  /** Tick at which the scenario hold-victory deadline occurs; null if none. */
+  readonly holdDeadlineTick: number | null;
+  /** Tick of the next pending enemy wave; null if all waves have spawned. */
+  readonly nextWaveTick: number | null;
 }
 
 export type PlayerCommand =

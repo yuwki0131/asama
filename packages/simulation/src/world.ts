@@ -460,7 +460,9 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
       assetId: unit.assetId,
       task: unit.task
     })),
-    buildings: world.buildings.map((building) => snapshotBuilding(world, building))
+    buildings: world.buildings.map((building) => snapshotBuilding(world, building)),
+    holdDeadlineTick: world.scenario.victory.holdTicks,
+    nextWaveTick: world.scenario.waves[world.nextWaveIndex]?.tick ?? null
   };
 }
 

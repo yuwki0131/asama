@@ -324,10 +324,9 @@ export function App() {
     [groups, snapshot]
   );
 
-  const outcome = snapshot?.outcome ?? null;
-  const food = snapshot?.food ?? null;
-  const economy = snapshot?.economy ?? null;
-  const alerts = useGameAlerts(snapshot);
+  const handleCancelBuildTool = useCallback(() => {
+    setBuildTool(null);
+  }, []);
 
   const handleRecruit = useCallback(
     (unitType: UnitType) => {
@@ -353,44 +352,28 @@ export function App() {
     [snapshot?.currentTick]
   );
 
+  const outcome = snapshot?.outcome ?? null;
+  const food = snapshot?.food ?? null;
+  const economy = snapshot?.economy ?? null;
+  const alerts = useGameAlerts(snapshot);
+
+  // Food crisis: show persistent banner when storage drops below 2 consumption cycles.
+  const foodCritical =
+    food !== null && food.requiredPerCycle > 0 && food.available < food.requiredPerCycle * 2;
+
+  const currentTick = snapshot?.currentTick ?? 0;
+  const holdDeadlineTick = snapshot?.holdDeadlineTick ?? null;
+  const nextWaveTick = snapshot?.nextWaveTick ?? null;
+
   return (
     <main className="app">
+      {/* Row 1: Time controls + resource displays */}
       <header className="topbar">
-        <h1>Asama RTS</h1>
-        <div className="stats">
-          <span>tick {snapshot?.currentTick ?? 0}</span>
-          <span>sim {simulationStatus}</span>
-          <span>
-            map {snapshot?.map.width ?? 128}x{snapshot?.map.height ?? 128}
-          </span>
-          <span>units {snapshot?.units.length ?? 0}</span>
-          <span>
-            food {food === null ? "-" : `${food.available}/${food.capacity}`}
-            {food !== null && food.requiredPerCycle > 0
-              ? ` (-${food.requiredPerCycle} in ${Math.ceil(food.nextConsumptionInTicks / 20)}s)`
-              : ""}
-          </span>
-          <span>gold {economy?.gold ?? "-"}</span>
-          <span>weapons {economy?.weapons ?? "-"}</span>
-          <span>
-            pop {economy === null ? "-" : `${economy.population}/${economy.populationCapacity}`}
-          </span>
-          <span>
-            recruits {economy === null ? "-" : `${economy.recruitPool}/${economy.recruitPoolMax}`}
-          </span>
-          <span>{economy === null ? "-" : `${economy.year}年 ${seasonLabel(economy.season)}`}</span>
-          <span>selected {selectedUnits.length}</span>
-          <span>
-            destination{" "}
-            {selectedUnits[0]?.destination === null || selectedUnits[0]?.destination === undefined
-              ? "-"
-              : `${selectedUnits[0].destination.x},${selectedUnits[0].destination.y}`}
-          </span>
-          {saveStatus === null ? null : <span>{saveStatus}</span>}
-          {simulationError === null ? null : <span className="error-text">{simulationError}</span>}
+        <div className="topbar-left">
+          <span className="game-title">Asama</span>
           {([0, 1, 2, 4] as const).map((value) => (
             <button
-              className={speed === value ? "active" : ""}
+              className={`speed-btn${speed === value ? " active" : ""}`}
               key={value}
               type="button"
               onClick={() => setSpeed(value)}
@@ -398,33 +381,53 @@ export function App() {
               {value === 0 ? "⏸" : `${value}x`}
             </button>
           ))}
-          <select value={saveSlot} onChange={(event) => setSaveSlot(event.target.value)}>
-            <option value="quicksave">quicksave</option>
-            <option value="slot1">slot1</option>
-            <option value="slot2">slot2</option>
-            <option value="slot3">slot3</option>
-            <option value="autosave">autosave</option>
-          </select>
-          <button type="button" disabled={saveSlot === "autosave"} onClick={() => void saveToSlot(saveSlot)}>
-            Save
-          </button>
-          <button type="button" onClick={() => void loadFromSlot(saveSlot)}>
-            Load
-          </button>
-          <button
-            className={debugVisible ? "active" : ""}
-            type="button"
-            onClick={() => setDebugVisible((visible) => !visible)}
-          >
-            Debug
-          </button>
+        </div>
+        <div className="topbar-resources">
+          <span className="res-item">
+            <span className="res-label">兵糧</span>
+            <span className={foodCritical ? "res-value res-critical" : "res-value"}>
+              {food === null ? "-" : `${food.available}/${food.capacity}`}
+              {food !== null && food.requiredPerCycle > 0 ? ` ▼${food.requiredPerCycle}` : ""}
+            </span>
+          </span>
+          <span className="res-item">
+            <span className="res-label">金</span>
+            <span className="res-value">{economy?.gold ?? "-"}</span>
+          </span>
+          <span className="res-item">
+            <span className="res-label">武器</span>
+            <span className="res-value">{economy?.weapons ?? "-"}</span>
+          </span>
+          <span className="res-item">
+            <span className="res-label">人口</span>
+            <span className="res-value">
+              {economy === null ? "-" : `${economy.population}/${economy.populationCapacity}`}
+            </span>
+          </span>
+          <span className="res-item">
+            <span className="res-label">招兵</span>
+            <span className="res-value">
+              {economy === null ? "-" : `${economy.recruitPool}/${economy.recruitPoolMax}`}
+            </span>
+          </span>
+          <span className="res-item res-season">
+            {economy === null ? "-" : `${economy.year}年 ${seasonLabel(economy.season)}`}
+          </span>
+        </div>
+        <div className="topbar-right">
+          {saveStatus !== null && <span className="save-status">{saveStatus}</span>}
+          {simulationError !== null && <span className="error-text">{simulationError}</span>}
         </div>
       </header>
+
+      {/* Row 2: Castle + Infrastructure build tools */}
       <div className="buildbar">
         <button className={buildTool === null ? "active" : ""} type="button" onClick={() => setBuildTool(null)}>
           Select
         </button>
-        {buildingTools.map((tool) => (
+        <span className="bar-divider" />
+        <span className="bar-group-label">城郭</span>
+        {CASTLE_TOOLS.map((tool) => (
           <button
             className={buildTool === tool.type ? "active" : ""}
             key={tool.type}
@@ -434,43 +437,126 @@ export function App() {
             {tool.label}
           </button>
         ))}
+        <span className="bar-divider" />
+        <span className="bar-group-label">インフラ</span>
+        {INFRA_TOOLS.map((tool) => (
+          <button
+            className={buildTool === tool.type ? "active" : ""}
+            key={tool.type}
+            type="button"
+            onClick={() => setBuildTool(tool.type)}
+          >
+            {tool.label}
+          </button>
+        ))}
+        <span className="bar-divider" />
         <button
           className={buildTool === "demolish" ? "active danger" : "danger"}
           type="button"
           onClick={() => setBuildTool("demolish")}
         >
-          Demolish
+          解体
         </button>
-        <span className="bar-divider" />
-        {RECRUITABLE_UNIT_TYPES.map((type) => (
-          <button key={type} type="button" onClick={() => handleRecruit(type)}>
-            徴兵:{unitTypeLabel(type)}
+      </div>
+
+      {/* Row 3: Economy + Military + Engineer + Market + System */}
+      <div className="buildbar">
+        <span className="bar-group-label">経済</span>
+        {ECONOMY_TOOLS.map((tool) => (
+          <button
+            className={buildTool === tool.type ? "active" : ""}
+            key={tool.type}
+            type="button"
+            onClick={() => setBuildTool(tool.type)}
+          >
+            {tool.label}
           </button>
         ))}
         <span className="bar-divider" />
-        <button className={buildTool === "ladder" ? "active" : ""} type="button" onClick={() => setBuildTool("ladder")}>
-          梯子設置
+        <span className="bar-group-label">徴兵</span>
+        {RECRUITABLE_UNIT_TYPES.map((type) => (
+          <button key={type} type="button" onClick={() => handleRecruit(type)}>
+            {unitTypeLabel(type)}
+          </button>
+        ))}
+        <span className="bar-divider" />
+        <span className="bar-group-label">工兵</span>
+        <button
+          className={buildTool === "ladder" ? "active" : ""}
+          type="button"
+          onClick={() => setBuildTool("ladder")}
+        >
+          梯子
         </button>
-        <button className={buildTool === "fillMoat" ? "active" : ""} type="button" onClick={() => setBuildTool("fillMoat")}>
-          堀埋め
+        <button
+          className={buildTool === "fillMoat" ? "active" : ""}
+          type="button"
+          onClick={() => setBuildTool("fillMoat")}
+        >
+          堀埋
         </button>
         <span className="bar-divider" />
-        <button type="button" onClick={() => handleMarketTrade("buyFood")}>
-          市場:食料購入
+        <span className="bar-group-label">市場</span>
+        <button type="button" onClick={() => handleMarketTrade("buyFood")}>食購入</button>
+        <button type="button" onClick={() => handleMarketTrade("sellFood")}>食売却</button>
+        <button type="button" onClick={() => handleMarketTrade("buyWeapons")}>武購入</button>
+        <span className="bar-divider" />
+        <select value={saveSlot} onChange={(event) => setSaveSlot(event.target.value)}>
+          <option value="quicksave">quicksave</option>
+          <option value="slot1">slot1</option>
+          <option value="slot2">slot2</option>
+          <option value="slot3">slot3</option>
+          <option value="autosave">autosave</option>
+        </select>
+        <button type="button" disabled={saveSlot === "autosave"} onClick={() => void saveToSlot(saveSlot)}>
+          Save
         </button>
-        <button type="button" onClick={() => handleMarketTrade("sellFood")}>
-          市場:食料売却
+        <button type="button" onClick={() => void loadFromSlot(saveSlot)}>
+          Load
         </button>
-        <button type="button" onClick={() => handleMarketTrade("buyWeapons")}>
-          市場:武器購入
+        <button
+          className={debugVisible ? "active" : ""}
+          type="button"
+          onClick={() => setDebugVisible((visible) => !visible)}
+        >
+          Debug
         </button>
       </div>
+
       <section className="game-view">
-        {snapshot?.supplyRetreat.active === true ? (
-          <div className="retreat-timer-banner" role="alert">
-            敵兵站切断! 撤退まで {ticksToMmSs(snapshot.supplyRetreat.remainingTicks)}
+        {/* Persistent status panel: hold timer + next wave (top-left) */}
+        {(holdDeadlineTick !== null || nextWaveTick !== null) && outcome === null ? (
+          <div className="status-panel">
+            {holdDeadlineTick !== null && (
+              <div className="status-row">
+                <span className="status-label">本丸保持</span>
+                <span className="status-value">{ticksToMmSs(Math.max(0, holdDeadlineTick - currentTick))}</span>
+              </div>
+            )}
+            {nextWaveTick !== null && nextWaveTick > currentTick && (
+              <div className="status-row status-warn">
+                <span className="status-label">敵援軍</span>
+                <span className="status-value">{ticksToMmSs(nextWaveTick - currentTick)}</span>
+              </div>
+            )}
           </div>
         ) : null}
+
+        {/* Emergency banners: stacked at top-center */}
+        <div className="top-banner-stack">
+          {snapshot?.supplyRetreat.active === true ? (
+            <div className="retreat-banner">
+              敵兵站切断! 撤退まで {ticksToMmSs(snapshot.supplyRetreat.remainingTicks)}
+            </div>
+          ) : null}
+          {foodCritical && outcome === null ? (
+            <div className="food-crisis-banner" role="alert">
+              ⚠ 兵糧危機!　残{food?.available ?? 0}（消費{food?.requiredPerCycle ?? 0}/サイクル）
+            </div>
+          ) : null}
+        </div>
+
+        {/* Alert toasts: tactical events (top-center, below banners) */}
         {alerts.length === 0 ? null : (
           <div className="alert-stack" aria-live="polite">
             {alerts.map((alert) => (
@@ -480,6 +566,7 @@ export function App() {
             ))}
           </div>
         )}
+
         {outcome === null ? null : (
           <div className={`outcome-banner ${outcome.winner === "player" ? "victory" : "defeat"}`}>
             <strong>{outcome.winner === "player" ? "勝利" : "敗北"}</strong>
@@ -513,6 +600,7 @@ export function App() {
           onCellSelected={setSelectedCell}
           onGroupSave={handleGroupSave}
           onGroupRecall={handleGroupRecall}
+          onCancelBuildTool={handleCancelBuildTool}
         />
         <SelectionInfoPanel selectedUnits={selectedUnits} selectedBuilding={selectedBuilding} />
         {debugVisible ? (
@@ -703,25 +791,30 @@ function buildingTypeCounts(snapshot: WorldSnapshot | null): string {
     .join(", ");
 }
 
-const buildingTools: readonly { readonly type: BuildingType; readonly label: string }[] = [
-  { type: "fence", label: "Fence" },
-  { type: "wall", label: "Wall" },
-  // MVP exposes only the 3-tile gates (2026-07-03 decision); the narrower
-  // gate types remain in the data model but are not placeable.
-  { type: "gate_wide_3", label: "Gate NW-SE" },
-  { type: "gate_wide_3_ne_sw", label: "Gate NE-SW" },
-  { type: "dry_moat", label: "Dry Moat" },
-  { type: "water_moat", label: "Water Moat" },
-  { type: "road", label: "Road" },
-  { type: "earth_bridge", label: "Earth Bridge" },
-  { type: "wood_bridge", label: "Wood Bridge" },
-  { type: "farm", label: "Farm" },
-  { type: "storehouse", label: "Storehouse" },
-  { type: "market", label: "Market" },
-  { type: "barracks", label: "Barracks" },
-  { type: "samurai_residence", label: "Samurai House" },
-  { type: "town_block", label: "Town Block" },
-  { type: "yagura", label: "Yagura" },
-  { type: "honmaru", label: "Honmaru" },
-  { type: "tenshu", label: "Tenshu" }
+// Building tools split by category for the 3-row header layout.
+const CASTLE_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [
+  { type: "fence", label: "柵" },
+  { type: "wall", label: "壁" },
+  { type: "gate_wide_3", label: "門NW" },
+  { type: "gate_wide_3_ne_sw", label: "門NE" },
+  { type: "yagura", label: "矢倉" },
+  { type: "honmaru", label: "本丸" },
+  { type: "tenshu", label: "天守" }
+];
+
+const INFRA_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [
+  { type: "dry_moat", label: "空堀" },
+  { type: "water_moat", label: "水堀" },
+  { type: "road", label: "道" },
+  { type: "earth_bridge", label: "土橋" },
+  { type: "wood_bridge", label: "木橋" }
+];
+
+const ECONOMY_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [
+  { type: "farm", label: "農地" },
+  { type: "storehouse", label: "蔵" },
+  { type: "market", label: "市場" },
+  { type: "barracks", label: "兵舎" },
+  { type: "samurai_residence", label: "武家屋敷" },
+  { type: "town_block", label: "町区画" }
 ];

@@ -10,7 +10,8 @@ import {
   UNIT_GROUND_OFFSET_Y
 } from "./camera";
 import { buildingAssetCandidates } from "./gameRules";
-import { addAlignmentDebugOverlay, buildingRenderPoint } from "./overlayLayer";
+import { addAlignmentDebugOverlay } from "./overlayLayer";
+import { buildingDrawY, buildingRenderPoint, decorationDrawY } from "./renderGeometry";
 
 export function drawSceneLayer(
   unitLayer: Container,
@@ -34,10 +35,13 @@ export function drawSceneLayer(
     }
   }
 
-  for (const building of [...snapshot.buildings].sort(compareBuildingsForDraw)) {
-    addBuildingSprite(unitLayer, building, assets, camera.zoom);
+  // Merge buildings and decorations into a single Y-sorted list so decorations
+  // participate in the same painter's-order as buildings (fixes trees rendering
+  // on top of tenshu/honmaru regardless of their Y position).
+  const sceneItems: SceneItemForSort[] = [];
+  for (const building of snapshot.buildings) {
+    sceneItems.push({ kind: "building", item: building });
   }
-
   for (const decoration of snapshot.map.decorations) {
     if (occupiedCells.has(`${decoration.position.x},${decoration.position.y}`)) {
       continue;
@@ -45,7 +49,16 @@ export function drawSceneLayer(
     if (!isVisibleCell(decoration.position, camera, screenWidth, screenHeight)) {
       continue;
     }
-    addDecorationSprite(unitLayer, decoration, assets, camera.zoom);
+    sceneItems.push({ kind: "decoration", item: decoration });
+  }
+  sceneItems.sort(compareSceneItems);
+
+  for (const entry of sceneItems) {
+    if (entry.kind === "building") {
+      addBuildingSprite(unitLayer, entry.item, assets, camera.zoom);
+    } else {
+      addDecorationSprite(unitLayer, entry.item, assets, camera.zoom);
+    }
   }
 
   for (const unit of [...snapshot.units].sort(compareUnitsForDraw)) {
@@ -183,11 +196,24 @@ function compareUnitsForDraw(a: UnitSnapshot, b: UnitSnapshot): number {
   return a.id.localeCompare(b.id);
 }
 
-function compareBuildingsForDraw(a: BuildingSnapshot, b: BuildingSnapshot): number {
-  const ay = buildingRenderPoint(a).y;
-  const by = buildingRenderPoint(b).y;
-  if (ay !== by) {
-    return ay - by;
+type SceneItemForSort =
+  | { readonly kind: "building"; readonly item: BuildingSnapshot }
+  | { readonly kind: "decoration"; readonly item: MapDecoration };
+
+function sceneItemY(entry: SceneItemForSort): number {
+  return entry.kind === "building"
+    ? buildingDrawY(entry.item)
+    : decorationDrawY(entry.item);
+}
+
+function sceneItemId(entry: SceneItemForSort): string {
+  return entry.kind === "building" ? entry.item.id : `dec:${entry.item.position.x},${entry.item.position.y}`;
+}
+
+function compareSceneItems(a: SceneItemForSort, b: SceneItemForSort): number {
+  const dy = sceneItemY(a) - sceneItemY(b);
+  if (dy !== 0) {
+    return dy;
   }
-  return a.id.localeCompare(b.id);
+  return sceneItemId(a).localeCompare(sceneItemId(b));
 }

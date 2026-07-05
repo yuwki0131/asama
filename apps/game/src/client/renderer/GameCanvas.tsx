@@ -37,6 +37,7 @@ interface GameCanvasProps {
   readonly onCellSelected?: (cell: CellCoord | null) => void;
   readonly onGroupSave: (groupNum: number, unitIds: readonly UnitId[]) => void;
   readonly onGroupRecall: (groupNum: number, jump: boolean) => void;
+  readonly onCancelBuildTool: () => void;
 }
 
 /** Initial state for the in-game debug toggle; the Debug button in the top
@@ -60,7 +61,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   onStopSelected,
   onCellSelected,
   onGroupSave,
-  onGroupRecall
+  onGroupRecall,
+  onCancelBuildTool
 }: GameCanvasProps, ref) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
@@ -82,13 +84,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const onCellSelectedRef = useRef(onCellSelected);
   const onGroupSaveRef = useRef(onGroupSave);
   const onGroupRecallRef = useRef(onGroupRecall);
+  const onCancelBuildToolRef = useRef(onCancelBuildTool);
   const heldKeysRef = useRef<Set<string>>(new Set());
   const minimapRef = useRef<HTMLCanvasElement | null>(null);
   const minimapTerrainRef = useRef<MinimapTerrainCache | null>(null);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
   const dragRef = useRef<{
     pointerId: number;
-    mode: "select" | "pan";
+    mode: "select" | "pan" | "build";
     startX: number;
     startY: number;
     lastX: number;
@@ -185,6 +188,10 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   useEffect(() => {
     onGroupRecallRef.current = onGroupRecall;
   }, [onGroupRecall]);
+
+  useEffect(() => {
+    onCancelBuildToolRef.current = onCancelBuildTool;
+  }, [onCancelBuildTool]);
 
   useImperativeHandle(ref, () => ({
     jumpCameraToCell: (cell: CellCoord) => {
@@ -337,7 +344,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         onAttackMoveRef,
         onStopSelectedRef,
         onGroupSaveRef,
-        onGroupRecallRef
+        onGroupRecallRef,
+        onCancelBuildToolRef
       },
       scheduleCameraRender,
       setHoverCell,

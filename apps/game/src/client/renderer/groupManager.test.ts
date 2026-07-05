@@ -44,6 +44,8 @@ function makeSnapshot(units: Partial<UnitSnapshot>[]): WorldSnapshot {
     units: fullUnits,
     buildings: [],
     supplyRetreat: { active: false, remainingTicks: 0 },
+    holdDeadlineTick: null,
+    nextWaveTick: null,
   };
 }
 
