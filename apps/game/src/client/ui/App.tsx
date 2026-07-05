@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitType, WorldSnapshot } from "@asama/shared";
-import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type ToolMode } from "../renderer/GameCanvas";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitId, UnitType, WorldSnapshot } from "@asama/shared";
+import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type GameCanvasHandle, type ToolMode } from "../renderer/GameCanvas";
+import { computeGroupCentroid } from "../renderer/groupManager";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
+import { SelectionInfoPanel } from "./SelectionInfoPanel";
 
 const DEBUG_STATUS_PANEL_ENABLED =
   import.meta.env.VITE_DEBUG_STATUS_PANEL === "true" ||
@@ -9,6 +11,7 @@ const DEBUG_STATUS_PANEL_ENABLED =
 
 export function App() {
   const simulationRef = useRef<SimulationClient | null>(null);
+  const gameCanvasRef = useRef<GameCanvasHandle | null>(null);
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [simulationStatus, setSimulationStatus] = useState("starting");
@@ -17,6 +20,23 @@ export function App() {
   const [speed, setSpeed] = useState<0 | 1 | 2 | 4>(1);
   const lastRunningSpeedRef = useRef<1 | 2 | 4>(1);
   const selectedUnits = snapshot?.units.filter((unit) => unit.selected) ?? [];
+
+  // Unit groups: Ctrl+1~9 saves, 1~9 recalls
+  const [groups, setGroups] = useState<ReadonlyMap<number, readonly UnitId[]>>(new Map());
+  const [selectedCell, setSelectedCell] = useState<CellCoord | null>(null);
+
+  const selectedBuilding = useMemo(() => {
+    if (selectedCell === null || snapshot === null || selectedUnits.length > 0) {
+      return null;
+    }
+    return (
+      snapshot.buildings.find(
+        (b) =>
+          b.lifecycleState === "intact" &&
+          b.footprint.some((c) => c.x === selectedCell.x && c.y === selectedCell.y)
+      ) ?? null
+    );
+  }, [selectedCell, snapshot, selectedUnits.length]);
 
   useEffect(() => {
     simulationRef.current?.setSpeed(speed);
@@ -273,6 +293,31 @@ export function App() {
     });
   }, [snapshot?.currentTick, snapshot?.units]);
 
+  const handleGroupSave = useCallback((groupNum: number, unitIds: readonly UnitId[]) => {
+    setGroups((prev) => new Map(prev).set(groupNum, unitIds));
+  }, []);
+
+  const handleGroupRecall = useCallback(
+    (groupNum: number, jump: boolean) => {
+      const ids = groups.get(groupNum) ?? [];
+      if (ids.length > 0) {
+        simulationRef.current?.enqueueCommand({
+          type: "selectUnits",
+          unitIds: ids,
+          issuedAtTick: snapshot?.currentTick ?? 0,
+          clientSequence: Date.now()
+        });
+      }
+      if (jump && ids.length > 0 && snapshot !== null) {
+        const centroid = computeGroupCentroid(ids, snapshot);
+        if (centroid !== null) {
+          gameCanvasRef.current?.jumpCameraToCell(centroid);
+        }
+      }
+    },
+    [groups, snapshot]
+  );
+
   const outcome = snapshot?.outcome ?? null;
   const food = snapshot?.food ?? null;
   const economy = snapshot?.economy ?? null;
@@ -446,6 +491,7 @@ export function App() {
           </div>
         )}
         <GameCanvas
+          ref={gameCanvasRef}
           buildTool={buildTool}
           debugOverlayVisible={debugVisible}
           snapshot={snapshot}
@@ -458,7 +504,11 @@ export function App() {
           onSelectUnits={handleSelectUnits}
           onAttackTarget={handleAttackTarget}
           onMoveSelected={handleMoveSelected}
+          onCellSelected={setSelectedCell}
+          onGroupSave={handleGroupSave}
+          onGroupRecall={handleGroupRecall}
         />
+        <SelectionInfoPanel selectedUnits={selectedUnits} selectedBuilding={selectedBuilding} />
         {debugVisible ? (
           <DebugStatusPanel
             buildTool={buildTool}

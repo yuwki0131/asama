@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent
+} from "react";
 import { Application, Container } from "pixi.js";
 import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@asama/shared";
 import { loadGeneratedAssets, type LoadedAsset } from "./assets";
@@ -8,6 +16,10 @@ import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type Minimap
 import { renderScene } from "./renderScene";
 
 export type ToolMode = BuildingType | "demolish" | "ladder" | "fillMoat" | null;
+
+export interface GameCanvasHandle {
+  jumpCameraToCell: (cell: CellCoord) => void;
+}
 
 interface GameCanvasProps {
   readonly snapshot: WorldSnapshot | null;
@@ -22,6 +34,9 @@ interface GameCanvasProps {
   readonly onEngineerTask: (task: "ladder" | "fillMoat", position: CellCoord) => void;
   readonly onAttackMove: (destination: CellCoord) => void;
   readonly onStopSelected: () => void;
+  readonly onCellSelected?: (cell: CellCoord | null) => void;
+  readonly onGroupSave: (groupNum: number, unitIds: readonly UnitId[]) => void;
+  readonly onGroupRecall: (groupNum: number, jump: boolean) => void;
 }
 
 /** Initial state for the in-game debug toggle; the Debug button in the top
@@ -30,7 +45,7 @@ export const DEBUG_OVERLAY_DEFAULT_ENABLED =
   import.meta.env.VITE_DEBUG_ALIGNMENT === "true" ||
   (import.meta.env.DEV && import.meta.env.VITE_DEBUG_ALIGNMENT !== "false");
 
-export function GameCanvas({
+export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function GameCanvas({
   snapshot,
   buildTool,
   debugOverlayVisible,
@@ -42,8 +57,11 @@ export function GameCanvas({
   onToggleGate,
   onEngineerTask,
   onAttackMove,
-  onStopSelected
-}: GameCanvasProps) {
+  onStopSelected,
+  onCellSelected,
+  onGroupSave,
+  onGroupRecall
+}: GameCanvasProps, ref) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
   const worldRef = useRef<Container | null>(null);
@@ -61,6 +79,9 @@ export function GameCanvas({
   const onEngineerTaskRef = useRef(onEngineerTask);
   const onAttackMoveRef = useRef(onAttackMove);
   const onStopSelectedRef = useRef(onStopSelected);
+  const onCellSelectedRef = useRef(onCellSelected);
+  const onGroupSaveRef = useRef(onGroupSave);
+  const onGroupRecallRef = useRef(onGroupRecall);
   const heldKeysRef = useRef<Set<string>>(new Set());
   const minimapRef = useRef<HTMLCanvasElement | null>(null);
   const minimapTerrainRef = useRef<MinimapTerrainCache | null>(null);
@@ -78,7 +99,11 @@ export function GameCanvas({
   const [ready, setReady] = useState(false);
   const [assets, setAssets] = useState<ReadonlyMap<string, LoadedAsset>>(new Map());
   const [hoverCell, setHoverCell] = useState<CellCoord | null>(null);
-  const [selectedCell, setSelectedCell] = useState<CellCoord | null>(null);
+  const [selectedCell, setSelectedCellState] = useState<CellCoord | null>(null);
+  const setSelectedCell = useCallback((cell: CellCoord | null) => {
+    setSelectedCellState(cell);
+    onCellSelectedRef.current?.(cell);
+  }, []);
   const [localInvalidMoveTarget, setLocalInvalidMoveTarget] = useState<CellCoord | null>(null);
   const [cameraVersion, setCameraVersion] = useState(0);
   const [selectionBox, setSelectionBox] = useState<{
@@ -150,11 +175,36 @@ export function GameCanvas({
   }, [onStopSelected]);
 
   useEffect(() => {
+    onCellSelectedRef.current = onCellSelected;
+  }, [onCellSelected]);
+
+  useEffect(() => {
+    onGroupSaveRef.current = onGroupSave;
+  }, [onGroupSave]);
+
+  useEffect(() => {
+    onGroupRecallRef.current = onGroupRecall;
+  }, [onGroupRecall]);
+
+  useImperativeHandle(ref, () => ({
+    jumpCameraToCell: (cell: CellCoord) => {
+      const host = hostRef.current;
+      if (host !== null) {
+        centerCameraOnCell(cell, host, cameraRef.current);
+        scheduleCameraRender();
+      }
+    }
+  }), [scheduleCameraRender]);
+
+  useEffect(() => {
     return registerKeyboardInput(
       {
         cameraRef,
         heldKeysRef,
-        onStopSelectedRef
+        onStopSelectedRef,
+        snapshotRef,
+        onGroupSaveRef,
+        onGroupRecallRef
       },
       scheduleCameraRender
     );
@@ -285,7 +335,9 @@ export function GameCanvas({
         onToggleGateRef,
         onEngineerTaskRef,
         onAttackMoveRef,
-        onStopSelectedRef
+        onStopSelectedRef,
+        onGroupSaveRef,
+        onGroupRecallRef
       },
       scheduleCameraRender,
       setHoverCell,
@@ -342,4 +394,4 @@ export function GameCanvas({
       )}
     </div>
   );
-}
+});
