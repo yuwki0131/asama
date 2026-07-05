@@ -27,9 +27,11 @@ export async function importRasterAsset(spec: RasterImportSpec): Promise<void> {
 
   image = image.resize(resizeOptions(spec));
 
-  const resizedMetadata = await image.metadata();
-  const left = Math.floor((spec.canvasWidth - (resizedMetadata.width ?? spec.canvasWidth)) / 2);
-  const top = Math.floor((spec.canvasHeight - (resizedMetadata.height ?? spec.canvasHeight)) / 2);
+  // Use raw RGBA bytes so that tEXt/eXIf metadata from the source file
+  // (e.g. Blender's Date/Time chunks) are not carried through to the output.
+  const { data: rawPixels, info: rawInfo } = await image.raw().toBuffer({ resolveWithObject: true });
+  const left = Math.floor((spec.canvasWidth - rawInfo.width) / 2);
+  const top = Math.floor((spec.canvasHeight - rawInfo.height) / 2);
 
   image = sharp({
     create: {
@@ -38,7 +40,12 @@ export async function importRasterAsset(spec: RasterImportSpec): Promise<void> {
       channels: 4,
       background: { r: 0, g: 0, b: 0, alpha: 0 }
     }
-  }).composite([{ input: await image.png().toBuffer(), left: Math.max(0, left), top: Math.max(0, top) }]);
+  }).composite([{
+    input: rawPixels,
+    raw: { width: rawInfo.width, height: rawInfo.height, channels: rawInfo.channels as 1 | 2 | 3 | 4 },
+    left: Math.max(0, left),
+    top: Math.max(0, top)
+  }]);
 
   const sharpenSigma = spec.sharpen?.sigma ?? categoryDefaults[spec.category].sharpenSigma;
   if (sharpenSigma !== undefined) {

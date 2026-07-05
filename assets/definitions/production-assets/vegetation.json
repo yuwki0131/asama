@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "assetId": "deco.tree.pine.1",
+      "kind": "building",
+      "output": "deco-tree-pine-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-pine-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 112,
+        "anchorX": 32,
+        "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.pine.2",
+      "kind": "building",
+      "output": "deco-tree-pine-2.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-pine-2.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 112,
+        "anchorX": 32,
+        "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.cedar.1",
+      "kind": "building",
+      "output": "deco-tree-cedar-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-cedar-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.broadleaf.1",
+      "kind": "building",
+      "output": "deco-tree-broadleaf-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-tree-broadleaf-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 112,
+        "anchorX": 32,
+        "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.bamboo.1",
+      "kind": "building",
+      "output": "deco-bamboo-1.png",
+      "source": {
+        "type": "blender",
+        "model": "bamboo-cluster",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.rock.1",
+      "kind": "building",
+      "output": "deco-rock-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-rock-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 56,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.reeds.1",
+      "kind": "building",
+      "output": "deco-reeds-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-reeds-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 56,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.bush.1",
+      "kind": "building",
+      "output": "deco-bush-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-bush-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 56,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.weeds.1",
+      "kind": "building",
+      "output": "deco-weeds-1.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/deco-weeds-1.png"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 32
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    }
+  ]
+}

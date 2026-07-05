@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { readProductionAssetConfig } from "./productionConfig";
-import { productionConfigPath, repoRoot } from "./paths";
+import { readProductionAssetConfigDir } from "./productionConfig";
+import { productionConfigDir, repoRoot } from "./paths";
 
 interface CandidateFamily {
   readonly assetIdPrefix: string;
@@ -29,7 +29,7 @@ const runtimeArtQualityPath = join(repoRoot, "assets/definitions/runtime-art-qua
 
 export async function auditProductionArt(): Promise<readonly ProductionArtAuditFinding[]> {
   const [production, quality] = await Promise.all([
-    readProductionAssetConfig(productionConfigPath),
+    readProductionAssetConfigDir(productionConfigDir),
     readRuntimeArtQualityConfig()
   ]);
 

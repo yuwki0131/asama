@@ -1,10 +1,10 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import type { BlenderRenderSpec, ProductionAssetSpec } from "./types";
 
 export interface RenderCacheMetadata {
-  readonly cacheVersion: 1;
+  readonly cacheVersion: 2;
   readonly assetId: string;
   readonly model: string;
   readonly canvas: {
@@ -28,6 +28,32 @@ export interface RenderCacheKeyResult {
   readonly metadata: RenderCacheMetadata;
 }
 
+/** Maps a Blender model name to the render_asset_lib domain module that builds it. */
+export function modelToDomain(model: string): string {
+  if (
+    model.startsWith("tree-") ||
+    model.startsWith("deco-") ||
+    model.startsWith("bamboo-") ||
+    model.startsWith("rock-") ||
+    model === "reeds"
+  ) {
+    return "vegetation";
+  }
+  if (
+    model.startsWith("terrain-") ||
+    model.startsWith("road-") ||
+    model.startsWith("dry-moat-") ||
+    model.startsWith("water-moat-") ||
+    model.endsWith("-bridge")
+  ) {
+    return "terrain";
+  }
+  if (model.startsWith("unit-")) {
+    return "units";
+  }
+  return "buildings";
+}
+
 export async function computeRenderCacheKey(
   asset: ProductionAssetSpec,
   spec: BlenderRenderSpec,
@@ -40,10 +66,21 @@ export async function computeRenderCacheKey(
     throw new Error(`Render cache requires a Blender model for asset: ${asset.assetId}`);
   }
 
-  const renderScript = await readFile(pythonScript);
-  const renderScriptSha256 = sha256Hex(renderScript);
+  const libDir = join(dirname(pythonScript), "render_asset_lib");
+  const domain = modelToDomain(spec.model);
+  const [entry, coreModule, materialsModule, registryModule, domainModule] = await Promise.all([
+    readFile(pythonScript),
+    readFile(join(libDir, "core.py")),
+    readFile(join(libDir, "materials.py")),
+    readFile(join(libDir, "registry.py")),
+    readFile(join(libDir, `${domain}.py`))
+  ]);
+
+  const composite = Buffer.concat([entry, coreModule, materialsModule, registryModule, domainModule]);
+  const renderScriptSha256 = sha256Hex(composite);
+
   const metadata: RenderCacheMetadata = {
-    cacheVersion: 1,
+    cacheVersion: 2,
     assetId: asset.assetId,
     model: spec.model,
     canvas: {
@@ -61,7 +98,7 @@ export async function computeRenderCacheKey(
   };
 
   const keyInput = {
-    renderScript: renderScript.toString("utf8"),
+    renderScript: composite.toString("utf8"),
     model: metadata.model,
     canvas: metadata.canvas,
     anchor: metadata.anchor,
@@ -147,11 +184,11 @@ function parseRenderCacheMetadata(value: unknown): RenderCacheMetadata {
     throw new Error("Render cache metadata must be an object");
   }
   const record = value as Record<string, unknown>;
-  if (record.cacheVersion !== 1) {
+  if (record.cacheVersion !== 2) {
     throw new Error("Unsupported render cache metadata version");
   }
   return {
-    cacheVersion: 1,
+    cacheVersion: 2,
     assetId: requiredString(record.assetId, "assetId"),
     model: requiredString(record.model, "model"),
     canvas: parsePoint(record.canvas, "canvas", "width", "height"),

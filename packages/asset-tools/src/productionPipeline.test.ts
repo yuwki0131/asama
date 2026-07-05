@@ -5,10 +5,20 @@ import { describe, expect, it } from "vitest";
 import sharp from "sharp";
 import { alphaBoundsFromRgba, buildHeadlessBlenderArgs } from "./blenderRender";
 import { buildAtlas } from "./productionPipeline";
-import { parseProductionAsset } from "./productionConfig";
+import { parseProductionAsset, readProductionAssetConfigDir } from "./productionConfig";
+import { productionConfigDir } from "./paths";
 import { importRasterAsset, validateRasterImportSpec } from "./postprocess";
 import { renderPlaceholderSvg } from "./templates";
 import type { BlenderRenderSpec } from "./types";
+
+describe("production asset config directory", () => {
+  it("loads all split JSON files and preserves the total asset count", async () => {
+    const config = await readProductionAssetConfigDir(productionConfigDir);
+    expect(config.assets).toHaveLength(396);
+    const ids = new Set(config.assets.map((a) => a.assetId));
+    expect(ids.size).toBe(396);
+  });
+});
 
 describe("production asset schema", () => {
   it("validates source types and separates footprint from canvas", () => {
