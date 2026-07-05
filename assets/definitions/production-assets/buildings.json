@@ -4913,6 +4913,28 @@
         "trim": false,
         "resizeMode": "exact"
       }
+    },
+    {
+      "assetId": "building.tenshu.main",
+      "kind": "building",
+      "output": "building-tenshu-main.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/building-tenshu-v2.png"
+      },
+      "geometry": {
+        "footprintWidth": 8,
+        "footprintHeight": 8,
+        "canvasWidth": 640,
+        "canvasHeight": 520,
+        "anchorX": 320,
+        "anchorY": 430
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
     }
   ]
 }

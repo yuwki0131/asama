@@ -211,7 +211,7 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     maxHp: 9999,
     footprint: { width: 8, height: 8 },
     passable: false,
-    assetId: "building.tenshu.test",
+    assetId: "building.tenshu.main",
     gateState: null
   },
   yagura: {

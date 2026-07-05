@@ -629,6 +629,74 @@ def build_yagura_small_graybox(scene: bpy.types.Scene) -> None:
     add_kawara_roof(scene, "TopRoof", (-1.68, -1.62), (-0.32, -0.38), 2.72, 3.12, "x", roof, trim, verge_material=plaster)
 
 
+def build_tenshu_graybox(scene: bpy.types.Scene) -> None:
+    """Godai-style keep: two-stage ishigaki, five shrinking tiers with
+    alternating kawara roofs, chidori-hafu dormers, top hip roof with
+    shachi finials. Lot 8x8, origin at south corner convention (build in
+    [-8,0]x[-8,0] like other lot buildings)."""
+    mats = building_material_set()
+    plaster = mats["plaster"]
+    roof_x = mats["roof"]
+    roof_y = mats["roof_y"]
+    trim = mats["trim"]
+    dark = mats["dark_wood"]
+    stone = make_ishigaki_material("TenshuIshigaki")
+    gold = make_material("Shachi", (0.55, 0.42, 0.12, 1.0))
+
+    cx, cy = -4.0, -4.0  # lot center
+
+    def centered(w: float):
+        return (cx - w / 2, cy - w / 2), (cx + w / 2, cy + w / 2)
+
+    # Ishigaki: two battered stages.
+    (l0, _), (h0, _2) = (centered(7.4)[0], None), (centered(7.4)[1], None)
+    low, high = centered(6.6)
+    add_frustum(scene, "IshigakiLower", low, high, 0.0, 0.85, 0.75, stone)
+    low, high = centered(5.2)
+    add_frustum(scene, "IshigakiUpper", low, high, 0.85, 1.5, 0.5, stone)
+
+    # Tiers: (width, body height, roof rise, ridge axis) — tall tower with
+    # walls clearly visible between roofs.
+    tiers = [
+        (4.2, 1.20, 0.60, "x"),
+        (3.6, 1.05, 0.56, "y"),
+        (3.0, 0.95, 0.52, "x"),
+        (2.4, 0.90, 0.62, "y"),
+    ]
+    z = 1.5
+    for index, (w, body_h, rise, axis) in enumerate(tiers):
+        low, high = centered(w)
+        # Dark wood skirt band then plaster body (tenshu reference look).
+        add_box(scene, f"T{index}Skirt", *map_box((low[0], low[1], z), (high[0], high[1], z + 0.16)), dark)
+        add_box(scene, f"T{index}Body", *map_box((low[0], low[1], z + 0.16), (high[0], high[1], z + body_h)), plaster)
+        # Window slit rows on the two visible faces.
+        n_win = max(2, int(w) - 1)
+        for wi in range(n_win):
+            fx = low[0] + (wi + 0.75) * (w / (n_win + 0.5))
+            add_box(scene, f"T{index}WinS{wi}", *map_box((fx, high[1] - 0.035, z + 0.42), (fx + 0.22, high[1] + 0.005, z + 0.62)), trim)
+            fy = low[1] + (wi + 0.75) * (w / (n_win + 0.5))
+            add_box(scene, f"T{index}WinE{wi}", *map_box((high[0] - 0.035, fy, z + 0.42), (high[0] + 0.005, fy + 0.22, z + 0.62)), trim)
+        roof_low = (low[0] - 0.5, low[1] - 0.5)
+        roof_high = (high[0] + 0.5, high[1] + 0.5)
+        z_eave = z + body_h
+        z_ridge = z_eave + rise
+        if index < len(tiers) - 1:
+            mat = roof_x if axis == "x" else roof_y
+            add_kawara_roof(scene, f"T{index}Roof", roof_low, roof_high, z_eave, z_ridge, axis, mat, trim, verge_material=plaster)
+            # Chidori-hafu dormer on the south-west face of even tiers.
+            if index % 2 == 0:
+                dw = w * 0.5
+                dlow = (cx - dw / 2, high[1] - 0.35)
+                dhigh = (cx + dw / 2, high[1] + 0.42)
+                add_gable_roof(scene, f"T{index}Hafu", (map_xy(*dlow)), (map_xy(*dhigh)), z_eave + 0.08, z_eave + rise * 0.85, "y", roof_y, end_material=plaster)
+            # next tier starts near the ridge so wall area stays exposed
+            z = z_eave + rise * 0.85
+        else:
+            # Top: grand hip roof (no shachi for now, user ruling 2026-07-05).
+            add_yosemune_roof(scene, "TopRoof", roof_low, roof_high, z_eave, z_ridge + 0.18, roof_x, trim)
+
+
+
 def build_farm_paddy(scene: bpy.types.Scene) -> None:
     """Rice paddy filling a 4x4 surface footprint. Canvas 256x128, anchor 128,64."""
     ridge = make_textured_material("AzeDirt", (0.185, 0.150, 0.105), (0.265, 0.220, 0.160), scale=9.0)
