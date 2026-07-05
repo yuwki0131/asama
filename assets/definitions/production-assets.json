@@ -9179,6 +9179,966 @@
         "trim": false,
         "resizeMode": "exact"
       }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101.p1",
+      "kind": "building",
+      "output": "dry-moat-connected-0101-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0101-p1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101.p2",
+      "kind": "building",
+      "output": "dry-moat-connected-0101-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0101-p2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101.p3",
+      "kind": "building",
+      "output": "dry-moat-connected-0101-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0101-p3",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p1",
+      "kind": "building",
+      "output": "dry-moat-connected-1010-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1010-p1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p2",
+      "kind": "building",
+      "output": "dry-moat-connected-1010-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1010-p2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p3",
+      "kind": "building",
+      "output": "dry-moat-connected-1010-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1010-p3",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0000.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-0000-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0000-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0001.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-0001-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0001-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0010.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-0010-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0010-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0011.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-0011-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0011-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0100.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-0100-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0100-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0110.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-0110-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0110-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0111.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-0111-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-0111-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1000.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-1000-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1000-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1001.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-1001-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1001-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1011.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-1011-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1011-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1100.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-1100-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1100-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1101.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-1101-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1101-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1110.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-1110-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1110-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1111.v1",
+      "kind": "building",
+      "output": "dry-moat-connected-1111-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-connected-1111-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101.p1",
+      "kind": "building",
+      "output": "water-moat-connected-0101-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0101-p1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101.p2",
+      "kind": "building",
+      "output": "water-moat-connected-0101-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0101-p2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101.p3",
+      "kind": "building",
+      "output": "water-moat-connected-0101-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0101-p3",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010.p1",
+      "kind": "building",
+      "output": "water-moat-connected-1010-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1010-p1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010.p2",
+      "kind": "building",
+      "output": "water-moat-connected-1010-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1010-p2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010.p3",
+      "kind": "building",
+      "output": "water-moat-connected-1010-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1010-p3",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0000.v1",
+      "kind": "building",
+      "output": "water-moat-connected-0000-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0000-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0001.v1",
+      "kind": "building",
+      "output": "water-moat-connected-0001-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0001-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0010.v1",
+      "kind": "building",
+      "output": "water-moat-connected-0010-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0010-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0011.v1",
+      "kind": "building",
+      "output": "water-moat-connected-0011-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0011-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0100.v1",
+      "kind": "building",
+      "output": "water-moat-connected-0100-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0100-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0110.v1",
+      "kind": "building",
+      "output": "water-moat-connected-0110-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0110-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0111.v1",
+      "kind": "building",
+      "output": "water-moat-connected-0111-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-0111-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1000.v1",
+      "kind": "building",
+      "output": "water-moat-connected-1000-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1000-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1001.v1",
+      "kind": "building",
+      "output": "water-moat-connected-1001-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1001-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1011.v1",
+      "kind": "building",
+      "output": "water-moat-connected-1011-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1011-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1100.v1",
+      "kind": "building",
+      "output": "water-moat-connected-1100-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1100-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1101.v1",
+      "kind": "building",
+      "output": "water-moat-connected-1101-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1101-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1110.v1",
+      "kind": "building",
+      "output": "water-moat-connected-1110-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1110-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1111.v1",
+      "kind": "building",
+      "output": "water-moat-connected-1111-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-connected-1111-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
     }
   ]
 }

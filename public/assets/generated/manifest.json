@@ -4027,6 +4027,446 @@
         "x": 0.5,
         "y": 0.4
       }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101.p1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0101-p1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101.p2",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0101-p2.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0101.p3",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0101-p3.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1010-p1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p2",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1010-p2.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p3",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1010-p3.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0000.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0000-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0001.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0001-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0010.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0010-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0011.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0011-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0100.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0100-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0110.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0110-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.0111.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-0111-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1000.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1000-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1001.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1001-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1011.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1011-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1100.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1100-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1101.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1101-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1110.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1110-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.dry_moat.connected.1111.v1",
+      "kind": "building",
+      "file": "generated/dry-moat-connected-1111-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101.p1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0101-p1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101.p2",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0101-p2.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0101.p3",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0101-p3.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010.p1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1010-p1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010.p2",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1010-p2.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1010.p3",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1010-p3.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0000.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0000-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0001.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0001-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0010.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0010-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0011.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0011-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0100.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0100-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0110.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0110-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.0111.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-0111-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1000.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1000-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1001.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1001-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1011.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1011-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1100.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1100-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1101.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1101-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1110.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1110-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.water_moat.connected.1111.v1",
+      "kind": "building",
+      "file": "generated/water-moat-connected-1111-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
     }
   ]
 }

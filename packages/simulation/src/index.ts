@@ -2198,6 +2198,23 @@ function connectedBuildingAssetId(world: WorldState, building: BuildingState): s
   }
 
   const mask = connectionMask(world, building);
+
+  // Moat interiors carry world-phased / seed-varied textures so straight
+  // runs read as one continuous excavation instead of a repeating tile.
+  if (building.type === "dry_moat" || building.type === "water_moat") {
+    if (mask === "0101") {
+      const phase = ((building.position.x % 4) + 4) % 4;
+      return phase === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.p${phase}`;
+    }
+    if (mask === "1010") {
+      const phase = ((building.position.y % 4) + 4) % 4;
+      return phase === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.p${phase}`;
+    }
+    let h = (building.position.x * 374761393 + building.position.y * 668265263 + 77003) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    return h % 2 === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.v1`;
+  }
+
   return `${family}.connected.${mask}`;
 }
 

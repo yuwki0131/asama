@@ -166,7 +166,21 @@ class Scene {
           return "0";
         })
         .join("");
-      kitBuildings.push({ assetId: `${kitAsset[kind]}.connected.${mask}`, type: kind === "wall" ? "wall" : kind === "fence" ? "fence" : kind, footprint: [{ x, y }] });
+      let kitAssetId = `${kitAsset[kind]}.connected.${mask}`;
+      if (kind === "dry_moat" || kind === "water_moat") {
+        if (mask === "0101") {
+          const phase = ((x % 4) + 4) % 4;
+          if (phase !== 0) kitAssetId += `.p${phase}`;
+        } else if (mask === "1010") {
+          const phase = ((y % 4) + 4) % 4;
+          if (phase !== 0) kitAssetId += `.p${phase}`;
+        } else {
+          let h = (x * 374761393 + y * 668265263 + 77003) >>> 0;
+          h = (h ^ (h >>> 13)) >>> 0;
+          if (h % 2 === 1) kitAssetId += ".v1";
+        }
+      }
+      kitBuildings.push({ assetId: kitAssetId, type: kind === "wall" ? "wall" : kind === "fence" ? "fence" : kind, footprint: [{ x, y }] });
     }
     return { cells, buildings: [...kitBuildings, ...this.buildings], decos: this.decos.map((d) => ({ assetId: d.assetId, position: { x: d.x, y: d.y } })) };
   }

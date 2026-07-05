@@ -2625,20 +2625,28 @@ def make_holdout_material() -> bpy.types.Material:
     return material
 
 
-def make_bank_material() -> bpy.types.Material:
-    """Excavated earth bank: horizontal strata, embedded stones, damp base."""
+def make_bank_material(offset: tuple[float, float] = (0.0, 0.0), seed: float = 0.0) -> bpy.types.Material:
+    """Excavated earth bank: horizontal strata, embedded stones, damp base.
+    offset shifts the noise field in map units so tiles phased along a run
+    continue the same texture; seed varies it for non-straight masks."""
     material = bpy.data.materials.new("BankEarth")
     material.use_nodes = True
     nodes = material.node_tree.nodes
     links = material.node_tree.links
 
     coords = nodes.new("ShaderNodeTexCoord")
+    shift = nodes.new("ShaderNodeMapping")
+    shift.inputs["Location"].default_value = (offset[0], -offset[1], 0.0)
+    links.new(coords.outputs["Object"], shift.inputs["Vector"])
     separate = nodes.new("ShaderNodeSeparateXYZ")
-    links.new(coords.outputs["Object"], separate.inputs["Vector"])
+    links.new(shift.outputs["Vector"], separate.inputs["Vector"])
 
     base_noise = nodes.new("ShaderNodeTexNoise")
+    base_noise.noise_dimensions = "4D"
+    base_noise.inputs["W"].default_value = seed * 5.13
     base_noise.inputs["Scale"].default_value = 9.0
     base_noise.inputs["Detail"].default_value = 3.0
+    links.new(shift.outputs["Vector"], base_noise.inputs["Vector"])
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.elements[0].position = 0.32
     ramp.color_ramp.elements[0].color = (0.062, 0.050, 0.036, 1.0)
@@ -2662,7 +2670,10 @@ def make_bank_material() -> bpy.types.Material:
 
     # Embedded stones: sparse voronoi cells brightened.
     stones = nodes.new("ShaderNodeTexVoronoi")
+    stones.voronoi_dimensions = "4D"
+    stones.inputs["W"].default_value = seed * 3.71
     stones.inputs["Scale"].default_value = 16.0
+    links.new(shift.outputs["Vector"], stones.inputs["Vector"])
     stone_ramp = nodes.new("ShaderNodeValToRGB")
     stone_ramp.color_ramp.interpolation = "CONSTANT"
     stone_ramp.color_ramp.elements[0].position = 0.0
@@ -2690,23 +2701,50 @@ def make_bank_material() -> bpy.types.Material:
     return material
 
 
-def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool) -> None:
+def make_trench_surface_material(water: bool, offset: tuple[float, float], seed: float) -> bpy.types.Material:
+    """Trench floor / moat water with a map-anchored noise field."""
+    if water:
+        dark, light, scale = (0.022, 0.052, 0.075), (0.045, 0.088, 0.115), 4.0
+    else:
+        dark, light, scale = (0.058, 0.046, 0.032), (0.105, 0.085, 0.060), 7.0
+    material = bpy.data.materials.new("TrenchSurface")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    coords = nodes.new("ShaderNodeTexCoord")
+    shift = nodes.new("ShaderNodeMapping")
+    shift.inputs["Location"].default_value = (offset[0], -offset[1], 0.0)
+    links.new(coords.outputs["Object"], shift.inputs["Vector"])
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.noise_dimensions = "4D"
+    noise.inputs["W"].default_value = seed * 7.77
+    noise.inputs["Scale"].default_value = scale
+    noise.inputs["Detail"].default_value = 4.0
+    links.new(shift.outputs["Vector"], noise.inputs["Vector"])
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.35
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
+    ramp.color_ramp.elements[1].position = 0.72
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    finish_material(material, ramp.outputs["Color"])
+    return material
+
+
+def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool, phase: tuple[float, float] = (0.0, 0.0), seed: float = 0.0) -> None:
     """Moat as a real excavated trench: the full tile is sunk MOAT_DEPTH,
     with steep earthen banks only on edges NOT connected to another moat
     tile — adjacent moat tiles merge into one continuous channel (kills the
     lattice), and the depth reads as impassable. Holdout ground quads clip
-    the underground view to this tile's own diamond."""
+    the underground view to this tile's own diamond. phase anchors the
+    textures to the map grid along straight runs; seed varies the rest."""
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
-    earth = make_bank_material()
+    earth = make_bank_material(offset=phase, seed=seed)
     rim = make_material("MoatRim", (0.150, 0.124, 0.088, 1.0))
     lip = make_material("MoatGrassLip", (0.105, 0.150, 0.070, 1.0))
 
-    if water:
-        surface = make_noise_material("MoatWater", (0.022, 0.052, 0.075), (0.045, 0.088, 0.115), scale=4.0)
-        surface_z = -MOAT_DEPTH + 0.08
-    else:
-        surface = make_noise_material("MoatFloor", (0.058, 0.046, 0.032), (0.105, 0.085, 0.060), scale=7.0)
-        surface_z = -MOAT_DEPTH
+    surface = make_trench_surface_material(water, phase, seed)
+    surface_z = (-MOAT_DEPTH + 0.08) if water else -MOAT_DEPTH
 
     b = TERRAIN_BLEED
     # The floor reaches far into OPEN north/west neighbours: at 4-corner
@@ -2854,6 +2892,15 @@ def resolve_model(name: str):
             mask = name[len(prefix):]
             if len(mask) == 4 and set(mask) <= {"0", "1"}:
                 return lambda scene, kit=kit, mask=mask: kit(scene, mask)
+    moat_variant = re.fullmatch(r"(dry|water)-moat-connected-([01]{4})-(p([123])|v1)", name)
+    if moat_variant is not None:
+        kind, mask, suffix = moat_variant.group(1), moat_variant.group(2), moat_variant.group(3)
+        is_water = kind == "water"
+        if suffix.startswith("p"):
+            p = float(moat_variant.group(4))
+            phase = (p, 0.0) if mask == "0101" else (0.0, p)
+            return lambda scene: build_trench_moat(scene, mask, is_water, phase=phase)
+        return lambda scene: build_trench_moat(scene, mask, is_water, seed=1.0)
     gate = re.fullmatch(r"gate-wood-(closed|open)-(nw_se|ne_sw)-w([123])-([01]{4})", name)
     if gate is not None:
         state, axis, width, mask = gate.group(1), gate.group(2), int(gate.group(3)), gate.group(4)
