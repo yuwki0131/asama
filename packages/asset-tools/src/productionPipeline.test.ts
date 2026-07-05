@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
@@ -12,11 +12,18 @@ import { renderPlaceholderSvg } from "./templates";
 import type { BlenderRenderSpec } from "./types";
 
 describe("production asset config directory", () => {
-  it("loads all split JSON files and preserves the total asset count", async () => {
+  it("loads all split JSON files with unique ids matching the file sum", async () => {
     const config = await readProductionAssetConfigDir(productionConfigDir);
-    expect(config.assets).toHaveLength(396);
-    const ids = new Set(config.assets.map((a) => a.assetId));
-    expect(ids.size).toBe(396);
+    const files = await readdir(productionConfigDir);
+    let fileSum = 0;
+    for (const file of files.filter((name) => name.endsWith(".json"))) {
+      const parsed = JSON.parse(await readFile(join(productionConfigDir, file), "utf8"));
+      fileSum += parsed.assets.length;
+    }
+    expect(config.assets.length).toBe(fileSum);
+    const ids = new Set(config.assets.map((asset) => asset.assetId));
+    expect(ids.size).toBe(config.assets.length);
+    expect(config.assets.length).toBeGreaterThan(300);
   });
 });
 

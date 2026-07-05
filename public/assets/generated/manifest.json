@@ -234,6 +234,39 @@
       }
     },
     {
+      "assetId": "unit.musketeer.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-musketeer-idle-south.png",
+      "width": 48,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.cavalry.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-cavalry-idle-south.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
+      }
+    },
+    {
+      "assetId": "unit.supply_cart.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-supply-cart-idle-south.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
+      }
+    },
+    {
       "assetId": "deco.tree.pine.1",
       "kind": "building",
       "file": "generated/deco-tree-pine-1.png",
