@@ -190,3 +190,75 @@ describe("construction", () => {
     expect(movedUnit?.destination).toBeNull();
   });
 });
+
+describe("courtyard terrain override", () => {
+  it("sets footprint cells to dirt assetId when placing a lot building", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    expect(place(world, "storehouse", { x: 10, y: 10 })).toBeNull();
+
+    const cell = world.map.cells[10 * world.map.width + 10];
+    expect(cell?.assetId).toMatch(/^terrain\.dirt\./);
+  });
+
+  it("all footprint cells of an 8x8 lot building get dirt assetId", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    expect(place(world, "tenshu", { x: 20, y: 20 })).toBeNull();
+
+    for (let dy = 0; dy < 8; dy += 1) {
+      for (let dx = 0; dx < 8; dx += 1) {
+        const cell = world.map.cells[(20 + dy) * world.map.width + (20 + dx)];
+        expect(cell?.assetId).toMatch(/^terrain\.dirt\./);
+      }
+    }
+  });
+
+  it("interior cells use macro tile, edge cells use connected mask", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    expect(place(world, "tenshu", { x: 20, y: 20 })).toBeNull();
+
+    // Interior cell (surrounded by footprint on all 4 sides) → macro tile
+    const interior = world.map.cells[22 * world.map.width + 22];
+    expect(interior?.assetId).toMatch(/^terrain\.dirt\.macro\./);
+
+    // Corner cell (only 2 footprint neighbors) → connected mask
+    const corner = world.map.cells[20 * world.map.width + 20];
+    expect(corner?.assetId).toMatch(/^terrain\.dirt\.connected\./);
+  });
+
+  it("restores footprint cells to grass assetId after demolish", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    expect(place(world, "storehouse", { x: 10, y: 10 })).toBeNull();
+    expect(world.map.cells[10 * world.map.width + 10]?.assetId).toMatch(/^terrain\.dirt\./);
+
+    expect(demolish(world, { x: 10, y: 10 })).toBeNull();
+    const cell = world.map.cells[10 * world.map.width + 10];
+    expect(cell?.assetId).toMatch(/^terrain\.grass\./);
+  });
+
+  it("does not apply courtyard to surface-type buildings (fence, wall, bridge)", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    const originalFence = world.map.cells[10 * world.map.width + 10]?.assetId;
+    expect(place(world, "fence", { x: 10, y: 10 })).toBeNull();
+    expect(world.map.cells[10 * world.map.width + 10]?.assetId).toBe(originalFence);
+  });
+});
