@@ -119,6 +119,7 @@ export interface WorldState {
   rngState: number;
   food: FoodState;
   economy: EconomyState;
+  supplyState: SupplyState;
   map: {
     width: number;
     height: number;
@@ -134,6 +135,15 @@ export interface FoodState {
   connectedStorehouseIds: BuildingId[];
   nextConnectivityCheckTick: number;
   nextConsumptionTick: number;
+}
+
+export interface SupplyState {
+  /** Becomes true once at least one enemy supply_cart has existed (never resets). */
+  hasHadCart: boolean;
+  /** True while the retreat countdown is running. */
+  retreatTimerActive: boolean;
+  /** Ticks remaining on the retreat countdown (meaningful only when active). */
+  retreatTimerRemaining: number;
 }
 
 export interface EconomyState {
@@ -170,7 +180,10 @@ export const ECONOMY_BALANCE = {
     spear_ashigaru: { gold: 20, weapons: 1 },
     sword_ashigaru: { gold: 28, weapons: 1 },
     archer: { gold: 32, weapons: 1 },
-    engineer: { gold: 30, weapons: 0 }
+    engineer: { gold: 30, weapons: 0 },
+    musketeer: { gold: 40, weapons: 2 },
+    cavalry: { gold: 50, weapons: 1 }
+    // supply_cart is enemy-only and cannot be recruited
   },
   market: {
     foodLot: 50,
@@ -206,7 +219,9 @@ export const SIEGE_BALANCE = {
   ladderMoveCost: 4,
   moatFillTicks: 300,
   /** Interrupted moat work keeps its progress (spec-recommended default). */
-  preserveProgressOnInterrupt: true
+  preserveProgressOnInterrupt: true,
+  /** Ticks from supply-cart annihilation to enemy retreat (4800 = 4 min at 20 tps). */
+  supplyRetreatTicks: 4800
 } as const;
 
 /** Building types the assault AI will breach when its route is blocked.

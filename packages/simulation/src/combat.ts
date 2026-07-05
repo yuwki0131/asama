@@ -1,4 +1,5 @@
 import type { EntityId, OwnerId } from "@asama/shared";
+import { UNIT_TYPE_AFFINITY } from "@asama/content";
 import { detachLadder } from "./buildings";
 import { PATH_RETRY_COOLDOWN_TICKS, findPath, findPathToAttackRange } from "./pathfinding";
 import { ENEMY_AI, manhattan, sameCell } from "./types";
@@ -24,7 +25,7 @@ export function updateCombat(world: WorldState): void {
       continue;
     }
 
-    const damage = damageAgainst(unit);
+    const damage = damageAgainst(unit, target);
     const laddered = target as Partial<BuildingState>;
     if (laddered.ladderHp !== undefined && laddered.ladderHp !== null && unit.attackRange === 1) {
       // Melee strikes tear down the attached ladder before the wall itself
@@ -134,9 +135,11 @@ export function areEnemies(a: OwnerId, b: OwnerId): boolean {
   return a !== b && a !== "neutral" && b !== "neutral";
 }
 
-function damageAgainst(attacker: UnitState): number {
-  let multiplier = 1;
-
+function damageAgainst(attacker: UnitState, target: AttackTarget): number {
+  const targetUnit = target as Partial<UnitState>;
+  const targetType = targetUnit.type;
+  const affinityRow = UNIT_TYPE_AFFINITY[attacker.type];
+  const multiplier = targetType !== undefined && affinityRow !== undefined ? (affinityRow[targetType] ?? 1) : 1;
   return Math.max(1, Math.round(attacker.attackDamage * multiplier));
 }
 

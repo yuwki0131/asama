@@ -35,6 +35,7 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
   }
   world.nextWaveIndex ??= 0;
   world.scenario ??= { waves: mvpDefenseScenario.waves, victory: mvpDefenseScenario.victory };
+  world.supplyState ??= { hasHadCart: false, retreatTimerActive: false, retreatTimerRemaining: 0 };
   world.map.decorations ??= [];
   world.economy ??= {
     gold: ECONOMY_BALANCE.initialGold,

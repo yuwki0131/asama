@@ -127,7 +127,12 @@ export function applyRecruitCommand(world: WorldState, unitType: UnitType): stri
   if (barracks === undefined) {
     return "No barracks";
   }
-  const cost = ECONOMY_BALANCE.recruitCosts[unitType];
+  const cost = ECONOMY_BALANCE.recruitCosts[unitType as keyof typeof ECONOMY_BALANCE.recruitCosts] as
+    | { readonly gold: number; readonly weapons: number }
+    | undefined;
+  if (cost === undefined) {
+    return "Cannot recruit this unit type";
+  }
   if (world.economy.gold < cost.gold) {
     return "Not enough gold";
   }
