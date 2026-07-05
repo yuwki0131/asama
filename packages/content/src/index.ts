@@ -409,8 +409,574 @@ export const mvpDefenseScenario: ScenarioDefinition = {
 };
 
 /**
+ * Concentric castle scenario (docs/07_scenarios/concentric-castle.md).
+ * A: 環郭式平城 — introductory.
+ * Layered defense: east gate line → water moat ring → inner wall.
+ * Supply cart in every wave teaches the retreat-timer mechanic.
+ * AI profile: 正面強襲型 (frontal assault, single east direction).
+ */
+export const concentricCastleScenario: ScenarioDefinition = {
+  id: "concentric-castle",
+  name: "環郭の城",
+  initialBuildings: [
+    // === Castle core ===
+    { type: "tenshu", position: { x: 32, y: 30 } },
+    { type: "honmaru", position: { x: 41, y: 40 } },
+
+    // === Inner wall (honmaru enclosure) x=30-43, y=28-43 ===
+    // North wall
+    { type: "wall", position: { x: 30, y: 28 } },
+    { type: "wall", position: { x: 31, y: 28 } },
+    { type: "wall", position: { x: 32, y: 28 } },
+    { type: "wall", position: { x: 33, y: 28 } },
+    { type: "wall", position: { x: 34, y: 28 } },
+    { type: "wall", position: { x: 35, y: 28 } },
+    { type: "wall", position: { x: 36, y: 28 } },
+    { type: "wall", position: { x: 37, y: 28 } },
+    { type: "wall", position: { x: 38, y: 28 } },
+    { type: "wall", position: { x: 39, y: 28 } },
+    { type: "wall", position: { x: 40, y: 28 } },
+    { type: "wall", position: { x: 41, y: 28 } },
+    { type: "wall", position: { x: 42, y: 28 } },
+    { type: "wall", position: { x: 43, y: 28 } },
+    // West wall
+    { type: "wall", position: { x: 30, y: 29 } },
+    { type: "wall", position: { x: 30, y: 30 } },
+    { type: "wall", position: { x: 30, y: 31 } },
+    { type: "wall", position: { x: 30, y: 32 } },
+    { type: "wall", position: { x: 30, y: 33 } },
+    { type: "wall", position: { x: 30, y: 34 } },
+    { type: "wall", position: { x: 30, y: 35 } },
+    { type: "wall", position: { x: 30, y: 36 } },
+    { type: "wall", position: { x: 30, y: 37 } },
+    { type: "wall", position: { x: 30, y: 38 } },
+    { type: "wall", position: { x: 30, y: 39 } },
+    { type: "wall", position: { x: 30, y: 40 } },
+    { type: "wall", position: { x: 30, y: 41 } },
+    { type: "wall", position: { x: 30, y: 42 } },
+    // East wall
+    { type: "wall", position: { x: 43, y: 29 } },
+    { type: "wall", position: { x: 43, y: 30 } },
+    { type: "wall", position: { x: 43, y: 31 } },
+    { type: "wall", position: { x: 43, y: 32 } },
+    { type: "wall", position: { x: 43, y: 33 } },
+    { type: "wall", position: { x: 43, y: 34 } },
+    { type: "wall", position: { x: 43, y: 35 } },
+    { type: "wall", position: { x: 43, y: 36 } },
+    { type: "wall", position: { x: 43, y: 37 } },
+    { type: "wall", position: { x: 43, y: 38 } },
+    { type: "wall", position: { x: 43, y: 39 } },
+    { type: "wall", position: { x: 43, y: 40 } },
+    { type: "wall", position: { x: 43, y: 41 } },
+    { type: "wall", position: { x: 43, y: 42 } },
+    // South wall — gate_wide_3 at x=34 occupies x=34,35,36
+    { type: "wall", position: { x: 30, y: 43 } },
+    { type: "wall", position: { x: 31, y: 43 } },
+    { type: "wall", position: { x: 32, y: 43 } },
+    { type: "wall", position: { x: 33, y: 43 } },
+    { type: "gate_wide_3", position: { x: 34, y: 43 } },
+    { type: "wall", position: { x: 37, y: 43 } },
+    { type: "wall", position: { x: 38, y: 43 } },
+    { type: "wall", position: { x: 39, y: 43 } },
+    { type: "wall", position: { x: 40, y: 43 } },
+    { type: "wall", position: { x: 41, y: 43 } },
+    { type: "wall", position: { x: 42, y: 43 } },
+    { type: "wall", position: { x: 43, y: 43 } },
+
+    // === Water moat ring x=28-45, y=26-45 ===
+    // North moat
+    { type: "water_moat", position: { x: 28, y: 26 } },
+    { type: "water_moat", position: { x: 29, y: 26 } },
+    { type: "water_moat", position: { x: 30, y: 26 } },
+    { type: "water_moat", position: { x: 31, y: 26 } },
+    { type: "water_moat", position: { x: 32, y: 26 } },
+    { type: "water_moat", position: { x: 33, y: 26 } },
+    { type: "water_moat", position: { x: 34, y: 26 } },
+    { type: "water_moat", position: { x: 35, y: 26 } },
+    { type: "water_moat", position: { x: 36, y: 26 } },
+    { type: "water_moat", position: { x: 37, y: 26 } },
+    { type: "water_moat", position: { x: 38, y: 26 } },
+    { type: "water_moat", position: { x: 39, y: 26 } },
+    { type: "water_moat", position: { x: 40, y: 26 } },
+    { type: "water_moat", position: { x: 41, y: 26 } },
+    { type: "water_moat", position: { x: 42, y: 26 } },
+    { type: "water_moat", position: { x: 43, y: 26 } },
+    { type: "water_moat", position: { x: 44, y: 26 } },
+    { type: "water_moat", position: { x: 45, y: 26 } },
+    // West moat
+    { type: "water_moat", position: { x: 28, y: 27 } },
+    { type: "water_moat", position: { x: 28, y: 28 } },
+    { type: "water_moat", position: { x: 28, y: 29 } },
+    { type: "water_moat", position: { x: 28, y: 30 } },
+    { type: "water_moat", position: { x: 28, y: 31 } },
+    { type: "water_moat", position: { x: 28, y: 32 } },
+    { type: "water_moat", position: { x: 28, y: 33 } },
+    { type: "water_moat", position: { x: 28, y: 34 } },
+    { type: "water_moat", position: { x: 28, y: 35 } },
+    { type: "water_moat", position: { x: 28, y: 36 } },
+    { type: "water_moat", position: { x: 28, y: 37 } },
+    { type: "water_moat", position: { x: 28, y: 38 } },
+    { type: "water_moat", position: { x: 28, y: 39 } },
+    { type: "water_moat", position: { x: 28, y: 40 } },
+    { type: "water_moat", position: { x: 28, y: 41 } },
+    { type: "water_moat", position: { x: 28, y: 42 } },
+    { type: "water_moat", position: { x: 28, y: 43 } },
+    { type: "water_moat", position: { x: 28, y: 44 } },
+    // East moat
+    { type: "water_moat", position: { x: 45, y: 27 } },
+    { type: "water_moat", position: { x: 45, y: 28 } },
+    { type: "water_moat", position: { x: 45, y: 29 } },
+    { type: "water_moat", position: { x: 45, y: 30 } },
+    { type: "water_moat", position: { x: 45, y: 31 } },
+    { type: "water_moat", position: { x: 45, y: 32 } },
+    { type: "water_moat", position: { x: 45, y: 33 } },
+    { type: "water_moat", position: { x: 45, y: 34 } },
+    { type: "water_moat", position: { x: 45, y: 35 } },
+    { type: "water_moat", position: { x: 45, y: 36 } },
+    { type: "water_moat", position: { x: 45, y: 37 } },
+    { type: "water_moat", position: { x: 45, y: 38 } },
+    { type: "water_moat", position: { x: 45, y: 39 } },
+    { type: "water_moat", position: { x: 45, y: 40 } },
+    { type: "water_moat", position: { x: 45, y: 41 } },
+    { type: "water_moat", position: { x: 45, y: 42 } },
+    { type: "water_moat", position: { x: 45, y: 43 } },
+    { type: "water_moat", position: { x: 45, y: 44 } },
+    // South moat — earth_bridge at x=35 aligns with inner wall gate center
+    { type: "water_moat", position: { x: 28, y: 45 } },
+    { type: "water_moat", position: { x: 29, y: 45 } },
+    { type: "water_moat", position: { x: 30, y: 45 } },
+    { type: "water_moat", position: { x: 31, y: 45 } },
+    { type: "water_moat", position: { x: 32, y: 45 } },
+    { type: "water_moat", position: { x: 33, y: 45 } },
+    { type: "water_moat", position: { x: 34, y: 45 } },
+    { type: "earth_bridge", position: { x: 35, y: 45 } },
+    { type: "water_moat", position: { x: 36, y: 45 } },
+    { type: "water_moat", position: { x: 37, y: 45 } },
+    { type: "water_moat", position: { x: 38, y: 45 } },
+    { type: "water_moat", position: { x: 39, y: 45 } },
+    { type: "water_moat", position: { x: 40, y: 45 } },
+    { type: "water_moat", position: { x: 41, y: 45 } },
+    { type: "water_moat", position: { x: 42, y: 45 } },
+    { type: "water_moat", position: { x: 43, y: 45 } },
+    { type: "water_moat", position: { x: 44, y: 45 } },
+    { type: "water_moat", position: { x: 45, y: 45 } },
+
+    // === East gate line (ninomaru first chokepoint) x=54, y=24-50 ===
+    // North segment
+    { type: "fence", position: { x: 54, y: 24 } },
+    { type: "fence", position: { x: 54, y: 25 } },
+    { type: "fence", position: { x: 54, y: 26 } },
+    { type: "fence", position: { x: 54, y: 27 } },
+    { type: "fence", position: { x: 54, y: 28 } },
+    { type: "fence", position: { x: 54, y: 29 } },
+    { type: "fence", position: { x: 54, y: 30 } },
+    { type: "fence", position: { x: 54, y: 31 } },
+    { type: "fence", position: { x: 54, y: 32 } },
+    { type: "fence", position: { x: 54, y: 33 } },
+    { type: "fence", position: { x: 54, y: 34 } },
+    { type: "fence", position: { x: 54, y: 35 } },
+    // East gate (single): gate_ne_sw at x=54, y=36
+    { type: "gate_ne_sw", position: { x: 54, y: 36 } },
+    // South segment
+    { type: "fence", position: { x: 54, y: 37 } },
+    { type: "fence", position: { x: 54, y: 38 } },
+    { type: "fence", position: { x: 54, y: 39 } },
+    { type: "fence", position: { x: 54, y: 40 } },
+    { type: "fence", position: { x: 54, y: 41 } },
+    { type: "fence", position: { x: 54, y: 42 } },
+    { type: "fence", position: { x: 54, y: 43 } },
+    { type: "fence", position: { x: 54, y: 44 } },
+    { type: "fence", position: { x: 54, y: 45 } },
+    { type: "fence", position: { x: 54, y: 46 } },
+    { type: "fence", position: { x: 54, y: 47 } },
+    { type: "fence", position: { x: 54, y: 48 } },
+
+    // === Ninomaru buildings (between water moat east side and east gate line) ===
+    { type: "yagura", position: { x: 47, y: 27 } },
+    { type: "yagura", position: { x: 47, y: 42 } },
+    { type: "storehouse", position: { x: 47, y: 32 } },
+    { type: "barracks", position: { x: 47, y: 37 } },
+    { type: "samurai_residence", position: { x: 22, y: 32 } },
+
+    // === Town (south of water moat, castle-town access road) ===
+    { type: "road", position: { x: 35, y: 47 } },
+    { type: "road", position: { x: 35, y: 50 } },
+    { type: "road", position: { x: 35, y: 54 } },
+    { type: "town_block", position: { x: 24, y: 48 } },
+    { type: "town_block", position: { x: 38, y: 48 } },
+    { type: "town_block", position: { x: 24, y: 58 } },
+    { type: "town_block", position: { x: 38, y: 58 } },
+    { type: "market", position: { x: 45, y: 50 } },
+    { type: "farm", position: { x: 23, y: 66 } },
+    { type: "farm", position: { x: 28, y: 66 } },
+
+    // Enemy staging area
+    { type: "gate", position: { x: 100, y: 38 }, owner: "enemy" },
+  ],
+  initialUnits: [
+    // Player garrison at honmaru
+    { type: "spear_ashigaru", position: { x: 41, y: 40 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 42, y: 40 }, owner: "player" },
+    // Player archers guarding east gate
+    { type: "archer", position: { x: 53, y: 33 }, owner: "player" },
+    { type: "archer", position: { x: 53, y: 39 }, owner: "player" },
+    // Spear guard between gate and water moat
+    { type: "spear_ashigaru", position: { x: 49, y: 36 }, owner: "player" },
+
+    // Enemy advance scouts
+    { type: "spear_ashigaru", position: { x: 87, y: 34 }, owner: "enemy" },
+    { type: "archer", position: { x: 88, y: 40 }, owner: "enemy" },
+  ],
+  waves: [
+    {
+      // Wave 1 (tick 2400): Light probe — east approach, supply cart introduced.
+      // Destroying the cart triggers the retreat timer (兵站切断 victory mechanic).
+      tick: 2400,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 100, y: 32 } },
+        { type: "spear_ashigaru", position: { x: 100, y: 42 } },
+        { type: "supply_cart", position: { x: 103, y: 37 } },
+      ],
+    },
+    {
+      // Wave 2 (tick 6000): Reinforced probe — sword joins, supply cart again.
+      tick: 6000,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 100, y: 30 } },
+        { type: "spear_ashigaru", position: { x: 100, y: 36 } },
+        { type: "sword_ashigaru", position: { x: 100, y: 42 } },
+        { type: "supply_cart", position: { x: 103, y: 36 } },
+      ],
+    },
+    {
+      // Wave 3 (tick 10000): First musketeer; supply cart is guarded more tightly.
+      tick: 10000,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 100, y: 30 } },
+        { type: "spear_ashigaru", position: { x: 100, y: 38 } },
+        { type: "sword_ashigaru", position: { x: 100, y: 44 } },
+        { type: "musketeer", position: { x: 102, y: 33 } },
+        { type: "supply_cart", position: { x: 104, y: 38 } },
+      ],
+    },
+  ],
+  victory: {
+    holdTicks: 18000,
+  },
+};
+
+/**
+ * Linear fortress scenario (docs/07_scenarios/linear-fortress.md).
+ * B: 連郭式 — standard difficulty.
+ * Two compounds (honmaru NW + ninomaru east) linked across a dry moat.
+ * Multi-direction assault (east + south) and cavalry introduction.
+ * AI profile: 混合型 (mixed — frontal east + cavalry flanking south).
+ */
+export const linearFortressScenario: ScenarioDefinition = {
+  id: "linear-fortress",
+  name: "連郭の城",
+  initialBuildings: [
+    // === Honmaru compound (NW) — wall ring x=15-29, y=14-29 ===
+    { type: "tenshu", position: { x: 17, y: 16 } },
+    { type: "honmaru", position: { x: 26, y: 26 } },
+
+    // North wall
+    { type: "wall", position: { x: 15, y: 14 } },
+    { type: "wall", position: { x: 16, y: 14 } },
+    { type: "wall", position: { x: 17, y: 14 } },
+    { type: "wall", position: { x: 18, y: 14 } },
+    { type: "wall", position: { x: 19, y: 14 } },
+    { type: "wall", position: { x: 20, y: 14 } },
+    { type: "wall", position: { x: 21, y: 14 } },
+    { type: "wall", position: { x: 22, y: 14 } },
+    { type: "wall", position: { x: 23, y: 14 } },
+    { type: "wall", position: { x: 24, y: 14 } },
+    { type: "wall", position: { x: 25, y: 14 } },
+    { type: "wall", position: { x: 26, y: 14 } },
+    { type: "wall", position: { x: 27, y: 14 } },
+    { type: "wall", position: { x: 28, y: 14 } },
+    { type: "wall", position: { x: 29, y: 14 } },
+    // South wall
+    { type: "wall", position: { x: 15, y: 29 } },
+    { type: "wall", position: { x: 16, y: 29 } },
+    { type: "wall", position: { x: 17, y: 29 } },
+    { type: "wall", position: { x: 18, y: 29 } },
+    { type: "wall", position: { x: 19, y: 29 } },
+    { type: "wall", position: { x: 20, y: 29 } },
+    { type: "wall", position: { x: 21, y: 29 } },
+    { type: "wall", position: { x: 22, y: 29 } },
+    { type: "wall", position: { x: 23, y: 29 } },
+    { type: "wall", position: { x: 24, y: 29 } },
+    { type: "wall", position: { x: 25, y: 29 } },
+    { type: "wall", position: { x: 26, y: 29 } },
+    { type: "wall", position: { x: 27, y: 29 } },
+    { type: "wall", position: { x: 28, y: 29 } },
+    { type: "wall", position: { x: 29, y: 29 } },
+    // West wall
+    { type: "wall", position: { x: 15, y: 15 } },
+    { type: "wall", position: { x: 15, y: 16 } },
+    { type: "wall", position: { x: 15, y: 17 } },
+    { type: "wall", position: { x: 15, y: 18 } },
+    { type: "wall", position: { x: 15, y: 19 } },
+    { type: "wall", position: { x: 15, y: 20 } },
+    { type: "wall", position: { x: 15, y: 21 } },
+    { type: "wall", position: { x: 15, y: 22 } },
+    { type: "wall", position: { x: 15, y: 23 } },
+    { type: "wall", position: { x: 15, y: 24 } },
+    { type: "wall", position: { x: 15, y: 25 } },
+    { type: "wall", position: { x: 15, y: 26 } },
+    { type: "wall", position: { x: 15, y: 27 } },
+    { type: "wall", position: { x: 15, y: 28 } },
+    // East wall — gate_wide_3_ne_sw at x=29, y=21 (spans y=21,22,23)
+    { type: "wall", position: { x: 29, y: 15 } },
+    { type: "wall", position: { x: 29, y: 16 } },
+    { type: "wall", position: { x: 29, y: 17 } },
+    { type: "wall", position: { x: 29, y: 18 } },
+    { type: "wall", position: { x: 29, y: 19 } },
+    { type: "wall", position: { x: 29, y: 20 } },
+    { type: "gate_wide_3_ne_sw", position: { x: 29, y: 21 } },
+    { type: "wall", position: { x: 29, y: 24 } },
+    { type: "wall", position: { x: 29, y: 25 } },
+    { type: "wall", position: { x: 29, y: 26 } },
+    { type: "wall", position: { x: 29, y: 27 } },
+    { type: "wall", position: { x: 29, y: 28 } },
+
+    // === Dry moat between compounds x=31-32, y=12-30 (bridges at y=22) ===
+    { type: "dry_moat", position: { x: 31, y: 12 } },
+    { type: "dry_moat", position: { x: 31, y: 13 } },
+    { type: "dry_moat", position: { x: 31, y: 14 } },
+    { type: "dry_moat", position: { x: 31, y: 15 } },
+    { type: "dry_moat", position: { x: 31, y: 16 } },
+    { type: "dry_moat", position: { x: 31, y: 17 } },
+    { type: "dry_moat", position: { x: 31, y: 18 } },
+    { type: "dry_moat", position: { x: 31, y: 19 } },
+    { type: "dry_moat", position: { x: 31, y: 20 } },
+    { type: "dry_moat", position: { x: 31, y: 21 } },
+    { type: "earth_bridge", position: { x: 31, y: 22 } },
+    { type: "dry_moat", position: { x: 31, y: 23 } },
+    { type: "dry_moat", position: { x: 31, y: 24 } },
+    { type: "dry_moat", position: { x: 31, y: 25 } },
+    { type: "dry_moat", position: { x: 31, y: 26 } },
+    { type: "dry_moat", position: { x: 31, y: 27 } },
+    { type: "dry_moat", position: { x: 31, y: 28 } },
+    { type: "dry_moat", position: { x: 31, y: 29 } },
+    { type: "dry_moat", position: { x: 31, y: 30 } },
+    { type: "dry_moat", position: { x: 32, y: 12 } },
+    { type: "dry_moat", position: { x: 32, y: 13 } },
+    { type: "dry_moat", position: { x: 32, y: 14 } },
+    { type: "dry_moat", position: { x: 32, y: 15 } },
+    { type: "dry_moat", position: { x: 32, y: 16 } },
+    { type: "dry_moat", position: { x: 32, y: 17 } },
+    { type: "dry_moat", position: { x: 32, y: 18 } },
+    { type: "dry_moat", position: { x: 32, y: 19 } },
+    { type: "dry_moat", position: { x: 32, y: 20 } },
+    { type: "dry_moat", position: { x: 32, y: 21 } },
+    { type: "earth_bridge", position: { x: 32, y: 22 } },
+    { type: "dry_moat", position: { x: 32, y: 23 } },
+    { type: "dry_moat", position: { x: 32, y: 24 } },
+    { type: "dry_moat", position: { x: 32, y: 25 } },
+    { type: "dry_moat", position: { x: 32, y: 26 } },
+    { type: "dry_moat", position: { x: 32, y: 27 } },
+    { type: "dry_moat", position: { x: 32, y: 28 } },
+    { type: "dry_moat", position: { x: 32, y: 29 } },
+    { type: "dry_moat", position: { x: 32, y: 30 } },
+
+    // === Ninomaru fence ring x=34-54, y=12-30 ===
+    // North fence
+    { type: "fence", position: { x: 34, y: 12 } },
+    { type: "fence", position: { x: 35, y: 12 } },
+    { type: "fence", position: { x: 36, y: 12 } },
+    { type: "fence", position: { x: 37, y: 12 } },
+    { type: "fence", position: { x: 38, y: 12 } },
+    { type: "fence", position: { x: 39, y: 12 } },
+    { type: "fence", position: { x: 40, y: 12 } },
+    { type: "fence", position: { x: 41, y: 12 } },
+    { type: "fence", position: { x: 42, y: 12 } },
+    { type: "fence", position: { x: 43, y: 12 } },
+    { type: "fence", position: { x: 44, y: 12 } },
+    { type: "fence", position: { x: 45, y: 12 } },
+    { type: "fence", position: { x: 46, y: 12 } },
+    { type: "fence", position: { x: 47, y: 12 } },
+    { type: "fence", position: { x: 48, y: 12 } },
+    { type: "fence", position: { x: 49, y: 12 } },
+    { type: "fence", position: { x: 50, y: 12 } },
+    { type: "fence", position: { x: 51, y: 12 } },
+    { type: "fence", position: { x: 52, y: 12 } },
+    { type: "fence", position: { x: 53, y: 12 } },
+    { type: "fence", position: { x: 54, y: 12 } },
+    // South fence
+    { type: "fence", position: { x: 34, y: 30 } },
+    { type: "fence", position: { x: 35, y: 30 } },
+    { type: "fence", position: { x: 36, y: 30 } },
+    { type: "fence", position: { x: 37, y: 30 } },
+    { type: "fence", position: { x: 38, y: 30 } },
+    { type: "fence", position: { x: 39, y: 30 } },
+    { type: "fence", position: { x: 40, y: 30 } },
+    { type: "fence", position: { x: 41, y: 30 } },
+    { type: "fence", position: { x: 42, y: 30 } },
+    { type: "fence", position: { x: 43, y: 30 } },
+    { type: "fence", position: { x: 44, y: 30 } },
+    { type: "fence", position: { x: 45, y: 30 } },
+    { type: "fence", position: { x: 46, y: 30 } },
+    { type: "fence", position: { x: 47, y: 30 } },
+    { type: "fence", position: { x: 48, y: 30 } },
+    { type: "fence", position: { x: 49, y: 30 } },
+    { type: "fence", position: { x: 50, y: 30 } },
+    { type: "fence", position: { x: 51, y: 30 } },
+    { type: "fence", position: { x: 52, y: 30 } },
+    { type: "fence", position: { x: 53, y: 30 } },
+    { type: "fence", position: { x: 54, y: 30 } },
+    // West fence
+    { type: "fence", position: { x: 34, y: 13 } },
+    { type: "fence", position: { x: 34, y: 14 } },
+    { type: "fence", position: { x: 34, y: 15 } },
+    { type: "fence", position: { x: 34, y: 16 } },
+    { type: "fence", position: { x: 34, y: 17 } },
+    { type: "fence", position: { x: 34, y: 18 } },
+    { type: "fence", position: { x: 34, y: 19 } },
+    { type: "fence", position: { x: 34, y: 20 } },
+    { type: "fence", position: { x: 34, y: 21 } },
+    { type: "fence", position: { x: 34, y: 22 } },
+    { type: "fence", position: { x: 34, y: 23 } },
+    { type: "fence", position: { x: 34, y: 24 } },
+    { type: "fence", position: { x: 34, y: 25 } },
+    { type: "fence", position: { x: 34, y: 26 } },
+    { type: "fence", position: { x: 34, y: 27 } },
+    { type: "fence", position: { x: 34, y: 28 } },
+    { type: "fence", position: { x: 34, y: 29 } },
+    // East fence — gate_wide_3_ne_sw at x=54, y=21 (spans y=21,22,23)
+    { type: "fence", position: { x: 54, y: 13 } },
+    { type: "fence", position: { x: 54, y: 14 } },
+    { type: "fence", position: { x: 54, y: 15 } },
+    { type: "fence", position: { x: 54, y: 16 } },
+    { type: "fence", position: { x: 54, y: 17 } },
+    { type: "fence", position: { x: 54, y: 18 } },
+    { type: "fence", position: { x: 54, y: 19 } },
+    { type: "fence", position: { x: 54, y: 20 } },
+    { type: "gate_wide_3_ne_sw", position: { x: 54, y: 21 } },
+    { type: "fence", position: { x: 54, y: 24 } },
+    { type: "fence", position: { x: 54, y: 25 } },
+    { type: "fence", position: { x: 54, y: 26 } },
+    { type: "fence", position: { x: 54, y: 27 } },
+    { type: "fence", position: { x: 54, y: 28 } },
+    { type: "fence", position: { x: 54, y: 29 } },
+
+    // === Ninomaru buildings ===
+    { type: "yagura", position: { x: 35, y: 13 } },
+    { type: "yagura", position: { x: 51, y: 27 } },
+    { type: "barracks", position: { x: 36, y: 19 } },
+    { type: "storehouse", position: { x: 46, y: 13 } },
+    { type: "storehouse", position: { x: 36, y: 24 } },
+
+    // === Road system (east exit road + south turn) ===
+    { type: "road", position: { x: 55, y: 22 } },
+    { type: "road", position: { x: 57, y: 22 } },
+    { type: "road", position: { x: 59, y: 22 } },
+    { type: "road", position: { x: 61, y: 22 } },
+    { type: "road", position: { x: 63, y: 22 } },
+    { type: "road", position: { x: 63, y: 25 } },
+    { type: "road", position: { x: 63, y: 30 } },
+    { type: "road", position: { x: 63, y: 38 } },
+    { type: "road", position: { x: 63, y: 46 } },
+
+    // === Town (SE of castle) ===
+    { type: "town_block", position: { x: 56, y: 34 } },
+    { type: "town_block", position: { x: 56, y: 42 } },
+    { type: "town_block", position: { x: 64, y: 34 } },
+    { type: "market", position: { x: 47, y: 34 } },
+    { type: "samurai_residence", position: { x: 47, y: 40 } },
+    { type: "samurai_residence", position: { x: 41, y: 32 } },
+    { type: "farm", position: { x: 42, y: 47 } },
+    { type: "farm", position: { x: 48, y: 49 } },
+
+    // Enemy staging areas (east and south)
+    { type: "gate", position: { x: 100, y: 22 }, owner: "enemy" },
+    { type: "gate", position: { x: 63, y: 100 }, owner: "enemy" },
+  ],
+  initialUnits: [
+    // Player garrison in honmaru
+    { type: "spear_ashigaru", position: { x: 26, y: 26 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 27, y: 27 }, owner: "player" },
+    // Archer guarding ninomaru east gate
+    { type: "archer", position: { x: 53, y: 22 }, owner: "player" },
+    // Spear at ninomaru east gate
+    { type: "spear_ashigaru", position: { x: 51, y: 22 }, owner: "player" },
+    // Archer covering southern road
+    { type: "archer", position: { x: 62, y: 48 }, owner: "player" },
+
+    // Enemy advance scouts (east bank)
+    { type: "spear_ashigaru", position: { x: 85, y: 21 }, owner: "enemy" },
+    { type: "archer", position: { x: 86, y: 25 }, owner: "enemy" },
+  ],
+  waves: [
+    {
+      // Wave 1 (tick 2400): Light east probe with supply cart.
+      tick: 2400,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 100, y: 19 } },
+        { type: "spear_ashigaru", position: { x: 100, y: 24 } },
+        { type: "supply_cart", position: { x: 103, y: 21 } },
+      ],
+    },
+    {
+      // Wave 2 (tick 6000): East main assault + south probe. Two-front pressure begins.
+      tick: 6000,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 100, y: 18 } },
+        { type: "spear_ashigaru", position: { x: 100, y: 22 } },
+        { type: "archer", position: { x: 100, y: 26 } },
+        { type: "supply_cart", position: { x: 103, y: 21 } },
+        // South probe — tests the undefended flank
+        { type: "spear_ashigaru", position: { x: 61, y: 100 } },
+        { type: "archer", position: { x: 64, y: 102 } },
+      ],
+    },
+    {
+      // Wave 3 (tick 10000): Cavalry flanks south; engineer begins moat-fill from east.
+      tick: 10000,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 100, y: 18 } },
+        { type: "sword_ashigaru", position: { x: 100, y: 22 } },
+        { type: "engineer", position: { x: 102, y: 20 } },
+        { type: "cavalry", position: { x: 100, y: 27 } },
+        { type: "supply_cart", position: { x: 104, y: 21 } },
+        // South cavalry flanking — fast and hard to intercept
+        { type: "cavalry", position: { x: 60, y: 100 } },
+        { type: "spear_ashigaru", position: { x: 64, y: 100 } },
+      ],
+    },
+    {
+      // Wave 4 (tick 15000): Full coordinated assault — east and south simultaneously.
+      // Musketeer provides long-range fire support from the east.
+      tick: 15000,
+      spawns: [
+        { type: "spear_ashigaru", position: { x: 100, y: 17 } },
+        { type: "sword_ashigaru", position: { x: 100, y: 21 } },
+        { type: "sword_ashigaru", position: { x: 100, y: 25 } },
+        { type: "archer", position: { x: 100, y: 29 } },
+        { type: "engineer", position: { x: 102, y: 21 } },
+        { type: "cavalry", position: { x: 100, y: 32 } },
+        { type: "musketeer", position: { x: 102, y: 25 } },
+        { type: "supply_cart", position: { x: 104, y: 21 } },
+        // South assault column
+        { type: "spear_ashigaru", position: { x: 59, y: 100 } },
+        { type: "sword_ashigaru", position: { x: 62, y: 100 } },
+        { type: "cavalry", position: { x: 66, y: 100 } },
+        { type: "supply_cart", position: { x: 62, y: 104 } },
+      ],
+    },
+  ],
+  victory: {
+    holdTicks: 24000,
+  },
+};
+
+/**
  * Riverside defense scenario (docs/07_scenarios/riverside-defense.md).
+ * C: 川城+門前町 — advanced.
  * A river acts as the primary barrier; two bridges are the key chokepoints.
+ * New unit types (musketeer, cavalry, supply_cart) appear in later waves.
+ * AI profile: 混合型 (mixed — bridge assault + engineer bridge-break + cavalry probe).
  */
 export const riversideDefenseScenario: ScenarioDefinition = {
   id: "riverside-defense",
@@ -530,7 +1096,7 @@ export const riversideDefenseScenario: ScenarioDefinition = {
   ],
   waves: [
     {
-      // Wave 1 (tick 1800): Light probe — tests north bridge
+      // Wave 1 (tick 1800): Light probe — tests north bridge.
       tick: 1800,
       spawns: [
         { type: "spear_ashigaru", position: { x: 90, y: 50 } },
@@ -538,16 +1104,17 @@ export const riversideDefenseScenario: ScenarioDefinition = {
       ],
     },
     {
-      // Wave 2 (tick 5400): Coordinated assault with archer fire support
+      // Wave 2 (tick 5400): Archer fire support. Supply cart introduced.
       tick: 5400,
       spawns: [
         { type: "spear_ashigaru", position: { x: 90, y: 48 } },
         { type: "spear_ashigaru", position: { x: 90, y: 52 } },
         { type: "archer", position: { x: 92, y: 50 } },
+        { type: "supply_cart", position: { x: 94, y: 50 } },
       ],
     },
     {
-      // Wave 3 (tick 9000): First engineer; dual bridge pressure begins
+      // Wave 3 (tick 9000): First engineer; dual bridge pressure begins. Supply cart.
       tick: 9000,
       spawns: [
         { type: "spear_ashigaru", position: { x: 90, y: 50 } },
@@ -555,10 +1122,11 @@ export const riversideDefenseScenario: ScenarioDefinition = {
         { type: "engineer", position: { x: 92, y: 52 } },
         { type: "spear_ashigaru", position: { x: 90, y: 66 } },
         { type: "archer", position: { x: 92, y: 68 } },
+        { type: "supply_cart", position: { x: 94, y: 58 } },
       ],
     },
     {
-      // Wave 4 (tick 13200): Coordinated two-bridge assault with engineers
+      // Wave 4 (tick 13200): Coordinated two-bridge assault. Musketeer ranged support.
       tick: 13200,
       spawns: [
         { type: "spear_ashigaru", position: { x: 90, y: 48 } },
@@ -569,10 +1137,13 @@ export const riversideDefenseScenario: ScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 90, y: 66 } },
         { type: "engineer", position: { x: 92, y: 66 } },
         { type: "archer", position: { x: 90, y: 68 } },
+        { type: "musketeer", position: { x: 93, y: 52 } },
+        { type: "supply_cart", position: { x: 95, y: 50 } },
       ],
     },
     {
-      // Wave 5 (tick 18000): Elite final assault — heavy swords and full engineer support
+      // Wave 5 (tick 18000): Elite final assault — cavalry probe + musketeer suppression.
+      // Two supply carts (north and south groups) to teach dual-cart interception.
       tick: 18000,
       spawns: [
         { type: "sword_ashigaru", position: { x: 90, y: 46 } },
@@ -584,6 +1155,10 @@ export const riversideDefenseScenario: ScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 90, y: 66 } },
         { type: "archer", position: { x: 90, y: 68 } },
         { type: "archer", position: { x: 90, y: 70 } },
+        { type: "cavalry", position: { x: 90, y: 58 } },
+        { type: "musketeer", position: { x: 93, y: 56 } },
+        { type: "supply_cart", position: { x: 95, y: 48 } },
+        { type: "supply_cart", position: { x: 95, y: 66 } },
       ],
     },
   ],
@@ -592,4 +1167,10 @@ export const riversideDefenseScenario: ScenarioDefinition = {
   },
 };
 
-export const scenarios: readonly ScenarioDefinition[] = [mvpDefenseScenario, riversideDefenseScenario];
+/** Release 1.0 scenario roster in ascending difficulty order.
+ *  A: 環郭式平城(入門) / B: 連郭式(標準) / C: 川城+門前町(上級) */
+export const scenarios: readonly ScenarioDefinition[] = [
+  concentricCastleScenario,
+  linearFortressScenario,
+  riversideDefenseScenario,
+];
