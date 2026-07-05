@@ -1,0 +1,201 @@
+import { MAP_HEIGHT, MAP_WIDTH, type CellCoord } from "@asama/shared";
+import { getBuildingAt } from "./buildings";
+import { getCell } from "./map";
+import { ORTHOGONAL_DIRECTIONS, cellKey, isBridge, isInsideMap, manhattan, sameCell } from "./types";
+import type { UnitState, WorldState } from "./types";
+
+export function formationSlots(world: WorldState, destination: CellCoord, count: number): CellCoord[] {
+  const slots: CellCoord[] = [];
+  const visited = new Set<string>([cellKey(destination)]);
+  const queue: CellCoord[] = [destination];
+  let explored = 0;
+  const explorationLimit = Math.max(count * 12, 200);
+
+  while (queue.length > 0 && slots.length < count && explored < explorationLimit) {
+    const current = queue.shift();
+    if (current === undefined) {
+      break;
+    }
+    explored += 1;
+    if (isPassable(world, current)) {
+      slots.push(current);
+    }
+    for (const direction of ORTHOGONAL_DIRECTIONS) {
+      const next = { x: current.x + direction.x, y: current.y + direction.y };
+      const key = cellKey(next);
+      if (visited.has(key) || !isInsideMap(next)) {
+        continue;
+      }
+      visited.add(key);
+      queue.push(next);
+    }
+  }
+  return slots;
+}
+
+export function findSpawnCell(world: WorldState, preferred: CellCoord): CellCoord | null {
+  if (isPassable(world, preferred)) {
+    return preferred;
+  }
+  for (let radius = 1; radius <= 4; radius += 1) {
+    for (let dy = -radius; dy <= radius; dy += 1) {
+      for (let dx = -radius; dx <= radius; dx += 1) {
+        const candidate = { x: preferred.x + dx, y: preferred.y + dy };
+        if (isPassable(world, candidate)) {
+          return candidate;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+export const PATH_RETRY_COOLDOWN_TICKS = 40;
+
+export function findPath(world: WorldState, start: CellCoord, goal: CellCoord): CellCoord[] {
+  if (sameCell(start, goal)) {
+    return [];
+  }
+
+  const open = new Map<string, PathNode>();
+  const closed = new Set<string>();
+  const nodes = new Map<string, PathNode>();
+  const startKey = cellKey(start);
+  const startNode = {
+    coord: start,
+    g: 0,
+    f: manhattan(start, goal),
+    parentKey: null
+  };
+  open.set(startKey, startNode);
+  nodes.set(startKey, startNode);
+
+  while (open.size > 0) {
+    const current = lowestCostNode(open);
+    const currentKey = cellKey(current.coord);
+    open.delete(currentKey);
+
+    if (sameCell(current.coord, goal)) {
+      return reconstructPath(currentKey, nodes);
+    }
+
+    closed.add(currentKey);
+
+    for (const direction of ORTHOGONAL_DIRECTIONS) {
+      const neighbor = { x: current.coord.x + direction.x, y: current.coord.y + direction.y };
+      const neighborKey = cellKey(neighbor);
+      if (!isInsideMap(neighbor) || closed.has(neighborKey) || !isPassable(world, neighbor)) {
+        continue;
+      }
+
+      const tentativeG = current.g + movementCostAt(world, neighbor);
+      const known = open.get(neighborKey);
+      if (known !== undefined && tentativeG >= known.g) {
+        continue;
+      }
+
+      const nextNode = {
+        coord: neighbor,
+        g: tentativeG,
+        f: tentativeG + manhattan(neighbor, goal),
+        parentKey: currentKey
+      };
+      open.set(neighborKey, nextNode);
+      nodes.set(neighborKey, nextNode);
+    }
+  }
+
+  return [];
+}
+
+export function findPathToAttackRange(world: WorldState, start: CellCoord, target: CellCoord, range: number): CellCoord[] {
+  const candidates: CellCoord[] = [];
+  for (let y = Math.max(0, target.y - range); y <= Math.min(MAP_HEIGHT - 1, target.y + range); y += 1) {
+    for (let x = Math.max(0, target.x - range); x <= Math.min(MAP_WIDTH - 1, target.x + range); x += 1) {
+      const candidate = { x, y };
+      if (manhattan(candidate, target) <= range && isPassable(world, candidate)) {
+        candidates.push(candidate);
+      }
+    }
+  }
+
+  candidates.sort((a, b) => {
+    const distanceA = manhattan(start, a);
+    const distanceB = manhattan(start, b);
+    if (distanceA !== distanceB) {
+      return distanceA - distanceB;
+    }
+    return cellKey(a).localeCompare(cellKey(b));
+  });
+
+  for (const candidate of candidates) {
+    const path = findPath(world, start, candidate);
+    if (path.length > 0 || sameCell(start, candidate)) {
+      return path;
+    }
+  }
+
+  return [];
+}
+
+interface PathNode {
+  readonly coord: CellCoord;
+  readonly g: number;
+  readonly f: number;
+  readonly parentKey: string | null;
+}
+
+function lowestCostNode(nodes: Map<string, PathNode>): PathNode {
+  let best: PathNode | null = null;
+  for (const node of nodes.values()) {
+    if (best === null || node.f < best.f || (node.f === best.f && cellKey(node.coord) < cellKey(best.coord))) {
+      best = node;
+    }
+  }
+
+  if (best === null) {
+    throw new Error("Cannot select a path node from an empty open set");
+  }
+
+  return best;
+}
+
+function reconstructPath(goalKey: string, nodes: Map<string, PathNode>): CellCoord[] {
+  const path: CellCoord[] = [];
+  let current = nodes.get(goalKey);
+
+  while (current !== undefined && current.parentKey !== null) {
+    path.push(current.coord);
+    current = nodes.get(current.parentKey);
+  }
+
+  return path.reverse();
+}
+
+export function isPassable(world: WorldState, coord: CellCoord): boolean {
+  if (!isInsideMap(coord)) {
+    return false;
+  }
+
+  if (getUnitAt(world, coord) !== null) {
+    return false;
+  }
+
+  const cell = getCell(world, coord);
+  const building = getBuildingAt(world, coord);
+  if (building !== null) {
+    return building.passable && (cell.passable || isBridge(building.type));
+  }
+
+  return cell.passable;
+}
+
+export function movementCostAt(world: WorldState, coord: CellCoord): number {
+  const terrainCost = getCell(world, coord).movementCost;
+  const building = getBuildingAt(world, coord);
+  return terrainCost + (building?.movementCostModifier ?? 0);
+}
+
+export function getUnitAt(world: WorldState, coord: CellCoord): UnitState | null {
+  return world.units.find((unit) => unit.hp > 0 && sameCell(unit.position, coord)) ?? null;
+}
