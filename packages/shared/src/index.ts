@@ -188,6 +188,8 @@ export interface WorldSnapshot {
   readonly supplyRetreat: SupplyRetreatSnapshot;
   /** Tick at which the next enemy wave spawns, or null if all waves have been deployed. */
   readonly nextWaveTick?: number | null;
+  /** Tick at which the hold-out victory triggers (null: no time victory). */
+  readonly holdDeadlineTick?: number | null;
 }
 
 export type PlayerCommand =
