@@ -146,6 +146,39 @@
       }
     },
     {
+      "assetId": "building.storehouse",
+      "kind": "building",
+      "file": "generated/building-storehouse.png",
+      "width": 224,
+      "height": 176,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8181818181818182
+      }
+    },
+    {
+      "assetId": "building.yagura.small.normal",
+      "kind": "building",
+      "file": "generated/building-yagura-small-normal.png",
+      "width": 160,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.84
+      }
+    },
+    {
+      "assetId": "building.market",
+      "kind": "building",
+      "file": "generated/building-market.png",
+      "width": 256,
+      "height": 192,
+      "anchor": {
+        "x": 0.5625,
+        "y": 0.8333333333333334
+      }
+    },
+    {
       "assetId": "building.barracks",
       "kind": "building",
       "file": "generated/building-barracks.png",
@@ -154,6 +187,28 @@
       "anchor": {
         "x": 0.5625,
         "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.samurai_residence",
+      "kind": "building",
+      "file": "generated/building-samurai-residence.png",
+      "width": 288,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "building.town_block",
+      "kind": "building",
+      "file": "generated/building-town-block.png",
+      "width": 416,
+      "height": 304,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8947368421052632
       }
     },
     {
@@ -330,61 +385,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.storehouse",
-      "kind": "building",
-      "file": "generated/building-storehouse.png",
-      "width": 224,
-      "height": 176,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8181818181818182
-      }
-    },
-    {
-      "assetId": "building.yagura.small.normal",
-      "kind": "building",
-      "file": "generated/building-yagura-small-normal.png",
-      "width": 160,
-      "height": 200,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.84
-      }
-    },
-    {
-      "assetId": "building.market",
-      "kind": "building",
-      "file": "generated/building-market.png",
-      "width": 256,
-      "height": 192,
-      "anchor": {
-        "x": 0.5625,
-        "y": 0.8333333333333334
-      }
-    },
-    {
-      "assetId": "building.samurai_residence",
-      "kind": "building",
-      "file": "generated/building-samurai-residence.png",
-      "width": 288,
-      "height": 224,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8571428571428571
-      }
-    },
-    {
-      "assetId": "building.town_block",
-      "kind": "building",
-      "file": "generated/building-town-block.png",
-      "width": 416,
-      "height": 304,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8947368421052632
       }
     },
     {

@@ -243,10 +243,8 @@
       "kind": "building",
       "output": "building-storehouse.png",
       "source": {
-        "type": "blender",
-        "model": "building-storehouse-showcase",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-storehouse.png"
       },
       "geometry": {
         "footprintWidth": 3,
@@ -270,10 +268,8 @@
       "kind": "building",
       "output": "building-yagura-small-normal.png",
       "source": {
-        "type": "blender",
-        "model": "building-yagura-small-graybox",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-yagura-small-normal.png"
       },
       "geometry": {
         "footprintWidth": 2,
@@ -297,10 +293,8 @@
       "kind": "building",
       "output": "building-market.png",
       "source": {
-        "type": "blender",
-        "model": "building-market-graybox",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-market.png"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -349,10 +343,8 @@
       "kind": "building",
       "output": "building-samurai-residence.png",
       "source": {
-        "type": "blender",
-        "model": "building-samurai-residence-graybox",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-samurai-residence.png"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -376,10 +368,8 @@
       "kind": "building",
       "output": "building-town-block.png",
       "source": {
-        "type": "blender",
-        "model": "building-town-block-graybox",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-town-block.png"
       },
       "geometry": {
         "footprintWidth": 6,
