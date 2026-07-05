@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createInitialWorld, applyCommand, updateWorld, type WorldState } from "./index";
+import type { UnitType } from "@asama/shared";
 
 function playerUnitIds(world: WorldState): string[] {
   return world.units.filter((unit) => unit.owner === "player").map((unit) => unit.id);
@@ -74,6 +75,168 @@ describe("formation movement", () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// Helpers shared by the regression suites below
+
+function normalizeMap(world: WorldState): void {
+  world.map.cells = world.map.cells.map((cell) => ({
+    ...cell,
+    terrain: "grass" as const,
+    movementCost: 1,
+    passable: true,
+    assetId: "terrain.grass.test"
+  }));
+}
+
+function resetBuildings(world: WorldState): void {
+  world.buildings.splice(0, world.buildings.length);
+}
+
+function makeUnit(id: string, type: UnitType, x: number, y: number): WorldState["units"][number] {
+  const stats: Record<UnitType, { hp: number; damage: number; range: number; cooldown: number; step: number }> = {
+    spear_ashigaru: { hp: 100, damage: 14, range: 1, cooldown: 26, step: 6 },
+    sword_ashigaru: { hp: 110, damage: 18, range: 1, cooldown: 22, step: 6 },
+    archer: { hp: 70, damage: 12, range: 8, cooldown: 32, step: 7 },
+    engineer: { hp: 80, damage: 8, range: 1, cooldown: 30, step: 7 },
+    musketeer: { hp: 60, damage: 20, range: 4, cooldown: 50, step: 7 },
+    cavalry: { hp: 140, damage: 16, range: 1, cooldown: 24, step: 3 },
+    supply_cart: { hp: 80, damage: 0, range: 0, cooldown: 19980, step: 10 }
+  };
+  const s = stats[type];
+  return {
+    id, owner: "player", type, position: { x, y }, destination: null, path: [],
+    selected: false, hp: s.hp, maxHp: s.hp, attackDamage: s.damage,
+    attackRange: s.range, attackCooldownTicks: s.cooldown, attackCooldownRemaining: 0,
+    targetId: null, attackTargetId: null, assetId: `unit.${type}.test`,
+    ticksPerStep: s.step, movementProgress: 0, pathRetryCooldown: 0,
+    task: null, attackMoveDestination: null
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Bug regression: 8-unit group move in a narrow corridor
+
+describe("8-unit group move (narrow corridor regression)", () => {
+  it("all 8 units receive path assignments even when tightly stacked in a single-file corridor", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+
+    // Place corridor walls first (no units yet to block placement)
+    for (let y = 5; y <= 40; y += 1) {
+      applyCommand(world, { type: "placeBuilding", buildingType: "wall", position: { x: 19, y }, issuedAtTick: 0, clientSequence: 0 });
+      applyCommand(world, { type: "placeBuilding", buildingType: "wall", position: { x: 21, y }, issuedAtTick: 0, clientSequence: 0 });
+    }
+
+    // 8 units stacked in a vertical column at x=20, y=10..17
+    world.units = Array.from({ length: 8 }, (_, i) => makeUnit(`u${i}`, "spear_ashigaru", 20, 10 + i));
+
+    const rejection = applyCommand(world, {
+      type: "moveUnits",
+      unitIds: world.units.map((u) => u.id),
+      destination: { x: 20, y: 30 },
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+
+    expect(rejection).toBeNull();
+    // Every mover must have been assigned a destination slot
+    const assigned = world.units.filter((u) => u.destination !== null);
+    expect(assigned.length).toBe(8);
+  });
+
+  it("all 8 units in a narrow corridor arrive at distinct slots near the destination", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+
+    for (let y = 5; y <= 40; y += 1) {
+      applyCommand(world, { type: "placeBuilding", buildingType: "wall", position: { x: 19, y }, issuedAtTick: 0, clientSequence: 0 });
+      applyCommand(world, { type: "placeBuilding", buildingType: "wall", position: { x: 21, y }, issuedAtTick: 0, clientSequence: 0 });
+    }
+
+    world.units = Array.from({ length: 8 }, (_, i) => makeUnit(`u${i}`, "spear_ashigaru", 20, 10 + i));
+
+    applyCommand(world, {
+      type: "moveUnits",
+      unitIds: world.units.map((u) => u.id),
+      destination: { x: 20, y: 30 },
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+
+    for (let tick = 0; tick < 3000; tick += 1) {
+      updateWorld(world);
+      if (world.units.every((u) => u.path.length === 0)) {
+        break;
+      }
+    }
+
+    const positions = world.units.map((u) => `${u.position.x},${u.position.y}`);
+    expect(new Set(positions).size).toBe(8);
+    for (const u of world.units) {
+      expect(Math.abs(u.position.x - 20) + Math.abs(u.position.y - 30)).toBeLessThanOrEqual(10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bug regression: bridge crossing over river water terrain
+
+describe("bridge crossing over river water", () => {
+  it("unit can path from the north bank to the south bank via earth_bridge at (61,44)", () => {
+    // MVP scenario places earth_bridge at (61,44). With the 1-cell-wide river fix
+    // (riverDistance===0 only), (61,43) and (61,45) are grass → bridge is reachable.
+    const world = createInitialWorld();
+    const testUnit = world.units.find((u) => u.owner === "player");
+    expect(testUnit).toBeDefined();
+    if (testUnit === undefined) return;
+
+    // Keep only this unit and place it on the north bank
+    world.units = [testUnit];
+    testUnit.position = { x: 61, y: 42 };
+
+    const rejection = applyCommand(world, {
+      type: "moveUnits",
+      unitIds: [testUnit.id],
+      destination: { x: 61, y: 46 },
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+
+    expect(rejection).toBeNull();
+    expect(testUnit.path.length).toBeGreaterThan(0);
+    // The assigned path must traverse the bridge cell itself
+    expect(testUnit.path.some((c) => c.x === 61 && c.y === 44)).toBe(true);
+  });
+
+  it("unit actually moves across the river via earth_bridge at (61,44)", () => {
+    const world = createInitialWorld();
+    const testUnit = world.units.find((u) => u.owner === "player");
+    expect(testUnit).toBeDefined();
+    if (testUnit === undefined) return;
+
+    world.units = [testUnit];
+    testUnit.position = { x: 61, y: 42 };
+
+    applyCommand(world, {
+      type: "moveUnits",
+      unitIds: [testUnit.id],
+      destination: { x: 61, y: 46 },
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+
+    for (let tick = 0; tick < 500; tick += 1) {
+      updateWorld(world);
+      if (testUnit.path.length === 0) break;
+    }
+
+    expect(testUnit.position).toEqual({ x: 61, y: 46 });
+  });
+});
+
+// ---------------------------------------------------------------------------
 describe("attack move and stop", () => {
   it("engages enemies encountered during an attack move", () => {
     const world = createInitialWorld();

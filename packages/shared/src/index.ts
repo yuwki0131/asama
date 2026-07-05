@@ -186,6 +186,8 @@ export interface WorldSnapshot {
   readonly units: readonly UnitSnapshot[];
   readonly buildings: readonly BuildingSnapshot[];
   readonly supplyRetreat: SupplyRetreatSnapshot;
+  /** Tick at which the next enemy wave spawns, or null if all waves have been deployed. */
+  readonly nextWaveTick?: number | null;
 }
 
 export type PlayerCommand =
