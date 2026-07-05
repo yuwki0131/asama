@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitId, UnitType, WorldSnapshot } from "@asama/shared";
+import { unitSpecs } from "@asama/content";
 import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type GameCanvasHandle, type ToolMode } from "../renderer/GameCanvas";
 import { computeGroupCentroid } from "../renderer/groupManager";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 import { SelectionInfoPanel } from "./SelectionInfoPanel";
+import { ticksToMmSs, unitTypeLabel } from "./selectionPanelUtils";
+
+const RECRUITABLE_UNIT_TYPES: readonly UnitType[] = (Object.values(unitSpecs) as (typeof unitSpecs)[keyof typeof unitSpecs][])
+  .filter((spec) => spec.type !== "supply_cart")
+  .map((spec) => spec.type);
 
 const DEBUG_STATUS_PANEL_ENABLED =
   import.meta.env.VITE_DEBUG_STATUS_PANEL === "true" ||
@@ -436,18 +442,11 @@ export function App() {
           Demolish
         </button>
         <span className="bar-divider" />
-        <button type="button" onClick={() => handleRecruit("spear_ashigaru")}>
-          徴兵:槍
-        </button>
-        <button type="button" onClick={() => handleRecruit("sword_ashigaru")}>
-          徴兵:刀
-        </button>
-        <button type="button" onClick={() => handleRecruit("archer")}>
-          徴兵:弓
-        </button>
-        <button type="button" onClick={() => handleRecruit("engineer")}>
-          徴兵:工兵
-        </button>
+        {RECRUITABLE_UNIT_TYPES.map((type) => (
+          <button key={type} type="button" onClick={() => handleRecruit(type)}>
+            徴兵:{unitTypeLabel(type)}
+          </button>
+        ))}
         <span className="bar-divider" />
         <button className={buildTool === "ladder" ? "active" : ""} type="button" onClick={() => setBuildTool("ladder")}>
           梯子設置
@@ -467,6 +466,11 @@ export function App() {
         </button>
       </div>
       <section className="game-view">
+        {snapshot?.supplyRetreat.active === true ? (
+          <div className="retreat-timer-banner" role="alert">
+            敵兵站切断! 撤退まで {ticksToMmSs(snapshot.supplyRetreat.remainingTicks)}
+          </div>
+        ) : null}
         {alerts.length === 0 ? null : (
           <div className="alert-stack" aria-live="polite">
             {alerts.map((alert) => (
@@ -486,7 +490,9 @@ export function App() {
                   ? "兵糧が尽き、開城しました"
                   : outcome.reason === "time_held"
                     ? "規定時間、本丸を守り抜きました"
-                    : "敵軍を全滅させました"}
+                    : outcome.reason === "supply_cut"
+                      ? "敵兵站を断ち、敵軍を撤退させました"
+                      : "敵軍を全滅させました"}
             </span>
           </div>
         )}

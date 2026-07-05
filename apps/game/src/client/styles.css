@@ -299,3 +299,21 @@ button {
 .sip-disconnected {
   color: #ff8f7e;
 }
+
+.retreat-timer-banner {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  padding: 5px 24px;
+  border-radius: 0 0 6px 6px;
+  border: 1px solid #d05030;
+  border-top: none;
+  background: rgba(160, 40, 10, 0.92);
+  color: #ffe0d0;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
