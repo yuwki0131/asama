@@ -54,8 +54,13 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
     add_flat_quad(scene, "Water", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), -WATER_DEPTH, water)
 
     def jitter(name, i, count):
+        # Endpoints (i=0, i=count) are pinned to zero so wavy banks from
+        # neighbouring tiles/variants always meet flush at tile boundaries —
+        # otherwise thin grass slivers show at the seams.
         seed = sum(ord(c) for c in name) + variant * 97
-        return 0.05 * _math.sin(seed * 2.13 + i * 2.9) + 0.03 * _math.sin(seed * 5.7 + i * 6.1)
+        raw = 0.05 * _math.sin(seed * 2.13 + i * 2.9) + 0.03 * _math.sin(seed * 5.7 + i * 6.1)
+        envelope = _math.sin(_math.pi * i / count)
+        return raw * envelope
 
     segments = 6
     depth_base = 0.17
