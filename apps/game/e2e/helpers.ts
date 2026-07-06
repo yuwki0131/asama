@@ -2,6 +2,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { inflateSync } from "node:zlib";
 import { join } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
+import { expectedScreenColor, type Rgb } from "../src/client/renderer/toneGrade";
 
 // Use port 5179 to avoid collisions with other dev servers on 5173–5177.
 const DEV_PORT = process.env["ASAMA_E2E_PORT"] ?? "5179";
@@ -125,6 +126,7 @@ export function parsePng(buffer: Buffer): PngData {
   let offset = 8; // skip 8-byte PNG signature
   let width = 0;
   let height = 0;
+  let colorType = 6;
   const idatParts: Buffer[] = [];
 
   while (offset + 12 <= buffer.length) {
@@ -134,6 +136,13 @@ export function parsePng(buffer: Buffer): PngData {
     if (type === "IHDR") {
       width = data.readUInt32BE(0);
       height = data.readUInt32BE(4);
+      if (data[8] !== 8) {
+        throw new Error(`parsePng: unsupported bit depth ${data[8]}`);
+      }
+      colorType = data[9]!;
+      if (colorType !== 2 && colorType !== 6) {
+        throw new Error(`parsePng: unsupported color type ${colorType} (only 8-bit RGB/RGBA)`);
+      }
     } else if (type === "IDAT") {
       idatParts.push(Buffer.from(data));
     } else if (type === "IEND") {
@@ -143,9 +152,11 @@ export function parsePng(buffer: Buffer): PngData {
   }
 
   const raw = inflateSync(Buffer.concat(idatParts));
-  const bpp = 4; // RGBA
+  // Playwright emits color type 2 (opaque RGB) for canvas screenshots and
+  // type 6 (RGBA) otherwise; unfilter at the source bpp, return RGBA.
+  const bpp = colorType === 2 ? 3 : 4;
   const stride = width * bpp;
-  const result = new Uint8Array(width * height * bpp);
+  const result = new Uint8Array(width * height * 4);
   const prev = new Uint8Array(stride);
 
   for (let y = 0; y < height; y++) {
@@ -171,7 +182,14 @@ export function parsePng(buffer: Buffer): PngData {
       out[x] = v;
     }
 
-    result.set(out, y * stride);
+    for (let px = 0; px < width; px++) {
+      const src = px * bpp;
+      const dst = (y * width + px) * 4;
+      result[dst] = out[src]!;
+      result[dst + 1] = out[src + 1]!;
+      result[dst + 2] = out[src + 2]!;
+      result[dst + 3] = bpp === 4 ? out[src + 3]! : 255;
+    }
     prev.set(out);
   }
 
@@ -188,12 +206,29 @@ function paethPredictor(a: number, b: number, c: number): number {
   return c;
 }
 
+// ── Tone-graded expected colors ──────────────────────────────────────────────
+// The world container renders through the grade-C color matrix and a
+// screen-fixed aerial haze gradient (top 20% opacity → 0% at 55% height), so
+// on-screen colors differ from raw asset colors. E2E pixel matching must
+// compare against the tone-graded color at the pixel's vertical position.
+// The transform is static, so a per-row lookup table is precomputed here.
+
+/** Per-row expected on-screen color for a raw world-space sRGB color. */
+export function buildRowExpectedColors(base: Rgb, height: number): Rgb[] {
+  const rows: Rgb[] = new Array(height);
+  for (let y = 0; y < height; y++) {
+    rows[y] = expectedScreenColor(base, y, height);
+  }
+  return rows;
+}
+
 /**
- * Count pixels that match the overlay.cell.selected fallback color (#f0c86a)
- * with tolerance=15. At tol=15: tenshu and other legitimate sprites have 0
- * matching pixels; the overlay.cell.selected itself has ~240 matching pixels.
- * In the initial uninteracted game state this overlay should never appear;
- * any occurrence indicates a missing asset fallback.
+ * Count pixels that match the overlay.cell.selected fallback color (#f0c86a,
+ * tone-graded to ~#f4cf83 mid-screen) with tolerance=15. At tol=15: tenshu and
+ * other legitimate sprites have 0 matching pixels; the overlay.cell.selected
+ * itself has ~240 matching pixels. In the initial uninteracted game state this
+ * overlay should never appear; any occurrence indicates a missing asset
+ * fallback.
  */
 export function countFallbackPixels(png: PngData): number {
   return countFallbackPixelsDebug(png).count;
@@ -205,17 +240,29 @@ export function countFallbackPixels(png: PngData): number {
 // ~10px, so the floor sits well above noise and well below a real hit.
 const MIN_FALLBACK_CLUSTER = 40;
 
+// Raw fallback texture color #f0c86a; matched on screen after tone grading.
+const FALLBACK_BASE_RGB: Rgb = { r: 0xf0, g: 0xc8, b: 0x6a };
+const FALLBACK_TOLERANCE = 15;
+
 export function countFallbackPixelsDebug(png: PngData): { count: number; samples: Array<{ x: number; y: number; r: number; g: number; b: number }> } {
   const { data, width, height } = png;
 
-  // Build a boolean map of candidate pixels (#f0c86a ±15, alpha > 80)
+  // Build a boolean map of candidate pixels: tone-graded #f0c86a ±15
+  // (haze-adjusted per row), alpha > 80.
+  const rowExpected = buildRowExpectedColors(FALLBACK_BASE_RGB, height);
   const candidates = new Uint8Array(width * height);
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i]!;
     const g = data[i + 1]!;
     const b = data[i + 2]!;
     const a = data[i + 3]!;
-    if (a > 80 && Math.abs(r - 240) < 15 && Math.abs(g - 200) < 15 && Math.abs(b - 106) < 15) {
+    const expected = rowExpected[Math.floor(i / 4 / width)]!;
+    if (
+      a > 80 &&
+      Math.abs(r - expected.r) < FALLBACK_TOLERANCE &&
+      Math.abs(g - expected.g) < FALLBACK_TOLERANCE &&
+      Math.abs(b - expected.b) < FALLBACK_TOLERANCE
+    ) {
       candidates[i / 4] = 1;
     }
   }

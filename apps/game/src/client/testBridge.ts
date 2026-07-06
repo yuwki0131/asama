@@ -15,6 +15,12 @@ export interface AsamaTestBridge {
   cellToScreenPoint(cell: { x: number; y: number }): { x: number; y: number } | null;
   /** Returns the measured average fps over the last second of render frames. */
   getFps(): number;
+  /**
+   * Toggle the grade-C color matrix + aerial haze overlay (default true).
+   * E2E pixel assertions expect tone ON — the shipped look — and derive
+   * expected colors via src/client/renderer/toneGrade.ts.
+   */
+  setTone(enabled: boolean): void;
 }
 
 declare global {

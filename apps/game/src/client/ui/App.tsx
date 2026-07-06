@@ -96,6 +96,9 @@ export function App() {
       getBuildTool: () => buildToolRef.current,
       cellToScreenPoint: (cell) => gameCanvasRef.current?.cellToScreenPoint(cell) ?? null,
       getFps: () => gameCanvasRef.current?.getFps() ?? 0,
+      setTone: (enabled) => {
+        gameCanvasRef.current?.setTone(enabled);
+      },
     };
     return () => {
       delete window.__asamaTest;
