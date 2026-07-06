@@ -65,9 +65,19 @@ export function buildTerrainChunks(
   // where water tile bleed crossed a chunk boundary.  A single Graphics has no
   // inter-chunk edges and therefore no seam.
   const underlayGraphics = new Graphics();
+  const waterCells = new Set<string>();
+  for (const cell of snapshot.map.cells) {
+    if (cell.terrain === "water") {
+      waterCells.add(`${cell.coord.x}:${cell.coord.y}`);
+    }
+  }
+  const touchesWater = (x: number, y: number): boolean =>
+    waterCells.has(`${x}:${y}`) ||
+    waterCells.has(`${x + 1}:${y}`) || waterCells.has(`${x - 1}:${y}`) ||
+    waterCells.has(`${x}:${y + 1}`) || waterCells.has(`${x}:${y - 1}`);
   for (const { cells } of chunkMap.values()) {
     for (const cell of cells) {
-      addTerrainUnderlay(underlayGraphics, cell);
+      addTerrainUnderlay(underlayGraphics, cell, touchesWater(cell.coord.x, cell.coord.y));
     }
   }
   // The underlay sits below all sprite chunks and is never culled.
@@ -133,10 +143,18 @@ function terrainFallbackAssetId(cell: TerrainCellSnapshot): string {
   return `terrain.${cell.terrain}.base`;
 }
 
-function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot): void {
+function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot, nearWater: boolean): void {
   const point = cellToWorld(cell.coord);
   const halfWidth = TILE_WIDTH / 2 + TERRAIN_UNDERLAY_PADDING;
   const halfHeight = TILE_HEIGHT / 2 + TERRAIN_UNDERLAY_PADDING / 2;
+
+  // The underlay shows through sub-pixel AA seams between adjacent tile
+  // sprites. Its color must be inconspicuous for the tiles above it:
+  // grass-green in the interior, but DARK for water cells and their
+  // direct neighbours — a bright green underlay leaking along the
+  // water/bank boundary reads as "green lines" across rivers, while a
+  // dark leak there reads as a natural shadow.
+  const color = nearWater ? 0x0d1e2a : 0x63753a;
 
   graphics
     .poly([
@@ -149,5 +167,5 @@ function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot): void
       point.x - halfWidth,
       point.y
     ])
-    .fill({ color: 0x63753a, alpha: 1 });
+    .fill({ color, alpha: 1 });
 }

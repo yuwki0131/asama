@@ -63,7 +63,7 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
         return raw * envelope
 
     segments = 6
-    depth_base = 0.12
+    depth_base = 0.08
     for name in ("N", "E", "S", "W"):
         if same[name]:
             continue
