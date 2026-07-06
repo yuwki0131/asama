@@ -16,6 +16,7 @@ import { tileOffsetYAt } from "./elevation";
 import { registerKeyboardInput, registerPointerInput } from "./input";
 import { elapsedSimTicks } from "./interpolation";
 import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type MinimapTerrainCache } from "./minimap";
+import { EffectsLayer } from "./effectsLayer";
 import { renderScene } from "./renderScene";
 import { RetainedScene } from "./sceneLayer";
 import { updateTerrainChunkVisibility } from "./terrainLayer";
@@ -89,6 +90,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const aerialOverlayRef = useRef<Sprite | null>(null);
   const toneEnabledRef = useRef(true);
   const retainedSceneRef = useRef<RetainedScene | null>(null);
+  const effectsLayerRef = useRef<EffectsLayer | null>(null);
   const lastTerrainKeyRef = useRef<string | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(snapshot);
   const snapshotReceivedAtRef = useRef<number>(performance.now());
@@ -307,8 +309,10 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         const terrainLayer = new Container();
         const overlayLayer = new Container();
         const retainedScene = new RetainedScene();
+        const effectsLayer = new EffectsLayer();
+        effectsLayerRef.current = effectsLayer;
         const debugLayer = new Container();
-        world.addChild(terrainLayer, overlayLayer, retainedScene.root, debugLayer);
+        world.addChild(terrainLayer, overlayLayer, retainedScene.root, effectsLayer.root, debugLayer);
         app.stage.addChild(world);
 
         // Grade C "大河ドラマ" color matrix over the whole world (terrain,
@@ -370,6 +374,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
           const elapsedMs = currentSnapshot.outcome === null ? now - snapshotReceivedAtRef.current : 0;
           const elapsedTicks = elapsedSimTicks(elapsedMs, speedRef.current);
           retainedScene.updateFrame(elapsedTicks, ticker.deltaMS, now / 1000, camera, app.screen.width, app.screen.height);
+          effectsLayerRef.current?.updateFrame(ticker.deltaMS);
         });
 
         setReady(true);
@@ -389,6 +394,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       toneFilterRef.current = null;
       aerialOverlayRef.current = null;
       retainedSceneRef.current = null;
+      effectsLayerRef.current?.clear();
+      effectsLayerRef.current = null;
       lastTerrainKeyRef.current = null;
       fpsSamplesRef.current = [];
       setReady(false);
@@ -437,6 +444,9 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       localInvalidMoveTarget
     );
     drawMinimap(minimapRef.current, minimapTerrainRef, snapshot, cameraRef.current, hostRef.current);
+    if (effectsLayerRef.current !== null) {
+      effectsLayerRef.current.triggerFromSnapshot(snapshot, cameraRef.current, assetsRef.current);
+    }
     // cameraVersion is not read by renderScene, but camera pans and zooms
     // mutate cameraRef without new state; the version bump re-triggers this
     // effect so the scene follows the camera.
