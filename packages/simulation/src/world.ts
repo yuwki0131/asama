@@ -479,7 +479,9 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
       attackCooldownRemaining: unit.attackCooldownRemaining,
       targetId: unit.targetId,
       assetId: unit.assetId,
-      task: unit.task
+      task: unit.task,
+      movementProgress: unit.movementProgress,
+      ticksPerStep: unit.ticksPerStep
     })),
     buildings: world.buildings.map((building) => snapshotBuilding(world, building)),
     nextWaveTick,

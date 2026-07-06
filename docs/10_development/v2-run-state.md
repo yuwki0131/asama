@@ -11,7 +11,7 @@
 
 | 作業 | ブランチ | 状態 |
 |---|---|---|
-| 60fps ticker + 補間 + 保持型シーングラフ + マップ初回送信化 | agent/v2-render-core | エージェント実装中 |
+| 60fps ticker + 補間 + 保持型シーングラフ + マップ初回送信化 | agent/v2-render-core | 実装完了・PR提出済み(typecheck/lint/unit/E2E全緑。ヘッドレスSwiftShaderでは1280x800でfill-rate律速~10fps=main同等、実GPUで60fps想定。fps計測は `__asamaTest.getFps()`) |
 | アニメパイプライン・スパイク(足軽歩行 8方向×8フレーム) | agent/v2-anim-pipeline | エージェント実装中 |
 
 ## 完了済みマイルストーン

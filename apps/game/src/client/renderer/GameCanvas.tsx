@@ -7,13 +7,16 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent
 } from "react";
-import { Application, Container } from "pixi.js";
+import { Application, Container, type Ticker } from "pixi.js";
 import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@asama/shared";
 import { loadGeneratedAssets, type LoadedAsset } from "./assets";
-import { cellToWorld, centerCameraOnCell, snapCamera, worldToScreen, type CameraState } from "./camera";
+import { cellToWorld, centerCameraOnCell, roundScreenPixel, snapCamera, worldToScreen, type CameraState } from "./camera";
 import { registerKeyboardInput, registerPointerInput } from "./input";
+import { elapsedSimTicks } from "./interpolation";
 import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type MinimapTerrainCache } from "./minimap";
 import { renderScene } from "./renderScene";
+import { RetainedScene } from "./sceneLayer";
+import { updateTerrainChunkVisibility } from "./terrainLayer";
 
 export type ToolMode = BuildingType | "demolish" | "ladder" | "fillMoat" | null;
 
@@ -21,10 +24,14 @@ export interface GameCanvasHandle {
   jumpCameraToCell: (cell: CellCoord) => void;
   /** DEV-only: returns absolute screen position {x,y} of a cell center. */
   cellToScreenPoint: (cell: CellCoord) => { x: number; y: number } | null;
+  /** DEV-only: measured average fps over the last second of render frames. */
+  getFps: () => number;
 }
 
 interface GameCanvasProps {
   readonly snapshot: WorldSnapshot | null;
+  /** Current simulation speed; scales snapshot extrapolation for interpolation. */
+  readonly speed: 0 | 1 | 2 | 4;
   readonly buildTool: ToolMode;
   readonly debugOverlayVisible: boolean;
   readonly onSelectUnits: (unitIds: readonly UnitId[], additive: boolean) => void;
@@ -50,6 +57,7 @@ export const DEBUG_OVERLAY_DEFAULT_ENABLED =
 
 export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function GameCanvas({
   snapshot,
+  speed,
   buildTool,
   debugOverlayVisible,
   onSelectUnits,
@@ -71,9 +79,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const worldRef = useRef<Container | null>(null);
   const terrainLayerRef = useRef<Container | null>(null);
   const overlayLayerRef = useRef<Container | null>(null);
-  const unitLayerRef = useRef<Container | null>(null);
+  const debugLayerRef = useRef<Container | null>(null);
+  const retainedSceneRef = useRef<RetainedScene | null>(null);
   const lastTerrainKeyRef = useRef<string | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(snapshot);
+  const snapshotReceivedAtRef = useRef<number>(performance.now());
+  const speedRef = useRef<0 | 1 | 2 | 4>(speed);
+  const assetsRef = useRef<ReadonlyMap<string, LoadedAsset>>(new Map());
+  const fpsSamplesRef = useRef<number[]>([]);
   const buildToolRef = useRef<ToolMode>(buildTool);
   const onSelectUnitsRef = useRef(onSelectUnits);
   const onAttackTargetRef = useRef(onAttackTarget);
@@ -141,7 +154,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
 
   useEffect(() => {
     snapshotRef.current = snapshot;
+    // Interpolation extrapolates from the moment this snapshot became visible
+    // to the renderer, not from the sim-side tick time.
+    snapshotReceivedAtRef.current = performance.now();
   }, [snapshot]);
+
+  useEffect(() => {
+    speedRef.current = speed;
+  }, [speed]);
 
   useEffect(() => {
     buildToolRef.current = buildTool;
@@ -210,6 +230,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       const screen = worldToScreen(world, cameraRef.current);
       const rect = app.canvas.getBoundingClientRect();
       return { x: rect.left + screen.x, y: rect.top + screen.y };
+    },
+    getFps: () => {
+      const samples = fpsSamplesRef.current;
+      if (samples.length < 2) return 0;
+      const first = samples[0]!;
+      const last = samples[samples.length - 1]!;
+      if (last <= first) return 0;
+      return ((samples.length - 1) * 1000) / (last - first);
     }
   }), [scheduleCameraRender]);
 
@@ -256,17 +284,49 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         const world = new Container();
         const terrainLayer = new Container();
         const overlayLayer = new Container();
-        const unitLayer = new Container();
-        world.addChild(terrainLayer, overlayLayer, unitLayer);
+        const retainedScene = new RetainedScene();
+        const debugLayer = new Container();
+        world.addChild(terrainLayer, overlayLayer, retainedScene.root, debugLayer);
         app.stage.addChild(world);
 
         appRef.current = app;
         worldRef.current = world;
         terrainLayerRef.current = terrainLayer;
         overlayLayerRef.current = overlayLayer;
-        unitLayerRef.current = unitLayer;
+        debugLayerRef.current = debugLayer;
+        retainedSceneRef.current = retainedScene;
         centerCameraOnCell({ x: 64, y: 64 }, host, cameraRef.current);
         snapCamera(cameraRef.current);
+
+        // 60fps render loop: camera transform, terrain culling and the
+        // retained unit/building scene are updated every ticker frame; the
+        // snapshot-driven overlays stay on the React effect path.
+        app.ticker.add((ticker: Ticker) => {
+          const now = performance.now();
+          const samples = fpsSamplesRef.current;
+          samples.push(now);
+          while (samples.length > 0 && samples[0]! < now - 1000) {
+            samples.shift();
+          }
+
+          const camera = cameraRef.current;
+          world.position.set(roundScreenPixel(camera.x), roundScreenPixel(camera.y));
+          world.scale.set(camera.zoom);
+          updateTerrainChunkVisibility(terrainLayer, camera, app.screen.width, app.screen.height);
+
+          const currentSnapshot = snapshotRef.current;
+          const assets = assetsRef.current;
+          if (currentSnapshot === null || assets.size === 0) {
+            return;
+          }
+          retainedScene.sync(currentSnapshot, assets, camera.zoom);
+          // Once the outcome is decided the sim stops ticking; freezing the
+          // extrapolation clock keeps units from drifting one cell ahead.
+          const elapsedMs = currentSnapshot.outcome === null ? now - snapshotReceivedAtRef.current : 0;
+          const elapsedTicks = elapsedSimTicks(elapsedMs, speedRef.current);
+          retainedScene.updateFrame(elapsedTicks, ticker.deltaMS, camera, app.screen.width, app.screen.height);
+        });
+
         setReady(true);
       })
       .catch((error) => {
@@ -280,8 +340,10 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       worldRef.current = null;
       terrainLayerRef.current = null;
       overlayLayerRef.current = null;
-      unitLayerRef.current = null;
+      debugLayerRef.current = null;
+      retainedSceneRef.current = null;
       lastTerrainKeyRef.current = null;
+      fpsSamplesRef.current = [];
       setReady(false);
     };
   }, []);
@@ -292,6 +354,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
     void loadGeneratedAssets()
       .then((loadedAssets) => {
         if (!disposed) {
+          assetsRef.current = loadedAssets;
           setAssets(loadedAssets);
         }
       })
@@ -314,7 +377,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       worldRef.current,
       terrainLayerRef.current,
       overlayLayerRef.current,
-      unitLayerRef.current,
+      debugLayerRef.current,
       lastTerrainKeyRef,
       snapshot,
       assets,

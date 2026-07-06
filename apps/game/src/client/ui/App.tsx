@@ -95,6 +95,7 @@ export function App() {
         }),
       getBuildTool: () => buildToolRef.current,
       cellToScreenPoint: (cell) => gameCanvasRef.current?.cellToScreenPoint(cell) ?? null,
+      getFps: () => gameCanvasRef.current?.getFps() ?? 0,
     };
     return () => {
       delete window.__asamaTest;
@@ -638,6 +639,7 @@ export function App() {
           buildTool={buildTool}
           debugOverlayVisible={debugVisible}
           snapshot={snapshot}
+          speed={speed}
           onDemolishBuilding={handleDemolishBuilding}
           onPlaceBuilding={handlePlaceBuilding}
           onToggleGate={handleToggleGate}
