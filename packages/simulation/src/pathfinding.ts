@@ -1,10 +1,10 @@
 import { MAP_HEIGHT, MAP_WIDTH, type CellCoord } from "@asama/shared";
 import { getBuildingAt } from "./buildings";
 import { getCell } from "./map";
-import { ORTHOGONAL_DIRECTIONS, cellKey, isBridge, isInsideMap, manhattan, sameCell } from "./types";
+import { ORTHOGONAL_DIRECTIONS, cellKey, isBridge, isGate, isInsideMap, manhattan, sameCell } from "./types";
 import type { UnitState, WorldState } from "./types";
 
-export function formationSlots(world: WorldState, destination: CellCoord, count: number): CellCoord[] {
+export function formationSlots(world: WorldState, destination: CellCoord, count: number, perspective?: "player"): CellCoord[] {
   const slots: CellCoord[] = [];
   const visited = new Set<string>([cellKey(destination)]);
   const queue: CellCoord[] = [destination];
@@ -17,7 +17,7 @@ export function formationSlots(world: WorldState, destination: CellCoord, count:
       break;
     }
     explored += 1;
-    if (isPassable(world, current)) {
+    if (isPassable(world, current, perspective)) {
       slots.push(current);
     }
     for (const direction of ORTHOGONAL_DIRECTIONS) {
@@ -33,15 +33,15 @@ export function formationSlots(world: WorldState, destination: CellCoord, count:
   return slots;
 }
 
-export function findSpawnCell(world: WorldState, preferred: CellCoord): CellCoord | null {
-  if (isPassable(world, preferred)) {
+export function findSpawnCell(world: WorldState, preferred: CellCoord, perspective?: "player"): CellCoord | null {
+  if (isPassable(world, preferred, perspective)) {
     return preferred;
   }
   for (let radius = 1; radius <= 4; radius += 1) {
     for (let dy = -radius; dy <= radius; dy += 1) {
       for (let dx = -radius; dx <= radius; dx += 1) {
         const candidate = { x: preferred.x + dx, y: preferred.y + dy };
-        if (isPassable(world, candidate)) {
+        if (isPassable(world, candidate, perspective)) {
           return candidate;
         }
       }
@@ -52,7 +52,7 @@ export function findSpawnCell(world: WorldState, preferred: CellCoord): CellCoor
 
 export const PATH_RETRY_COOLDOWN_TICKS = 40;
 
-export function findPath(world: WorldState, start: CellCoord, goal: CellCoord): CellCoord[] {
+export function findPath(world: WorldState, start: CellCoord, goal: CellCoord, perspective?: "player"): CellCoord[] {
   if (sameCell(start, goal)) {
     return [];
   }
@@ -84,11 +84,11 @@ export function findPath(world: WorldState, start: CellCoord, goal: CellCoord): 
     for (const direction of ORTHOGONAL_DIRECTIONS) {
       const neighbor = { x: current.coord.x + direction.x, y: current.coord.y + direction.y };
       const neighborKey = cellKey(neighbor);
-      if (!isInsideMap(neighbor) || closed.has(neighborKey) || !isPassable(world, neighbor)) {
+      if (!isInsideMap(neighbor) || closed.has(neighborKey) || !isPassable(world, neighbor, perspective)) {
         continue;
       }
 
-      const tentativeG = current.g + movementCostAt(world, neighbor);
+      const tentativeG = current.g + movementCostAt(world, neighbor, perspective);
       const known = open.get(neighborKey);
       if (known !== undefined && tentativeG >= known.g) {
         continue;
@@ -108,12 +108,12 @@ export function findPath(world: WorldState, start: CellCoord, goal: CellCoord): 
   return [];
 }
 
-export function findPathToAttackRange(world: WorldState, start: CellCoord, target: CellCoord, range: number): CellCoord[] {
+export function findPathToAttackRange(world: WorldState, start: CellCoord, target: CellCoord, range: number, perspective?: "player"): CellCoord[] {
   const candidates: CellCoord[] = [];
   for (let y = Math.max(0, target.y - range); y <= Math.min(MAP_HEIGHT - 1, target.y + range); y += 1) {
     for (let x = Math.max(0, target.x - range); x <= Math.min(MAP_WIDTH - 1, target.x + range); x += 1) {
       const candidate = { x, y };
-      if (manhattan(candidate, target) <= range && isPassable(world, candidate)) {
+      if (manhattan(candidate, target) <= range && isPassable(world, candidate, perspective)) {
         candidates.push(candidate);
       }
     }
@@ -129,7 +129,7 @@ export function findPathToAttackRange(world: WorldState, start: CellCoord, targe
   });
 
   for (const candidate of candidates) {
-    const path = findPath(world, start, candidate);
+    const path = findPath(world, start, candidate, perspective);
     if (path.length > 0 || sameCell(start, candidate)) {
       return path;
     }
@@ -172,7 +172,7 @@ function reconstructPath(goalKey: string, nodes: Map<string, PathNode>): CellCoo
   return path.reverse();
 }
 
-export function isPassable(world: WorldState, coord: CellCoord): boolean {
+export function isPassable(world: WorldState, coord: CellCoord, perspective?: "player"): boolean {
   if (!isInsideMap(coord)) {
     return false;
   }
@@ -184,16 +184,30 @@ export function isPassable(world: WorldState, coord: CellCoord): boolean {
   const cell = getCell(world, coord);
   const building = getBuildingAt(world, coord);
   if (building !== null) {
-    return building.passable && (cell.passable || isBridge(building.type));
+    // Player's own gates are always traversable from the player's perspective
+    // (自動開閉の抽象化: closed gates don't block the owning side's movement).
+    const effectivePassable =
+      perspective === "player" && building.owner === "player" && isGate(building.type)
+        ? true
+        : building.passable;
+    return effectivePassable && (cell.passable || isBridge(building.type));
   }
 
   return cell.passable;
 }
 
-export function movementCostAt(world: WorldState, coord: CellCoord): number {
+export function movementCostAt(world: WorldState, coord: CellCoord, perspective?: "player"): number {
   const terrainCost = getCell(world, coord).movementCost;
   const building = getBuildingAt(world, coord);
-  return terrainCost + (building?.movementCostModifier ?? 0);
+  if (building === null) {
+    return terrainCost;
+  }
+  // Treat closed player gates as open (cost 2) when pathfinding for the player.
+  const modifier =
+    perspective === "player" && building.owner === "player" && building.gateState === "closed"
+      ? 2
+      : building.movementCostModifier;
+  return terrainCost + modifier;
 }
 
 export function getUnitAt(world: WorldState, coord: CellCoord): UnitState | null {
