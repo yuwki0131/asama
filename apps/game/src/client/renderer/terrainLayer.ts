@@ -3,7 +3,11 @@ import type { TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
 import { clearLayer, createSpriteFromCandidates, type LoadedAsset } from "./assets";
 import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera";
 
-const TERRAIN_UNDERLAY_PADDING = 0.5;
+// Underlay diamonds have exact tile footprint — no padding — to avoid
+// sub-pixel overlap between the single global underlay Graphics and the
+// chunk-local sprite layers.  The previous 0.5 px padding caused faint
+// bright seam lines where chunk boundaries crossed water tiles.
+const TERRAIN_UNDERLAY_PADDING = 0;
 const TERRAIN_CHUNK_CELLS = 16;
 
 interface TerrainChunkBounds {
@@ -25,38 +29,68 @@ export function buildTerrainChunks(
   assets: ReadonlyMap<string, LoadedAsset>
 ): void {
   clearLayer(terrainLayer);
-  const chunks = new Map<string, { container: Container; underlay: Graphics; bounds: TerrainChunkBounds }>();
+
+  // Phase 1 — collect cells per chunk.
+  // Sprites must be rendered in isometric depth order (ascending x+y) so that
+  // "closer" tiles paint over "farther" ones. We accumulate cells first, sort
+  // within each chunk, then flush sprites in the correct order.
+  const chunkMap = new Map<
+    string,
+    { cx: number; cy: number; cells: TerrainCellSnapshot[]; bounds: TerrainChunkBounds }
+  >();
 
   for (const cell of snapshot.map.cells) {
-    const key = `${Math.floor(cell.coord.x / TERRAIN_CHUNK_CELLS)}:${Math.floor(cell.coord.y / TERRAIN_CHUNK_CELLS)}`;
-    let chunk = chunks.get(key);
-    if (chunk === undefined) {
-      const container = new Container();
-      const underlay = new Graphics();
-      container.addChild(underlay);
-      chunk = {
-        container,
-        underlay,
-        bounds: { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
-      };
-      chunks.set(key, chunk);
-      terrainLayer.addChild(container);
+    const cx = Math.floor(cell.coord.x / TERRAIN_CHUNK_CELLS);
+    const cy = Math.floor(cell.coord.y / TERRAIN_CHUNK_CELLS);
+    const key = `${cx}:${cy}`;
+    let entry = chunkMap.get(key);
+    if (entry === undefined) {
+      entry = { cx, cy, cells: [], bounds: { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity } };
+      chunkMap.set(key, entry);
     }
-
-    addTerrainUnderlay(chunk.underlay, cell);
-    addTerrainSprite(chunk.container, cell, assets);
-
+    entry.cells.push(cell);
     const world = cellToWorld(cell.coord);
-    chunk.bounds = {
-      minX: Math.min(chunk.bounds.minX, world.x - TILE_WIDTH),
-      minY: Math.min(chunk.bounds.minY, world.y - TILE_HEIGHT * 2),
-      maxX: Math.max(chunk.bounds.maxX, world.x + TILE_WIDTH),
-      maxY: Math.max(chunk.bounds.maxY, world.y + TILE_HEIGHT * 2)
+    entry.bounds = {
+      minX: Math.min(entry.bounds.minX, world.x - TILE_WIDTH),
+      minY: Math.min(entry.bounds.minY, world.y - TILE_HEIGHT * 2),
+      maxX: Math.max(entry.bounds.maxX, world.x + TILE_WIDTH),
+      maxY: Math.max(entry.bounds.maxY, world.y + TILE_HEIGHT * 2)
     };
   }
 
-  for (const chunk of chunks.values()) {
-    (chunk.container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = chunk.bounds;
+  // Phase 2 — build a single underlay Graphics that covers the whole map.
+  // Using one Graphics per chunk caused visible seam lines at chunk boundaries:
+  // each Graphics anti-aliases its own edges independently, and the 0.5 px
+  // "padding" overlap between neighbouring chunks produced bright artifacts
+  // where water tile bleed crossed a chunk boundary.  A single Graphics has no
+  // inter-chunk edges and therefore no seam.
+  const underlayGraphics = new Graphics();
+  for (const { cells } of chunkMap.values()) {
+    for (const cell of cells) {
+      addTerrainUnderlay(underlayGraphics, cell);
+    }
+  }
+  // The underlay sits below all sprite chunks and is never culled.
+  terrainLayer.addChild(underlayGraphics);
+
+  // Phase 3 — emit sprite chunks sorted by isometric depth (ascending cx+cy).
+  // Chunks with a smaller cx+cy value are visually farther from the camera and
+  // must be painted first.  Within each chunk, cells are also sorted by x+y
+  // depth for the same reason.
+  const sortedChunks = [...chunkMap.values()].sort(
+    (a, b) => (a.cx + a.cy) - (b.cx + b.cy)
+  );
+
+  for (const { cells, bounds } of sortedChunks) {
+    // Sort cells by isometric depth within the chunk.
+    cells.sort((a, b) => (a.coord.x + a.coord.y) - (b.coord.x + b.coord.y));
+
+    const container = new Container();
+    for (const cell of cells) {
+      addTerrainSprite(container, cell, assets);
+    }
+    (container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = bounds;
+    terrainLayer.addChild(container);
   }
 }
 
@@ -68,6 +102,7 @@ export function updateTerrainChunkVisibility(
 ): void {
   for (const child of terrainLayer.children) {
     const bounds = (child as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds;
+    // The global underlay Graphics has no bounds tag — always keep it visible.
     if (bounds === undefined) {
       continue;
     }
