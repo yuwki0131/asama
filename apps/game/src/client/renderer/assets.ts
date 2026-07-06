@@ -9,6 +9,31 @@ interface AssetManifest {
       readonly y: number;
     };
   }[];
+  readonly animations?: readonly AnimationManifestEntry[];
+}
+
+interface AnimationManifestEntry {
+  readonly assetId: string;
+  readonly unitAssetId: string;
+  readonly action: string;
+  readonly file: string;
+  readonly frame: { readonly width: number; readonly height: number };
+  readonly frames: number;
+  readonly fps: number;
+  readonly loop: boolean;
+  readonly anchor: { readonly x: number; readonly y: number };
+}
+
+export interface AnimationSheetAsset {
+  readonly unitAssetId: string;
+  readonly action: string;
+  readonly texture: Texture;
+  readonly frames: number;
+  readonly fps: number;
+  readonly loop: boolean;
+  readonly frameWidth: number;
+  readonly frameHeight: number;
+  readonly anchor: { readonly x: number; readonly y: number };
 }
 
 export interface LoadedAsset {
@@ -77,6 +102,33 @@ export function firstLoadedAsset(
     }
   }
   return null;
+}
+
+export async function loadAnimationSheets(): Promise<ReadonlyMap<string, AnimationSheetAsset>> {
+  const response = await fetch(GENERATED_MANIFEST_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to load asset manifest for animations: ${response.status}`);
+  }
+
+  const manifest = (await response.json()) as AssetManifest;
+  const loaded = new Map<string, AnimationSheetAsset>();
+  for (const anim of manifest.animations ?? []) {
+    const texture = await Assets.load<Texture>(`/assets/${anim.file}`);
+    const key = `${anim.unitAssetId}.anim.${anim.action}`;
+    loaded.set(key, {
+      unitAssetId: anim.unitAssetId,
+      action: anim.action,
+      texture,
+      frames: anim.frames,
+      fps: anim.fps,
+      loop: anim.loop,
+      frameWidth: anim.frame.width,
+      frameHeight: anim.frame.height,
+      anchor: anim.anchor
+    });
+  }
+
+  return loaded;
 }
 
 export function clearLayer(layer: Container): void {
