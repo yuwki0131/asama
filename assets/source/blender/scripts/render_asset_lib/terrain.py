@@ -63,13 +63,20 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
         return raw * envelope
 
     segments = 6
-    depth_base = 0.17
+    depth_base = 0.12
     for name in ("N", "E", "S", "W"):
         if same[name]:
             continue
         for i in range(segments):
             t0 = i / segments
             t1 = (i + 1) / segments
+            # Extend the strip past both tile ends (into the bleed zone) so
+            # zigzag river corners are covered by a neighbour's bank instead
+            # of showing a grass sliver (same lesson as the moat trenches).
+            if i == 0:
+                t0 = -TERRAIN_BLEED
+            if i == segments - 1:
+                t1 = 1.0 + TERRAIN_BLEED
             d0 = depth_base + jitter(name + str(variant), i, segments)
             d1 = depth_base + jitter(name + str(variant), i + 1, segments)
             if name == "N":
