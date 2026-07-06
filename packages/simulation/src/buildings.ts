@@ -102,15 +102,12 @@ export function canPlaceBuilding(world: WorldState, position: CellCoord, definit
 function canPlaceBridgeAt(world: WorldState, position: CellCoord): boolean {
   if (!isInsideMap(position)) return false;
   if (getCell(world, position).terrain !== "water") return false;
-  if (getBuildingAt(world, position) !== null) return false;
-  if (world.units.some(u => sameCell(u.position, position))) return false;
 
   const orientation = bridgeOrientation(world, position);
-  for (const offset of bridgeRelativeFootprint(orientation)) {
-    if (offset.x === 0 && offset.y === 0) continue;
-    const cell = { x: position.x + offset.x, y: position.y + offset.y };
-    if (!isInsideMap(cell)) return false;
-    if (!getCell(world, cell).passable) return false;
+  const footprint = bridgeSpan(world, position, orientation);
+  if (footprint === null) return false;
+
+  for (const cell of footprint) {
     if (getBuildingAt(world, cell) !== null) return false;
     if (world.units.some(u => sameCell(u.position, cell))) return false;
   }
@@ -124,7 +121,7 @@ export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefini
       throw new Error(`Unknown initial building type: ${placement.type}`);
     }
 
-    // Bridges in existing scenarios use pre-1x3 single-cell positions; validate
+    // Bridges in existing scenarios use pre-1xN single-cell positions; validate
     // with the legacy per-cell check until scenarios are updated (see requests/sim2content).
     const canPlace = isBridge(definition.type)
       ? canPlaceOnCell(world, placement.position, definition)
@@ -143,7 +140,8 @@ export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefini
 }
 
 export function bridgeAbsoluteFootprint(world: WorldState, position: CellCoord): CellCoord[] {
-  return absoluteFootprint(position, bridgeRelativeFootprint(bridgeOrientation(world, position)));
+  const orientation = bridgeOrientation(world, position);
+  return bridgeSpan(world, position, orientation) ?? [position];
 }
 
 export function createBuildingState(
@@ -154,6 +152,8 @@ export function createBuildingState(
   owner: OwnerId
 ): BuildingState {
   const footprint = absoluteFootprint(position, definition.footprint);
+  // Gates always start open; players close them intentionally for defense.
+  const gateOpen = isGate(type);
   return {
     id: `building:${world.nextBuildingId}`,
     owner,
@@ -164,9 +164,9 @@ export function createBuildingState(
     hp: definition.maxHp,
     maxHp: definition.maxHp,
     lifecycleState: "intact",
-    gateState: definition.gateState,
-    passable: definition.passable,
-    movementCostModifier: definition.movementCostModifier,
+    gateState: gateOpen ? "open" : definition.gateState,
+    passable: gateOpen ? true : definition.passable,
+    movementCostModifier: gateOpen ? 2 : definition.movementCostModifier,
     assetId: definition.assetId,
     food: type === "storehouse" ? FOOD_BALANCE.storehouseInitialFood : null,
     foodCapacity: type === "storehouse" ? FOOD_BALANCE.storehouseCapacity : null,
@@ -405,14 +405,48 @@ function bridgeOrientation(world: WorldState, position: CellCoord): "x" | "y" {
   return [east, west].some(coord => isWaterNeighbor(world, coord)) ? "y" : "x";
 }
 
-function bridgeRelativeFootprint(orientation: "x" | "y"): readonly CellCoord[] {
-  return orientation === "y"
-    ? [{ x: 0, y: -1 }, { x: 0, y: 0 }, { x: 0, y: 1 }]
-    : [{ x: -1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }];
+// Expand from the clicked water cell in both directions along the bridge axis
+// until landing on non-water (passable land). Returns the full footprint
+// (land + water + land) or null if the span is < 3 or > 5 cells.
+function bridgeSpan(world: WorldState, position: CellCoord, orientation: "x" | "y"): CellCoord[] | null {
+  const isX = orientation === "x";
+  const dimSize = isX ? world.map.width : world.map.height;
+
+  let negIdx = (isX ? position.x : position.y) - 1;
+  while (negIdx >= 0) {
+    const cell: CellCoord = isX ? { x: negIdx, y: position.y } : { x: position.x, y: negIdx };
+    if (getCell(world, cell).terrain !== "water") break;
+    negIdx--;
+  }
+  if (negIdx < 0) return null;
+
+  let posIdx = (isX ? position.x : position.y) + 1;
+  while (posIdx < dimSize) {
+    const cell: CellCoord = isX ? { x: posIdx, y: position.y } : { x: position.x, y: posIdx };
+    if (getCell(world, cell).terrain !== "water") break;
+    posIdx++;
+  }
+  if (posIdx >= dimSize) return null;
+
+  const length = posIdx - negIdx + 1;
+  if (length < 3 || length > 5) return null;
+
+  const negCell: CellCoord = isX ? { x: negIdx, y: position.y } : { x: position.x, y: negIdx };
+  const posCell: CellCoord = isX ? { x: posIdx, y: position.y } : { x: position.x, y: posIdx };
+  if (!getCell(world, negCell).passable || !getCell(world, posCell).passable) return null;
+
+  const footprint: CellCoord[] = [];
+  for (let i = negIdx; i <= posIdx; i++) {
+    footprint.push(isX ? { x: i, y: position.y } : { x: position.x, y: i });
+  }
+  return footprint;
 }
 
 function bridgeOrientedAssetId(world: WorldState, building: BuildingState): string {
-  return `${building.assetId}.${bridgeOrientation(world, building.position)}3`;
+  // For legacy single-cell scenario bridges, fall back to "3" so the asset ID
+  // remains well-formed; player-placed bridges use actual footprint length (3–5).
+  const n = Math.max(3, building.footprint.length);
+  return `${building.assetId}.${bridgeOrientation(world, building.position)}${n}`;
 }
 
 function isWaterNeighbor(world: WorldState, coord: CellCoord): boolean {

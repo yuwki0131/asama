@@ -115,12 +115,12 @@ describe("connected building asset masks", () => {
     place(world, "wall", { x: 39, y: 40 });
 
     expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe(
-      "building.gate.wood.closed.nw_se.width2.connected.0001"
+      "building.gate.wood.open.nw_se.width2.connected.0001"
     );
 
     place(world, "wall", { x: 42, y: 40 });
     expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe(
-      "building.gate.wood.closed.nw_se.width2.connected.0101"
+      "building.gate.wood.open.nw_se.width2.connected.0101"
     );
   });
 
@@ -137,7 +137,7 @@ describe("connected building asset masks", () => {
       { x: 70, y: 71 },
       { x: 70, y: 72 }
     ]);
-    expect(gate.assetId).toBe("building.gate.wood.closed.ne_sw.width3.connected.1010");
+    expect(gate.assetId).toBe("building.gate.wood.open.ne_sw.width3.connected.1010");
     expect(buildingAt(world, { x: 70, y: 69 }).assetId).toBe("building.wall.plaster.connected.0010");
     expect(buildingAt(world, { x: 70, y: 73 }).assetId).toBe("building.wall.plaster.connected.1000");
   });
@@ -150,7 +150,7 @@ describe("connected building asset masks", () => {
 
     expect(buildingAt(world, { x: 81, y: 79 }).assetId).toBe("building.wall.plaster.connected.0000");
     expect(buildingAt(world, { x: 80, y: 80 }).assetId).toBe(
-      "building.gate.wood.closed.nw_se.width3.connected.0000"
+      "building.gate.wood.open.nw_se.width3.connected.0000"
     );
   });
 
@@ -228,13 +228,16 @@ describe("bridge orientation", () => {
     expect(error).toBe("Cannot place building there");
   });
 
-  it("rejects bridge placement when an end cell is not passable", () => {
+  it("rejects bridge placement when the river is too wide to span (> 5 cells)", () => {
     const world = createInitialWorld();
     resetBuildings(world);
     normalizeMap(world);
-    setWaterCell(world, { x: 20, y: 20 });
-    setWaterCell(world, { x: 21, y: 20 });
+    // 4-cell-wide river at y=17-20 requires a 6-cell bridge: exceeds max of 5
+    setWaterCell(world, { x: 20, y: 17 });
+    setWaterCell(world, { x: 20, y: 18 });
     setWaterCell(world, { x: 20, y: 19 });
+    setWaterCell(world, { x: 20, y: 20 });
+    setWaterCell(world, { x: 21, y: 20 });  // east water triggers y-orientation
 
     const error = applyCommand(world, {
       type: "placeBuilding",

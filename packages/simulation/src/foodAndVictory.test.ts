@@ -51,11 +51,19 @@ describe("food supply", () => {
     expect(world.outcome).toEqual({ winner: "enemy", reason: "starvation", tick: 1 });
   });
 
-  it("connects storehouses through a closed player-owned gate (regression: gate-enclosed honmaru)", () => {
-    // concentricCastleScenario has the honmaru fully enclosed by a wall ring
-    // whose only exit is a closed gate. Before the fix, all storehouses were
-    // disconnected and the scenario starved at tick 601.
+  it("connects storehouses through a closed player-owned gate (supply BFS bypasses gate state)", () => {
+    // concentricCastleScenario has the honmaru enclosed by a wall ring with a gate.
+    // Close the gate manually to verify food connectivity uses supply perspective,
+    // which treats player gates as always traversable regardless of open/closed state.
     const world = createInitialWorld(concentricCastleScenario);
+    const gate = world.buildings.find((b) => b.gateState !== null && b.owner === "player");
+    expect(gate).toBeDefined();
+    if (gate === undefined) return;
+
+    // Close the gate
+    gate.gateState = "closed";
+    gate.passable = false;
+
     updateWorld(world);
     const connected = world.food.connectedStorehouseIds;
     const allStorehouses = world.buildings.filter((b) => b.type === "storehouse");

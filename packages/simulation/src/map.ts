@@ -125,8 +125,8 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
 }
 
 function terrainAt(coord: CellCoord): TerrainType {
-  const riverDistance = Math.abs(coord.y - 42 - Math.round(Math.sin(coord.x / 9) * 4));
-  if (riverDistance === 0 && coord.x > 12 && coord.x < MAP_WIDTH - 10) {
+  const riverDistance = Math.abs(coord.y - 41 - Math.round(Math.sin(coord.x / 9) * 4));
+  if (riverDistance <= 1 && coord.x > 12 && coord.x < MAP_WIDTH - 10) {
     return "water";
   }
 
