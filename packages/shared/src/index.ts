@@ -11,6 +11,17 @@ export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer" | "enginee
 
 export type EngineerTaskKind = "ladder" | "fillMoat";
 export type TerrainType = "grass" | "dirt" | "water" | "stone";
+
+// --- Elevation (docs/10_development/elevation-contract.md) ------------------
+
+/** Discrete terrain height levels: 0 (base plain) .. 3 (highest terrace). */
+export const MAX_ELEVATION = 3;
+
+/** Cardinal direction in cell space (N = -y, E = +x, S = +y, W = -x). */
+export type SlopeDirection = "N" | "E" | "S" | "W";
+
+/** Visual skin for elevation edges: natural rock face or castle stone wall. */
+export type ElevationSkin = "cliff" | "ishigaki";
 export type BuildingType =
   | "fence"
   | "wall"
@@ -54,6 +65,14 @@ export interface TerrainCellSnapshot {
   readonly movementCost: number;
   readonly passable: boolean;
   readonly assetId: string;
+  /** Discrete height 0..MAX_ELEVATION. Flat worlds are all 0. */
+  readonly elevation: number;
+  /** Ramp marker: walking toward this direction exits one level above
+   *  `elevation`; the opposite edge exits at `elevation`. The two side edges
+   *  of a slope cell are cliffs (impassable). null = flat cell. */
+  readonly slope: SlopeDirection | null;
+  /** Skin used for cliff faces / slope tiles rendered around this cell. */
+  readonly elevationSkin: ElevationSkin;
 }
 
 export interface UnitSnapshot {
@@ -75,8 +94,11 @@ export interface UnitSnapshot {
   readonly task: EngineerTaskSnapshot | null;
   /** Sim ticks accumulated toward the next path step (0..ticksPerStep-1). */
   readonly movementProgress: number;
-  /** Sim ticks required to advance one cell along the path. */
+  /** Sim ticks required to advance one cell along the path. Reflects the
+   *  current step's climb penalty when moving uphill (elevation-contract.md). */
   readonly ticksPerStep: number;
+  /** Elevation of the cell the unit stands on (0 when absent; additive field). */
+  readonly elevation?: number;
 }
 
 export interface EngineerTaskSnapshot {
@@ -104,6 +126,9 @@ export interface BuildingSnapshot {
   readonly connectedToHonmaru: boolean;
   readonly ladderHp: number | null;
   readonly fillProgress: number;
+  /** Elevation of the building's anchor cell (0 when absent; additive field).
+   *  Footprints are always on uniform elevation (elevation-contract.md). */
+  readonly elevation?: number;
 }
 
 export type GameOutcomeReason = "honmaru_fallen" | "starvation" | "enemy_annihilated" | "time_held" | "supply_cut";
@@ -125,12 +150,63 @@ export interface ScenarioWave {
   readonly spawns: readonly { readonly type: UnitType; readonly position: CellCoord }[];
 }
 
+// --- Scenario elevation vocabulary (elevation-contract.md, P5) --------------
+
+/** Axis-aligned rectangle of cells: x..x+width-1, y..y+height-1 (inclusive). */
+export interface ElevationRectArea {
+  readonly kind: "rect";
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** Filled ellipse of cells: (dx/rx)^2 + (dy/ry)^2 <= 1 around center (cx, cy). */
+export interface ElevationEllipseArea {
+  readonly kind: "ellipse";
+  readonly cx: number;
+  readonly cy: number;
+  readonly rx: number;
+  readonly ry: number;
+}
+
+export type ElevationArea = ElevationRectArea | ElevationEllipseArea;
+
+/** Raises every covered land cell to at least `level` (max-composition:
+ *  overlapping patches keep the highest level). Water cells are skipped and
+ *  always stay at elevation 0. */
+export interface ScenarioElevationPatch {
+  readonly area: ElevationArea;
+  /** Absolute target level 1..MAX_ELEVATION. */
+  readonly level: number;
+  /** Edge skin for covered cells: natural rock ("cliff", default) or castle
+   *  stone wall ("ishigaki" — use for kuruwa terraces). */
+  readonly skin?: ElevationSkin;
+}
+
+/** Declares a ramp. `position` is the LOW cell of the ramp; walking `toward`
+ *  from it exits one level higher. `width` extends the ramp perpendicular to
+ *  `toward` (in +x for N/S ramps, +y for E/W ramps), default 1. */
+export interface ScenarioSlope {
+  readonly position: CellCoord;
+  readonly toward: SlopeDirection;
+  readonly width?: number;
+}
+
+export interface ScenarioElevationDefinition {
+  readonly patches: readonly ScenarioElevationPatch[];
+  readonly slopes?: readonly ScenarioSlope[];
+}
+
 export interface ScenarioDefinition {
   readonly id: string;
   readonly name: string;
   readonly initialBuildings: readonly ScenarioBuildingPlacement[];
   readonly initialUnits: readonly ScenarioUnitSpawn[];
   readonly waves: readonly ScenarioWave[];
+  /** Terrain elevation layout (hills, terraces, ramps). Omitted = fully flat
+   *  map (all cells at elevation 0) — existing scenarios need no change. */
+  readonly elevation?: ScenarioElevationDefinition;
   readonly victory: {
     /** Defender wins by holding the honmaru until this tick (null: no time victory). */
     readonly holdTicks: number | null;

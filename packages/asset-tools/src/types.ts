@@ -73,6 +73,11 @@ export interface AssetManifest {
   readonly generatedBy: string;
   readonly generatedAt: string;
   readonly assets: readonly GeneratedAsset[];
+  /**
+   * Sprite-sheet animations, additive so pre-2.0 clients that only read
+   * `assets` keep working unchanged.
+   */
+  readonly animations?: readonly AnimationManifestEntry[];
 }
 
 export type AssetSource =
@@ -171,4 +176,71 @@ export interface BlenderRenderSpec {
 
 export interface AtlasBuildSpec {
   readonly padding: number;
+}
+
+// --- animated sprite-sheet assets (release 2.0, P2) ---------------------------
+
+/** Fixed sheet row order (map compass; N = toward map y-1). */
+export type SheetDirection = "s" | "se" | "e" | "ne" | "n" | "nw" | "w" | "sw";
+
+export interface AnimationActionSpec {
+  readonly name: string;
+  readonly frames: number;
+  readonly fps: number;
+  readonly loop: boolean;
+}
+
+export interface AnimationFrameCanvas {
+  readonly width: number;
+  readonly height: number;
+  readonly anchorX: number;
+  readonly anchorY: number;
+}
+
+/**
+ * One animated unit: a rigged Blender model rendered as one sprite sheet per
+ * action (columns = frames, rows = the 8 directions). Declared in the
+ * `animations` array of a production-assets JSON file, which pre-2.0 readers
+ * ignore (they only parse `assets`).
+ */
+export interface AnimationAssetSpec {
+  readonly assetId: string;
+  readonly kind: AssetKind;
+  readonly model: string;
+  readonly renderSpec: string;
+  readonly supersample?: number;
+  readonly directions: number;
+  readonly frameCanvas: AnimationFrameCanvas;
+  readonly actions: readonly AnimationActionSpec[];
+  readonly postprocess?: {
+    readonly sharpen?: {
+      readonly sigma: number;
+    };
+  };
+}
+
+export interface AnimationManifestEntry {
+  readonly assetId: string;
+  readonly unitAssetId: string;
+  readonly action: string;
+  readonly kind: AssetKind;
+  readonly file: string;
+  readonly sheet: {
+    readonly width: number;
+    readonly height: number;
+  };
+  readonly frame: {
+    readonly width: number;
+    readonly height: number;
+  };
+  readonly frames: number;
+  readonly fps: number;
+  readonly loop: boolean;
+  readonly directions: readonly SheetDirection[];
+  readonly layout: {
+    readonly columns: "frames";
+    readonly rows: "directions";
+  };
+  /** Normalized within one frame cell, same convention as static assets. */
+  readonly anchor: AssetAnchor;
 }
