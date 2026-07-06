@@ -87,7 +87,7 @@ function makeSnapshot(tick: number, events: readonly CombatEventSnapshot[]): Wor
 }
 
 const MOCK_CAMERA: CameraState = { x: 0, y: 0, zoom: 1 };
-const MOCK_ASSETS: ReadonlyMap<string, never> = new Map();
+const MOCK_ASSETS = new Map() as ReadonlyMap<string, never>;
 
 // --- Tests ---
 
