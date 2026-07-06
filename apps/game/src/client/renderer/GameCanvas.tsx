@@ -369,7 +369,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
           // extrapolation clock keeps units from drifting one cell ahead.
           const elapsedMs = currentSnapshot.outcome === null ? now - snapshotReceivedAtRef.current : 0;
           const elapsedTicks = elapsedSimTicks(elapsedMs, speedRef.current);
-          retainedScene.updateFrame(elapsedTicks, ticker.deltaMS, camera, app.screen.width, app.screen.height);
+          retainedScene.updateFrame(elapsedTicks, ticker.deltaMS, now / 1000, camera, app.screen.width, app.screen.height);
         });
 
         setReady(true);

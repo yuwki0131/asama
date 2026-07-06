@@ -46,6 +46,17 @@ interface UnitVisual {
 interface DecorationVisual {
   readonly position: CellCoord;
   readonly sprite: Sprite;
+  /** Asset id used to detect vegetation types for sway animation. */
+  readonly assetId: string;
+  /** Sprite X at the time the visual was created; used as sway baseline. */
+  readonly baseX: number;
+}
+
+interface FlagVisual {
+  readonly graphics: Graphics;
+  readonly position: CellCoord;
+  /** Phase offset in [0,1) derived from cell coordinates for desync. */
+  readonly phaseOffset: number;
 }
 
 /**
@@ -65,6 +76,7 @@ export class RetainedScene {
   /** Units that have died and are fading out. Not in unitVisuals. */
   private readonly dyingVisuals = new Map<UnitId, UnitVisual>();
   private decorationVisuals: DecorationVisual[] = [];
+  private flagVisuals: FlagVisual[] = [];
   private staticSignature: string | null = null;
   private lastSnapshot: WorldSnapshot | null = null;
   private lastAssets: ReadonlyMap<string, LoadedAsset> | null = null;
@@ -118,12 +130,14 @@ export class RetainedScene {
   }
 
   /**
-   * Per-frame update: interpolated unit positions, Y-sort depth and
-   * decoration visibility culling. No allocation of display objects.
+   * Per-frame update: interpolated unit positions, Y-sort depth,
+   * decoration visibility culling, vegetation sway and flag flutter.
+   * No allocation of display objects.
    */
   updateFrame(
     elapsedTicks: number,
     frameDeltaMs: number,
+    timeSec: number,
     camera: CameraState,
     screenWidth: number,
     screenHeight: number
@@ -170,12 +184,29 @@ export class RetainedScene {
 
     for (const decoration of this.decorationVisuals) {
       decoration.sprite.visible = isVisibleCell(decoration.position, camera, screenWidth, screenHeight);
+      // Vegetation sway: tree and bamboo decorations get a subtle X-axis sine offset.
+      const aid = decoration.assetId;
+      const isTree = aid.startsWith("deco.tree.");
+      const isBamboo = aid.startsWith("deco.bamboo.");
+      if (isTree || isBamboo) {
+        const freq = isBamboo ? 1.2 : 0.8;
+        const amplitude = isBamboo ? 2.0 : 1.5;
+        const phase = cellPhaseOffset(decoration.position);
+        const swayOffset = Math.sin(timeSec * freq + phase * 6.28) * amplitude;
+        decoration.sprite.position.x = decoration.baseX + swayOffset;
+      }
+    }
+
+    // Flag flutter: small pennant Graphics on castle buildings rotate ±0.15 rad.
+    for (const flag of this.flagVisuals) {
+      flag.graphics.rotation = Math.sin(timeSec * 3 + flag.phaseOffset * 6.28) * 0.15;
     }
   }
 
   destroy(): void {
     this.destroyUnitVisuals();
     this.decorationVisuals = [];
+    this.flagVisuals = [];
     this.root.destroy({ children: true, context: true });
   }
 
@@ -200,6 +231,7 @@ export class RetainedScene {
   ): void {
     clearLayer(this.staticLayer);
     this.decorationVisuals = [];
+    this.flagVisuals = [];
 
     // Cells covered by intact buildings hide their decorations.
     const occupiedCells = new Set<string>();
@@ -232,10 +264,29 @@ export class RetainedScene {
     for (const entry of sceneItems) {
       if (entry.kind === "building") {
         addBuildingSprite(this.staticLayer, entry.item, assets, zoom);
+        // Flag pennant for castle buildings on intact structures only.
+        const building = entry.item;
+        if (
+          building.lifecycleState === "intact" &&
+          (building.type === "yagura" || building.type === "tenshu" || building.type === "honmaru")
+        ) {
+          const flagGraphics = createFlagGraphics(building, zoom);
+          this.staticLayer.addChild(flagGraphics);
+          this.flagVisuals.push({
+            graphics: flagGraphics,
+            position: building.position,
+            phaseOffset: cellPhaseOffset(building.position)
+          });
+        }
       } else {
         const sprite = addDecorationSprite(this.staticLayer, entry.item, assets, zoom, snapshot.map);
         if (sprite !== null) {
-          this.decorationVisuals.push({ position: entry.item.position, sprite });
+          this.decorationVisuals.push({
+            position: entry.item.position,
+            sprite,
+            assetId: entry.item.assetId,
+            baseX: sprite.position.x
+          });
         }
       }
     }
@@ -407,6 +458,34 @@ export class RetainedScene {
     });
     visual.sprite.anchor.set(currentSheet.anchor.x, currentSheet.anchor.y);
   }
+}
+
+/**
+ * Returns a deterministic phase offset in [0, 1) from a cell coordinate so
+ * that nearby decorations/flags are desynchronised in their animations.
+ */
+function cellPhaseOffset(pos: CellCoord): number {
+  return Math.abs((pos.x * 1637 + pos.y * 2053) % 100) / 100;
+}
+
+/**
+ * Draws a small pennant triangle for a castle building.
+ * The Graphics origin sits at the flag's attachment point (pole top) so that
+ * `graphics.rotation` creates a natural flutter around that anchor.
+ * The pennant points to the right: (0,0)→(8,3)→(0,6).
+ */
+function createFlagGraphics(building: BuildingSnapshot, zoom: number): Graphics {
+  const point = buildingRenderPoint(building);
+  const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
+  const flagX = roundWorldPixel(point.x, zoom);
+  // 75 px above the building's render anchor — works for all three building types.
+  const flagY = roundWorldPixel(point.y + offsetY, zoom) - 75;
+
+  const flagColor = building.owner === "enemy" ? 0xaa2222 : 0x2244aa;
+  const graphics = new Graphics();
+  graphics.poly([0, 0, 8, 3, 0, 6]).fill({ color: flagColor, alpha: 0.92 });
+  graphics.position.set(flagX, flagY);
+  return graphics;
 }
 
 /**
