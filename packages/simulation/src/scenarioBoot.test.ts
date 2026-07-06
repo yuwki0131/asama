@@ -29,6 +29,15 @@ describe("scenario boot + 1000-tick regression", () => {
         }
       }).not.toThrow();
     });
+
+    it(`${name}: boots fully flat (elevation 0, no slopes on every cell)`, () => {
+      // Existing 1.0 scenarios declare no elevation vocabulary and must keep
+      // behaving exactly as before the elevation fields were added.
+      const world = createInitialWorld(scenario);
+      expect(
+        world.map.cells.every((cell) => cell.elevation === 0 && cell.slope === null)
+      ).toBe(true);
+    });
   }
 });
 

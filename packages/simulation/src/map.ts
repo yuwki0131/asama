@@ -120,7 +120,12 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
     terrain,
     movementCost,
     passable,
-    assetId: terrainAssetId(terrain, coord)
+    assetId: terrainAssetId(terrain, coord),
+    // Procedural base map is flat; scenarios raise cells afterwards via
+    // applyScenarioElevation (elevation-contract.md).
+    elevation: 0,
+    slope: null,
+    elevationSkin: "cliff"
   };
 }
 

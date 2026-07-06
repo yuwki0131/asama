@@ -96,7 +96,16 @@ export function canPlaceBuilding(world: WorldState, position: CellCoord, definit
     return canPlaceBridgeAt(world, position);
   }
   const footprint = absoluteFootprint(position, definition.footprint);
-  return footprint.every((cell) => canPlaceOnCell(world, cell, definition));
+  if (!footprint.every((cell) => canPlaceOnCell(world, cell, definition))) {
+    return false;
+  }
+  // Buildings sit on uniform elevation and never on ramp cells
+  // (elevation-contract.md: 建物と高低差).
+  const anchorElevation = getCell(world, position).elevation;
+  return footprint.every((cell) => {
+    const terrain = getCell(world, cell);
+    return terrain.slope === null && terrain.elevation === anchorElevation;
+  });
 }
 
 function canPlaceBridgeAt(world: WorldState, position: CellCoord): boolean {
@@ -313,7 +322,10 @@ export function snapshotCell(cell: TerrainCellState): TerrainCellSnapshot {
     terrain: cell.terrain,
     movementCost: cell.movementCost,
     passable: cell.passable,
-    assetId: cell.assetId
+    assetId: cell.assetId,
+    elevation: cell.elevation,
+    slope: cell.slope,
+    elevationSkin: cell.elevationSkin
   };
 }
 
@@ -336,7 +348,8 @@ export function snapshotBuilding(world: WorldState, building: BuildingState): Bu
     foodCapacity: building.foodCapacity,
     connectedToHonmaru: world.food.connectedStorehouseIds.includes(building.id),
     ladderHp: building.ladderHp,
-    fillProgress: building.fillProgress
+    fillProgress: building.fillProgress,
+    elevation: getCell(world, building.position).elevation
   };
 }
 

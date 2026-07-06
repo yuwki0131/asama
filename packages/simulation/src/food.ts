@@ -1,6 +1,6 @@
 import type { BuildingId, CellCoord } from "@asama/shared";
 import { getBuildingAt } from "./buildings";
-import { isPassable } from "./pathfinding";
+import { canStep } from "./pathfinding";
 import { FOOD_BALANCE, ORTHOGONAL_DIRECTIONS, cellKey, intactBuildingsOfType, isInsideMap, manhattan, nextRandom } from "./types";
 import type { BuildingState, WorldState } from "./types";
 
@@ -101,7 +101,9 @@ export function computeConnectedStorehouseIds(world: WorldState): BuildingId[] {
     for (const direction of ORTHOGONAL_DIRECTIONS) {
       const next = { x: current.x + direction.x, y: current.y + direction.y };
       const key = cellKey(next);
-      if (visited.has(key) || !isInsideMap(next) || !isPassable(world, next, "supply")) {
+      // Edge-based check: cliffs cut supply lines; slopes carry them
+      // (elevation-contract.md: 兵糧接続と高低差).
+      if (visited.has(key) || !isInsideMap(next) || !canStep(world, current, next, "supply")) {
         continue;
       }
       visited.add(key);

@@ -6,6 +6,7 @@ import {
   type BuildingLifecycleState,
   type BuildingType,
   type CellCoord,
+  type ElevationSkin,
   type EngineerTaskKind,
   type EntityId,
   type GameOutcome,
@@ -15,6 +16,7 @@ import {
   type ScenarioDefinition,
   type ScenarioWave,
   type Season,
+  type SlopeDirection,
   type TerrainType,
   type UnitId,
   type UnitType
@@ -26,6 +28,12 @@ export interface TerrainCellState {
   readonly movementCost: number;
   readonly passable: boolean;
   readonly assetId: string;
+  /** Discrete height 0..MAX_ELEVATION (elevation-contract.md). */
+  readonly elevation: number;
+  /** Ramp toward this direction (+1 level); side edges are cliffs. */
+  readonly slope: SlopeDirection | null;
+  /** Skin for cliff faces / slope tiles around this cell. */
+  readonly elevationSkin: ElevationSkin;
 }
 
 export interface UnitState {

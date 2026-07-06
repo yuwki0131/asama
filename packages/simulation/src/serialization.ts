@@ -33,6 +33,13 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
     building.ladderHp ??= null;
     building.fillProgress ??= 0;
   }
+  // Pre-elevation saves: backfill flat terrain (elevation-contract.md).
+  world.map.cells = world.map.cells.map((cell) => ({
+    ...cell,
+    elevation: cell.elevation ?? 0,
+    slope: cell.slope ?? null,
+    elevationSkin: cell.elevationSkin ?? "cliff"
+  }));
   world.nextWaveIndex ??= 0;
   world.scenario ??= { waves: mvpDefenseScenario.waves, victory: mvpDefenseScenario.victory };
   world.supplyState ??= { hasHadCart: false, retreatTimerActive: false, retreatTimerRemaining: 0 };
