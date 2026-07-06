@@ -4622,5 +4622,151 @@
         "y": 0.875
       }
     }
+  ],
+  "animations": [
+    {
+      "assetId": "unit.spear_ashigaru.anim.attack",
+      "unitAssetId": "unit.spear_ashigaru",
+      "action": "attack",
+      "kind": "unit",
+      "file": "generated/unit-spear-ashigaru-attack-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.spear_ashigaru.anim.death",
+      "unitAssetId": "unit.spear_ashigaru",
+      "action": "death",
+      "kind": "unit",
+      "file": "generated/unit-spear-ashigaru-death-sheet.png",
+      "sheet": {
+        "width": 144,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 3,
+      "fps": 8,
+      "loop": false,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.spear_ashigaru.anim.idle",
+      "unitAssetId": "unit.spear_ashigaru",
+      "action": "idle",
+      "kind": "unit",
+      "file": "generated/unit-spear-ashigaru-idle-sheet.png",
+      "sheet": {
+        "width": 288,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.spear_ashigaru.anim.walk",
+      "unitAssetId": "unit.spear_ashigaru",
+      "action": "walk",
+      "kind": "unit",
+      "file": "generated/unit-spear-ashigaru-walk-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    }
   ]
 }
