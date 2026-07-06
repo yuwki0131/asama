@@ -7,7 +7,7 @@ import {
   resolveBlenderBinary,
   toHeadlessBlenderRenderSpec
 } from "./blenderRender";
-import { defaultBlenderRenderScript } from "./blenderAdapter";
+import { blenderRenderScriptForAsset, defaultBlenderRenderScript } from "./blenderAdapter";
 import { readManifest } from "./manifest";
 import { readProductionAssetConfigDir } from "./productionConfig";
 import { importRasterAsset } from "./postprocess";
@@ -107,7 +107,6 @@ export async function renderBlenderAssets(): Promise<BlenderRenderBatchResult> {
   }
 
   let blenderBinary: string | undefined;
-  const pythonScript = defaultBlenderRenderScript(repoRoot);
   const rawOutputDirectory = join(intermediateAssetsDir, "raw-renders");
   const reportDirectory = join(intermediateAssetsDir, "render-reports");
   const cacheIndex = await readRenderCacheIndex(renderCacheDir);
@@ -117,6 +116,9 @@ export async function renderBlenderAssets(): Promise<BlenderRenderBatchResult> {
 
   await mkdir(generatedOutputDir, { recursive: true });
   for (const asset of blenderAssets) {
+    // Per-asset entry script: isolated registries (source.registry) render
+    // via their own script; everything else keeps render_asset.py.
+    const pythonScript = blenderRenderScriptForAsset(repoRoot, asset);
     const spec = toHeadlessBlenderRenderSpec(asset, rawOutputDirectory, reportDirectory);
     const cacheKey = await computeRenderCacheKey(asset, spec, pythonScript);
     const cachedPng = await resolveRenderCacheHit(renderCacheDir, cacheKey.sha256);

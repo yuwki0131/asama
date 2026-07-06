@@ -134,7 +134,38 @@ elevation: {
 | `packages/simulation/src/world.ts` | シナリオ elevation 適用、登坂の実時間化、スナップショット出力 |
 | `packages/simulation/src/serialization.ts` | 旧セーブのフラット埋め |
 
-## 8. 未解決事項(後続判断)
+## 8. P4c 実装ノート(タイルアセット、2026-07-07)
+
+P4cで制作済みのタイル一式(定義: `assets/definitions/production-assets/elevation-terrain.json`、
+34枚)。ビルダーは `assets/source/blender/scripts/render_asset_lib/elevation/` +
+`render_elevation_asset.py` に隔離(anim/ と同じパターン。静的387アセットの
+キャッシュ鍵に入らない。定義JSONの `source.registry: "elevation"` が隔離レジストリを指す)。
+
+### キャンバスとアンカー(P4b はこの前提で合成する)
+
+| 種別 | キャンバス | アンカー | 配置 |
+|---|---|---|---|
+| `terrain.<skin>.face.<s\|e>.h<n>` / `corner.se.h<n>` | 64 x (32+24n) | (32, 16) | **高いセル**の位置に、そのセルの `screenY -= elevation*24` を適用して描く。上面菱形は通常タイルと同位置(z=0面)で、崖面はその下に垂れる |
+| `terrain.slope.<skin>.<dir>` / 同 `.side.<s\|e>` | 64 x 56 | (32, 40) | 坂セルの位置に低い側の elevation オフセットで描く。上 24px は高い側の縁の分の余白 |
+
+### 描画セマンティクス
+
+- **corner.se は face.s + face.e の置き換え**(完全な L 型ピース)。S/E 両エッジが同じ h で崖になるセルでは corner のみを描く。h が異なる場合は face.s と face.e を個別に描く(角の意匠は落ちるが破綻はしない)
+- セル内の描画順は「崖面(corner または face)→ 坂サイド → 坂 or 上面タイル」。すべて既存の (x+y) 昇順走査に収まる(持ち上がるジオメトリは常に自セルか先に描かれたセルの領域にしか投影されない)
+- **坂タイルは中身の詰まったソリッド**(石段・土手とも)。側面が露出したときは素の側壁が描かれるため、`slope.*.side.*` を描き忘れても穴は開かない。side タイルは草の縁・化粧を足した正装版で、坂セルの「側面が低地に面するエッジ」にのみ重ねる(可視なのは N/S 向き坂の E サイド、E/W 向き坂の S サイドのみ。他方向は自前ジオメトリが隠す)
+- side タイルの想定は「隣接地が坂の基準レベルと同じ」。それ以上の段差が横に出るレイアウトでは高いセル側の face.h を併用する
+- **石垣はベースがセル境界・天端が内側**(裾広がりの実形状だとキャンバス 64x(32+24n) を溢れるため)。天端の物理エッジは上面タイルに隠れる前提で、緑の縁草は見かけの縁(菱形エッジのすぐ下)に付けてある
+- 内角(凹角)は専用アセット不要の判断: face の両端に +0.03 のブリードがあり、隣接面と高いセルの上面が継ぎ目を覆う
+
+### 検証画像
+
+`pnpm assets:elevation:contact-sheet` が
+`assets/intermediate/spike/elevation-tiles-contact-sheet.png`(全タイル)と
+`elevation-kuruwa-mock.png`(段2曲輪+石段+切通しの手動合成、描画規則どおりの実装例)
+を再生成する。合成ロジックは `packages/asset-tools/src/generateElevationContactSheet.ts`
+の `buildKuruwaMock` が P4b の参照実装を兼ねる。
+
+## 9. 未解決事項(後続判断)
 
 - **梯子と高低差**: 攻城梯子(壁越え)は現状 elevation を見ない。石垣段差そのものに梯子を掛ける仕様は P5 で必要になったら定義
 - **崖の内角(concave corner)アセット**: 命名は `corner.se` の類推で拡張可能だが、実際に必要な角種は P4c のタイル制作時に確定
