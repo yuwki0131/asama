@@ -3,17 +3,22 @@ import type { CellCoord, WorldSnapshot } from "@asama/shared";
 import { clearLayer, type LoadedAsset } from "./assets";
 import { roundScreenPixel, type CameraState } from "./camera";
 import { getSnapshotCell, isInsideSnapshotMap } from "./gameRules";
-import { addCellActionPreview, addOverlaySprite, addPathSprites } from "./overlayLayer";
-import { drawSceneLayer } from "./sceneLayer";
+import { addAlignmentDebugOverlay, addCellActionPreview, addOverlaySprite, addPathSprites } from "./overlayLayer";
 import { buildTerrainChunks, terrainKeyFor, updateTerrainChunkVisibility } from "./terrainLayer";
 import type { ToolMode } from "./GameCanvas";
 
+/**
+ * Snapshot/interaction-driven rendering: terrain chunk (re)build, overlay
+ * sprites (paths, hover, build previews) and the alignment debug overlay.
+ * Units and buildings live in the retained scene graph (sceneLayer.ts) and
+ * are updated by the per-frame ticker in GameCanvas instead.
+ */
 export function renderScene(
   app: Application | null,
   world: Container | null,
   terrainLayer: Container | null,
   overlayLayer: Container | null,
-  unitLayer: Container | null,
+  debugLayer: Container | null,
   lastTerrainKeyRef: { current: string | null },
   snapshot: WorldSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
@@ -24,7 +29,7 @@ export function renderScene(
   selectedCell: CellCoord | null,
   localInvalidMoveTarget: CellCoord | null
 ): void {
-  if (app === null || world === null || terrainLayer === null || overlayLayer === null || unitLayer === null) {
+  if (app === null || world === null || terrainLayer === null || overlayLayer === null || debugLayer === null) {
     return;
   }
 
@@ -62,5 +67,8 @@ export function renderScene(
     addOverlaySprite(overlayLayer, invalidMoveTarget, "overlay.cell.blocked", assets);
   }
 
-  drawSceneLayer(unitLayer, snapshot, assets, camera, app.screen.width, app.screen.height, debugOverlayVisible);
+  clearLayer(debugLayer);
+  if (debugOverlayVisible) {
+    addAlignmentDebugOverlay(debugLayer, snapshot, camera, app.screen.width, app.screen.height, assets);
+  }
 }

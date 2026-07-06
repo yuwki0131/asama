@@ -20,6 +20,8 @@ function makeSnapshot(units: Partial<UnitSnapshot>[]): WorldSnapshot {
     targetId: null,
     assetId: "unit_spear",
     task: null,
+    movementProgress: 0,
+    ticksPerStep: 8,
     ...u,
   }));
 

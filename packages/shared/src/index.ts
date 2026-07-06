@@ -73,6 +73,10 @@ export interface UnitSnapshot {
   readonly targetId: EntityId | null;
   readonly assetId: string;
   readonly task: EngineerTaskSnapshot | null;
+  /** Sim ticks accumulated toward the next path step (0..ticksPerStep-1). */
+  readonly movementProgress: number;
+  /** Sim ticks required to advance one cell along the path. */
+  readonly ticksPerStep: number;
 }
 
 export interface EngineerTaskSnapshot {

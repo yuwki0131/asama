@@ -13,6 +13,8 @@ export interface AsamaTestBridge {
   getBuildTool(): string | null;
   /** Returns the absolute screen position of a cell center in px. */
   cellToScreenPoint(cell: { x: number; y: number }): { x: number; y: number } | null;
+  /** Returns the measured average fps over the last second of render frames. */
+  getFps(): number;
 }
 
 declare global {

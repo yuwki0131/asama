@@ -20,6 +20,8 @@ function makeUnit(overrides: Partial<UnitSnapshot>): UnitSnapshot {
     targetId: null,
     assetId: "unit_spear",
     task: null,
+    movementProgress: 0,
+    ticksPerStep: 8,
     ...overrides,
   };
 }
