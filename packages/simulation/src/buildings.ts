@@ -115,28 +115,118 @@ function canPlaceBridgeAt(world: WorldState, position: CellCoord): boolean {
 }
 
 export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefinition): void {
+  // Pre-collect all bridge positions so auto-span does not extend into a cell
+  // that is reserved for an adjacent bridge (e.g. two-wide moat crossings).
+  const reservedBridgeCells = new Set<string>(
+    scenario.initialBuildings
+      .filter(p => isBridge(p.type))
+      .map(p => `${p.position.x},${p.position.y}`)
+  );
+
   for (const placement of scenario.initialBuildings) {
     const definition = buildingDefinitions[placement.type];
     if (definition === undefined) {
       throw new Error(`Unknown initial building type: ${placement.type}`);
     }
 
-    // Bridges in existing scenarios use pre-1xN single-cell positions; validate
-    // with the legacy per-cell check until scenarios are updated (see requests/sim2content).
-    const canPlace = isBridge(definition.type)
-      ? canPlaceOnCell(world, placement.position, definition)
-      : canPlaceBuilding(world, placement.position, definition);
-    if (!canPlace) {
-      throw new Error(`Cannot place initial building ${placement.type} at ${placement.position.x},${placement.position.y}`);
-    }
-
-    const building = createBuildingState(world, placement.type, placement.position, definition, placement.owner ?? "player");
-    world.buildings.push(building);
-    if (isLotBuilding(building.type)) {
-      applyLotCourtyard(world, building.footprint);
+    if (isBridge(definition.type)) {
+      // Auto-span: derive the full bridge footprint from the designated water/moat
+      // cell using the same orientation logic as player placement, but stop at
+      // cells reserved for adjacent bridges in this scenario.
+      const footprint = seedBridgeFootprint(world, placement.position, reservedBridgeCells);
+      for (const cell of footprint) {
+        if (getBuildingAt(world, cell) !== null) {
+          throw new Error(`Cannot place initial bridge ${placement.type} at ${placement.position.x},${placement.position.y}: cell ${cell.x},${cell.y} is occupied`);
+        }
+      }
+      world.buildings.push({
+        id: `building:${world.nextBuildingId}`,
+        owner: placement.owner ?? "player",
+        type: placement.type,
+        category: definition.category,
+        position: placement.position,
+        footprint,
+        hp: definition.maxHp,
+        maxHp: definition.maxHp,
+        lifecycleState: "intact",
+        gateState: definition.gateState,
+        passable: definition.passable,
+        movementCostModifier: definition.movementCostModifier,
+        assetId: definition.assetId,
+        food: null,
+        foodCapacity: null,
+        ladderHp: null,
+        fillProgress: 0
+      });
+    } else {
+      if (!canPlaceBuilding(world, placement.position, definition)) {
+        throw new Error(`Cannot place initial building ${placement.type} at ${placement.position.x},${placement.position.y}`);
+      }
+      const building = createBuildingState(world, placement.type, placement.position, definition, placement.owner ?? "player");
+      world.buildings.push(building);
+      if (isLotBuilding(building.type)) {
+        applyLotCourtyard(world, building.footprint);
+      }
     }
     world.nextBuildingId += 1;
   }
+}
+
+function seedBridgeFootprint(
+  world: WorldState,
+  position: CellCoord,
+  reservedBridgeCells: Set<string>
+): readonly CellCoord[] {
+  const orientation = bridgeOrientation(world, position);
+  const footprint = bridgeSpanForSeed(world, position, orientation, reservedBridgeCells);
+  return footprint ?? [position];
+}
+
+// Like bridgeSpan but stops the endpoint scan when it reaches a cell reserved
+// for another bridge in the same scenario (prevents adjacent bridge conflicts).
+function bridgeSpanForSeed(
+  world: WorldState,
+  position: CellCoord,
+  orientation: "x" | "y",
+  reservedBridgeCells: Set<string>
+): CellCoord[] | null {
+  const isX = orientation === "x";
+  const dimSize = isX ? world.map.width : world.map.height;
+
+  let negIdx = (isX ? position.x : position.y) - 1;
+  while (negIdx >= 0) {
+    const cell: CellCoord = isX ? { x: negIdx, y: position.y } : { x: position.x, y: negIdx };
+    if (getCell(world, cell).terrain !== "water") {
+      if (reservedBridgeCells.has(`${cell.x},${cell.y}`)) return null;
+      break;
+    }
+    negIdx--;
+  }
+  if (negIdx < 0) return null;
+
+  let posIdx = (isX ? position.x : position.y) + 1;
+  while (posIdx < dimSize) {
+    const cell: CellCoord = isX ? { x: posIdx, y: position.y } : { x: position.x, y: posIdx };
+    if (getCell(world, cell).terrain !== "water") {
+      if (reservedBridgeCells.has(`${cell.x},${cell.y}`)) return null;
+      break;
+    }
+    posIdx++;
+  }
+  if (posIdx >= dimSize) return null;
+
+  const length = posIdx - negIdx + 1;
+  if (length < 3 || length > 5) return null;
+
+  const negCell: CellCoord = isX ? { x: negIdx, y: position.y } : { x: position.x, y: negIdx };
+  const posCell: CellCoord = isX ? { x: posIdx, y: position.y } : { x: position.x, y: posIdx };
+  if (!getCell(world, negCell).passable || !getCell(world, posCell).passable) return null;
+
+  const footprint: CellCoord[] = [];
+  for (let i = negIdx; i <= posIdx; i++) {
+    footprint.push(isX ? { x: i, y: position.y } : { x: position.x, y: i });
+  }
+  return footprint;
 }
 
 export function bridgeAbsoluteFootprint(world: WorldState, position: CellCoord): CellCoord[] {

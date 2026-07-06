@@ -63,6 +63,16 @@ export function updateEnemyAi(world: WorldState): void {
       unit.movementProgress = 0;
       continue;
     }
+
+    // Unit is already adjacent to a honmaru footprint cell: attack directly
+    // instead of entering the path-retry cooldown loop. This covers both
+    // multi-tile honmaru and the case where findPathToAttackRange returns []
+    // because the unit's own position satisfies the sameCell shortcut.
+    if (honmaru.footprint.some(cell => manhattan(unit.position, cell) <= unit.attackRange)) {
+      unit.attackTargetId = honmaru.id;
+      continue;
+    }
+
     unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
 
     // Route blocked: breach the nearest defender fortification. Engineers
