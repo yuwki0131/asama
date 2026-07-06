@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  concentricCastleScenario,
+} from "@asama/content";
+import {
   ENEMY_WAVES,
   FOOD_BALANCE,
   createInitialWorld,
@@ -46,6 +49,18 @@ describe("food supply", () => {
     updateWorld(world);
 
     expect(world.outcome).toEqual({ winner: "enemy", reason: "starvation", tick: 1 });
+  });
+
+  it("connects storehouses through a closed player-owned gate (regression: gate-enclosed honmaru)", () => {
+    // concentricCastleScenario has the honmaru fully enclosed by a wall ring
+    // whose only exit is a closed gate. Before the fix, all storehouses were
+    // disconnected and the scenario starved at tick 601.
+    const world = createInitialWorld(concentricCastleScenario);
+    updateWorld(world);
+    const connected = world.food.connectedStorehouseIds;
+    const allStorehouses = world.buildings.filter((b) => b.type === "storehouse");
+    expect(allStorehouses.length).toBeGreaterThan(0);
+    expect(connected.length).toBe(allStorehouses.length);
   });
 
   it("does not draw food from a disconnected storehouse", () => {

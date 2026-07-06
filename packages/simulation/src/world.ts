@@ -1,7 +1,7 @@
 import { mvpDefenseScenario } from "@asama/content";
 import type { CellCoord, EconomySnapshot, FoodSnapshot, PlayerCommand, WorldSnapshot } from "@asama/shared";
 import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
-import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
+import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, bridgeAbsoluteFootprint, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
 import { getAttackTarget, areEnemies, updateAttackMoveBehavior, updateCombat } from "./combat";
 import { updateEconomy, applyMarketTrade, applyRecruitCommand, populationCapacity, currentApproval, maxRecruitPool } from "./economy";
 import { updateEnemyAi } from "./enemyAi";
@@ -21,6 +21,7 @@ import {
   cellKey,
   clampCell,
   intactBuildingsOfType,
+  isBridge,
   manhattan,
   sameCell,
   type SnapshotOptions,
@@ -94,7 +95,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
 
   if (command.type === "moveUnits") {
     const destination = clampCell(command.destination);
-    if (!isPassable(world, destination)) {
+    if (!isPassable(world, destination, "player")) {
       world.invalidMoveTarget = destination;
       return "That cell is not passable";
     }
@@ -108,7 +109,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     // units packed together do not block each other's computed paths.
     const moverIds = new Set(command.unitIds);
     const worldForPaths: WorldState = { ...world, units: world.units.filter((u) => !moverIds.has(u.id)) };
-    const slots = formationSlots(worldForPaths, destination, movers.length);
+    const slots = formationSlots(worldForPaths, destination, movers.length, "player");
 
     let assignedPath = false;
     let slotIndex = 0;
@@ -120,7 +121,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
         if (slot === undefined) {
           break;
         }
-        const path = findPath(worldForPaths, unit.position, slot);
+        const path = findPath(worldForPaths, unit.position, slot, "player");
         if (path.length === 0 && !sameCell(unit.position, slot)) {
           continue;
         }
@@ -189,7 +190,9 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       return "Cannot place building there";
     }
 
-    const footprint = absoluteFootprint(position, definition.footprint);
+    const footprint = isBridge(command.buildingType)
+      ? bridgeAbsoluteFootprint(world, position)
+      : absoluteFootprint(position, definition.footprint);
     world.buildings.push({
       id: `building:${world.nextBuildingId}`,
       owner: "player",

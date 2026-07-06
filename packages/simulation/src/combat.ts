@@ -75,7 +75,7 @@ function updateAttackMovement(world: WorldState): void {
         unit.pathRetryCooldown -= 1;
         continue;
       }
-      const path = findPathToAttackRange(world, unit.position, target.position, unit.attackRange);
+      const path = findPathToAttackRange(world, unit.position, target.position, unit.attackRange, unit.owner === "player" ? "player" : undefined);
       if (path.length === 0) {
         unit.pathRetryCooldown = PATH_RETRY_COOLDOWN_TICKS;
       }

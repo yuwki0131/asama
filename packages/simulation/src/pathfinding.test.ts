@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { applyCommand, createInitialWorld, snapshotWorld, updateWorld, type WorldState } from "./index";
+import { findPath, isPassable } from "./pathfinding";
+import { MAP_WIDTH } from "@asama/shared";
 import type { CellCoord, PlayerCommand, UnitType } from "@asama/shared";
 
 let clientSequence = 0;
@@ -106,6 +108,34 @@ function setTerrainCost(world: WorldState, coord: CellCoord, movementCost: numbe
   };
 }
 
+function setWaterCell(world: WorldState, coord: CellCoord): void {
+  const index = coord.y * world.map.width + coord.x;
+  const cell = world.map.cells[index];
+  if (cell === undefined) {
+    throw new Error(`Missing terrain cell at ${coord.x},${coord.y}`);
+  }
+
+  world.map.cells[index] = {
+    ...cell,
+    terrain: "water",
+    movementCost: 9999,
+    passable: false,
+    assetId: "terrain.water.test"
+  };
+}
+
+function placeBridge(world: WorldState, position: CellCoord): void {
+  const error = applyCommand(
+    world,
+    command({
+      type: "placeBuilding",
+      buildingType: "earth_bridge",
+      position
+    })
+  );
+  expect(error).toBeNull();
+}
+
 describe("pathfinding", () => {
   it("routes around blocking walls and buildings", () => {
     const world = createInitialWorld();
@@ -183,6 +213,30 @@ describe("pathfinding", () => {
     expect(path.some((cell) => cell.y !== 10)).toBe(true);
   });
 
+  it("traverses all 3 cells of a 1x3 bridge over a water channel", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    // Full-width E-W river at y=30; bridge at {20,30} gets y-orientation
+    for (let x = 0; x < MAP_WIDTH; x++) setWaterCell(world, { x, y: 30 });
+    // Footprint: {20,29}, {20,30}, {20,31}
+    placeBridge(world, { x: 20, y: 30 });
+
+    const path = findPath(world, { x: 20, y: 33 }, { x: 20, y: 27 });
+    expect(path.length).toBeGreaterThan(0);
+    expect(path.some(c => c.x === 20 && c.y === 30)).toBe(true);
+  });
+
+  it("blocks traversal when no bridge spans the water channel", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    for (let x = 0; x < MAP_WIDTH; x++) setWaterCell(world, { x, y: 30 });
+
+    const path = findPath(world, { x: 20, y: 33 }, { x: 20, y: 27 });
+    expect(path).toEqual([]);
+  });
+
   it("finds an approach path that stops inside melee attack range", () => {
     const world = createInitialWorld();
     normalizeMap(world);
@@ -209,5 +263,66 @@ describe("pathfinding", () => {
     expect(finalStep).toBeDefined();
     expect(finalStep).not.toEqual({ x: 16, y: 10 });
     expect(manhattan(finalStep as CellCoord, { x: 16, y: 10 })).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("player gate passability", () => {
+  function placeGate(world: WorldState, position: CellCoord): void {
+    const error = applyCommand(
+      world,
+      command({
+        type: "placeBuilding",
+        buildingType: "gate",
+        position
+      })
+    );
+    expect(error).toBeNull();
+  }
+
+  it("player unit can path through a closed player-owned gate", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [unit("u1", "player", "spear_ashigaru", { x: 10, y: 12 })];
+
+    placeWall(world, { x: 12, y: 11 });
+    placeGate(world, { x: 12, y: 12 });
+    placeWall(world, { x: 12, y: 13 });
+
+    const gate = world.buildings.find((b) => b.type === "gate");
+    expect(gate?.gateState).toBe("closed");
+    expect(gate?.passable).toBe(false);
+
+    const error = applyCommand(
+      world,
+      command({
+        type: "moveUnits",
+        unitIds: ["u1"],
+        destination: { x: 14, y: 12 }
+      })
+    );
+
+    expect(error).toBeNull();
+    const path = pathFor(world, "u1");
+    expect(path.length).toBeGreaterThan(0);
+    expect(path.some((c) => c.x === 12 && c.y === 12)).toBe(true);
+  });
+
+  it("closed player-owned gate is impassable without player perspective (enemy rule)", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    placeGate(world, { x: 12, y: 12 });
+
+    const gate = world.buildings.find((b) => b.type === "gate");
+    expect(gate?.gateState).toBe("closed");
+    expect(gate?.owner).toBe("player");
+
+    // Without player perspective (default/enemy): closed gate is impassable.
+    expect(isPassable(world, { x: 12, y: 12 })).toBe(false);
+    // With player perspective: passable.
+    expect(isPassable(world, { x: 12, y: 12 }, "player")).toBe(true);
   });
 });

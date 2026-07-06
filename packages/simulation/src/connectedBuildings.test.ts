@@ -167,56 +167,82 @@ describe("connected building asset masks", () => {
 });
 
 describe("bridge orientation", () => {
-  it("uses base assetId (x orientation) when no water neighbors", () => {
+  it("places x3 bridge over N-S river (water north and south, land east and west)", () => {
     const world = createInitialWorld();
     resetBuildings(world);
     normalizeMap(world);
-
-    place(world, "earth_bridge", { x: 20, y: 20 });
-    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge");
-
-    place(world, "wood_bridge", { x: 22, y: 20 });
-    expect(buildingAt(world, { x: 22, y: 20 }).assetId).toBe("building.wood_bridge");
-  });
-
-  it("uses .y suffix when east neighbor is water terrain", () => {
-    const world = createInitialWorld();
-    resetBuildings(world);
-    normalizeMap(world);
-    setWaterCell(world, { x: 21, y: 20 });
-
-    place(world, "earth_bridge", { x: 20, y: 20 });
-    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge.y");
-  });
-
-  it("uses .y suffix when west neighbor is water terrain", () => {
-    const world = createInitialWorld();
-    resetBuildings(world);
-    normalizeMap(world);
-    setWaterCell(world, { x: 19, y: 20 });
-
-    place(world, "wood_bridge", { x: 20, y: 20 });
-    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.wood_bridge.y");
-  });
-
-  it("uses .y suffix when east neighbor has a moat building", () => {
-    const world = createInitialWorld();
-    resetBuildings(world);
-    normalizeMap(world);
-
-    place(world, "dry_moat", { x: 21, y: 20 });
-    place(world, "earth_bridge", { x: 20, y: 20 });
-    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge.y");
-  });
-
-  it("does not use .y suffix when only north/south neighbors are water", () => {
-    const world = createInitialWorld();
-    resetBuildings(world);
-    normalizeMap(world);
+    setWaterCell(world, { x: 20, y: 20 });
     setWaterCell(world, { x: 20, y: 19 });
     setWaterCell(world, { x: 20, y: 21 });
 
     place(world, "earth_bridge", { x: 20, y: 20 });
-    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge");
+    const b = buildingAt(world, { x: 20, y: 20 });
+    expect(b.assetId).toBe("building.earth_bridge.x3");
+    expect(b.footprint).toEqual([
+      { x: 19, y: 20 },
+      { x: 20, y: 20 },
+      { x: 21, y: 20 }
+    ]);
+  });
+
+  it("places y3 bridge over E-W river (water east, land north and south)", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 20, y: 20 });
+    setWaterCell(world, { x: 21, y: 20 });
+
+    place(world, "wood_bridge", { x: 20, y: 20 });
+    const b = buildingAt(world, { x: 20, y: 20 });
+    expect(b.assetId).toBe("building.wood_bridge.y3");
+    expect(b.footprint).toEqual([
+      { x: 20, y: 19 },
+      { x: 20, y: 20 },
+      { x: 20, y: 21 }
+    ]);
+  });
+
+  it("uses y3 when east neighbor has a moat building adjacent to water center", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 20, y: 20 });
+
+    place(world, "dry_moat", { x: 21, y: 20 });
+    place(world, "earth_bridge", { x: 20, y: 20 });
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.earth_bridge.y3");
+  });
+
+  it("rejects bridge placement when center cell is not water", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+
+    const error = applyCommand(world, {
+      type: "placeBuilding",
+      buildingType: "earth_bridge",
+      position: { x: 20, y: 20 },
+      issuedAtTick: 0,
+      clientSequence: 99
+    });
+    expect(error).toBe("Cannot place building there");
+  });
+
+  it("rejects bridge placement when an end cell is not passable", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 20, y: 20 });
+    setWaterCell(world, { x: 21, y: 20 });
+    setWaterCell(world, { x: 20, y: 19 });
+
+    const error = applyCommand(world, {
+      type: "placeBuilding",
+      buildingType: "earth_bridge",
+      position: { x: 20, y: 20 },
+      issuedAtTick: 0,
+      clientSequence: 100
+    });
+    expect(error).toBe("Cannot place building there");
   });
 });
