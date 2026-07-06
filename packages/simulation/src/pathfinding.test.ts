@@ -266,7 +266,7 @@ describe("pathfinding", () => {
   });
 });
 
-describe("player gate passability", () => {
+describe("gate passability", () => {
   function placeGate(world: WorldState, position: CellCoord): void {
     const error = applyCommand(
       world,
@@ -279,36 +279,42 @@ describe("player gate passability", () => {
     expect(error).toBeNull();
   }
 
-  it("player unit can path through a closed player-owned gate", () => {
+  it("player unit cannot path through a closed gate", () => {
     const world = createInitialWorld();
     normalizeMap(world);
     resetBuildings(world);
     world.units = [unit("u1", "player", "spear_ashigaru", { x: 10, y: 12 })];
 
+    // Enclose cell {13,12}: walls on all sides, gate as the only west entry.
     placeWall(world, { x: 12, y: 11 });
     placeGate(world, { x: 12, y: 12 });
     placeWall(world, { x: 12, y: 13 });
+    placeWall(world, { x: 13, y: 11 });
+    placeWall(world, { x: 13, y: 13 });
+    placeWall(world, { x: 14, y: 11 });
+    placeWall(world, { x: 14, y: 12 });
+    placeWall(world, { x: 14, y: 13 });
+
+    // Close the gate (starts open, toggle closes it)
+    applyCommand(world, command({ type: "toggleGate", position: { x: 12, y: 12 } }));
 
     const gate = world.buildings.find((b) => b.type === "gate");
     expect(gate?.gateState).toBe("closed");
     expect(gate?.passable).toBe(false);
 
+    // {13,12} is only reachable through the (closed) gate — no path
     const error = applyCommand(
       world,
       command({
         type: "moveUnits",
         unitIds: ["u1"],
-        destination: { x: 14, y: 12 }
+        destination: { x: 13, y: 12 }
       })
     );
-
-    expect(error).toBeNull();
-    const path = pathFor(world, "u1");
-    expect(path.length).toBeGreaterThan(0);
-    expect(path.some((c) => c.x === 12 && c.y === 12)).toBe(true);
+    expect(error).toBe("No path to that cell");
   });
 
-  it("closed player-owned gate is impassable without player perspective (enemy rule)", () => {
+  it("closed gate is impassable to all perspectives", () => {
     const world = createInitialWorld();
     normalizeMap(world);
     resetBuildings(world);
@@ -317,12 +323,28 @@ describe("player gate passability", () => {
     placeGate(world, { x: 12, y: 12 });
 
     const gate = world.buildings.find((b) => b.type === "gate");
+    // Close the gate
+    applyCommand(world, command({ type: "toggleGate", position: { x: 12, y: 12 } }));
     expect(gate?.gateState).toBe("closed");
     expect(gate?.owner).toBe("player");
 
-    // Without player perspective (default/enemy): closed gate is impassable.
+    // Closed gate is impassable regardless of perspective
     expect(isPassable(world, { x: 12, y: 12 })).toBe(false);
-    // With player perspective: passable.
+    expect(isPassable(world, { x: 12, y: 12 }, "player")).toBe(false);
+  });
+
+  it("open gate is passable to all perspectives", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    placeGate(world, { x: 12, y: 12 });
+
+    const gate = world.buildings.find((b) => b.type === "gate");
+    expect(gate?.gateState).toBe("open");
+
+    expect(isPassable(world, { x: 12, y: 12 })).toBe(true);
     expect(isPassable(world, { x: 12, y: 12 }, "player")).toBe(true);
   });
 });

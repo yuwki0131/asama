@@ -101,7 +101,7 @@ export function computeConnectedStorehouseIds(world: WorldState): BuildingId[] {
     for (const direction of ORTHOGONAL_DIRECTIONS) {
       const next = { x: current.x + direction.x, y: current.y + direction.y };
       const key = cellKey(next);
-      if (visited.has(key) || !isInsideMap(next) || !isPassable(world, next, "player")) {
+      if (visited.has(key) || !isInsideMap(next) || !isPassable(world, next, "supply")) {
         continue;
       }
       visited.add(key);

@@ -22,6 +22,7 @@ import {
   clampCell,
   intactBuildingsOfType,
   isBridge,
+  isGate,
   manhattan,
   sameCell,
   type SnapshotOptions,
@@ -193,6 +194,8 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     const footprint = isBridge(command.buildingType)
       ? bridgeAbsoluteFootprint(world, position)
       : absoluteFootprint(position, definition.footprint);
+    // Gates always start open; players close them intentionally for defense.
+    const isGateBuilding = isGate(command.buildingType);
     world.buildings.push({
       id: `building:${world.nextBuildingId}`,
       owner: "player",
@@ -203,9 +206,9 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       hp: definition.maxHp,
       maxHp: definition.maxHp,
       lifecycleState: "intact",
-      gateState: definition.gateState,
-      passable: definition.passable,
-      movementCostModifier: definition.movementCostModifier,
+      gateState: isGateBuilding ? "open" : definition.gateState,
+      passable: isGateBuilding ? true : definition.passable,
+      movementCostModifier: isGateBuilding ? 2 : definition.movementCostModifier,
       assetId: definition.assetId,
       // Player-built storehouses start empty; stock arrives via harvest or
       // supply carts, not construction.

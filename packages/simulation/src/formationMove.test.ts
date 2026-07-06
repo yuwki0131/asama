@@ -69,7 +69,7 @@ describe("formation movement", () => {
   it("rejects a move into impassable terrain", () => {
     const world = createInitialWorld();
     const ids = playerUnitIds(world);
-    // (40, 38) is mid-river water in the procedural map.
+    // (40, 38) is mid-river water in the procedural map (river centre ≈ y=37 at x=40).
     const rejection = applyCommand(world, moveCommand(ids, { x: 40, y: 38 }));
     expect(rejection).toBe("That cell is not passable");
   });
@@ -181,58 +181,97 @@ describe("8-unit group move (narrow corridor regression)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Bug regression: bridge crossing over river water terrain
+// Bridge crossing over a 3-cell-wide river (regression: variable-length bridge)
+
+function setWaterCell(world: WorldState, coord: { x: number; y: number }): void {
+  const index = coord.y * world.map.width + coord.x;
+  const cell = world.map.cells[index];
+  if (cell === undefined) return;
+  world.map.cells[index] = {
+    ...cell,
+    terrain: "water" as const,
+    movementCost: 9999,
+    passable: false,
+    assetId: "terrain.water.test"
+  };
+}
 
 describe("bridge crossing over river water", () => {
-  it("unit can path from the north bank to the south bank via earth_bridge at (61,44)", () => {
-    // MVP scenario places earth_bridge at (61,44). With the 1-cell-wide river fix
-    // (riverDistance===0 only), (61,43) and (61,45) are grass → bridge is reachable.
+  it("unit can path from north bank to south bank via a 5-cell bridge over a 3-cell river", () => {
     const world = createInitialWorld();
-    const testUnit = world.units.find((u) => u.owner === "player");
-    expect(testUnit).toBeDefined();
-    if (testUnit === undefined) return;
+    normalizeMap(world);
+    resetBuildings(world);
 
-    // Keep only this unit and place it on the north bank
+    // 3-cell-wide E-W river at y=30,31,32
+    for (let x = 0; x < world.map.width; x++) {
+      setWaterCell(world, { x, y: 30 });
+      setWaterCell(world, { x, y: 31 });
+      setWaterCell(world, { x, y: 32 });
+    }
+
+    // Player places bridge at center row — auto-spans to 5 cells (y=29..33)
+    const bridgeError = applyCommand(world, {
+      type: "placeBuilding",
+      buildingType: "earth_bridge",
+      position: { x: 20, y: 31 },
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+    expect(bridgeError).toBeNull();
+
+    const testUnit = makeUnit("u1", "spear_ashigaru", 20, 26);
     world.units = [testUnit];
-    testUnit.position = { x: 61, y: 42 };
 
     const rejection = applyCommand(world, {
       type: "moveUnits",
-      unitIds: [testUnit.id],
-      destination: { x: 61, y: 46 },
+      unitIds: ["u1"],
+      destination: { x: 20, y: 36 },
       issuedAtTick: 0,
-      clientSequence: 1
+      clientSequence: 2
     });
 
     expect(rejection).toBeNull();
     expect(testUnit.path.length).toBeGreaterThan(0);
-    // The assigned path must traverse the bridge cell itself
-    expect(testUnit.path.some((c) => c.x === 61 && c.y === 44)).toBe(true);
+    // Path must pass through at least one of the water cells (bridge covers them)
+    expect(testUnit.path.some((c) => c.x === 20 && c.y >= 30 && c.y <= 32)).toBe(true);
   });
 
-  it("unit actually moves across the river via earth_bridge at (61,44)", () => {
+  it("unit actually moves across a 3-cell-wide river via bridge", () => {
     const world = createInitialWorld();
-    const testUnit = world.units.find((u) => u.owner === "player");
-    expect(testUnit).toBeDefined();
-    if (testUnit === undefined) return;
+    normalizeMap(world);
+    resetBuildings(world);
 
-    world.units = [testUnit];
-    testUnit.position = { x: 61, y: 42 };
+    for (let x = 0; x < world.map.width; x++) {
+      setWaterCell(world, { x, y: 30 });
+      setWaterCell(world, { x, y: 31 });
+      setWaterCell(world, { x, y: 32 });
+    }
 
     applyCommand(world, {
-      type: "moveUnits",
-      unitIds: [testUnit.id],
-      destination: { x: 61, y: 46 },
+      type: "placeBuilding",
+      buildingType: "earth_bridge",
+      position: { x: 20, y: 31 },
       issuedAtTick: 0,
       clientSequence: 1
     });
 
-    for (let tick = 0; tick < 500; tick += 1) {
+    const testUnit = makeUnit("u1", "spear_ashigaru", 20, 26);
+    world.units = [testUnit];
+
+    applyCommand(world, {
+      type: "moveUnits",
+      unitIds: ["u1"],
+      destination: { x: 20, y: 36 },
+      issuedAtTick: 0,
+      clientSequence: 2
+    });
+
+    for (let tick = 0; tick < 600; tick += 1) {
       updateWorld(world);
       if (testUnit.path.length === 0) break;
     }
 
-    expect(testUnit.position).toEqual({ x: 61, y: 46 });
+    expect(testUnit.position).toEqual({ x: 20, y: 36 });
   });
 });
 

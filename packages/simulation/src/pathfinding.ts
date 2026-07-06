@@ -88,7 +88,7 @@ export function findPath(world: WorldState, start: CellCoord, goal: CellCoord, p
         continue;
       }
 
-      const tentativeG = current.g + movementCostAt(world, neighbor, perspective);
+      const tentativeG = current.g + movementCostAt(world, neighbor);
       const known = open.get(neighborKey);
       if (known !== undefined && tentativeG >= known.g) {
         continue;
@@ -172,7 +172,7 @@ function reconstructPath(goalKey: string, nodes: Map<string, PathNode>): CellCoo
   return path.reverse();
 }
 
-export function isPassable(world: WorldState, coord: CellCoord, perspective?: "player"): boolean {
+export function isPassable(world: WorldState, coord: CellCoord, perspective?: "player" | "supply"): boolean {
   if (!isInsideMap(coord)) {
     return false;
   }
@@ -184,10 +184,10 @@ export function isPassable(world: WorldState, coord: CellCoord, perspective?: "p
   const cell = getCell(world, coord);
   const building = getBuildingAt(world, coord);
   if (building !== null) {
-    // Player's own gates are always traversable from the player's perspective
-    // (自動開閉の抽象化: closed gates don't block the owning side's movement).
+    // Supply perspective: player gates are always passable for food connectivity
+    // regardless of open/closed state (通用口の抽象化).
     const effectivePassable =
-      perspective === "player" && building.owner === "player" && isGate(building.type)
+      perspective === "supply" && building.owner === "player" && isGate(building.type)
         ? true
         : building.passable;
     return effectivePassable && (cell.passable || isBridge(building.type));
@@ -196,18 +196,13 @@ export function isPassable(world: WorldState, coord: CellCoord, perspective?: "p
   return cell.passable;
 }
 
-export function movementCostAt(world: WorldState, coord: CellCoord, perspective?: "player"): number {
+export function movementCostAt(world: WorldState, coord: CellCoord): number {
   const terrainCost = getCell(world, coord).movementCost;
   const building = getBuildingAt(world, coord);
   if (building === null) {
     return terrainCost;
   }
-  // Treat closed player gates as open (cost 2) when pathfinding for the player.
-  const modifier =
-    perspective === "player" && building.owner === "player" && building.gateState === "closed"
-      ? 2
-      : building.movementCostModifier;
-  return terrainCost + modifier;
+  return terrainCost + building.movementCostModifier;
 }
 
 export function getUnitAt(world: WorldState, coord: CellCoord): UnitState | null {

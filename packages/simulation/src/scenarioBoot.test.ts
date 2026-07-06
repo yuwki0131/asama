@@ -33,8 +33,8 @@ describe("scenario boot + 1000-tick regression", () => {
 
 describe("DEFAULT_SCENARIO 2000-tick starvation regression", () => {
   it("DEFAULT_SCENARIO survives 2000 ticks without starvation or early defeat", () => {
-    // Before the fix, closed player gates blocked food connectivity and the
-    // scenario lost to starvation at tick 601 (first consumption cycle).
+    // Food connectivity uses supply perspective (player gates always traversable)
+    // so closing the castle gate does not starve the garrison.
     const world = createInitialWorld(DEFAULT_SCENARIO);
     for (let i = 0; i < 2000; i++) {
       updateWorld(world);
