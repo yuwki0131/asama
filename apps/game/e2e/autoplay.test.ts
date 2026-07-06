@@ -13,6 +13,7 @@ import { launchBrowser, newPage, openGame } from "./helpers";
 import {
   concentricCastleScript,
   linearFortressScript,
+  mountainCastleScript,
   riversideDefenseScript,
 } from "@asama/content";
 import type { PlaythroughScript } from "@asama/content";
@@ -316,5 +317,29 @@ describe("autoplay: riverside-defense (scenario C)", () => {
   it.skip(
     "needs scenario-selection bridge — see requests/ui2sim/add-scenario-selection.md",
     () => { void riversideDefenseScript; }
+  );
+});
+
+// ── Scenario D: mountain-castle — player wins (time_held) ─────────────────
+
+describe("autoplay: 山城シナリオ — player wins (time_held)", () => {
+  let page: Page;
+
+  beforeAll(async () => {
+    const { page: p } = await newPage(browser);
+    page = p;
+    await openGame(page, "?scenario=mountain-castle");
+  });
+
+  afterAll(async () => {
+    await page?.close();
+  });
+
+  it(
+    "plays mountain-castle to time_held outcome within maxTick (holdTicks=24000)",
+    async () => {
+      await runPlaythrough(page, mountainCastleScript);
+    },
+    700_000
   );
 });

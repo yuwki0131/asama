@@ -270,11 +270,61 @@ export const riversideDefenseScript: PlaythroughScript = {
   },
 };
 
+// ---- Scenario D: mountainCastleScript (rough) --------------------------------
+
+/**
+ * mountain-castle (霞ヶ峰城・2.0ショーケース) の粗い完走台本。
+ *
+ * 大きな初期ガリソンがすでに各段(L0-L3)に配置されており、
+ * 城下 (L0) の遅滞部隊を大手坂上 (L1) に引き上げることで
+ * 壊滅を防ぎ、24000 tick まで本丸を保持して time_held 勝利する。
+ *
+ * 座標参照:
+ *   - 本丸          honmaru @ (60, 60)  L3
+ *   - 大手門 (L1)   gate_wide_2 @ (56, 85)
+ *   - 搦手門 (L1)   gate_ne_sw @ (73, 79)
+ *   - 城下守備       spear(55,106) archer(57,106)
+ *   - 各波荷車       wave1: (56,119)  wave2: (56,120)  wave3: (56,121)  wave4: (55,120),(76,110)
+ */
+export const mountainCastleScript: PlaythroughScript = {
+  scenarioId: "mountain-castle",
+  steps: [
+    // ── Phase 0: 城下遅滞部隊を大手坂上(L1)に引き上げる ────────────────────
+    s(200,  { type: "moveUnits", selector: playerNear({ x: 56, y: 106 }, 6), destination: { x: 56, y: 87 } }),
+    s(500,  { type: "marketTrade", trade: "buyFood" }),
+
+    // ── Wave 1 (tick 3000): 大手坂前で荷車を優先撃破 ──────────────────────
+    s(3100, { type: "attackTarget", selector: playerNear({ x: 56, y: 84 }, 20), targetSelector: enemyOfType("supply_cart") }),
+    s(5500, { type: "moveUnits", selector: playerNear({ x: 56, y: 90 }, 15), destination: { x: 56, y: 84 } }),
+
+    // ── Wave 2 (tick 7200): 弓+荷車への応答 ────────────────────────────────
+    s(7300, { type: "attackTarget", selector: playerNear({ x: 56, y: 80 }, 25), targetSelector: enemyOfType("supply_cart") }),
+    s(10000, { type: "moveUnits", selector: playerNear({ x: 56, y: 80 }, 20), destination: { x: 56, y: 72 } }),
+
+    // ── Wave 3 (tick 12000): 大手・搦手の二方面 ────────────────────────────
+    s(12100, { type: "attackTarget", selector: allPlayer, targetSelector: enemyOfType("supply_cart") }),
+    s(12200, { type: "moveUnits", selector: playerNear({ x: 72, y: 79 }, 8), destination: { x: 72, y: 84 } }),
+    s(15000, { type: "stopUnits", selector: allPlayer }),
+    s(15500, { type: "moveUnits", selector: playerNear({ x: 56, y: 75 }, 20), destination: { x: 56, y: 72 } }),
+
+    // ── Wave 4 (tick 17000): 総攻撃 — 本丸を最終防衛 ──────────────────────
+    s(17100, { type: "attackTarget", selector: allPlayer, targetSelector: enemyOfType("supply_cart") }),
+    s(20000, { type: "stopUnits", selector: allPlayer }),
+    s(20500, { type: "moveUnits", selector: allPlayer, destination: { x: 60, y: 62 } }),
+  ],
+  expectedOutcome: {
+    outcome: "time_held",
+    winner: "player",
+    maxTick: 28000,
+  },
+};
+
 // ---- Script registry -------------------------------------------------------
 
-/** All playthrough scripts in scenario order (A / B / C difficulty). */
+/** All playthrough scripts in scenario order (A / B / C / D difficulty). */
 export const playthroughScripts: readonly PlaythroughScript[] = [
   concentricCastleScript,
   linearFortressScript,
   riversideDefenseScript,
+  mountainCastleScript,
 ];
