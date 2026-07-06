@@ -4,6 +4,8 @@ import process from "node:process";
 import { generateGeneratedAssets } from "./generateGeneratedAssets";
 import { generatePlaceholders } from "./generatePlaceholders";
 import { readManifest, validateManifest } from "./manifest";
+import { validateAnimationManifest } from "./animationManifest";
+import { renderAnimationAssets } from "./animationPipeline";
 import { auditProductionArt } from "./productionArtAudit";
 import {
   buildAtlas,
@@ -31,6 +33,15 @@ try {
     } else {
       console.log(
         `Rendered ${result.total} Blender production assets; rendered ${result.rendered}, cached-hit ${result.cachedHit}.`
+      );
+    }
+  } else if (command === "assets:render:anim") {
+    const result = await renderAnimationAssets();
+    if (result.total === 0) {
+      console.log("No animation production assets configured.");
+    } else {
+      console.log(
+        `Rendered ${result.total} animation sheets; rendered ${result.rendered}, cached-hit ${result.cachedHit}.`
       );
     }
   } else if (command === "assets:blender:calibration") {
@@ -64,7 +75,10 @@ try {
     await validateProductionAssetDefinitions();
     const manifest = await readManifest(generatedManifestPath);
     await validateManifest(manifest, publicAssetsDir);
-    console.log(`Validated production definitions and ${manifest.assets.length} generated assets.`);
+    await validateAnimationManifest(manifest, publicAssetsDir);
+    console.log(
+      `Validated production definitions, ${manifest.assets.length} generated assets and ${manifest.animations?.length ?? 0} animation sheets.`
+    );
   } else if (command === "assets:audit:production") {
     const findings = await auditProductionArt();
     if (findings.length === 0) {
@@ -79,12 +93,14 @@ try {
     await generatePlaceholders();
     await generateGeneratedAssets();
     const postprocessResult = await postprocessProductionAssets();
+    const animationResult = await renderAnimationAssets();
     await buildAtlas();
     await validateProductionAssetDefinitions();
     const manifest = await readManifest(generatedManifestPath);
     await validateManifest(manifest, publicAssetsDir);
+    await validateAnimationManifest(manifest, publicAssetsDir);
     console.log(
-      `Completed asset pipeline; rendered ${postprocessResult.blender.rendered}, cached-hit ${postprocessResult.blender.cachedHit}; validated ${manifest.assets.length} generated assets.`
+      `Completed asset pipeline; rendered ${postprocessResult.blender.rendered}, cached-hit ${postprocessResult.blender.cachedHit}; animation sheets rendered ${animationResult.rendered}, cached-hit ${animationResult.cachedHit}; validated ${manifest.assets.length} generated assets.`
     );
   } else if (command === "validate-manifest") {
     const manifestPath = process.argv[3] === "generated" ? generatedManifestPath : placeholderManifestPath;

@@ -27,7 +27,13 @@ import {
   storeRenderCachePng,
   writeRenderCacheIndex
 } from "./renderCache";
-import type { AtlasBuildSpec, GeneratedAsset, ProductionAssetSpec, RasterImportSpec } from "./types";
+import type {
+  AnimationManifestEntry,
+  AtlasBuildSpec,
+  GeneratedAsset,
+  ProductionAssetSpec,
+  RasterImportSpec
+} from "./types";
 
 export interface BlenderRenderBatchResult {
   readonly total: number;
@@ -55,24 +61,42 @@ export async function importRasterAssets(): Promise<number> {
     ...existingManifest.assets.filter((asset) => !productionIds.has(asset.assetId)),
     ...productionAssets
   ];
-  await writeFile(
-    generatedManifestPath,
-    `${JSON.stringify(
-      { version: 1, generatedBy: "@asama/asset-tools production", assets: mergedAssets },
-      null,
-      2
-    )}\n`,
-    "utf8"
-  );
+  await writeGeneratedManifest(mergedAssets, existingManifest.animations);
   return rasterAssets.length;
 }
 
-async function readExistingGeneratedManifest(): Promise<{ readonly assets: readonly GeneratedAsset[] }> {
+async function readExistingGeneratedManifest(): Promise<{
+  readonly assets: readonly GeneratedAsset[];
+  readonly animations?: readonly AnimationManifestEntry[];
+}> {
   try {
     return await readManifest(generatedManifestPath);
   } catch {
     return { assets: [] };
   }
+}
+
+// The `animations` section is owned by the animation pipeline; static
+// manifest rewrites must carry it through untouched (backward compatible:
+// the key is simply absent until animations are generated).
+async function writeGeneratedManifest(
+  assets: readonly GeneratedAsset[],
+  animations: readonly AnimationManifestEntry[] | undefined
+): Promise<void> {
+  await writeFile(
+    generatedManifestPath,
+    `${JSON.stringify(
+      {
+        version: 1,
+        generatedBy: "@asama/asset-tools production",
+        assets,
+        ...(animations === undefined ? {} : { animations })
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
 }
 
 export async function renderBlenderAssets(): Promise<BlenderRenderBatchResult> {
@@ -194,15 +218,7 @@ async function mergeProductionManifest(assets: readonly ProductionAssetSpec[]): 
     ...existingManifest.assets.filter((asset) => !productionIds.has(asset.assetId)),
     ...productionAssets
   ];
-  await writeFile(
-    generatedManifestPath,
-    `${JSON.stringify(
-      { version: 1, generatedBy: "@asama/asset-tools production", assets: mergedAssets },
-      null,
-      2
-    )}\n`,
-    "utf8"
-  );
+  await writeGeneratedManifest(mergedAssets, existingManifest.animations);
 }
 
 function toRasterImportSpec(asset: ProductionAssetSpec): RasterImportSpec {
