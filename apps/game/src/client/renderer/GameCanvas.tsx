@@ -7,8 +7,9 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent
 } from "react";
-import { Application, Container, type Ticker } from "pixi.js";
+import { Application, ColorMatrixFilter, Container, type ColorMatrix, type Sprite, type Ticker } from "pixi.js";
 import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@asama/shared";
+import { createAerialOverlay, resizeAerialOverlay } from "./aerialOverlay";
 import { loadGeneratedAssets, type LoadedAsset } from "./assets";
 import { cellToWorld, centerCameraOnCell, roundScreenPixel, snapCamera, worldToScreen, type CameraState } from "./camera";
 import { registerKeyboardInput, registerPointerInput } from "./input";
@@ -17,6 +18,7 @@ import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type Minimap
 import { renderScene } from "./renderScene";
 import { RetainedScene } from "./sceneLayer";
 import { updateTerrainChunkVisibility } from "./terrainLayer";
+import { TONE_MATRIX_C } from "./toneGrade";
 
 export type ToolMode = BuildingType | "demolish" | "ladder" | "fillMoat" | null;
 
@@ -26,6 +28,8 @@ export interface GameCanvasHandle {
   cellToScreenPoint: (cell: CellCoord) => { x: number; y: number } | null;
   /** DEV-only: measured average fps over the last second of render frames. */
   getFps: () => number;
+  /** Toggle the grade-C color matrix + aerial haze overlay (default on). */
+  setTone: (enabled: boolean) => void;
 }
 
 interface GameCanvasProps {
@@ -80,6 +84,9 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const terrainLayerRef = useRef<Container | null>(null);
   const overlayLayerRef = useRef<Container | null>(null);
   const debugLayerRef = useRef<Container | null>(null);
+  const toneFilterRef = useRef<ColorMatrixFilter | null>(null);
+  const aerialOverlayRef = useRef<Sprite | null>(null);
+  const toneEnabledRef = useRef(true);
   const retainedSceneRef = useRef<RetainedScene | null>(null);
   const lastTerrainKeyRef = useRef<string | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(snapshot);
@@ -238,6 +245,17 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       const last = samples[samples.length - 1]!;
       if (last <= first) return 0;
       return ((samples.length - 1) * 1000) / (last - first);
+    },
+    setTone: (enabled: boolean) => {
+      toneEnabledRef.current = enabled;
+      const toneFilter = toneFilterRef.current;
+      if (toneFilter !== null) {
+        toneFilter.enabled = enabled;
+      }
+      const aerialOverlay = aerialOverlayRef.current;
+      if (aerialOverlay !== null) {
+        aerialOverlay.visible = enabled;
+      }
     }
   }), [scheduleCameraRender]);
 
@@ -289,7 +307,28 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         world.addChild(terrainLayer, overlayLayer, retainedScene.root, debugLayer);
         app.stage.addChild(world);
 
+        // Grade C "大河ドラマ" color matrix over the whole world (terrain,
+        // buildings, units, overlays) — the React UI stays ungraded. The
+        // matrix is pre-composed with Rec.709 luma weights; do NOT rebuild it
+        // from Pixi presets like saturate(), which use different weights.
+        const toneFilter = new ColorMatrixFilter();
+        toneFilter.matrix = TONE_MATRIX_C.slice() as ColorMatrix;
+        // No filterArea: in Pixi v8 filterArea is container-local (camera
+        // transformed), which would push the pass off-screen. The default
+        // clipToViewport=true already limits the framebuffer to the screen.
+        // Aerial perspective haze: screen-fixed, above the world, below UI.
+        const aerialOverlay = createAerialOverlay();
+        resizeAerialOverlay(aerialOverlay, app.screen.width, app.screen.height);
+        app.stage.addChild(aerialOverlay);
+        // Pixi skips the filter pass entirely while every filter is disabled,
+        // so setTone() only flips `enabled` instead of swapping the array.
+        toneFilter.enabled = toneEnabledRef.current;
+        world.filters = [toneFilter];
+        aerialOverlay.visible = toneEnabledRef.current;
+
         appRef.current = app;
+        toneFilterRef.current = toneFilter;
+        aerialOverlayRef.current = aerialOverlay;
         worldRef.current = world;
         terrainLayerRef.current = terrainLayer;
         overlayLayerRef.current = overlayLayer;
@@ -312,6 +351,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
           const camera = cameraRef.current;
           world.position.set(roundScreenPixel(camera.x), roundScreenPixel(camera.y));
           world.scale.set(camera.zoom);
+          // Keep the screen-fixed haze covering the top 55% across resizes.
+          resizeAerialOverlay(aerialOverlay, app.screen.width, app.screen.height);
           updateTerrainChunkVisibility(terrainLayer, camera, app.screen.width, app.screen.height);
 
           const currentSnapshot = snapshotRef.current;
@@ -341,6 +382,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       terrainLayerRef.current = null;
       overlayLayerRef.current = null;
       debugLayerRef.current = null;
+      toneFilterRef.current = null;
+      aerialOverlayRef.current = null;
       retainedSceneRef.current = null;
       lastTerrainKeyRef.current = null;
       fpsSamplesRef.current = [];

@@ -14,7 +14,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Browser, Page } from "playwright-core";
-import { cellToScreen, launchBrowser, newPage, openGame, parsePng, _REPO_ROOT } from "./helpers";
+import { buildRowExpectedColors, launchBrowser, newPage, openGame, parsePng, _REPO_ROOT } from "./helpers";
 
 let browser: Browser;
 let page: Page;
@@ -33,9 +33,11 @@ afterAll(async () => {
 });
 
 /**
- * Count bright yellow-green pixels (#a0b050 ±20, alpha > 128) that form a
- * diagonal line cluster.  A "cluster" requires ≥ LINE_MIN_LENGTH adjacent
- * pixels following a diagonal direction (±1 in both x and y per step).
+ * Count bright yellow-green pixels (raw #a0b050 ±20, alpha > 128) that form a
+ * diagonal line cluster.  The raw seam color is tone-graded (grade-C matrix +
+ * aerial haze per screen row) before matching, so the check follows the
+ * shipped look.  A "cluster" requires ≥ LINE_MIN_LENGTH adjacent pixels
+ * following a diagonal direction (±1 in both x and y per step).
  * Small isolated bright pixels (sun-lit ground noise) are ignored.
  */
 function countYellowGreenLinePixels(
@@ -43,24 +45,24 @@ function countYellowGreenLinePixels(
   width: number,
   height: number
 ): { count: number; samples: Array<{ x: number; y: number }> } {
-  const R_TARGET = 0xa0; // 160
-  const G_TARGET = 0xb0; // 176
-  const B_TARGET = 0x50; // 80
+  const SEAM_BASE = { r: 0xa0, g: 0xb0, b: 0x50 }; // raw #a0b050
   const TOL = 20;
   const LINE_MIN_LENGTH = 8; // contiguous diagonal run to count as a seam line
 
-  // Build candidate map
+  // Build candidate map against the per-row tone-graded seam color
+  const rowExpected = buildRowExpectedColors(SEAM_BASE, height);
   const cand = new Uint8Array(width * height);
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i]!;
     const g = data[i + 1]!;
     const b = data[i + 2]!;
     const a = data[i + 3]!;
+    const expected = rowExpected[Math.floor(i / 4 / width)]!;
     if (
       a > 128 &&
-      Math.abs(r - R_TARGET) <= TOL &&
-      Math.abs(g - G_TARGET) <= TOL &&
-      Math.abs(b - B_TARGET) <= TOL
+      Math.abs(r - expected.r) <= TOL &&
+      Math.abs(g - expected.g) <= TOL &&
+      Math.abs(b - expected.b) <= TOL
     ) {
       cand[i / 4] = 1;
     }
