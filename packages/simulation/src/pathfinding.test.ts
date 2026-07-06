@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { applyCommand, createInitialWorld, snapshotWorld, updateWorld, type WorldState } from "./index";
+import { findPath } from "./pathfinding";
+import { MAP_WIDTH } from "@asama/shared";
 import type { CellCoord, PlayerCommand, UnitType } from "@asama/shared";
 
 let clientSequence = 0;
@@ -106,6 +108,34 @@ function setTerrainCost(world: WorldState, coord: CellCoord, movementCost: numbe
   };
 }
 
+function setWaterCell(world: WorldState, coord: CellCoord): void {
+  const index = coord.y * world.map.width + coord.x;
+  const cell = world.map.cells[index];
+  if (cell === undefined) {
+    throw new Error(`Missing terrain cell at ${coord.x},${coord.y}`);
+  }
+
+  world.map.cells[index] = {
+    ...cell,
+    terrain: "water",
+    movementCost: 9999,
+    passable: false,
+    assetId: "terrain.water.test"
+  };
+}
+
+function placeBridge(world: WorldState, position: CellCoord): void {
+  const error = applyCommand(
+    world,
+    command({
+      type: "placeBuilding",
+      buildingType: "earth_bridge",
+      position
+    })
+  );
+  expect(error).toBeNull();
+}
+
 describe("pathfinding", () => {
   it("routes around blocking walls and buildings", () => {
     const world = createInitialWorld();
@@ -181,6 +211,30 @@ describe("pathfinding", () => {
     const path = pathFor(world, "unit:player:1");
     expect(path.length).toBeGreaterThan(4);
     expect(path.some((cell) => cell.y !== 10)).toBe(true);
+  });
+
+  it("traverses all 3 cells of a 1x3 bridge over a water channel", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    // Full-width E-W river at y=30; bridge at {20,30} gets y-orientation
+    for (let x = 0; x < MAP_WIDTH; x++) setWaterCell(world, { x, y: 30 });
+    // Footprint: {20,29}, {20,30}, {20,31}
+    placeBridge(world, { x: 20, y: 30 });
+
+    const path = findPath(world, { x: 20, y: 33 }, { x: 20, y: 27 });
+    expect(path.length).toBeGreaterThan(0);
+    expect(path.some(c => c.x === 20 && c.y === 30)).toBe(true);
+  });
+
+  it("blocks traversal when no bridge spans the water channel", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    for (let x = 0; x < MAP_WIDTH; x++) setWaterCell(world, { x, y: 30 });
+
+    const path = findPath(world, { x: 20, y: 33 }, { x: 20, y: 27 });
+    expect(path).toEqual([]);
   });
 
   it("finds an approach path that stops inside melee attack range", () => {
