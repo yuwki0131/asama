@@ -10,7 +10,7 @@ import {
 import { Application, Container } from "pixi.js";
 import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@asama/shared";
 import { loadGeneratedAssets, type LoadedAsset } from "./assets";
-import { centerCameraOnCell, snapCamera, type CameraState } from "./camera";
+import { cellToWorld, centerCameraOnCell, snapCamera, worldToScreen, type CameraState } from "./camera";
 import { registerKeyboardInput, registerPointerInput } from "./input";
 import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type MinimapTerrainCache } from "./minimap";
 import { renderScene } from "./renderScene";
@@ -19,6 +19,8 @@ export type ToolMode = BuildingType | "demolish" | "ladder" | "fillMoat" | null;
 
 export interface GameCanvasHandle {
   jumpCameraToCell: (cell: CellCoord) => void;
+  /** DEV-only: returns absolute screen position {x,y} of a cell center. */
+  cellToScreenPoint: (cell: CellCoord) => { x: number; y: number } | null;
 }
 
 interface GameCanvasProps {
@@ -200,6 +202,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         centerCameraOnCell(cell, host, cameraRef.current);
         scheduleCameraRender();
       }
+    },
+    cellToScreenPoint: (cell: CellCoord) => {
+      const app = appRef.current;
+      if (app === null) return null;
+      const world = cellToWorld(cell);
+      const screen = worldToScreen(world, cameraRef.current);
+      const rect = app.canvas.getBoundingClientRect();
+      return { x: rect.left + screen.x, y: rect.top + screen.y };
     }
   }), [scheduleCameraRender]);
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitId, UnitType, WorldSnapshot } from "@asama/shared";
+import type {} from "../testBridge";
 import { unitSpecs } from "@asama/content";
 import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type GameCanvasHandle, type ToolMode } from "../renderer/GameCanvas";
 import { computeGroupCentroid } from "../renderer/groupManager";
@@ -19,6 +20,9 @@ export function App() {
   const simulationRef = useRef<SimulationClient | null>(null);
   const gameCanvasRef = useRef<GameCanvasHandle | null>(null);
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
+  const snapshotRef = useRef<WorldSnapshot | null>(null);
+  const buildToolRef = useRef<BuildingType | "demolish" | "ladder" | "fillMoat" | null>(null);
+  const tickWaitersRef = useRef<Map<number, Array<(s: WorldSnapshot) => void>>>(new Map());
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [simulationStatus, setSimulationStatus] = useState("starting");
   const [buildTool, setBuildTool] = useState<ToolMode>(null);
@@ -50,6 +54,52 @@ export function App() {
       lastRunningSpeedRef.current = speed;
     }
   }, [speed]);
+
+  useEffect(() => {
+    buildToolRef.current = buildTool;
+  }, [buildTool]);
+
+  useEffect(() => {
+    snapshotRef.current = snapshot;
+    if (snapshot === null) return;
+    const waiters = tickWaitersRef.current;
+    for (const [tick, resolvers] of [...waiters.entries()]) {
+      if (snapshot.currentTick >= tick) {
+        waiters.delete(tick);
+        for (const resolve of resolvers) resolve(snapshot);
+      }
+    }
+  }, [snapshot]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    window.__asamaTest = {
+      getSnapshot: () => snapshotRef.current,
+      enqueue: (command) => {
+        simulationRef.current?.enqueueCommand(command);
+      },
+      setSpeed: (s) => {
+        simulationRef.current?.setSpeed(s);
+        setSpeed(s);
+      },
+      waitForTick: (tick) =>
+        new Promise<WorldSnapshot>((resolve) => {
+          const current = snapshotRef.current;
+          if (current !== null && current.currentTick >= tick) {
+            resolve(current);
+            return;
+          }
+          const list = tickWaitersRef.current.get(tick) ?? [];
+          list.push(resolve);
+          tickWaitersRef.current.set(tick, list);
+        }),
+      getBuildTool: () => buildToolRef.current,
+      cellToScreenPoint: (cell) => gameCanvasRef.current?.cellToScreenPoint(cell) ?? null,
+    };
+    return () => {
+      delete window.__asamaTest;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
