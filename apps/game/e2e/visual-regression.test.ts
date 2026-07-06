@@ -76,6 +76,10 @@ for (const { scenarioId, label } of SCENARIOS) {
           await openGame(page, `?scenario=${scenarioId}`);
           // Pause to let the renderer settle; terrain and buildings fully appear.
           await page.evaluate(() => window.__asamaTest?.setSpeed(0));
+          // The DEV alignment overlay draws gold (0xffd166) footprint diamonds
+          // that trip the missing-asset gold-pixel detector; turn it off before
+          // taking screenshots (same fix as elevation.test.ts).
+          await page.getByRole("button", { name: "Debug" }).click();
           await waitForSceneRender(page, 30_000);
           await page.waitForTimeout(2_000);
 
