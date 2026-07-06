@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   concentricCastleScript,
   linearFortressScript,
+  mountainCastleScript,
   playthroughScripts,
   riversideDefenseScript,
   type PlaythroughScript,
@@ -120,11 +121,12 @@ describe("PlaythroughScript structural invariants", () => {
   validateScript(concentricCastleScript, "concentricCastleScript");
   validateScript(linearFortressScript, "linearFortressScript");
   validateScript(riversideDefenseScript, "riversideDefenseScript");
+  validateScript(mountainCastleScript, "mountainCastleScript");
 });
 
 describe("PlaythroughScript scenario-specific requirements", () => {
-  it("playthroughScripts contains exactly 3 scripts", () => {
-    expect(playthroughScripts).toHaveLength(3);
+  it("playthroughScripts contains exactly 4 scripts (A/B/C/D)", () => {
+    expect(playthroughScripts).toHaveLength(4);
   });
 
   it("each script has a unique scenarioId", () => {
@@ -137,6 +139,7 @@ describe("PlaythroughScript scenario-specific requirements", () => {
     expect(ids).toContain("concentric-castle");
     expect(ids).toContain("linear-fortress");
     expect(ids).toContain("riverside-defense");
+    expect(ids).toContain("mountain-castle");
   });
 
   // ---- Scenario A specifics -----------------------------------------------
@@ -232,5 +235,31 @@ describe("PlaythroughScript scenario-specific requirements", () => {
         action.targetSelector.unitType === "supply_cart",
     );
     expect(cartAttacks.length).toBeGreaterThanOrEqual(2);
+  });
+
+  // ---- Scenario D specifics -----------------------------------------------
+
+  it("mountainCastleScript expectedOutcome is time_held (holdTicks=24000)", () => {
+    expect(mountainCastleScript.expectedOutcome?.outcome).toBe("time_held");
+    expect(mountainCastleScript.expectedOutcome?.winner).toBe("player");
+  });
+
+  it("mountainCastleScript maxTick exceeds holdTicks (28000 > 24000)", () => {
+    expect(mountainCastleScript.expectedOutcome?.maxTick).toBeGreaterThan(24000);
+  });
+
+  it("mountainCastleScript covers all 4 waves (has steps past tick 16999)", () => {
+    const lastTick = Math.max(...mountainCastleScript.steps.map((step) => step.atTick));
+    expect(lastTick).toBeGreaterThan(16999);
+  });
+
+  it("mountainCastleScript attacks supply carts (retreat-timer mechanic)", () => {
+    const cartAttacks = mountainCastleScript.steps.filter(
+      ({ action }) =>
+        action.type === "attackTarget" &&
+        action.targetSelector.kind === "byUnitType" &&
+        action.targetSelector.unitType === "supply_cart",
+    );
+    expect(cartAttacks.length).toBeGreaterThanOrEqual(1);
   });
 });
