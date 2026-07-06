@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_SCENARIO,
   concentricCastleScenario,
   linearFortressScenario,
   riversideDefenseScenario,
@@ -28,4 +29,16 @@ describe("scenario boot + 1000-tick regression", () => {
       }).not.toThrow();
     });
   }
+});
+
+describe("DEFAULT_SCENARIO 2000-tick starvation regression", () => {
+  it("DEFAULT_SCENARIO survives 2000 ticks without starvation or early defeat", () => {
+    // Before the fix, closed player gates blocked food connectivity and the
+    // scenario lost to starvation at tick 601 (first consumption cycle).
+    const world = createInitialWorld(DEFAULT_SCENARIO);
+    for (let i = 0; i < 2000; i++) {
+      updateWorld(world);
+    }
+    expect(world.outcome).toBeNull();
+  });
 });
