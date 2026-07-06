@@ -17,3 +17,20 @@ jobs:
       - run: pnpm run typecheck
       - run: pnpm test
       - run: pnpm run assets:audit:production
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: sudo apt-get update && sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
+      - name: Smoke + functional E2E
+        working-directory: apps/game
+        run: |
+          export ASAMA_CHROMIUM_BIN=$(command -v chromium-browser || command -v chromium)
+          pnpm run test:e2e:smoke && pnpm run test:e2e

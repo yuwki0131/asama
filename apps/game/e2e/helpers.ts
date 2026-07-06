@@ -6,7 +6,7 @@ import { chromium, type Browser, type BrowserContext, type Page } from "playwrig
 // Use port 5179 to avoid collisions with other dev servers on 5173–5177.
 const DEV_PORT = process.env["ASAMA_E2E_PORT"] ?? "5179";
 export const DEV_URL = `http://127.0.0.1:${DEV_PORT}`;
-const CHROMIUM_PATH = "/run/current-system/sw/bin/chromium";
+const CHROMIUM_PATH = process.env.ASAMA_CHROMIUM_BIN ?? "/run/current-system/sw/bin/chromium";
 const REPO_ROOT = join(import.meta.dirname, "../../..");
 const GAME_DIR = join(import.meta.dirname, "..");
 
