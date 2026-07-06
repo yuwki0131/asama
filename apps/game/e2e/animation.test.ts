@@ -80,7 +80,8 @@ describe("animation: manifest", () => {
     const count = await page.evaluate(() => {
       const snap = window.__asamaTest?.getSnapshot();
       if (!snap) return 0;
-      return snap.units.filter((u) => u.assetId === "unit.spear_ashigaru").length;
+      // assetId for spear_ashigaru is "unit.spear_ashigaru.idle.south" (static sprite)
+      return snap.units.filter((u) => u.assetId.startsWith("unit.spear_ashigaru")).length;
     });
     expect(count, "Expected at least one spear_ashigaru unit in initial snapshot").toBeGreaterThan(0);
   });
