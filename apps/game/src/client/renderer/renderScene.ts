@@ -50,7 +50,7 @@ export function renderScene(
   clearLayer(overlayLayer);
 
   for (const unit of snapshot.units) {
-    addPathSprites(overlayLayer, unit, assets);
+    addPathSprites(overlayLayer, unit, assets, snapshot.map);
   }
 
   if (selectedCell !== null) {
@@ -59,12 +59,12 @@ export function renderScene(
 
   if (hoverCell !== null && isInsideSnapshotMap(hoverCell, snapshot)) {
     const cell = getSnapshotCell(snapshot, hoverCell);
-    addOverlaySprite(overlayLayer, hoverCell, cell?.passable === false ? "overlay.cell.blocked" : "overlay.cell.hover", assets);
+    addOverlaySprite(overlayLayer, hoverCell, cell?.passable === false ? "overlay.cell.blocked" : "overlay.cell.hover", assets, snapshot.map);
   }
 
   const invalidMoveTarget = snapshot.invalidMoveTarget ?? localInvalidMoveTarget;
   if (invalidMoveTarget !== null && isInsideSnapshotMap(invalidMoveTarget, snapshot)) {
-    addOverlaySprite(overlayLayer, invalidMoveTarget, "overlay.cell.blocked", assets);
+    addOverlaySprite(overlayLayer, invalidMoveTarget, "overlay.cell.blocked", assets, snapshot.map);
   }
 
   clearLayer(debugLayer);

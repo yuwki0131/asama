@@ -1,7 +1,14 @@
 import { Container, Graphics } from "pixi.js";
-import type { TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
+import type { ElevationSkin, TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
 import { clearLayer, createSpriteFromCandidates, type LoadedAsset } from "./assets";
 import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera";
+import {
+  cliffInfoFor,
+  ELEVATION_PIXELS_PER_LEVEL,
+  tileOffsetY,
+  type CellCliffInfo,
+  type CliffFace
+} from "./elevation";
 
 // Underlay diamonds have exact tile footprint — no padding — to avoid
 // sub-pixel overlap between the single global underlay Graphics and the
@@ -9,6 +16,15 @@ import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera
 // bright seam lines where chunk boundaries crossed water tiles.
 const TERRAIN_UNDERLAY_PADDING = 0;
 const TERRAIN_CHUNK_CELLS = 16;
+
+// Fallback colors for cliff walls / slope ramps while the P4c tile assets are
+// in production. Deliberately NOT the gold missing-asset color: cliffs read
+// as dark rock, ishigaki as grey-brown stone. The E face is shaded darker
+// than the S face so terraces keep a readable light direction.
+const CLIFF_FALLBACK_COLORS: Record<ElevationSkin, { s: number; e: number; slope: number }> = {
+  cliff: { s: 0x4f4a43, e: 0x3f3b36, slope: 0x77694c },
+  ishigaki: { s: 0x7e7566, e: 0x685f52, slope: 0x8d8578 }
+};
 
 interface TerrainChunkBounds {
   readonly minX: number;
@@ -50,9 +66,13 @@ export function buildTerrainChunks(
     }
     entry.cells.push(cell);
     const world = cellToWorld(cell.coord);
+    // Elevated cells draw their tile up to 24*elevation px higher; include
+    // that lift in the culling bounds so hilltops don't vanish at the screen
+    // edge.
+    const lift = cell.elevation * ELEVATION_PIXELS_PER_LEVEL;
     entry.bounds = {
       minX: Math.min(entry.bounds.minX, world.x - TILE_WIDTH),
-      minY: Math.min(entry.bounds.minY, world.y - TILE_HEIGHT * 2),
+      minY: Math.min(entry.bounds.minY, world.y - TILE_HEIGHT * 2 - lift),
       maxX: Math.max(entry.bounds.maxX, world.x + TILE_WIDTH),
       maxY: Math.max(entry.bounds.maxY, world.y + TILE_HEIGHT * 2)
     };
@@ -97,6 +117,13 @@ export function buildTerrainChunks(
 
     const container = new Container();
     for (const cell of cells) {
+      // Per-cell paint order (elevation-contract.md §5): cliff faces first,
+      // then the top tile. Faces are part of the HIGH cell's drawing, so no
+      // extra sorting is needed — painter's order stays (x+y) ascending.
+      const cliffInfo = cliffInfoFor(snapshot.map, cell);
+      if (cliffInfo.faces.length > 0) {
+        addCliffFaces(container, cell, cliffInfo, assets);
+      }
       addTerrainSprite(container, cell, assets);
     }
     (container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = bounds;
@@ -126,9 +153,164 @@ export function updateTerrainChunkVisibility(
 
 function addTerrainSprite(layer: Container, cell: TerrainCellSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
   const point = cellToWorld(cell.coord);
+  const offsetY = tileOffsetY(cell);
+
+  if (cell.slope !== null) {
+    addSlopeTile(layer, cell, assets);
+    return;
+  }
+
   const sprite = createSpriteFromCandidates([cell.assetId, terrainFallbackAssetId(cell)], assets);
-  sprite.position.copyFrom(point);
+  sprite.position.set(point.x, point.y + offsetY);
   layer.addChild(sprite);
+}
+
+/**
+ * Slope cells draw the contract's `terrain.slope.<skin>.<dir>` tile anchored
+ * like a flat tile of the LOW side. Until the P4c assets land, the fallback
+ * draws the base terrain tile plus an opaque ramp polygon: the tile diamond
+ * with the two uphill corners lifted one level.
+ */
+function addSlopeTile(layer: Container, cell: TerrainCellSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
+  const point = cellToWorld(cell.coord);
+  const offsetY = tileOffsetY(cell);
+  const slope = cell.slope;
+  if (slope === null) {
+    return;
+  }
+
+  const slopeAssetId = `terrain.slope.${cell.elevationSkin}.${slope.toLowerCase()}`;
+  const asset = assets.get(slopeAssetId);
+  if (asset !== undefined) {
+    const sprite = createSpriteFromCandidates([slopeAssetId], assets);
+    sprite.position.set(point.x, point.y + offsetY);
+    layer.addChild(sprite);
+    return;
+  }
+
+  // Fallback: base terrain under the ramp (fills the low-side sliver), then
+  // the ramp polygon.
+  const base = createSpriteFromCandidates([cell.assetId, terrainFallbackAssetId(cell)], assets);
+  base.position.set(point.x, point.y + offsetY);
+  layer.addChild(base);
+
+  const lifted = liftedCorners(slope);
+  const lift = -ELEVATION_PIXELS_PER_LEVEL;
+  const corners = {
+    n: { x: point.x, y: point.y - TILE_HEIGHT / 2 + offsetY + (lifted.has("n") ? lift : 0) },
+    e: { x: point.x + TILE_WIDTH / 2, y: point.y + offsetY + (lifted.has("e") ? lift : 0) },
+    s: { x: point.x, y: point.y + TILE_HEIGHT / 2 + offsetY + (lifted.has("s") ? lift : 0) },
+    w: { x: point.x - TILE_WIDTH / 2, y: point.y + offsetY + (lifted.has("w") ? lift : 0) }
+  };
+  const ramp = new Graphics();
+  ramp
+    .poly([corners.n.x, corners.n.y, corners.e.x, corners.e.y, corners.s.x, corners.s.y, corners.w.x, corners.w.y])
+    .fill({ color: CLIFF_FALLBACK_COLORS[cell.elevationSkin].slope, alpha: 1 })
+    .stroke({ color: 0x2c2721, alpha: 0.5, width: 1 });
+  layer.addChild(ramp);
+}
+
+/** Diamond corners lifted one extra level on a slope tile: the two corners of
+ *  the uphill edge (N edge = n+e corners, E edge = s+e, S = w+s, W = w+n). */
+function liftedCorners(slope: "N" | "E" | "S" | "W"): Set<"n" | "e" | "s" | "w"> {
+  switch (slope) {
+    case "N":
+      return new Set(["n", "e"]);
+    case "E":
+      return new Set(["s", "e"]);
+    case "S":
+      return new Set(["w", "s"]);
+    case "W":
+      return new Set(["w", "n"]);
+  }
+}
+
+/**
+ * Cliff walls on the S/E edges of a high cell. Uses the contract sprites
+ * (`terrain.<skin>.face.<s|e>.h<n>`, `terrain.<skin>.corner.se.h<n>`,
+ * `terrain.slope.<skin>.<dir>.side.<s|e>`) when loaded; otherwise draws
+ * opaque quad polygons so terraces stay readable before P4c delivers tiles.
+ * Sprites are anchored at the cell's ground-tile position (top surface) —
+ * their art extends downward from the tile's S/E diamond edge.
+ */
+function addCliffFaces(
+  layer: Container,
+  cell: TerrainCellSnapshot,
+  info: CellCliffInfo,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  const point = cellToWorld(cell.coord);
+  const anchorY = point.y + tileOffsetY(cell);
+  let fallback: Graphics | null = null;
+
+  for (const face of info.faces) {
+    const asset = assets.get(face.assetId);
+    if (asset !== undefined) {
+      const sprite = createSpriteFromCandidates([face.assetId], assets);
+      sprite.position.set(point.x, anchorY);
+      layer.addChild(sprite);
+      continue;
+    }
+    fallback ??= new Graphics();
+    drawFallbackFace(fallback, point, cell.elevationSkin, face);
+  }
+
+  if (fallback !== null) {
+    layer.addChild(fallback);
+    // Fallback polygons already tile the full silhouette; the corner sprite
+    // is only meaningful with real face art.
+    return;
+  }
+
+  if (info.cornerAssetId !== null) {
+    const cornerAsset = assets.get(info.cornerAssetId);
+    if (cornerAsset !== undefined) {
+      const sprite = createSpriteFromCandidates([info.cornerAssetId], assets);
+      sprite.position.set(point.x, anchorY);
+      layer.addChild(sprite);
+    }
+  }
+}
+
+/** Quad from the face's top edge (at the lifted tile edge) straight down to
+ *  the neighbour's surface level. Vertex A/B order matches CliffFace. */
+function drawFallbackFace(
+  graphics: Graphics,
+  point: { x: number; y: number },
+  skin: ElevationSkin,
+  face: CliffFace
+): void {
+  const px = ELEVATION_PIXELS_PER_LEVEL;
+  // Diamond edge vertices at ground (elevation 0) height.
+  const vertexA =
+    face.edge === "s"
+      ? { x: point.x - TILE_WIDTH / 2, y: point.y } // W corner
+      : { x: point.x, y: point.y + TILE_HEIGHT / 2 }; // S corner
+  const vertexB =
+    face.edge === "s"
+      ? { x: point.x, y: point.y + TILE_HEIGHT / 2 } // S corner
+      : { x: point.x + TILE_WIDTH / 2, y: point.y }; // E corner
+
+  const color = CLIFF_FALLBACK_COLORS[skin][face.edge];
+  graphics
+    .poly([
+      vertexA.x, vertexA.y - face.topA * px,
+      vertexB.x, vertexB.y - face.topB * px,
+      vertexB.x, vertexB.y - face.bottom * px,
+      vertexA.x, vertexA.y - face.bottom * px
+    ])
+    .fill({ color, alpha: 1 });
+
+  // Horizontal joint lines every level so tall walls read as stacked stone
+  // rather than a flat smear (skip slanted slope-side walls).
+  if (face.topA === face.topB) {
+    for (let level = face.bottom + 1; level < face.topA; level += 1) {
+      graphics
+        .moveTo(vertexA.x, vertexA.y - level * px)
+        .lineTo(vertexB.x, vertexB.y - level * px)
+        .stroke({ color: 0x241f1a, alpha: 0.35, width: 1 });
+    }
+  }
 }
 
 function terrainFallbackAssetId(cell: TerrainCellSnapshot): string {
@@ -145,6 +327,7 @@ function terrainFallbackAssetId(cell: TerrainCellSnapshot): string {
 
 function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot, nearWater: boolean): void {
   const point = cellToWorld(cell.coord);
+  const offsetY = tileOffsetY(cell);
   const halfWidth = TILE_WIDTH / 2 + TERRAIN_UNDERLAY_PADDING;
   const halfHeight = TILE_HEIGHT / 2 + TERRAIN_UNDERLAY_PADDING / 2;
 
@@ -154,18 +337,21 @@ function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot, nearW
   // direct neighbours — a bright green underlay leaking along the
   // water/bank boundary reads as "green lines" across rivers, while a
   // dark leak there reads as a natural shadow.
+  // Elevated cells lift their underlay diamond with the tile so it keeps
+  // backing that tile's AA edges (the whole underlay layer paints below
+  // every sprite chunk, so the lift cannot cover anything).
   const color = nearWater ? 0x0d1e2a : 0x63753a;
 
   graphics
     .poly([
       point.x,
-      point.y - halfHeight,
+      point.y - halfHeight + offsetY,
       point.x + halfWidth,
-      point.y,
+      point.y + offsetY,
       point.x,
-      point.y + halfHeight,
+      point.y + halfHeight + offsetY,
       point.x - halfWidth,
-      point.y
+      point.y + offsetY
     ])
     .fill({ color, alpha: 1 });
 }

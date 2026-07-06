@@ -6,6 +6,7 @@ import {
   SNAP_DISTANCE,
   TELEPORT_DISTANCE,
   elapsedSimTicks,
+  interpolateUnitRenderPosition,
   interpolateUnitWorldPosition,
   movementFraction,
   resolveDisplayPosition,
@@ -90,6 +91,61 @@ describe("interpolateUnitWorldPosition", () => {
   it("clamps at the next path cell even with a huge elapsed time", () => {
     const unit = makeUnit();
     expect(interpolateUnitWorldPosition(unit, 1000)).toEqual(cellToWorld(unit.path[0]!));
+  });
+});
+
+describe("interpolateUnitRenderPosition", () => {
+  // Surface offsets in px: flat ground 0, terrace -24, slope midpoint -12.
+  const offsets = new Map<string, number>([
+    ["10,10", 0],
+    ["11,10", -12], // slope cell (elevation 0 + 0.5)
+    ["12,10", -24] // terrace at elevation 1
+  ]);
+  const offsetAt = (cell: { x: number; y: number }): number => offsets.get(`${cell.x},${cell.y}`) ?? 0;
+
+  it("sits on the lifted surface when idle, with a flat sortY", () => {
+    const unit = makeUnit({ position: { x: 12, y: 10 }, path: [] });
+    const flat = cellToWorld(unit.position);
+    const point = interpolateUnitRenderPosition(unit, 0, offsetAt);
+    expect(point.x).toBe(flat.x);
+    expect(point.y).toBe(flat.y - 24);
+    expect(point.sortY).toBe(flat.y);
+  });
+
+  it("interpolates the elevation offset while climbing onto a slope", () => {
+    // Halfway from flat (0) onto the slope (-12): offset should be -6.
+    const unit = makeUnit({ position: { x: 10, y: 10 }, path: [{ x: 11, y: 10 }], movementProgress: 4 });
+    const from = cellToWorld(unit.position);
+    const to = cellToWorld(unit.path[0]!);
+    const point = interpolateUnitRenderPosition(unit, 0, offsetAt);
+    const flatY = (from.y + to.y) / 2;
+    expect(point.x).toBeCloseTo((from.x + to.x) / 2);
+    expect(point.y).toBeCloseTo(flatY - 6);
+    expect(point.sortY).toBeCloseTo(flatY);
+  });
+
+  it("interpolates from the slope midpoint up to the terrace", () => {
+    // Halfway from slope (-12) to terrace (-24): offset -18.
+    const unit = makeUnit({ position: { x: 11, y: 10 }, path: [{ x: 12, y: 10 }], movementProgress: 4 });
+    const from = cellToWorld(unit.position);
+    const to = cellToWorld(unit.path[0]!);
+    const point = interpolateUnitRenderPosition(unit, 0, offsetAt);
+    expect(point.y).toBeCloseTo((from.y + to.y) / 2 - 18);
+  });
+
+  it("matches the flat interpolation when all offsets are 0", () => {
+    const unit = makeUnit({ movementProgress: 3 });
+    const flat = interpolateUnitWorldPosition(unit, 1);
+    const render = interpolateUnitRenderPosition(unit, 1, () => 0);
+    expect(render.x).toBe(flat.x);
+    expect(render.y).toBe(flat.y);
+    expect(render.sortY).toBe(flat.y);
+  });
+
+  it("keeps sortY free of elevation so the depth sort stays cell-based", () => {
+    const unit = makeUnit({ position: { x: 12, y: 10 }, path: [], movementProgress: 0 });
+    const point = interpolateUnitRenderPosition(unit, 0, offsetAt);
+    expect(point.sortY - point.y).toBe(24);
   });
 });
 

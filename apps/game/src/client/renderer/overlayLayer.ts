@@ -16,20 +16,26 @@ import {
   findBuildingAtCell,
   isInsideSnapshotMap
 } from "./gameRules";
+import { ELEVATION_PIXELS_PER_LEVEL, tileOffsetYAt, type ElevationMapLike } from "./elevation";
 import { buildingRenderPoint } from "./renderGeometry";
 import type { ToolMode } from "./GameCanvas";
 
-export function addPathSprites(layer: Container, unit: UnitSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
+export function addPathSprites(
+  layer: Container,
+  unit: UnitSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>,
+  map: ElevationMapLike
+): void {
   if (!unit.selected) {
     return;
   }
 
   for (const step of unit.path) {
-    addOverlaySprite(layer, step, "overlay.path.step", assets);
+    addOverlaySprite(layer, step, "overlay.path.step", assets, map);
   }
 
   if (unit.destination !== null) {
-    addOverlaySprite(layer, unit.destination, "overlay.move.destination", assets);
+    addOverlaySprite(layer, unit.destination, "overlay.move.destination", assets, map);
   }
 }
 
@@ -37,10 +43,14 @@ export function addOverlaySprite(
   layer: Container,
   cell: CellCoord,
   assetId: string,
-  assets: ReadonlyMap<string, LoadedAsset>
+  assets: ReadonlyMap<string, LoadedAsset>,
+  map: ElevationMapLike | null
 ): void {
   const sprite = createSprite(assetId, assets);
-  sprite.position.copyFrom(cellToWorld(cell));
+  const point = cellToWorld(cell);
+  // Cell overlays (hover, selection, path, build preview) ride on the lifted
+  // ground tile of elevated cells.
+  sprite.position.set(point.x, point.y + tileOffsetYAt(map, cell));
   layer.addChild(sprite);
 }
 
@@ -51,19 +61,20 @@ export function addCellActionPreview(
   buildTool: ToolMode,
   assets: ReadonlyMap<string, LoadedAsset>
 ): void {
+  const map = snapshot.map;
   if (buildTool === null) {
-    addOverlaySprite(layer, cell, "overlay.cell.selected", assets);
+    addOverlaySprite(layer, cell, "overlay.cell.selected", assets, map);
     return;
   }
 
   if (buildTool === "ladder" || buildTool === "fillMoat") {
-    addOverlaySprite(layer, cell, "overlay.cell.selected", assets);
+    addOverlaySprite(layer, cell, "overlay.cell.selected", assets, map);
     return;
   }
 
   if (buildTool === "demolish") {
     const hasBuilding = findBuildingAtCell(cell, snapshot) !== null;
-    addOverlaySprite(layer, cell, hasBuilding ? "overlay.demolish.target" : "overlay.build.invalid", assets);
+    addOverlaySprite(layer, cell, hasBuilding ? "overlay.demolish.target" : "overlay.build.invalid", assets, map);
     return;
   }
 
@@ -71,7 +82,7 @@ export function addCellActionPreview(
   const canPlace = footprint.every((footprintCell) => canPreviewPlaceBuildingCell(snapshot, footprintCell, buildTool));
   for (const footprintCell of footprint) {
     if (isInsideSnapshotMap(footprintCell, snapshot)) {
-      addOverlaySprite(layer, footprintCell, canPlace ? "overlay.build.valid" : "overlay.build.invalid", assets);
+      addOverlaySprite(layer, footprintCell, canPlace ? "overlay.build.valid" : "overlay.build.invalid", assets, map);
     }
   }
 }
@@ -87,15 +98,16 @@ export function addAlignmentDebugOverlay(
   const grid = new Graphics();
   for (const cell of snapshot.map.cells) {
     if (isVisibleCell(cell.coord, camera, screenWidth, screenHeight)) {
-      drawCellDiamond(grid, cell.coord, 0x65c8ff, 0.18);
+      drawCellDiamond(grid, cell.coord, 0x65c8ff, 0.18, -cell.elevation * ELEVATION_PIXELS_PER_LEVEL);
     }
   }
 
   for (const building of snapshot.buildings) {
-    drawFootprintDiamond(grid, building.footprint, 0xffd166, 0.85);
+    const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
+    drawFootprintDiamond(grid, building.footprint, 0xffd166, 0.85, offsetY);
     const anchor = buildingRenderPoint(building);
-    drawCrosshair(grid, anchor, 0xff3b30);
-    drawSpriteBounds(grid, building, assets);
+    drawCrosshair(grid, { x: anchor.x, y: anchor.y + offsetY }, 0xff3b30);
+    drawSpriteBounds(grid, building, assets, offsetY);
   }
 
   layer.addChild(grid);
@@ -123,26 +135,32 @@ function footprintDiamondPoints(footprint: readonly CellCoord[]): readonly CellC
   ];
 }
 
-function drawCellDiamond(graphics: Graphics, cell: CellCoord, color: number, alpha: number): void {
+function drawCellDiamond(graphics: Graphics, cell: CellCoord, color: number, alpha: number, offsetY = 0): void {
   const point = cellToWorld(cell);
   graphics
     .poly([
       point.x,
-      point.y - TILE_HEIGHT / 2,
+      point.y - TILE_HEIGHT / 2 + offsetY,
       point.x + TILE_WIDTH / 2,
-      point.y,
+      point.y + offsetY,
       point.x,
-      point.y + TILE_HEIGHT / 2,
+      point.y + TILE_HEIGHT / 2 + offsetY,
       point.x - TILE_WIDTH / 2,
-      point.y
+      point.y + offsetY
     ])
     .stroke({ color, alpha, width: 1 });
 }
 
-function drawFootprintDiamond(graphics: Graphics, footprint: readonly CellCoord[], color: number, alpha: number): void {
+function drawFootprintDiamond(
+  graphics: Graphics,
+  footprint: readonly CellCoord[],
+  color: number,
+  alpha: number,
+  offsetY = 0
+): void {
   const points = footprintDiamondPoints(footprint);
   graphics
-    .poly(points.flatMap((point) => [point.x, point.y]))
+    .poly(points.flatMap((point) => [point.x, point.y + offsetY]))
     .stroke({ color, alpha, width: 2 });
 }
 
@@ -158,7 +176,8 @@ function drawCrosshair(graphics: Graphics, point: CellCoord, color: number): voi
 function drawSpriteBounds(
   graphics: Graphics,
   building: BuildingSnapshot,
-  assets: ReadonlyMap<string, LoadedAsset>
+  assets: ReadonlyMap<string, LoadedAsset>,
+  offsetY = 0
 ): void {
   const spriteAsset = firstLoadedAsset(buildingAssetCandidates(building), assets);
   if (spriteAsset === null) {
@@ -169,6 +188,6 @@ function drawSpriteBounds(
   const width = spriteAsset.texture.width;
   const height = spriteAsset.texture.height;
   const left = point.x - width * spriteAsset.anchor.x;
-  const top = point.y - height * spriteAsset.anchor.y;
+  const top = point.y + offsetY - height * spriteAsset.anchor.y;
   graphics.rect(left, top, width, height).stroke({ color: 0xff4fd8, alpha: 0.65, width: 1 });
 }

@@ -9,8 +9,9 @@ import {
   type CameraState,
   UNIT_GROUND_OFFSET_Y
 } from "./camera";
+import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
 import { buildingAssetCandidates } from "./gameRules";
-import { interpolateUnitWorldPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
+import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
 
@@ -101,12 +102,16 @@ export class RetainedScene {
     screenWidth: number,
     screenHeight: number
   ): void {
+    const map = this.lastSnapshot?.map ?? null;
+    const surfaceOffsetAt = (cell: CellCoord): number => surfaceOffsetYAt(map, cell);
     for (const visual of this.unitVisuals.values()) {
-      const target = interpolateUnitWorldPosition(visual.unit, elapsedTicks);
+      const target = interpolateUnitRenderPosition(visual.unit, elapsedTicks, surfaceOffsetAt);
       const display = resolveDisplayPosition(visual.displayPosition, target, frameDeltaMs);
       visual.displayPosition = display;
       visual.container.position.set(display.x, display.y);
-      visual.container.zIndex = display.y + UNIT_GROUND_OFFSET_Y;
+      // Depth sort stays cell-based: elevation lifts the drawing but must not
+      // change the painter's order (elevation-contract.md §5).
+      visual.container.zIndex = target.sortY + UNIT_GROUND_OFFSET_Y;
     }
 
     for (const decoration of this.decorationVisuals) {
@@ -151,6 +156,7 @@ export class RetainedScene {
     // participate in the same painter's-order as buildings (fixes trees rendering
     // on top of tenshu/honmaru regardless of their Y position). All decorations
     // are included; camera culling happens per frame via sprite visibility.
+    // Elevation only offsets draw positions; it never feeds the sort.
     const sceneItems: SceneItemForSort[] = [];
     for (const building of snapshot.buildings) {
       sceneItems.push({ kind: "building", item: building });
@@ -167,7 +173,7 @@ export class RetainedScene {
       if (entry.kind === "building") {
         addBuildingSprite(this.staticLayer, entry.item, assets, zoom);
       } else {
-        const sprite = addDecorationSprite(this.staticLayer, entry.item, assets, zoom);
+        const sprite = addDecorationSprite(this.staticLayer, entry.item, assets, zoom, snapshot.map);
         if (sprite !== null) {
           this.decorationVisuals.push({ position: entry.item.position, sprite });
         }
@@ -187,7 +193,7 @@ export class RetainedScene {
         visual = undefined;
       }
       if (visual === undefined) {
-        visual = createUnitVisual(unit, assets);
+        visual = createUnitVisual(unit, assets, snapshot.map);
         this.unitVisuals.set(unit.id, visual);
         this.unitsLayer.addChild(visual.container);
       }
@@ -227,7 +233,11 @@ function staticSceneSignature(snapshot: WorldSnapshot, zoom: number): string {
   return parts.join(";");
 }
 
-function createUnitVisual(unit: UnitSnapshot, assets: ReadonlyMap<string, LoadedAsset>): UnitVisual {
+function createUnitVisual(
+  unit: UnitSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>,
+  map: ElevationMapLike | null
+): UnitVisual {
   const container = new Container();
 
   const ring = createSprite("overlay.unit.selection-ring", assets);
@@ -247,7 +257,7 @@ function createUnitVisual(unit: UnitSnapshot, assets: ReadonlyMap<string, Loaded
 
   container.addChild(ring, sprite, healthBar);
   const point = cellToWorld(unit.position);
-  container.position.set(point.x, point.y);
+  container.position.set(point.x, point.y + surfaceOffsetYAt(map, unit.position));
   container.zIndex = point.y + UNIT_GROUND_OFFSET_Y;
 
   return {
@@ -288,7 +298,7 @@ export function findUnitAtScreenPoint(
   const hitRadius = 30 * camera.zoom;
 
   for (const unit of snapshot.units) {
-    const unitPoint = unitScreenPoint(unit, camera);
+    const unitPoint = unitScreenPoint(unit, camera, snapshot.map);
     const distance = Math.hypot(point.x - unitPoint.x, point.y - unitPoint.y);
     if (distance <= hitRadius && distance < nearestDistance) {
       nearest = unit;
@@ -299,11 +309,17 @@ export function findUnitAtScreenPoint(
   return nearest;
 }
 
-export function unitScreenPoint(unit: UnitSnapshot, camera: CameraState): CellCoord {
+/** Screen point of a unit's anchor, elevation lift included so hit testing
+ *  and box selection line up with the lifted drawing. */
+export function unitScreenPoint(unit: UnitSnapshot, camera: CameraState, map: ElevationMapLike | null): CellCoord {
   const point = cellToWorld(unit.position);
+  const offsetY =
+    map !== null
+      ? surfaceOffsetYAt(map, unit.position)
+      : -(unit.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   return {
     x: camera.x + point.x * camera.zoom,
-    y: camera.y + (point.y + UNIT_GROUND_OFFSET_Y) * camera.zoom
+    y: camera.y + (point.y + offsetY + UNIT_GROUND_OFFSET_Y) * camera.zoom
   };
 }
 
@@ -315,7 +331,10 @@ function addBuildingSprite(
 ): void {
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
   const point = buildingRenderPoint(building);
-  sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y, zoom));
+  // Buildings sit on uniform-elevation footprints (elevation-contract.md §4);
+  // the anchor cell's elevation lifts the whole sprite.
+  const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
+  sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
   }
@@ -336,7 +355,8 @@ function addDecorationSprite(
   layer: Container,
   decoration: MapDecoration,
   assets: ReadonlyMap<string, LoadedAsset>,
-  zoom: number
+  zoom: number,
+  map: ElevationMapLike
 ): Sprite | null {
   const asset = assets.get(decoration.assetId);
   if (asset === undefined) {
@@ -345,7 +365,8 @@ function addDecorationSprite(
   const sprite = new Sprite(asset.texture);
   sprite.anchor.set(asset.anchor.x, asset.anchor.y);
   const point = cellToWorld(decoration.position);
-  sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y, zoom));
+  const offsetY = tileOffsetYAt(map, decoration.position);
+  sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
   layer.addChild(sprite);
   return sprite;
 }

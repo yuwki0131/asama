@@ -439,7 +439,10 @@ export type PlayerCommand =
     };
 
 export type MainToWorkerMessage =
-  | { readonly type: "init" }
+  /** `scenarioId` is a DEV-only hook for booting test fixtures (e.g. the
+   *  elevation render fixture). Omitted / unknown ids boot the default
+   *  scenario, so production behaviour is unchanged. */
+  | { readonly type: "init"; readonly scenarioId?: string }
   | { readonly type: "setSpeed"; readonly speed: 0 | 1 | 2 | 4 }
   | { readonly type: "enqueueCommand"; readonly command: PlayerCommand }
   | { readonly type: "requestSnapshot" }

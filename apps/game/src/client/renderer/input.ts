@@ -2,11 +2,11 @@ import type { MutableRefObject } from "react";
 import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@asama/shared";
 import {
   roundScreenPixel,
-  screenToCell,
   screenToWorld,
   stepZoom,
   type CameraState
 } from "./camera";
+import { pickCellAtScreenPoint } from "./elevation";
 import { canPreviewPlaceBuildingCell, findBuildingAtCell, getSnapshotCell, isSnapshotPassable } from "./gameRules";
 import { findUnitAtScreenPoint, unitScreenPoint } from "./sceneLayer";
 import type { ToolMode } from "./GameCanvas";
@@ -175,6 +175,12 @@ export function registerPointerInput({
   // Tracks the last cell placed during a drag-build gesture to avoid duplicate placement.
   let lastBuildCell: { x: number; y: number } | null = null;
 
+  // Elevation-aware screen → cell: a raised cell's diamond is drawn 24px per
+  // level higher, so the inverse must probe the lifted grids from the top
+  // level down (falls back to the flat inverse on fully flat maps).
+  const pickCell = (screenX: number, screenY: number): CellCoord =>
+    pickCellAtScreenPoint(screenX, screenY, refs.cameraRef.current, refs.snapshotRef.current?.map ?? null);
+
   const handlePointerDown = (event: PointerEvent) => {
     // Left button drags a selection box (per controls spec); middle button
     // pans the camera. Right button issues commands via contextmenu.
@@ -189,7 +195,7 @@ export function registerPointerInput({
     // down and again for each new cell the pointer enters while held.
     if (event.button === 0 && isDragBuildTool(refs.buildToolRef.current)) {
       const rect = canvas.getBoundingClientRect();
-      const clickedCell = screenToCell(event.clientX - rect.left, event.clientY - rect.top, refs.cameraRef.current);
+      const clickedCell = pickCell(event.clientX - rect.left, event.clientY - rect.top);
       const activeTool = refs.buildToolRef.current as BuildingType;
       const snapshot = refs.snapshotRef.current;
       if (snapshot !== null && canPreviewPlaceBuildingCell(snapshot, clickedCell, activeTool)) {
@@ -232,7 +238,7 @@ export function registerPointerInput({
 
       if (drag.mode === "build") {
         const rect = canvas.getBoundingClientRect();
-        const currentCell = screenToCell(event.clientX - rect.left, event.clientY - rect.top, refs.cameraRef.current);
+        const currentCell = pickCell(event.clientX - rect.left, event.clientY - rect.top);
         if (lastBuildCell === null || currentCell.x !== lastBuildCell.x || currentCell.y !== lastBuildCell.y) {
           const activeTool = refs.buildToolRef.current;
           const snapshot = refs.snapshotRef.current;
@@ -268,7 +274,7 @@ export function registerPointerInput({
     }
 
     const rect = canvas.getBoundingClientRect();
-    setHoverCell(screenToCell(event.clientX - rect.left, event.clientY - rect.top, refs.cameraRef.current));
+    setHoverCell(pickCell(event.clientX - rect.left, event.clientY - rect.top));
   };
 
   const handlePointerUp = (event: PointerEvent) => {
@@ -302,7 +308,7 @@ export function registerPointerInput({
         if (unit.owner !== "player") {
           continue;
         }
-        const point = unitScreenPoint(unit, refs.cameraRef.current);
+        const point = unitScreenPoint(unit, refs.cameraRef.current, snapshot?.map ?? null);
         if (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY) {
           ids.push(unit.id);
         }
@@ -322,7 +328,7 @@ export function registerPointerInput({
       x: event.clientX - rect.left,
       y: event.clientY - rect.top
     };
-    const clickedCell = screenToCell(screenPoint.x, screenPoint.y, refs.cameraRef.current);
+    const clickedCell = pickCell(screenPoint.x, screenPoint.y);
     const activeBuildTool = refs.buildToolRef.current;
     if (activeBuildTool === "demolish") {
       setSelectedCell(clickedCell);
@@ -366,7 +372,7 @@ export function registerPointerInput({
           snapshot?.units
             .filter((u) => u.owner === "player" && u.type === hitUnit.type)
             .filter((u) => {
-              const pt = unitScreenPoint(u, camera);
+              const pt = unitScreenPoint(u, camera, snapshot?.map ?? null);
               return pt.x >= 0 && pt.x <= w && pt.y >= 0 && pt.y <= h;
             })
             .map((u) => u.id) ?? [];
@@ -421,7 +427,7 @@ export function registerPointerInput({
       x: event.clientX - rect.left,
       y: event.clientY - rect.top
     };
-    const destination = screenToCell(screenPoint.x, screenPoint.y, refs.cameraRef.current);
+    const destination = pickCell(screenPoint.x, screenPoint.y);
     if (refs.buildToolRef.current !== null) {
       // Right-click during build mode cancels the tool and returns to Select.
       refs.onCancelBuildToolRef.current();

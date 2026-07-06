@@ -5,7 +5,7 @@ type ErrorListener = (message: string) => void;
 type SaveStateListener = (state: SerializedWorld) => void;
 
 export interface SimulationClient {
-  init(): void;
+  init(scenarioId?: string): void;
   setSpeed(speed: 0 | 1 | 2 | 4): void;
   enqueueCommand(command: PlayerCommand): void;
   requestSaveState(): Promise<SerializedWorld>;
@@ -67,8 +67,8 @@ export function createSimulationClient(): SimulationClient {
   });
 
   return {
-    init() {
-      post(worker, { type: "init" });
+    init(scenarioId?: string) {
+      post(worker, scenarioId === undefined ? { type: "init" } : { type: "init", scenarioId });
     },
     setSpeed(speed) {
       post(worker, { type: "setSpeed", speed });
