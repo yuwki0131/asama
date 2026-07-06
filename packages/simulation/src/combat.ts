@@ -5,6 +5,17 @@ import { PATH_RETRY_COOLDOWN_TICKS, findPath, findPathToAttackRange } from "./pa
 import { ENEMY_AI, manhattan, sameCell } from "./types";
 import type { AttackTarget, BuildingState, UnitState, WorldState } from "./types";
 
+// For building targets: check range against the nearest footprint cell, not
+// just the anchor position, so units adjacent to any part of a multi-tile
+// building enter attack range immediately.
+function inAttackRange(attacker: UnitState, target: AttackTarget): boolean {
+  const asBuilding = target as Partial<BuildingState>;
+  if (asBuilding.footprint !== undefined) {
+    return asBuilding.footprint.some(cell => manhattan(attacker.position, cell) <= attacker.attackRange);
+  }
+  return manhattan(attacker.position, target.position) <= attacker.attackRange;
+}
+
 export function updateCombat(world: WorldState): void {
   for (const unit of world.units) {
     unit.targetId = null;
@@ -61,7 +72,7 @@ function updateAttackMovement(world: WorldState): void {
     }
 
     unit.targetId = target.id;
-    if (manhattan(unit.position, target.position) <= unit.attackRange) {
+    if (inAttackRange(unit, target)) {
       unit.path = [];
       unit.destination = null;
       unit.movementProgress = 0;
@@ -97,7 +108,7 @@ function attackTargetInRange(world: WorldState, attacker: UnitState): AttackTarg
     return null;
   }
 
-  return manhattan(attacker.position, target.position) <= attacker.attackRange ? target : null;
+  return inAttackRange(attacker, target) ? target : null;
 }
 
 function nearestEnemyInRange(world: WorldState, attacker: UnitState): AttackTarget | null {
