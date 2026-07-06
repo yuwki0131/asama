@@ -295,7 +295,10 @@ describe("attack move and stop", () => {
     // enemy on the straight line toward it, inside aggro range.
     let rejection: string | null = "no destination tried";
     let dest = { x: cx, y: cy };
-    for (const [dx, dy] of [[8, 8], [-8, -8], [8, -8], [-8, 8], [12, 0], [0, 12], [-12, 0], [0, -12]]) {
+    const candidateOffsets: ReadonlyArray<readonly [number, number]> = [
+      [8, 8], [-8, -8], [8, -8], [-8, 8], [12, 0], [0, 12], [-12, 0], [0, -12]
+    ];
+    for (const [dx, dy] of candidateOffsets) {
       dest = { x: cx + dx, y: cy + dy };
       enemy.position = { x: cx + dx - Math.sign(dx), y: cy + dy - Math.sign(dy) };
       rejection = applyCommand(world, {
