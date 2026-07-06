@@ -12,6 +12,7 @@ import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@
 import { createAerialOverlay, resizeAerialOverlay } from "./aerialOverlay";
 import { loadGeneratedAssets, type LoadedAsset } from "./assets";
 import { cellToWorld, centerCameraOnCell, roundScreenPixel, snapCamera, worldToScreen, type CameraState } from "./camera";
+import { tileOffsetYAt } from "./elevation";
 import { registerKeyboardInput, registerPointerInput } from "./input";
 import { elapsedSimTicks } from "./interpolation";
 import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type MinimapTerrainCache } from "./minimap";
@@ -234,7 +235,9 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       const app = appRef.current;
       if (app === null) return null;
       const world = cellToWorld(cell);
-      const screen = worldToScreen(world, cameraRef.current);
+      // Elevated cells draw (and hit-test) 24px per level higher.
+      const offsetY = tileOffsetYAt(snapshotRef.current?.map ?? null, cell);
+      const screen = worldToScreen({ x: world.x, y: world.y + offsetY }, cameraRef.current);
       const rect = app.canvas.getBoundingClientRect();
       return { x: rect.left + screen.x, y: rect.top + screen.y };
     },

@@ -1,4 +1,4 @@
-import type { CellCoord, UnitSnapshot } from "@asama/shared";
+import type { CellCoord } from "@asama/shared";
 
 export interface CameraState {
   x: number;
@@ -80,11 +80,6 @@ export function worldToScreen(point: CellCoord, camera: CameraState): CellCoord 
     x: camera.x + point.x * camera.zoom,
     y: camera.y + point.y * camera.zoom
   };
-}
-
-export function unitScreenPoint(unit: UnitSnapshot, camera: CameraState): CellCoord {
-  const point = cellToWorld(unit.position);
-  return worldToScreen({ x: point.x, y: point.y + UNIT_GROUND_OFFSET_Y }, camera);
 }
 
 export function centerCameraOnCell(cell: CellCoord, host: HTMLElement, camera: CameraState): void {

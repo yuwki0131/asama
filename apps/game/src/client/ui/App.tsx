@@ -16,6 +16,12 @@ const DEBUG_STATUS_PANEL_ENABLED =
   import.meta.env.VITE_DEBUG_STATUS_PANEL === "true" ||
   (import.meta.env.DEV && import.meta.env.VITE_DEBUG_STATUS_PANEL !== "false");
 
+/** DEV-only scenario override (`?scenario=elevation-fixture`) for E2E and
+ *  manual verification fixtures; production always boots the default. */
+const DEV_SCENARIO_ID = import.meta.env.DEV
+  ? new URLSearchParams(window.location.search).get("scenario") ?? undefined
+  : undefined;
+
 export function App() {
   const simulationRef = useRef<SimulationClient | null>(null);
   const gameCanvasRef = useRef<GameCanvasHandle | null>(null);
@@ -95,6 +101,9 @@ export function App() {
         }),
       getBuildTool: () => buildToolRef.current,
       cellToScreenPoint: (cell) => gameCanvasRef.current?.cellToScreenPoint(cell) ?? null,
+      jumpCameraToCell: (cell) => {
+        gameCanvasRef.current?.jumpCameraToCell(cell);
+      },
       getFps: () => gameCanvasRef.current?.getFps() ?? 0,
       setTone: (enabled) => {
         gameCanvasRef.current?.setTone(enabled);
@@ -138,7 +147,7 @@ export function App() {
       setSnapshot(nextSnapshot);
     });
     const unsubscribeErrors = simulation.subscribeErrors(setSimulationError);
-    simulation.init();
+    simulation.init(DEV_SCENARIO_ID);
     simulation.setSpeed(1);
     return () => {
       unsubscribe();

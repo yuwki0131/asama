@@ -77,6 +77,43 @@ export function interpolateUnitWorldPosition(unit: MovingUnitLike, elapsedTicks:
   };
 }
 
+/** Interpolated render position of a unit on elevated terrain. */
+export interface RenderPoint extends WorldPoint {
+  /** Flat (elevation-less) world Y — the depth-sort key. Elevation must not
+   *  feed the y-sort (elevation-contract.md §5); it only lifts the drawing. */
+  readonly sortY: number;
+}
+
+/**
+ * Like `interpolateUnitWorldPosition`, but lifts the unit by the walking
+ * surface offset of the cell(s) it moves across. `surfaceOffsetAt` returns
+ * the offset in world px (≤ 0; e.g. -24×elevation, slope cells at half a
+ * level extra). The offset is interpolated with the same movement fraction,
+ * so a unit walking onto a slope and up a terrace rises smoothly instead of
+ * popping per cell.
+ */
+export function interpolateUnitRenderPosition(
+  unit: MovingUnitLike,
+  elapsedTicks: number,
+  surfaceOffsetAt: (cell: CellCoord) => number
+): RenderPoint {
+  const from = cellToWorld(unit.position);
+  const fromOffset = surfaceOffsetAt(unit.position);
+  const next = unit.path[0];
+  if (next === undefined) {
+    return { x: from.x, y: from.y + fromOffset, sortY: from.y };
+  }
+  const to = cellToWorld(next);
+  const toOffset = surfaceOffsetAt(next);
+  const fraction = movementFraction(unit.movementProgress, unit.ticksPerStep, elapsedTicks);
+  const sortY = from.y + (to.y - from.y) * fraction;
+  return {
+    x: from.x + (to.x - from.x) * fraction,
+    y: sortY + fromOffset + (toOffset - fromOffset) * fraction,
+    sortY
+  };
+}
+
 /**
  * Anti-pop smoothing between the currently displayed position and the freshly
  * interpolated target. Small gaps snap (sub-pixel), huge gaps snap (teleport),

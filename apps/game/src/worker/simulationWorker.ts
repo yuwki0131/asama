@@ -1,6 +1,22 @@
 import { createInitialWorld, applyCommand, deserializeWorld, serializeWorld, snapshotWorld, updateWorld } from "@asama/simulation";
 import { DEFAULT_SCENARIO } from "@asama/content";
-import { SIM_TICKS_PER_SECOND, SNAPSHOTS_PER_SECOND, type MainToWorkerMessage, type WorkerToMainMessage } from "@asama/shared";
+import {
+  SIM_TICKS_PER_SECOND,
+  SNAPSHOTS_PER_SECOND,
+  type MainToWorkerMessage,
+  type ScenarioDefinition,
+  type WorkerToMainMessage
+} from "@asama/shared";
+import { elevationFixtureScenario } from "../dev/elevationFixtureScenario";
+
+/** DEV-only fixture scenarios selectable via the init message's scenarioId
+ *  (page URL `?scenario=...`). Production always boots DEFAULT_SCENARIO. */
+function scenarioForId(scenarioId: string | undefined): ScenarioDefinition {
+  if (import.meta.env.DEV && scenarioId === "elevation-fixture") {
+    return elevationFixtureScenario;
+  }
+  return DEFAULT_SCENARIO;
+}
 
 // The game boots the first-play scenario; sim tests keep their own fixtures.
 let world = createInitialWorld(DEFAULT_SCENARIO);
@@ -15,7 +31,7 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
   const message = event.data;
 
   if (message.type === "init") {
-    world = createInitialWorld(DEFAULT_SCENARIO);
+    world = createInitialWorld(scenarioForId(message.scenarioId));
     lastSnapshotTick = world.currentTick;
     post({ type: "ready", snapshot: snapshotWorld(world, { includeMapCells: true }) });
     return;

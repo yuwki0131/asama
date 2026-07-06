@@ -78,8 +78,9 @@ export async function newPage(browser: Browser): Promise<{ context: BrowserConte
 
 // ── Test bridge wait ─────────────────────────────────────────────────────────
 
-/** Navigate to the game and wait until window.__asamaTest and a first snapshot are ready. */
-export async function openGame(page: Page): Promise<void> {
+/** Navigate to the game and wait until window.__asamaTest and a first snapshot
+ *  are ready. `query` selects DEV fixtures, e.g. "?scenario=elevation-fixture". */
+export async function openGame(page: Page, query = ""): Promise<void> {
   const consoleMsgs: string[] = [];
   page.on("console", (msg) => {
     const loc = msg.location();
@@ -96,7 +97,7 @@ export async function openGame(page: Page): Promise<void> {
   });
   (page as any).__consoleMsgs = consoleMsgs;
 
-  await page.goto(DEV_URL);
+  await page.goto(DEV_URL + query);
   // Wait for __asamaTest to appear
   await page.waitForFunction(
     () => typeof window.__asamaTest !== "undefined",
