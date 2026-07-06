@@ -1314,3 +1314,5 @@ export const scenarios: readonly ScenarioDefinition[] = [
 
 /** デフォルトシナリオ (初回プレイ = 環郭の城・入門)。 */
 export const DEFAULT_SCENARIO = concentricCastleScenario;
+
+export * from "./scripts";
