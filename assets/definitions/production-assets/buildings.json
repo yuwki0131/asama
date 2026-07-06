@@ -5079,6 +5079,102 @@
         "trim": false,
         "resizeMode": "exact"
       }
+    },
+    {
+      "assetId": "building.wood_bridge.x5",
+      "kind": "building",
+      "output": "building-wood-bridge-x5.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-x5",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 5,
+        "footprintHeight": 1,
+        "canvasWidth": 320,
+        "canvasHeight": 192,
+        "anchorX": 160,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y5",
+      "kind": "building",
+      "output": "building-wood-bridge-y5.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y5",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 5,
+        "canvasWidth": 320,
+        "canvasHeight": 192,
+        "anchorX": 160,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x5",
+      "kind": "building",
+      "output": "building-earth-bridge-x5.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-x5",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 5,
+        "footprintHeight": 1,
+        "canvasWidth": 320,
+        "canvasHeight": 192,
+        "anchorX": 160,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y5",
+      "kind": "building",
+      "output": "building-earth-bridge-y5.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y5",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 5,
+        "canvasWidth": 320,
+        "canvasHeight": 192,
+        "anchorX": 160,
+        "anchorY": 112
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
     }
   ]
 }

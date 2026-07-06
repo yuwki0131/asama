@@ -238,7 +238,7 @@ def build_water_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
     build_trench_moat(scene, mask, water=True)
 
 
-def build_wood_bridge_span(scene: bpy.types.Scene, axis: str = "x") -> None:
+def build_wood_bridge_span(scene: bpy.types.Scene, axis: str = "x", span_len: int = 3) -> None:
     """1x3 wooden bridge spanning a sunken river: earthen approach ramps on
     the two bank cells, arched plank span over the middle water cell, trestle
     posts in the water, railings full length. Built in along=[-3,0],
@@ -251,41 +251,47 @@ def build_wood_bridge_span(scene: bpy.types.Scene, axis: str = "x") -> None:
     stone = make_ishigaki_material("SpanAbutment")
     dirt = make_mud_material("SpanRamp")
 
+    L = float(span_len)
+
     def box(name, a0, a1, c0, c1, z0, z1, mat):
         lo = pt(min(a0, a1), min(c0, c1))
         hi = pt(max(a0, a1), max(c0, c1))
         add_box(scene, name, *map_box((lo[0], lo[1], z0), (hi[0], hi[1], z1)), mat)
 
-    # Bank cells [-3,-2] and [-1,0]: packed-earth approach ramps rising to
+    # Bank cells (first and last): packed-earth approach ramps rising to
     # the deck level, with stone cheek walls facing the water.
-    for name, a0, a1, cheek_a in (("RampW", -3.0, -2.0, -2.0), ("RampE", -1.0, 0.0, -1.0)):
+    for name, a0, a1, cheek_a in (("RampW", -L, -L + 1.0, -L + 1.0), ("RampE", -1.0, 0.0, -1.0)):
         box(name + "Fill", a0, a1, -0.42, 0.42, 0.0, 0.10, dirt)
         box(name + "Cheek", cheek_a - 0.10, cheek_a + 0.10, -0.46, 0.46, -0.20, 0.11, stone)
-    # Trestle posts standing in the sunken water (middle cell).
-    for a in (-1.72, -1.28):
-        for c in (-0.24, 0.24):
-            p = pt(a, c)
-            add_box(scene, f"Post{a}{c}", *map_box((p[0] - 0.04, p[1] - 0.04, -0.20), (p[0] + 0.04, p[1] + 0.04, 0.10)), beam)
-    # Stringers under the span.
+    # Trestle posts standing in the sunken water (one pair per water cell).
+    for wi in range(span_len - 2):
+        for da in (-0.22, 0.22):
+            a = -L + 1.0 + wi + 0.5 + da
+            for c in (-0.24, 0.24):
+                p = pt(a, c)
+                add_box(scene, f"Post{wi}{da}{c}", *map_box((p[0] - 0.04, p[1] - 0.04, -0.20), (p[0] + 0.04, p[1] + 0.04, 0.10)), beam)
+    # Stringers under the water span.
     for c in (-0.24, 0.0, 0.24):
-        box(f"Stringer{c}", -2.1, -0.9, c - 0.04, c + 0.04, 0.075, 0.115, beam)
-    # Deck: full length, slightly arched over the middle.
-    box("DeckW", -3.0, -2.0, -0.34, 0.34, 0.10, 0.14, plank)
-    box("DeckMid", -2.05, -0.95, -0.34, 0.34, 0.115, 0.155, plank)
+        box(f"Stringer{c}", -L + 0.9, -0.9, c - 0.04, c + 0.04, 0.075, 0.115, beam)
+    # Deck: bank sections flat, water span slightly arched.
+    box("DeckW", -L, -L + 1.0, -0.34, 0.34, 0.10, 0.14, plank)
+    box("DeckMid", -L + 0.95, -0.95, -0.34, 0.34, 0.115, 0.155, plank)
     box("DeckE", -1.0, 0.0, -0.34, 0.34, 0.10, 0.14, plank)
     # Kamachi edge beams + railings full length.
     for side in (-1.0, 1.0):
         c = side * 0.36
-        box(f"Kamachi{side}", -3.0, 0.0, c - 0.02, c + 0.02, 0.14, 0.165, beam)
-        for a in (-2.9, -2.3, -1.8, -1.2, -0.7, -0.1):
-            zb = 0.155 if -2.05 < a < -0.95 else 0.14
+        box(f"Kamachi{side}", -L, 0.0, c - 0.02, c + 0.02, 0.14, 0.165, beam)
+        n_posts = 2 * span_len
+        for pi in range(n_posts + 1):
+            a = -L + 0.1 + (L - 0.2) * pi / n_posts
+            zb = 0.155 if (-L + 0.95) < a < -0.95 else 0.14
             p = pt(a, c)
-            add_box(scene, f"RailPost{side}{a}", *map_box((p[0] - 0.03, p[1] - 0.03, zb), (p[0] + 0.03, p[1] + 0.03, zb + 0.30)), rail)
+            add_box(scene, f"RailPost{side}{pi}", *map_box((p[0] - 0.03, p[1] - 0.03, zb), (p[0] + 0.03, p[1] + 0.03, zb + 0.30)), rail)
         for rz in (0.30, 0.40):
-            box(f"Rail{side}{rz}", -2.95, -0.05, c - 0.022, c + 0.022, rz, rz + 0.035, rail)
+            box(f"Rail{side}{rz}", -L + 0.05, -0.05, c - 0.022, c + 0.022, rz, rz + 0.035, rail)
 
 
-def build_earth_bridge_span(scene: bpy.types.Scene, axis: str = "x") -> None:
+def build_earth_bridge_span(scene: bpy.types.Scene, axis: str = "x", span_len: int = 3) -> None:
     """1x3 dobashi: continuous earthen causeway over the middle water cell,
     stone revetment along the water span, grass lips on the shoulders."""
     from .materials import make_ishigaki_material
@@ -299,15 +305,16 @@ def build_earth_bridge_span(scene: bpy.types.Scene, axis: str = "x") -> None:
         hi = pt(max(a0, a1), max(c0, c1))
         add_box(scene, name, *map_box((lo[0], lo[1], z0), (hi[0], hi[1], z1)), mat)
 
-    # Stone revetment carrying the causeway across the sunken middle cell.
-    box("Revet", -2.1, -0.9, -0.40, 0.40, -0.20, 0.05, stone)
-    # Earthen causeway full length, gently cambered.
-    box("CausewayW", -3.0, -2.0, -0.36, 0.36, 0.0, 0.075, dirt)
-    box("CausewayMid", -2.05, -0.95, -0.36, 0.36, 0.0, 0.10, dirt)
+    L = float(span_len)
+    # Stone revetment carrying the causeway across the sunken water cells.
+    box("Revet", -L + 0.9, -0.9, -0.40, 0.40, -0.20, 0.05, stone)
+    # Earthen causeway full length, gently cambered over the water.
+    box("CausewayW", -L, -L + 1.0, -0.36, 0.36, 0.0, 0.075, dirt)
+    box("CausewayMid", -L + 0.95, -0.95, -0.36, 0.36, 0.0, 0.10, dirt)
     box("CausewayE", -1.0, 0.0, -0.36, 0.36, 0.0, 0.075, dirt)
     # Grass lips on both shoulders, full length.
     for side in (-1.0, 1.0):
-        box(f"Lip{side}", -3.0, 0.0, side * 0.36, side * 0.42, 0.0, 0.055, grass_lip)
+        box(f"Lip{side}", -L, 0.0, side * 0.36, side * 0.42, 0.0, 0.055, grass_lip)
 
 
 def _bridge_axes(axis: str):
