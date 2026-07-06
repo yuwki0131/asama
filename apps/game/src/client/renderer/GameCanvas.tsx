@@ -10,7 +10,7 @@ import {
 import { Application, ColorMatrixFilter, Container, type ColorMatrix, type Sprite, type Ticker } from "pixi.js";
 import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@asama/shared";
 import { createAerialOverlay, resizeAerialOverlay } from "./aerialOverlay";
-import { loadGeneratedAssets, type LoadedAsset } from "./assets";
+import { loadAnimationSheets, loadGeneratedAssets, type AnimationSheetAsset, type LoadedAsset } from "./assets";
 import { cellToWorld, centerCameraOnCell, roundScreenPixel, snapCamera, worldToScreen, type CameraState } from "./camera";
 import { tileOffsetYAt } from "./elevation";
 import { registerKeyboardInput, registerPointerInput } from "./input";
@@ -94,6 +94,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const snapshotReceivedAtRef = useRef<number>(performance.now());
   const speedRef = useRef<0 | 1 | 2 | 4>(speed);
   const assetsRef = useRef<ReadonlyMap<string, LoadedAsset>>(new Map());
+  const sheetsRef = useRef<ReadonlyMap<string, AnimationSheetAsset>>(new Map());
   const fpsSamplesRef = useRef<number[]>([]);
   const buildToolRef = useRef<ToolMode>(buildTool);
   const onSelectUnitsRef = useRef(onSelectUnits);
@@ -363,7 +364,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
           if (currentSnapshot === null || assets.size === 0) {
             return;
           }
-          retainedScene.sync(currentSnapshot, assets, camera.zoom);
+          retainedScene.sync(currentSnapshot, assets, camera.zoom, sheetsRef.current);
           // Once the outcome is decided the sim stops ticking; freezing the
           // extrapolation clock keeps units from drifting one cell ahead.
           const elapsedMs = currentSnapshot.outcome === null ? now - snapshotReceivedAtRef.current : 0;
@@ -397,10 +398,11 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   useEffect(() => {
     let disposed = false;
 
-    void loadGeneratedAssets()
-      .then((loadedAssets) => {
+    void Promise.all([loadGeneratedAssets(), loadAnimationSheets()])
+      .then(([loadedAssets, loadedSheets]) => {
         if (!disposed) {
           assetsRef.current = loadedAssets;
+          sheetsRef.current = loadedSheets;
           setAssets(loadedAssets);
         }
       })

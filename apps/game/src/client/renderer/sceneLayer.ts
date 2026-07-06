@@ -1,6 +1,6 @@
-import { Container, Graphics, Sprite } from "pixi.js";
+import { Container, Graphics, Rectangle, Sprite, Texture } from "pixi.js";
 import type { BuildingSnapshot, CellCoord, MapDecoration, UnitId, UnitSnapshot, WorldSnapshot } from "@asama/shared";
-import { clearLayer, createSprite, createSpriteFromCandidates, type LoadedAsset } from "./assets";
+import { clearLayer, createSprite, createSpriteFromCandidates, type AnimationSheetAsset, type LoadedAsset } from "./assets";
 import {
   cellToWorld,
   clamp,
@@ -15,6 +15,18 @@ import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint 
 import { buildingRenderPoint, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
 
+interface AnimState {
+  currentAction: "idle" | "walk" | "attack" | "death";
+  directionRow: number;
+  frameIndex: number;
+  frameAccMs: number;
+  attackCyclesLeft: number;
+  isDying: boolean;
+  fadeAlpha: number;
+  fadeDurationMs: number;
+  readonly phaseOffset: number;
+}
+
 interface UnitVisual {
   readonly container: Container;
   readonly ring: Sprite;
@@ -27,6 +39,8 @@ interface UnitVisual {
   /** `${hp}/${maxHp}` — the health bar is only redrawn when this changes. */
   hpKey: string;
   assetId: string;
+  /** Per-unit animation state machine; null when no sheets available. */
+  animState: AnimState | null;
 }
 
 interface DecorationVisual {
@@ -48,10 +62,13 @@ export class RetainedScene {
   private readonly staticLayer = new Container();
   private readonly unitsLayer = new Container();
   private readonly unitVisuals = new Map<UnitId, UnitVisual>();
+  /** Units that have died and are fading out. Not in unitVisuals. */
+  private readonly dyingVisuals = new Map<UnitId, UnitVisual>();
   private decorationVisuals: DecorationVisual[] = [];
   private staticSignature: string | null = null;
   private lastSnapshot: WorldSnapshot | null = null;
   private lastAssets: ReadonlyMap<string, LoadedAsset> | null = null;
+  private lastSheets: ReadonlyMap<string, AnimationSheetAsset> | null = null;
   private lastZoom: number | null = null;
 
   constructor() {
@@ -62,16 +79,25 @@ export class RetainedScene {
   }
 
   /** Reconciles retained visuals with a snapshot. Cheap when nothing changed. */
-  sync(snapshot: WorldSnapshot, assets: ReadonlyMap<string, LoadedAsset>, zoom: number): void {
+  sync(
+    snapshot: WorldSnapshot,
+    assets: ReadonlyMap<string, LoadedAsset>,
+    zoom: number,
+    sheets?: ReadonlyMap<string, AnimationSheetAsset>
+  ): void {
     const snapshotChanged = snapshot !== this.lastSnapshot;
     const assetsChanged = assets !== this.lastAssets;
+    const sheetsChanged = sheets !== undefined && sheets !== this.lastSheets;
     const zoomChanged = zoom !== this.lastZoom;
-    if (!snapshotChanged && !assetsChanged && !zoomChanged) {
+    if (!snapshotChanged && !assetsChanged && !sheetsChanged && !zoomChanged) {
       return;
     }
     this.lastSnapshot = snapshot;
     this.lastAssets = assets;
     this.lastZoom = zoom;
+    if (sheets !== undefined) {
+      this.lastSheets = sheets;
+    }
 
     if (assetsChanged) {
       // Textures resolved against the previous asset map are stale; rebuild
@@ -86,7 +112,7 @@ export class RetainedScene {
       this.staticSignature = signature;
     }
 
-    if (snapshotChanged || assetsChanged) {
+    if (snapshotChanged || assetsChanged || sheetsChanged) {
       this.syncUnits(snapshot, assets);
     }
   }
@@ -112,6 +138,34 @@ export class RetainedScene {
       // Depth sort stays cell-based: elevation lifts the drawing but must not
       // change the painter's order (elevation-contract.md §5).
       visual.container.zIndex = target.sortY + UNIT_GROUND_OFFSET_Y;
+
+      // Advance animation for living units
+      if (visual.animState !== null) {
+        this.advanceAnimation(visual, frameDeltaMs);
+      }
+    }
+
+    // Advance dying visuals (death animation + fade-out)
+    const toRemove: UnitId[] = [];
+    for (const [id, visual] of this.dyingVisuals) {
+      if (visual.animState !== null) {
+        this.advanceAnimation(visual, frameDeltaMs);
+        const st = visual.animState;
+        st.fadeAlpha -= frameDeltaMs / st.fadeDurationMs;
+        visual.container.alpha = Math.max(0, st.fadeAlpha);
+        if (st.fadeAlpha <= 0) {
+          toRemove.push(id);
+        }
+      } else {
+        // No animation sheet for this unit type; just fade out immediately
+        toRemove.push(id);
+      }
+    }
+    for (const id of toRemove) {
+      const visual = this.dyingVisuals.get(id)!;
+      this.unitsLayer.removeChild(visual.container);
+      visual.container.destroy({ children: true, context: true });
+      this.dyingVisuals.delete(id);
     }
 
     for (const decoration of this.decorationVisuals) {
@@ -131,6 +185,12 @@ export class RetainedScene {
       visual.container.destroy({ children: true, context: true });
     }
     this.unitVisuals.clear();
+
+    for (const visual of this.dyingVisuals.values()) {
+      this.unitsLayer.removeChild(visual.container);
+      visual.container.destroy({ children: true, context: true });
+    }
+    this.dyingVisuals.clear();
   }
 
   private rebuildStaticLayer(
@@ -182,6 +242,37 @@ export class RetainedScene {
   }
 
   private syncUnits(snapshot: WorldSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
+    const sheets = this.lastSheets ?? (new Map() as ReadonlyMap<string, AnimationSheetAsset>);
+    const events = snapshot.events ?? [];
+
+    // Collect attacker IDs from combat events this snapshot
+    const attackerIds = new Set<UnitId>();
+    for (const event of events) {
+      if (event.kind === "attack_melee" || event.kind === "attack_ranged") {
+        attackerIds.add(event.attackerId);
+      }
+    }
+
+    // Process unit_died events: move visuals from unitVisuals to dyingVisuals
+    for (const event of events) {
+      if (event.kind === "unit_died") {
+        const visual = this.unitVisuals.get(event.unitId);
+        if (visual !== undefined) {
+          if (visual.animState !== null) {
+            const st = visual.animState;
+            st.isDying = true;
+            st.currentAction = "death";
+            st.frameIndex = 0;
+            st.frameAccMs = 0;
+            st.fadeAlpha = 1.0;
+            st.fadeDurationMs = 500;
+          }
+          this.dyingVisuals.set(event.unitId, visual);
+          this.unitVisuals.delete(event.unitId);
+        }
+      }
+    }
+
     const seen = new Set<UnitId>();
     for (const unit of snapshot.units) {
       seen.add(unit.id);
@@ -194,9 +285,20 @@ export class RetainedScene {
       }
       if (visual === undefined) {
         visual = createUnitVisual(unit, assets, snapshot.map);
+        // Initialize animState if sheets are available for this unit type
+        const walkSheetKey = `${unit.assetId}.anim.walk`;
+        if (sheets.has(walkSheetKey)) {
+          visual.animState = createAnimState(unit.id, unit.assetId, "idle", sheets);
+        }
         this.unitVisuals.set(unit.id, visual);
         this.unitsLayer.addChild(visual.container);
       }
+
+      // Late-init animState when sheets became available after visual creation
+      if (visual.animState === null && sheets.has(`${unit.assetId}.anim.walk`)) {
+        visual.animState = createAnimState(unit.id, unit.assetId, "idle", sheets);
+      }
+
       visual.unit = unit;
       visual.ring.visible = unit.selected;
       const hpKey = `${unit.hp}/${unit.maxHp}`;
@@ -205,6 +307,44 @@ export class RetainedScene {
         visual.hpKey = hpKey;
       }
       visual.healthBar.visible = unit.hp < unit.maxHp;
+
+      // Update animation state transitions
+      if (visual.animState !== null) {
+        const st = visual.animState;
+
+        if (attackerIds.has(unit.id) && st.currentAction !== "attack" && st.currentAction !== "death") {
+          // Trigger attack animation for one cycle
+          const attackSheetKey = `${unit.assetId}.anim.attack`;
+          if (sheets.has(attackSheetKey)) {
+            st.currentAction = "attack";
+            st.attackCyclesLeft = 1;
+            st.frameIndex = 0;
+            st.frameAccMs = 0;
+          }
+        } else if (st.currentAction !== "attack" && st.currentAction !== "death") {
+          if (unit.path.length > 0) {
+            if (st.currentAction !== "walk") {
+              st.currentAction = "walk";
+              st.frameIndex = 0;
+              st.frameAccMs = 0;
+            }
+            // Update direction from movement vector
+            st.directionRow = quantizeDirection(unit.position, unit.path[0]!);
+          } else {
+            if (st.currentAction !== "idle") {
+              st.currentAction = "idle";
+              // Apply phase offset when entering idle
+              const idleSheet = sheets.get(`${unit.assetId}.anim.idle`);
+              if (idleSheet !== undefined) {
+                st.frameIndex = st.phaseOffset % idleSheet.frames;
+              } else {
+                st.frameIndex = 0;
+              }
+              st.frameAccMs = 0;
+            }
+          }
+        }
+      }
     }
 
     for (const [id, visual] of this.unitVisuals) {
@@ -214,6 +354,58 @@ export class RetainedScene {
         this.unitVisuals.delete(id);
       }
     }
+  }
+
+  private advanceAnimation(visual: UnitVisual, frameDeltaMs: number): void {
+    const st = visual.animState;
+    if (st === null) return;
+
+    const sheetKey = `${visual.assetId}.anim.${st.currentAction}`;
+    const sheet = this.lastSheets?.get(sheetKey);
+    if (sheet === undefined) return;
+
+    const msPerFrame = 1000 / sheet.fps;
+    st.frameAccMs += frameDeltaMs;
+
+    if (st.frameAccMs >= msPerFrame) {
+      const steps = Math.floor(st.frameAccMs / msPerFrame);
+      st.frameAccMs -= steps * msPerFrame;
+
+      const newFrame = st.frameIndex + steps;
+
+      if (sheet.loop) {
+        const cycleWrapped = newFrame >= sheet.frames;
+        st.frameIndex = newFrame % sheet.frames;
+
+        // Handle attack cycle completion (one full cycle → return to walk/idle)
+        if (st.currentAction === "attack" && cycleWrapped) {
+          st.attackCyclesLeft--;
+          if (st.attackCyclesLeft <= 0) {
+            st.currentAction = visual.unit.path.length > 0 ? "walk" : "idle";
+            st.frameIndex = 0;
+            st.frameAccMs = 0;
+          }
+        }
+      } else {
+        // Non-looping animation (death): clamp at last frame
+        st.frameIndex = Math.min(newFrame, sheet.frames - 1);
+      }
+    }
+
+    // Look up the sheet for the (possibly updated) current action
+    const currentSheetKey = `${visual.assetId}.anim.${st.currentAction}`;
+    const currentSheet = this.lastSheets?.get(currentSheetKey);
+    if (currentSheet === undefined) return;
+
+    const fw = currentSheet.frameWidth;
+    const fh = currentSheet.frameHeight;
+    // Clamp frameIndex in case action changed and new sheet has fewer frames
+    const safeFrame = Math.min(st.frameIndex, currentSheet.frames - 1);
+    visual.sprite.texture = new Texture({
+      source: currentSheet.texture.source,
+      frame: new Rectangle(safeFrame * fw, st.directionRow * fh, fw, fh)
+    });
+    visual.sprite.anchor.set(currentSheet.anchor.x, currentSheet.anchor.y);
   }
 }
 
@@ -231,6 +423,60 @@ function staticSceneSignature(snapshot: WorldSnapshot, zoom: number): string {
     );
   }
   return parts.join(";");
+}
+
+/** Stable non-cryptographic integer hash for a string. Used for idle phase offsets. */
+function stableHash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+/** Create a fresh AnimState for a unit with idle as the default action. */
+function createAnimState(
+  unitId: UnitId,
+  unitAssetId: string,
+  action: "idle" | "walk" | "attack" | "death",
+  sheets: ReadonlyMap<string, AnimationSheetAsset>
+): AnimState {
+  // Use a deterministic hash of the unit id to stagger idle animation start
+  // frames so all idle units don't bob in sync.
+  const idleSheet = sheets.get(`${unitAssetId}.anim.idle`);
+  const maxFrames = idleSheet?.frames ?? 1;
+  const phaseOffset = stableHash(unitId) % maxFrames;
+
+  return {
+    currentAction: action,
+    directionRow: 0,
+    frameIndex: action === "idle" ? phaseOffset : 0,
+    frameAccMs: 0,
+    attackCyclesLeft: 0,
+    isDying: false,
+    fadeAlpha: 1.0,
+    fadeDurationMs: 500,
+    phaseOffset
+  };
+}
+
+/**
+ * Quantize a movement vector (from → to, cell coordinates) into one of the
+ * 8 direction row indices used by the sprite sheets.
+ * Row order: S=0, SE=1, E=2, NE=3, N=4, NW=5, W=6, SW=7
+ */
+function quantizeDirection(from: CellCoord, to: CellCoord): number {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  if (dy > 0 && dx === 0) return 0;  // S
+  if (dy > 0 && dx > 0)  return 1;  // SE
+  if (dy === 0 && dx > 0) return 2; // E
+  if (dy < 0 && dx > 0)  return 3;  // NE
+  if (dy < 0 && dx === 0) return 4; // N
+  if (dy < 0 && dx < 0)  return 5;  // NW
+  if (dy === 0 && dx < 0) return 6; // W
+  if (dy > 0 && dx < 0)  return 7;  // SW
+  return 0; // default south
 }
 
 function createUnitVisual(
@@ -268,7 +514,8 @@ function createUnitVisual(
     unit,
     displayPosition: null,
     hpKey: `${unit.hp}/${unit.maxHp}`,
-    assetId: unit.assetId
+    assetId: unit.assetId,
+    animState: null  // initialized after sheets are available
   };
 }
 
