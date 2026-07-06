@@ -6,6 +6,8 @@ import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type GameCanvasHandle, type 
 import { computeGroupCentroid } from "../renderer/groupManager";
 import { createSimulationClient, type SimulationClient } from "../worker-client/simulationClient";
 import { SelectionInfoPanel } from "./SelectionInfoPanel";
+import { LoadingScreen } from "./LoadingScreen";
+import { ScenarioSelectScreen } from "./ScenarioSelectScreen";
 import { ticksToMmSs, unitTypeLabel } from "./selectionPanelUtils";
 
 const RECRUITABLE_UNIT_TYPES: readonly UnitType[] = (Object.values(unitSpecs) as (typeof unitSpecs)[keyof typeof unitSpecs][])
@@ -23,6 +25,14 @@ const DEV_SCENARIO_ID = import.meta.env.DEV
   : undefined;
 
 export function App() {
+  // Scenario selection: null = waiting for user to pick, string = ID chosen
+  // DEV_SCENARIO_ID (URL param) bypasses the selection screen immediately.
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(
+    DEV_SCENARIO_ID ?? null
+  );
+  // Loading screen: keep rendered until 500ms after the simulation is ready.
+  const [loadingFaded, setLoadingFaded] = useState(false);
+
   const simulationRef = useRef<SimulationClient | null>(null);
   const gameCanvasRef = useRef<GameCanvasHandle | null>(null);
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
@@ -129,7 +139,17 @@ export function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Fade out the loading screen 500ms after the simulation signals ready.
   useEffect(() => {
+    if (simulationStatus !== "ready" || loadingFaded) return;
+    const timer = setTimeout(() => setLoadingFaded(true), 500);
+    return () => clearTimeout(timer);
+  }, [simulationStatus, loadingFaded]);
+
+  useEffect(() => {
+    // Don't start the simulation until the user has chosen a scenario.
+    if (selectedScenarioId === null) return;
+
     let simulation: SimulationClient;
     try {
       simulation = createSimulationClient();
@@ -147,7 +167,7 @@ export function App() {
       setSnapshot(nextSnapshot);
     });
     const unsubscribeErrors = simulation.subscribeErrors(setSimulationError);
-    simulation.init(DEV_SCENARIO_ID);
+    simulation.init(selectedScenarioId);
     simulation.setSpeed(1);
     return () => {
       unsubscribe();
@@ -157,7 +177,7 @@ export function App() {
         simulationRef.current = null;
       }
     };
-  }, []);
+  }, [selectedScenarioId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectUnits = useCallback(
     (unitIds: readonly string[], additive: boolean) => {
@@ -428,7 +448,13 @@ export function App() {
   const holdDeadlineTick = snapshot?.holdDeadlineTick ?? null;
   const nextWaveTick = snapshot?.nextWaveTick ?? null;
 
+  // Show scenario selection screen until a scenario is chosen.
+  if (selectedScenarioId === null) {
+    return <ScenarioSelectScreen onSelect={setSelectedScenarioId} />;
+  }
+
   return (
+    <>
     <main className="app">
       {/* Row 1: Time controls + resource displays */}
       <header className="topbar">
@@ -678,6 +704,14 @@ export function App() {
         ) : null}
       </section>
     </main>
+    {/* Loading overlay: rendered until 500ms after the simulation signals ready */}
+    {!loadingFaded && (
+      <LoadingScreen
+        status={simulationStatus}
+        isReady={simulationStatus === "ready"}
+      />
+    )}
+    </>
   );
 }
 
