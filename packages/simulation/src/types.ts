@@ -6,6 +6,7 @@ import {
   type BuildingLifecycleState,
   type BuildingType,
   type CellCoord,
+  type CombatEventSnapshot,
   type ElevationSkin,
   type EngineerTaskKind,
   type EntityId,
@@ -136,6 +137,9 @@ export interface WorldState {
   };
   units: UnitState[];
   buildings: BuildingState[];
+  /** Combat events accumulated since the last snapshot; snapshotWorld drains
+   *  this buffer so each event reaches the snapshot consumer exactly once. */
+  combatEvents: CombatEventSnapshot[];
 }
 
 export interface FoodState {
