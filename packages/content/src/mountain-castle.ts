@@ -71,7 +71,6 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     { type: "yagura", position: { x: 66, y: 69 } },
 
     // === 三の丸 (L1 帯曲輪) ===
-    { type: "storehouse", position: { x: 45, y: 80 } },
     // 大手門 — 0→1 大手坂の上端を塞ぐ幅2の門。
     { type: "gate_wide_2", position: { x: 56, y: 85 } },
     // 搦手門 — 0→1 搦手坂の上端を塞ぐ門 (東西向き)。
@@ -82,7 +81,6 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
 
     // === 城下 (L0, 南麓) ===
     { type: "market", position: { x: 59, y: 92 } },
-    { type: "storehouse", position: { x: 48, y: 98 } },
     { type: "town_block", position: { x: 46, y: 92 } },
     { type: "town_block", position: { x: 64, y: 92 } },
     { type: "samurai_residence", position: { x: 46, y: 87 } },
