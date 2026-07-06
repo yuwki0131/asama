@@ -4,6 +4,7 @@ import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
 import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, bridgeAbsoluteFootprint, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
 import { getAttackTarget, areEnemies, updateAttackMoveBehavior, updateCombat } from "./combat";
 import { updateEconomy, applyMarketTrade, applyRecruitCommand, populationCapacity, currentApproval, maxRecruitPool } from "./economy";
+import { applyScenarioElevation, elevationAt, stepTicksFor } from "./elevation";
 import { updateEnemyAi } from "./enemyAi";
 import { applyEngineerTaskCommand, updateEngineerTasks } from "./engineer";
 import { requiredFoodPerCycle, updateFoodSupply } from "./food";
@@ -71,6 +72,12 @@ export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScen
     units: [],
     buildings: []
   };
+
+  // Elevation is applied before buildings so placement validation can enforce
+  // uniform-elevation footprints (elevation-contract.md).
+  if (scenario.elevation !== undefined) {
+    applyScenarioElevation(world.map, scenario.elevation);
+  }
 
   seedInitialBuildings(world, scenario);
   // Units spawn after buildings so building placement validation does not
@@ -343,7 +350,8 @@ export function updateWorld(world: WorldState): void {
     }
 
     unit.movementProgress += 1;
-    if (unit.movementProgress < unit.ticksPerStep) {
+    // Uphill steps take extra ticks (登坂コスト, elevation-contract.md).
+    if (unit.movementProgress < stepTicksFor(world, unit)) {
       continue;
     }
 
@@ -481,7 +489,10 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
       assetId: unit.assetId,
       task: unit.task,
       movementProgress: unit.movementProgress,
-      ticksPerStep: unit.ticksPerStep
+      // Effective step duration including the current step's climb penalty so
+      // client interpolation stays in sync with the slower uphill movement.
+      ticksPerStep: stepTicksFor(world, unit),
+      elevation: elevationAt(world, unit.position)
     })),
     buildings: world.buildings.map((building) => snapshotBuilding(world, building)),
     nextWaveTick,

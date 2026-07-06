@@ -1,19 +1,41 @@
 import type { EntityId, OwnerId } from "@asama/shared";
 import { UNIT_TYPE_AFFINITY } from "@asama/content";
 import { detachLadder } from "./buildings";
+import { ELEVATION_BALANCE, elevationAt } from "./elevation";
 import { PATH_RETRY_COOLDOWN_TICKS, findPath, findPathToAttackRange } from "./pathfinding";
 import { ENEMY_AI, manhattan, sameCell } from "./types";
 import type { AttackTarget, BuildingState, UnitState, WorldState } from "./types";
 
+// High-ground rules (elevation-contract.md): an attacker standing strictly
+// above its target gains +1 range and x1.25 damage. Low ground carries no
+// penalty. A unit on a slope counts as the slope's lower level; a building's
+// elevation is its anchor cell's (footprints are uniform-elevation).
+function targetElevation(world: WorldState, target: AttackTarget): number {
+  return elevationAt(world, target.position);
+}
+
+function highGroundRangeBonus(world: WorldState, attacker: UnitState, target: AttackTarget): number {
+  return elevationAt(world, attacker.position) > targetElevation(world, target)
+    ? ELEVATION_BALANCE.highGroundRangeBonus
+    : 0;
+}
+
+function highGroundDamageMultiplier(world: WorldState, attacker: UnitState, target: AttackTarget): number {
+  return elevationAt(world, attacker.position) > targetElevation(world, target)
+    ? ELEVATION_BALANCE.highGroundDamageMultiplier
+    : 1;
+}
+
 // For building targets: check range against the nearest footprint cell, not
 // just the anchor position, so units adjacent to any part of a multi-tile
 // building enter attack range immediately.
-function inAttackRange(attacker: UnitState, target: AttackTarget): boolean {
+function inAttackRange(world: WorldState, attacker: UnitState, target: AttackTarget): boolean {
+  const effectiveRange = attacker.attackRange + highGroundRangeBonus(world, attacker, target);
   const asBuilding = target as Partial<BuildingState>;
   if (asBuilding.footprint !== undefined) {
-    return asBuilding.footprint.some(cell => manhattan(attacker.position, cell) <= attacker.attackRange);
+    return asBuilding.footprint.some(cell => manhattan(attacker.position, cell) <= effectiveRange);
   }
-  return manhattan(attacker.position, target.position) <= attacker.attackRange;
+  return manhattan(attacker.position, target.position) <= effectiveRange;
 }
 
 export function updateCombat(world: WorldState): void {
@@ -36,7 +58,7 @@ export function updateCombat(world: WorldState): void {
       continue;
     }
 
-    const damage = damageAgainst(unit, target);
+    const damage = damageAgainst(world, unit, target);
     const laddered = target as Partial<BuildingState>;
     if (laddered.ladderHp !== undefined && laddered.ladderHp !== null && unit.attackRange === 1) {
       // Melee strikes tear down the attached ladder before the wall itself
@@ -72,7 +94,7 @@ function updateAttackMovement(world: WorldState): void {
     }
 
     unit.targetId = target.id;
-    if (inAttackRange(unit, target)) {
+    if (inAttackRange(world, unit, target)) {
       unit.path = [];
       unit.destination = null;
       unit.movementProgress = 0;
@@ -108,7 +130,7 @@ function attackTargetInRange(world: WorldState, attacker: UnitState): AttackTarg
     return null;
   }
 
-  return inAttackRange(attacker, target) ? target : null;
+  return inAttackRange(world, attacker, target) ? target : null;
 }
 
 function nearestEnemyInRange(world: WorldState, attacker: UnitState): AttackTarget | null {
@@ -121,7 +143,8 @@ function nearestEnemyInRange(world: WorldState, attacker: UnitState): AttackTarg
     }
 
     const distance = manhattan(attacker.position, candidate.position);
-    if (distance <= attacker.attackRange && distance < nearestDistance) {
+    const effectiveRange = attacker.attackRange + highGroundRangeBonus(world, attacker, candidate);
+    if (distance <= effectiveRange && distance < nearestDistance) {
       nearest = candidate;
       nearestDistance = distance;
     }
@@ -146,12 +169,13 @@ export function areEnemies(a: OwnerId, b: OwnerId): boolean {
   return a !== b && a !== "neutral" && b !== "neutral";
 }
 
-function damageAgainst(attacker: UnitState, target: AttackTarget): number {
+function damageAgainst(world: WorldState, attacker: UnitState, target: AttackTarget): number {
   const targetUnit = target as Partial<UnitState>;
   const targetType = targetUnit.type;
   const affinityRow = UNIT_TYPE_AFFINITY[attacker.type];
   const multiplier = targetType !== undefined && affinityRow !== undefined ? (affinityRow[targetType] ?? 1) : 1;
-  return Math.max(1, Math.round(attacker.attackDamage * multiplier));
+  const elevationMultiplier = highGroundDamageMultiplier(world, attacker, target);
+  return Math.max(1, Math.round(attacker.attackDamage * multiplier * elevationMultiplier));
 }
 
 function removeDeadEntities(world: WorldState): void {

@@ -1,7 +1,7 @@
 import type { CellCoord, MarketTrade, UnitType } from "@asama/shared";
 import { getBuildingAt } from "./buildings";
 import { computeConnectedStorehouseIds } from "./food";
-import { findSpawnCell, isPassable } from "./pathfinding";
+import { canStep, findSpawnCell } from "./pathfinding";
 import { createUnit, unitDefinitionFor } from "./units";
 import { ECONOMY_BALANCE, ORTHOGONAL_DIRECTIONS, SEASONS, cellKey, intactBuildingsOfType, isInsideMap, manhattan } from "./types";
 import type { BuildingState, WorldState } from "./types";
@@ -246,7 +246,7 @@ function isBuildingReachableFromHonmaru(world: WorldState, building: BuildingSta
     for (const direction of ORTHOGONAL_DIRECTIONS) {
       const next = { x: current.x + direction.x, y: current.y + direction.y };
       const key = cellKey(next);
-      if (visited.has(key) || !isInsideMap(next) || !isPassable(world, next)) {
+      if (visited.has(key) || !isInsideMap(next) || !canStep(world, current, next)) {
         continue;
       }
       visited.add(key);

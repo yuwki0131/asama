@@ -1,5 +1,6 @@
 import { MAP_HEIGHT, MAP_WIDTH, type CellCoord } from "@asama/shared";
 import { getBuildingAt } from "./buildings";
+import { canTraverseElevation, climbCost } from "./elevation";
 import { getCell } from "./map";
 import { ORTHOGONAL_DIRECTIONS, cellKey, isBridge, isGate, isInsideMap, manhattan, sameCell } from "./types";
 import type { UnitState, WorldState } from "./types";
@@ -84,11 +85,11 @@ export function findPath(world: WorldState, start: CellCoord, goal: CellCoord, p
     for (const direction of ORTHOGONAL_DIRECTIONS) {
       const neighbor = { x: current.coord.x + direction.x, y: current.coord.y + direction.y };
       const neighborKey = cellKey(neighbor);
-      if (!isInsideMap(neighbor) || closed.has(neighborKey) || !isPassable(world, neighbor, perspective)) {
+      if (!isInsideMap(neighbor) || closed.has(neighborKey) || !canStep(world, current.coord, neighbor, perspective)) {
         continue;
       }
 
-      const tentativeG = current.g + movementCostAt(world, neighbor);
+      const tentativeG = current.g + movementCostForStep(world, current.coord, neighbor);
       const known = open.get(neighborKey);
       if (known !== undefined && tentativeG >= known.g) {
         continue;
@@ -194,6 +195,21 @@ export function isPassable(world: WorldState, coord: CellCoord, perspective?: "p
   }
 
   return cell.passable;
+}
+
+/**
+ * Edge-based traversal check: movement legality between two adjacent cells is
+ * a property of the pair, not of the destination cell alone. A step is legal
+ * when the destination is passable AND the elevation edge rule allows it
+ * (matching surface heights; cliffs and slope sides block).
+ */
+export function canStep(world: WorldState, from: CellCoord, to: CellCoord, perspective?: "player" | "supply"): boolean {
+  return isPassable(world, to, perspective) && canTraverseElevation(world, from, to);
+}
+
+/** Cost of entering `to` from `from`: terrain/building cost plus climb cost. */
+export function movementCostForStep(world: WorldState, from: CellCoord, to: CellCoord): number {
+  return movementCostAt(world, to) + climbCost(world, from, to);
 }
 
 export function movementCostAt(world: WorldState, coord: CellCoord): number {
