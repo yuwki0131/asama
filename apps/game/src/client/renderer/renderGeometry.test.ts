@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildingDrawY, decorationDrawY } from "./renderGeometry";
+import { buildingDrawY, decorationDrawY, isoBehind } from "./renderGeometry";
+import type { FootprintRect } from "./renderGeometry";
 import { cellToWorld, TILE_HEIGHT } from "./camera";
 import type { BuildingSnapshot, MapDecoration } from "@asama/shared";
 
@@ -93,5 +94,125 @@ describe("Y-sort: decoration vs building", () => {
 
   it("tile height constant is positive (sanity check)", () => {
     expect(TILE_HEIGHT).toBeGreaterThan(0);
+  });
+});
+
+// Helper: runs the same two-step isoSort algorithm (mirrors sceneLayer.ts)
+// on abstract {id, rect} items so we can test it without importing pixi.
+function isoSortRects(items: Array<{ id: string; rect: FootprintRect }>): string[] {
+  const arr = [...items];
+  arr.sort((a, b) => {
+    const diff = (a.rect.maxX + a.rect.maxY) - (b.rect.maxX + b.rect.maxY);
+    if (diff !== 0) return diff;
+    return a.id.localeCompare(b.id);
+  });
+  const PASSES = 3;
+  for (let pass = 0; pass < PASSES; pass++) {
+    let swapped = false;
+    for (let i = 0; i < arr.length - 1; i++) {
+      if (isoBehind(arr[i + 1]!.rect, arr[i]!.rect) && !isoBehind(arr[i]!.rect, arr[i + 1]!.rect)) {
+        const tmp = arr[i]!;
+        arr[i] = arr[i + 1]!;
+        arr[i + 1] = tmp;
+        swapped = true;
+      }
+    }
+    if (!swapped) break;
+  }
+  return arr.map((x) => x.id);
+}
+
+describe("isoBehind", () => {
+  it("A with smaller maxX than B.minX → A behind B (x-axis separation)", () => {
+    // a is completely to the west: every x in a < every x in b
+    const a: FootprintRect = { minX: 2, maxX: 4, minY: 5, maxY: 7 };
+    const b: FootprintRect = { minX: 5, maxX: 8, minY: 4, maxY: 9 };
+    expect(isoBehind(a, b)).toBe(true);
+    expect(isoBehind(b, a)).toBe(false);
+  });
+
+  it("A with smaller maxY than B.minY → A behind B (y-axis separation)", () => {
+    // a is completely to the north: every y in a < every y in b
+    const a: FootprintRect = { minX: 3, maxX: 8, minY: 2, maxY: 4 };
+    const b: FootprintRect = { minX: 5, maxX: 7, minY: 5, maxY: 9 };
+    expect(isoBehind(a, b)).toBe(true);
+    expect(isoBehind(b, a)).toBe(false);
+  });
+
+  it("overlapping rects → neither is behind the other", () => {
+    const a: FootprintRect = { minX: 3, maxX: 7, minY: 3, maxY: 7 };
+    const b: FootprintRect = { minX: 5, maxX: 9, minY: 5, maxY: 9 };
+    expect(isoBehind(a, b)).toBe(false);
+    expect(isoBehind(b, a)).toBe(false);
+  });
+
+  it("8x8 tenshu (0-7,0-7) is behind tree at (3,8) via Y separation — unambiguous", () => {
+    const tenshu: FootprintRect = { minX: 0, maxX: 7, minY: 0, maxY: 7 };
+    const tree: FootprintRect = { minX: 3, maxX: 3, minY: 8, maxY: 8 };
+    expect(isoBehind(tenshu, tree)).toBe(true); // tenshu.maxY=7 < tree.minY=8
+    expect(isoBehind(tree, tenshu)).toBe(false); // tree.maxX=3 >= tenshu.minX=0
+  });
+
+  it("building (1-4,1-4) is behind wall at (6,1) via X separation — unambiguous", () => {
+    // building's entire footprint is to the west (smaller x) of the wall
+    const building: FootprintRect = { minX: 1, maxX: 4, minY: 1, maxY: 4 };
+    const wall: FootprintRect = { minX: 6, maxX: 6, minY: 1, maxY: 1 };
+    expect(isoBehind(building, wall)).toBe(true); // building.maxX=4 < wall.minX=6
+    expect(isoBehind(wall, building)).toBe(false); // wall.maxY=1 is NOT < building.minY=1 (equal)
+  });
+
+  it("diagonal case: each is behind the other in a different axis (both true)", () => {
+    // wall at (9,3): to the east AND north of building (5-8,5-8)
+    // This creates an ambiguous ordering that the sort handles via depth fallback.
+    const building: FootprintRect = { minX: 5, maxX: 8, minY: 5, maxY: 8 };
+    const wall: FootprintRect = { minX: 9, maxX: 9, minY: 3, maxY: 3 };
+    expect(isoBehind(building, wall)).toBe(true); // building.maxX=8 < wall.minX=9
+    expect(isoBehind(wall, building)).toBe(true); // wall.maxY=3 < building.minY=5
+  });
+});
+
+describe("isoSort: footprint-based painter's order", () => {
+  it("bug(a): tree at south of 8x8 tenshu drawn after tenshu", () => {
+    // tenshu (0-7,0-7) maxX+maxY=14, tree at (3,8) maxX+maxY=11
+    // Primary sort puts tree first (smaller depth) — wrong
+    // Bubble: tenshu.maxY=7 < tree.minY=8 (unambiguous) → swap to [tenshu, tree]
+    const tenshu = { id: "tenshu", rect: { minX: 0, maxX: 7, minY: 0, maxY: 7 } };
+    const tree = { id: "tree", rect: { minX: 3, maxX: 3, minY: 8, maxY: 8 } };
+    expect(isoSortRects([tree, tenshu])).toEqual(["tenshu", "tree"]);
+    expect(isoSortRects([tenshu, tree])).toEqual(["tenshu", "tree"]);
+  });
+
+  it("bug(b): south-anchored building drawn before wall to its east", () => {
+    // Building (1-4, 1-4) maxX+maxY=8, wall at (6,1) maxX+maxY=7
+    // Primary sort puts wall first (smaller depth) — wrong: building.maxX=4 < wall.minX=6
+    // isoBehind(wall,building) false (wall.maxY=1 NOT < building.minY=1), so unambiguous swap
+    const building = { id: "bldg", rect: { minX: 1, maxX: 4, minY: 1, maxY: 4 } };
+    const wall = { id: "wall", rect: { minX: 6, maxX: 6, minY: 1, maxY: 1 } };
+    expect(isoSortRects([wall, building])).toEqual(["bldg", "wall"]);
+    expect(isoSortRects([building, wall])).toEqual(["bldg", "wall"]);
+  });
+
+  it("diagonal/ambiguous case: uses depth fallback, no oscillation", () => {
+    // wall(9,3) and building(5-8,5-8): each is behind the other along a different axis
+    // → mutual isoBehind → skip swap → depth fallback: wall(12) before building(16)
+    const wall = { id: "wall", rect: { minX: 9, maxX: 9, minY: 3, maxY: 3 } };
+    const building = { id: "bldg", rect: { minX: 5, maxX: 8, minY: 5, maxY: 8 } };
+    expect(isoBehind(wall.rect, building.rect)).toBe(true); // mutual diagonal
+    expect(isoBehind(building.rect, wall.rect)).toBe(true);
+    // No swap: wall(12) stays before building(16)
+    expect(isoSortRects([wall, building])).toEqual(["wall", "bldg"]);
+    expect(isoSortRects([building, wall])).toEqual(["wall", "bldg"]);
+  });
+
+  it("three items: chain resolved correctly via multiple bubble passes", () => {
+    // wall(5,1) behind building(5-8,5-8) via Y [unambiguous]
+    // building behind tree(5,9) via Y [unambiguous]
+    // Primary sort by depth: wall=6, tree=14, building=16 → [wall, tree, building] (wrong)
+    // Bubble pass 1: swap tree↔building → [wall, building, tree] ✓
+    const wall = { id: "wall", rect: { minX: 5, maxX: 5, minY: 1, maxY: 1 } };
+    const building = { id: "bldg", rect: { minX: 5, maxX: 8, minY: 5, maxY: 8 } };
+    const tree = { id: "tree", rect: { minX: 5, maxX: 5, minY: 9, maxY: 9 } };
+    expect(isoSortRects([tree, wall, building])).toEqual(["wall", "bldg", "tree"]);
+    expect(isoSortRects([building, tree, wall])).toEqual(["wall", "bldg", "tree"]);
   });
 });

@@ -11,7 +11,8 @@ import {
 } from "./camera";
 import { buildingAssetCandidates } from "./gameRules";
 import { addAlignmentDebugOverlay } from "./overlayLayer";
-import { buildingDrawY, buildingRenderPoint, decorationDrawY } from "./renderGeometry";
+import { buildingRenderPoint, isoBehind } from "./renderGeometry";
+import type { FootprintRect } from "./renderGeometry";
 
 export function drawSceneLayer(
   unitLayer: Container,
@@ -51,7 +52,7 @@ export function drawSceneLayer(
     }
     sceneItems.push({ kind: "decoration", item: decoration });
   }
-  sceneItems.sort(compareSceneItems);
+  isoSort(sceneItems);
 
   for (const entry of sceneItems) {
     if (entry.kind === "building") {
@@ -200,20 +201,61 @@ type SceneItemForSort =
   | { readonly kind: "building"; readonly item: BuildingSnapshot }
   | { readonly kind: "decoration"; readonly item: MapDecoration };
 
-function sceneItemY(entry: SceneItemForSort): number {
-  return entry.kind === "building"
-    ? buildingDrawY(entry.item)
-    : decorationDrawY(entry.item);
-}
-
 function sceneItemId(entry: SceneItemForSort): string {
   return entry.kind === "building" ? entry.item.id : `dec:${entry.item.position.x},${entry.item.position.y}`;
 }
 
-function compareSceneItems(a: SceneItemForSort, b: SceneItemForSort): number {
-  const dy = sceneItemY(a) - sceneItemY(b);
-  if (dy !== 0) {
-    return dy;
+function sceneItemRect(entry: SceneItemForSort): FootprintRect {
+  if (entry.kind === "building") {
+    const fp = entry.item.footprint;
+    if (fp.length === 0) {
+      const { x, y } = entry.item.position;
+      return { minX: x, maxX: x, minY: y, maxY: y };
+    }
+    let minX = fp[0]!.x, maxX = fp[0]!.x, minY = fp[0]!.y, maxY = fp[0]!.y;
+    for (let i = 1; i < fp.length; i++) {
+      const c = fp[i]!;
+      if (c.x < minX) minX = c.x;
+      if (c.x > maxX) maxX = c.x;
+      if (c.y < minY) minY = c.y;
+      if (c.y > maxY) maxY = c.y;
+    }
+    return { minX, maxX, minY, maxY };
   }
-  return sceneItemId(a).localeCompare(sceneItemId(b));
+  const { x, y } = entry.item.position;
+  return { minX: x, maxX: x, minY: y, maxY: y };
+}
+
+// Isometric painter's sort for scene items (buildings + decorations).
+// Step 1: primary sort by south-corner depth (maxX+maxY) — a good approximation
+//   but non-transitive for separated footprints (e.g. 1x1 wall to the NE of a
+//   large building, or a tree south of an 8x8 tenshu).
+// Step 2: a few bubble passes that swap adjacent pairs only when the footprint
+//   separation test definitively says they are in the wrong order.
+function isoSort(items: SceneItemForSort[]): void {
+  items.sort((a, b) => {
+    const ra = sceneItemRect(a);
+    const rb = sceneItemRect(b);
+    const diff = (ra.maxX + ra.maxY) - (rb.maxX + rb.maxY);
+    if (diff !== 0) return diff;
+    return sceneItemId(a).localeCompare(sceneItemId(b));
+  });
+
+  const PASSES = 3;
+  for (let pass = 0; pass < PASSES; pass++) {
+    let swapped = false;
+    for (let i = 0; i < items.length - 1; i++) {
+      const ra = sceneItemRect(items[i]!);
+      const rb = sceneItemRect(items[i + 1]!);
+      // items[i+1] is provably behind items[i] AND not in a mutual/diagonal relationship
+      // (both separated in opposing axes → depth fallback keeps primary-sort order).
+      if (isoBehind(rb, ra) && !isoBehind(ra, rb)) {
+        const tmp = items[i]!;
+        items[i] = items[i + 1]!;
+        items[i + 1] = tmp;
+        swapped = true;
+      }
+    }
+    if (!swapped) break;
+  }
 }
