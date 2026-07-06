@@ -1,4 +1,4 @@
-import type { EntityId, OwnerId } from "@asama/shared";
+import type { CellCoord, EntityId, OwnerId } from "@asama/shared";
 import { UNIT_TYPE_AFFINITY } from "@asama/content";
 import { detachLadder } from "./buildings";
 import { ELEVATION_BALANCE, elevationAt } from "./elevation";
@@ -70,6 +70,7 @@ export function updateCombat(world: WorldState): void {
     } else {
       target.hp -= damage;
     }
+    recordAttackEvents(world, unit, target, damage);
     unit.targetId = target.id;
     unit.attackCooldownRemaining = unit.attackCooldownTicks;
   }
@@ -178,11 +179,69 @@ function damageAgainst(world: WorldState, attacker: UnitState, target: AttackTar
   return Math.max(1, Math.round(attacker.attackDamage * multiplier * elevationMultiplier));
 }
 
+// Combat-event reporting (P6, snapshot `events`): every resolved attack emits
+// one attack_melee/attack_ranged plus one paired damage event. Facts only —
+// damage numbers and target selection above are untouched.
+function recordAttackEvents(world: WorldState, attacker: UnitState, target: AttackTarget, damage: number): void {
+  const isBuilding = (target as Partial<BuildingState>).footprint !== undefined;
+  const targetId = isBuilding ? null : target.id;
+  const targetBuildingId = isBuilding ? target.id : null;
+  const targetPos = copyCell(target.position);
+  const tick = world.currentTick;
+  world.combatEvents.push(
+    {
+      kind: attacker.attackRange > 1 ? "attack_ranged" : "attack_melee",
+      tick,
+      attackerId: attacker.id,
+      attackerOwner: attacker.owner,
+      unitType: attacker.type,
+      attackerPos: copyCell(attacker.position),
+      targetId,
+      targetBuildingId,
+      targetPos,
+      highGround: elevationAt(world, attacker.position) > targetElevation(world, target)
+    },
+    { kind: "damage", tick, attackerId: attacker.id, targetId, targetBuildingId, targetPos, amount: damage }
+  );
+}
+
+function copyCell(cell: CellCoord): CellCoord {
+  return { x: cell.x, y: cell.y };
+}
+
 function removeDeadEntities(world: WorldState): void {
   const deadUnitIds = new Set(world.units.filter((unit) => unit.hp <= 0).map((unit) => unit.id));
   const deadBuildingIds = new Set(world.buildings.filter((building) => building.hp <= 0).map((building) => building.id));
   if (deadUnitIds.size === 0 && deadBuildingIds.size === 0) {
     return;
+  }
+
+  // Death/destruction facts for the renderer: the entities disappear from
+  // this tick's state, so effects must key off these events.
+  for (const unit of world.units) {
+    if (unit.hp <= 0) {
+      world.combatEvents.push({
+        kind: "unit_died",
+        tick: world.currentTick,
+        unitId: unit.id,
+        unitType: unit.type,
+        owner: unit.owner,
+        position: copyCell(unit.position)
+      });
+    }
+  }
+  for (const building of world.buildings) {
+    if (building.hp <= 0) {
+      world.combatEvents.push({
+        kind: "building_destroyed",
+        tick: world.currentTick,
+        buildingId: building.id,
+        buildingType: building.type,
+        owner: building.owner,
+        position: copyCell(building.position),
+        footprint: building.footprint
+      });
+    }
   }
 
   world.units = world.units.filter((unit) => unit.hp > 0);

@@ -251,6 +251,93 @@ export interface SupplyRetreatSnapshot {
   readonly remainingTicks: number;
 }
 
+// --- Combat events (P6: 戦闘エフェクト用の事実データ) ------------------------
+//
+// The simulation reports combat *facts* only; visual physics (arrow flight
+// time, smoke duration, ragdoll timing…) is entirely the renderer's choice.
+// Events accumulate per sim tick and are drained into the next snapshot, so a
+// snapshot carries every event that happened since the previous snapshot
+// (normally 2 ticks at 20 tps / 10 snapshots per second) and each event is
+// delivered exactly once.
+
+/** Fields shared by both attack event kinds. Exactly one of `targetId` /
+ *  `targetBuildingId` is non-null. */
+export interface CombatAttackEventBase {
+  /** Sim tick at which the attack resolved (damage applied on this tick). */
+  readonly tick: number;
+  readonly attackerId: UnitId;
+  readonly attackerOwner: OwnerId;
+  /** Attacker's unit type — the renderer derives the projectile/effect from
+   *  this (archer → arrow, musketeer → smoke + muzzle flash, …). */
+  readonly unitType: UnitType;
+  readonly attackerPos: CellCoord;
+  readonly targetId: UnitId | null;
+  readonly targetBuildingId: BuildingId | null;
+  /** Target's anchor cell at resolution time (buildings: anchor position). */
+  readonly targetPos: CellCoord;
+  /** True when the high-ground bonus applied (attacker strictly above the
+   *  target, elevation-contract.md: +1 range, x1.25 damage). */
+  readonly highGround: boolean;
+}
+
+/** A melee strike resolved (attackRange 1 units: 槍・刀・騎馬・工兵). */
+export interface AttackMeleeEventSnapshot extends CombatAttackEventBase {
+  readonly kind: "attack_melee";
+}
+
+/** A ranged shot resolved (attackRange > 1 units: 弓 archer / 鉄砲 musketeer). */
+export interface AttackRangedEventSnapshot extends CombatAttackEventBase {
+  readonly kind: "attack_ranged";
+}
+
+/** Damage was applied. Paired 1:1 with the same-tick attack event of the same
+ *  `attackerId` (hit numbers / flash display). For a melee strike on a wall
+ *  with an attached ladder the amount went to the ladder, still reported
+ *  against the building (siege-system.md: 梯子破壊). */
+export interface DamageEventSnapshot {
+  readonly kind: "damage";
+  readonly tick: number;
+  /** Unit whose attack caused this damage (correlate with the attack event). */
+  readonly attackerId: UnitId;
+  readonly targetId: UnitId | null;
+  readonly targetBuildingId: BuildingId | null;
+  readonly targetPos: CellCoord;
+  readonly amount: number;
+}
+
+/** A unit died in combat. The unit is absent from `units` in the same
+ *  snapshot, so death VFX must key off this event. Enemy retreat despawns
+ *  (supply_cut) are not deaths and emit no event. */
+export interface UnitDiedEventSnapshot {
+  readonly kind: "unit_died";
+  readonly tick: number;
+  readonly unitId: UnitId;
+  readonly unitType: UnitType;
+  readonly owner: OwnerId;
+  readonly position: CellCoord;
+}
+
+/** A building was destroyed by combat damage (hp reached 0). The building is
+ *  absent from `buildings` in the same snapshot; `footprint` is included so
+ *  multi-tile debris can be placed. Player demolition and engineer moat fill
+ *  emit no event. */
+export interface BuildingDestroyedEventSnapshot {
+  readonly kind: "building_destroyed";
+  readonly tick: number;
+  readonly buildingId: BuildingId;
+  readonly buildingType: BuildingType;
+  readonly owner: OwnerId;
+  readonly position: CellCoord;
+  readonly footprint: readonly CellCoord[];
+}
+
+export type CombatEventSnapshot =
+  | AttackMeleeEventSnapshot
+  | AttackRangedEventSnapshot
+  | DamageEventSnapshot
+  | UnitDiedEventSnapshot
+  | BuildingDestroyedEventSnapshot;
+
 export interface WorldSnapshot {
   readonly currentTick: number;
   readonly invalidMoveTarget: CellCoord | null;
@@ -266,6 +353,11 @@ export interface WorldSnapshot {
   readonly units: readonly UnitSnapshot[];
   readonly buildings: readonly BuildingSnapshot[];
   readonly supplyRetreat: SupplyRetreatSnapshot;
+  /** Combat events since the previous snapshot (exactly-once delivery: the
+   *  sim's buffer is drained into the snapshot). Empty when nothing happened;
+   *  optional only for compatibility with pre-P6 payloads — snapshotWorld
+   *  always sets it. */
+  readonly events?: readonly CombatEventSnapshot[];
   /** Tick at which the next enemy wave spawns, or null if all waves have been deployed. */
   readonly nextWaveTick?: number | null;
   /** Tick at which the hold-out victory triggers (null: no time victory). */

@@ -70,7 +70,8 @@ export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScen
     },
     map: createInitialMap(),
     units: [],
-    buildings: []
+    buildings: [],
+    combatEvents: []
   };
 
   // Elevation is applied before buildings so placement validation can enforce
@@ -455,6 +456,14 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
   const nextWaveTick = nextWave !== undefined ? nextWave.tick : null;
   const holdDeadlineTick = world.scenario.victory.holdTicks;
 
+  // Drain the combat-event buffer: the snapshot consumer receives each event
+  // exactly once (P6 contract). While the sim is paused or after the outcome
+  // is decided updateWorld does not run, so no new events accumulate and
+  // subsequent snapshots carry an empty array; events from the deciding tick
+  // itself are still delivered by the first snapshot taken after it.
+  const events = world.combatEvents;
+  world.combatEvents = [];
+
   return {
     currentTick: world.currentTick,
     invalidMoveTarget: world.invalidMoveTarget,
@@ -495,6 +504,7 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
       elevation: elevationAt(world, unit.position)
     })),
     buildings: world.buildings.map((building) => snapshotBuilding(world, building)),
+    events,
     nextWaveTick,
     holdDeadlineTick
   };

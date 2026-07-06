@@ -44,6 +44,8 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
   world.scenario ??= { waves: mvpDefenseScenario.waves, victory: mvpDefenseScenario.victory };
   world.supplyState ??= { hasHadCart: false, retreatTimerActive: false, retreatTimerRemaining: 0 };
   world.map.decorations ??= [];
+  // Pre-P6 saves: start with an empty combat-event buffer.
+  world.combatEvents ??= [];
   world.economy ??= {
     gold: ECONOMY_BALANCE.initialGold,
     weapons: ECONOMY_BALANCE.initialWeapons,
