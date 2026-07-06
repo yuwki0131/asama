@@ -92,8 +92,29 @@ export const buildingDefinitions: Record<BuildingType, BuildingDefinition> = Obj
 ) as Record<BuildingType, BuildingDefinition>;
 
 export function canPlaceBuilding(world: WorldState, position: CellCoord, definition: BuildingDefinition): boolean {
+  if (isBridge(definition.type)) {
+    return canPlaceBridgeAt(world, position);
+  }
   const footprint = absoluteFootprint(position, definition.footprint);
   return footprint.every((cell) => canPlaceOnCell(world, cell, definition));
+}
+
+function canPlaceBridgeAt(world: WorldState, position: CellCoord): boolean {
+  if (!isInsideMap(position)) return false;
+  if (getCell(world, position).terrain !== "water") return false;
+  if (getBuildingAt(world, position) !== null) return false;
+  if (world.units.some(u => sameCell(u.position, position))) return false;
+
+  const orientation = bridgeOrientation(world, position);
+  for (const offset of bridgeRelativeFootprint(orientation)) {
+    if (offset.x === 0 && offset.y === 0) continue;
+    const cell = { x: position.x + offset.x, y: position.y + offset.y };
+    if (!isInsideMap(cell)) return false;
+    if (!getCell(world, cell).passable) return false;
+    if (getBuildingAt(world, cell) !== null) return false;
+    if (world.units.some(u => sameCell(u.position, cell))) return false;
+  }
+  return true;
 }
 
 export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefinition): void {
@@ -103,7 +124,12 @@ export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefini
       throw new Error(`Unknown initial building type: ${placement.type}`);
     }
 
-    if (!canPlaceBuilding(world, placement.position, definition)) {
+    // Bridges in existing scenarios use pre-1x3 single-cell positions; validate
+    // with the legacy per-cell check until scenarios are updated (see requests/sim2content).
+    const canPlace = isBridge(definition.type)
+      ? canPlaceOnCell(world, placement.position, definition)
+      : canPlaceBuilding(world, placement.position, definition);
+    if (!canPlace) {
       throw new Error(`Cannot place initial building ${placement.type} at ${placement.position.x},${placement.position.y}`);
     }
 
@@ -116,6 +142,10 @@ export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefini
   }
 }
 
+export function bridgeAbsoluteFootprint(world: WorldState, position: CellCoord): CellCoord[] {
+  return absoluteFootprint(position, bridgeRelativeFootprint(bridgeOrientation(world, position)));
+}
+
 export function createBuildingState(
   world: WorldState,
   type: BuildingType,
@@ -123,13 +153,14 @@ export function createBuildingState(
   definition: BuildingDefinition,
   owner: OwnerId
 ): BuildingState {
+  const footprint = absoluteFootprint(position, definition.footprint);
   return {
     id: `building:${world.nextBuildingId}`,
     owner,
     type,
     category: definition.category,
     position,
-    footprint: absoluteFootprint(position, definition.footprint),
+    footprint,
     hp: definition.maxHp,
     maxHp: definition.maxHp,
     lifecycleState: "intact",
@@ -368,11 +399,20 @@ function connectsTo(building: BuildingState, neighbor: BuildingState | null): bo
   );
 }
 
+function bridgeOrientation(world: WorldState, position: CellCoord): "x" | "y" {
+  const east = { x: position.x + 1, y: position.y };
+  const west = { x: position.x - 1, y: position.y };
+  return [east, west].some(coord => isWaterNeighbor(world, coord)) ? "y" : "x";
+}
+
+function bridgeRelativeFootprint(orientation: "x" | "y"): readonly CellCoord[] {
+  return orientation === "y"
+    ? [{ x: 0, y: -1 }, { x: 0, y: 0 }, { x: 0, y: 1 }]
+    : [{ x: -1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }];
+}
+
 function bridgeOrientedAssetId(world: WorldState, building: BuildingState): string {
-  const east = { x: building.position.x + 1, y: building.position.y };
-  const west = { x: building.position.x - 1, y: building.position.y };
-  const useY = [east, west].some(coord => isWaterNeighbor(world, coord));
-  return useY ? `${building.assetId}.y` : building.assetId;
+  return `${building.assetId}.${bridgeOrientation(world, building.position)}3`;
 }
 
 function isWaterNeighbor(world: WorldState, coord: CellCoord): boolean {

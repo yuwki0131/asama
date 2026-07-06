@@ -1,7 +1,7 @@
 import { mvpDefenseScenario } from "@asama/content";
 import type { CellCoord, EconomySnapshot, FoodSnapshot, PlayerCommand, WorldSnapshot } from "@asama/shared";
 import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
-import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
+import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, bridgeAbsoluteFootprint, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
 import { getAttackTarget, areEnemies, updateAttackMoveBehavior, updateCombat } from "./combat";
 import { updateEconomy, applyMarketTrade, applyRecruitCommand, populationCapacity, currentApproval, maxRecruitPool } from "./economy";
 import { updateEnemyAi } from "./enemyAi";
@@ -21,6 +21,7 @@ import {
   cellKey,
   clampCell,
   intactBuildingsOfType,
+  isBridge,
   manhattan,
   sameCell,
   type SnapshotOptions,
@@ -189,7 +190,9 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       return "Cannot place building there";
     }
 
-    const footprint = absoluteFootprint(position, definition.footprint);
+    const footprint = isBridge(command.buildingType)
+      ? bridgeAbsoluteFootprint(world, position)
+      : absoluteFootprint(position, definition.footprint);
     world.buildings.push({
       id: `building:${world.nextBuildingId}`,
       owner: "player",
