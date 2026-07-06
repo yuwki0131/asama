@@ -79,8 +79,10 @@ export async function newPage(browser: Browser): Promise<{ context: BrowserConte
 // ── Test bridge wait ─────────────────────────────────────────────────────────
 
 /** Navigate to the game and wait until window.__asamaTest and a first snapshot
- *  are ready. `query` selects DEV fixtures, e.g. "?scenario=elevation-fixture". */
-export async function openGame(page: Page, query = ""): Promise<void> {
+ *  are ready. `query` selects DEV fixtures, e.g. "?scenario=elevation-fixture".
+ *  Defaults to "?scenario=concentric-castle" to bypass the scenario selection
+ *  screen so E2E tests start directly into the game. */
+export async function openGame(page: Page, query = "?scenario=concentric-castle"): Promise<void> {
   const consoleMsgs: string[] = [];
   page.on("console", (msg) => {
     const loc = msg.location();
