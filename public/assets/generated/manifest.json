@@ -4999,6 +4999,582 @@
   ],
   "animations": [
     {
+      "assetId": "unit.archer.anim.attack",
+      "unitAssetId": "unit.archer",
+      "action": "attack",
+      "kind": "unit",
+      "file": "generated/unit-archer-attack-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.archer.anim.death",
+      "unitAssetId": "unit.archer",
+      "action": "death",
+      "kind": "unit",
+      "file": "generated/unit-archer-death-sheet.png",
+      "sheet": {
+        "width": 144,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 3,
+      "fps": 8,
+      "loop": false,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.archer.anim.idle",
+      "unitAssetId": "unit.archer",
+      "action": "idle",
+      "kind": "unit",
+      "file": "generated/unit-archer-idle-sheet.png",
+      "sheet": {
+        "width": 288,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.archer.anim.walk",
+      "unitAssetId": "unit.archer",
+      "action": "walk",
+      "kind": "unit",
+      "file": "generated/unit-archer-walk-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.cavalry.anim.attack",
+      "unitAssetId": "unit.cavalry",
+      "action": "attack",
+      "kind": "unit",
+      "file": "generated/unit-cavalry-attack-sheet.png",
+      "sheet": {
+        "width": 512,
+        "height": 512
+      },
+      "frame": {
+        "width": 64,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8125
+      }
+    },
+    {
+      "assetId": "unit.cavalry.anim.death",
+      "unitAssetId": "unit.cavalry",
+      "action": "death",
+      "kind": "unit",
+      "file": "generated/unit-cavalry-death-sheet.png",
+      "sheet": {
+        "width": 192,
+        "height": 512
+      },
+      "frame": {
+        "width": 64,
+        "height": 64
+      },
+      "frames": 3,
+      "fps": 8,
+      "loop": false,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8125
+      }
+    },
+    {
+      "assetId": "unit.cavalry.anim.idle",
+      "unitAssetId": "unit.cavalry",
+      "action": "idle",
+      "kind": "unit",
+      "file": "generated/unit-cavalry-idle-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 64,
+        "height": 64
+      },
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8125
+      }
+    },
+    {
+      "assetId": "unit.cavalry.anim.walk",
+      "unitAssetId": "unit.cavalry",
+      "action": "walk",
+      "kind": "unit",
+      "file": "generated/unit-cavalry-walk-sheet.png",
+      "sheet": {
+        "width": 512,
+        "height": 512
+      },
+      "frame": {
+        "width": 64,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8125
+      }
+    },
+    {
+      "assetId": "unit.engineer.anim.attack",
+      "unitAssetId": "unit.engineer",
+      "action": "attack",
+      "kind": "unit",
+      "file": "generated/unit-engineer-attack-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.engineer.anim.death",
+      "unitAssetId": "unit.engineer",
+      "action": "death",
+      "kind": "unit",
+      "file": "generated/unit-engineer-death-sheet.png",
+      "sheet": {
+        "width": 144,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 3,
+      "fps": 8,
+      "loop": false,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.engineer.anim.idle",
+      "unitAssetId": "unit.engineer",
+      "action": "idle",
+      "kind": "unit",
+      "file": "generated/unit-engineer-idle-sheet.png",
+      "sheet": {
+        "width": 288,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.engineer.anim.walk",
+      "unitAssetId": "unit.engineer",
+      "action": "walk",
+      "kind": "unit",
+      "file": "generated/unit-engineer-walk-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.musketeer.anim.attack",
+      "unitAssetId": "unit.musketeer",
+      "action": "attack",
+      "kind": "unit",
+      "file": "generated/unit-musketeer-attack-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.musketeer.anim.death",
+      "unitAssetId": "unit.musketeer",
+      "action": "death",
+      "kind": "unit",
+      "file": "generated/unit-musketeer-death-sheet.png",
+      "sheet": {
+        "width": 144,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 3,
+      "fps": 8,
+      "loop": false,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.musketeer.anim.idle",
+      "unitAssetId": "unit.musketeer",
+      "action": "idle",
+      "kind": "unit",
+      "file": "generated/unit-musketeer-idle-sheet.png",
+      "sheet": {
+        "width": 288,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.musketeer.anim.walk",
+      "unitAssetId": "unit.musketeer",
+      "action": "walk",
+      "kind": "unit",
+      "file": "generated/unit-musketeer-walk-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
       "assetId": "unit.spear_ashigaru.anim.attack",
       "unitAssetId": "unit.spear_ashigaru",
       "action": "attack",
@@ -5140,6 +5716,78 @@
       "anchor": {
         "x": 0.5,
         "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.supply_cart.anim.death",
+      "unitAssetId": "unit.supply_cart",
+      "action": "death",
+      "kind": "unit",
+      "file": "generated/unit-supply-cart-death-sheet.png",
+      "sheet": {
+        "width": 168,
+        "height": 384
+      },
+      "frame": {
+        "width": 56,
+        "height": 48
+      },
+      "frames": 3,
+      "fps": 8,
+      "loop": false,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7916666666666666
+      }
+    },
+    {
+      "assetId": "unit.supply_cart.anim.walk",
+      "unitAssetId": "unit.supply_cart",
+      "action": "walk",
+      "kind": "unit",
+      "file": "generated/unit-supply-cart-walk-sheet.png",
+      "sheet": {
+        "width": 448,
+        "height": 384
+      },
+      "frame": {
+        "width": 56,
+        "height": 48
+      },
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7916666666666666
       }
     }
   ]
