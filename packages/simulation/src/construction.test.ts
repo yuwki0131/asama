@@ -1,3 +1,4 @@
+import { buildingSpecs } from "@asama/content";
 import { describe, expect, it } from "vitest";
 import { applyCommand, createInitialWorld, snapshotWorld, type WorldState } from "./index";
 import type { BuildingSnapshot, BuildingType, CellCoord, PlayerCommand, UnitType } from "@asama/shared";
@@ -204,7 +205,7 @@ describe("courtyard terrain override", () => {
     expect(cell?.assetId).toMatch(/^terrain\.dirt\./);
   });
 
-  it("all footprint cells of an 8x8 lot building get dirt assetId", () => {
+  it("all footprint cells of the tenshu lot get dirt assetId", () => {
     const world = createInitialWorld();
     normalizeMap(world);
     resetBuildings(world);
@@ -212,8 +213,9 @@ describe("courtyard terrain override", () => {
 
     expect(place(world, "tenshu", { x: 20, y: 20 })).toBeNull();
 
-    for (let dy = 0; dy < 8; dy += 1) {
-      for (let dx = 0; dx < 8; dx += 1) {
+    const { width, height } = buildingSpecs.tenshu.footprint;
+    for (let dy = 0; dy < height; dy += 1) {
+      for (let dx = 0; dx < width; dx += 1) {
         const cell = world.map.cells[(20 + dy) * world.map.width + (20 + dx)];
         expect(cell?.assetId).toMatch(/^terrain\.dirt\./);
       }
