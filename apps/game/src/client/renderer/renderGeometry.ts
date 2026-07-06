@@ -2,6 +2,20 @@ import type { BuildingSnapshot, CellCoord, MapDecoration } from "@asama/shared";
 import { cellToWorld, gridCornerToWorld } from "./camera";
 import { isCenterAnchoredBuilding } from "./gameRules";
 
+export type FootprintRect = {
+  readonly minX: number;
+  readonly maxX: number;
+  readonly minY: number;
+  readonly maxY: number;
+};
+
+// Returns true if A's footprint is provably further from the viewer than B's:
+// A is fully separated to the northeast (lower x) or northwest (lower y) of B.
+// Used by the isometric painter's sort in sceneLayer.
+export function isoBehind(a: FootprintRect, b: FootprintRect): boolean {
+  return a.maxX < b.minX || a.maxY < b.minY;
+}
+
 export function buildingRenderPoint(building: BuildingSnapshot): CellCoord {
   if (building.footprint.length === 0) {
     return cellToWorld(building.position);
@@ -22,12 +36,7 @@ export function decorationDrawY(decoration: MapDecoration): number {
   return cellToWorld(decoration.position).y;
 }
 
-function footprintBounds(footprint: readonly CellCoord[]): {
-  readonly minX: number;
-  readonly maxX: number;
-  readonly minY: number;
-  readonly maxY: number;
-} {
+export function footprintBounds(footprint: readonly CellCoord[]): FootprintRect {
   return footprint.reduce(
     (bounds, cell) => ({
       minX: Math.min(bounds.minX, cell.x),
