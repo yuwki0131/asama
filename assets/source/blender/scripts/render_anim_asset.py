@@ -63,9 +63,15 @@ def main() -> None:
     builder = resolve_anim_model(args.model)
     if builder is None:
         raise SystemExit(f"unknown animated model: {args.model}; known: {sorted(ANIM_MODEL_REGISTRY)}")
-    keyframer = resolve_action(args.action)
+    # Try model-specific action first ("unit-archer-rigged:attack"), then
+    # the plain name ("attack") so per-unit overrides work transparently.
+    keyframer = resolve_action(f"{args.model}:{args.action}")
     if keyframer is None:
-        raise SystemExit(f"unknown action: {args.action}; known: {sorted(ACTIONS)}")
+        keyframer = resolve_action(args.action)
+    if keyframer is None:
+        raise SystemExit(
+            f"unknown action: {args.action} (model: {args.model}); known: {sorted(ACTIONS)}"
+        )
     if args.frames < 1:
         raise SystemExit("--frames must be >= 1")
 
