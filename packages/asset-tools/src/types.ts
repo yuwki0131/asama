@@ -92,6 +92,14 @@ export type AssetSource =
       readonly collection?: string;
       readonly renderSpec: string;
       readonly supersample?: number;
+      /**
+       * Isolated model registry (e.g. "elevation"): the asset renders via
+       * scripts/render_<registry>_asset.py and its cache key hashes
+       * render_asset_lib/<registry>/ instead of the static registry.py.
+       * Omitted (default) keeps the exact legacy script and cache key, so
+       * adding registries never invalidates existing assets.
+       */
+      readonly registry?: string;
     }
   | {
       readonly type: "raster";

@@ -11,6 +11,7 @@
     "assets:render:blender": "node --import tsx src/index.ts assets:render:blender",
     "assets:render:anim": "node --import tsx src/index.ts assets:render:anim",
     "assets:anim:contact-sheet": "tsx src/generateAnimContactSheets.ts",
+    "assets:elevation:contact-sheet": "tsx src/generateElevationContactSheet.ts",
     "assets:blender:calibration": "node --import tsx src/index.ts assets:blender:calibration",
     "assets:import:raster": "tsx src/index.ts assets:import:raster",
     "assets:postprocess": "tsx src/index.ts assets:postprocess",

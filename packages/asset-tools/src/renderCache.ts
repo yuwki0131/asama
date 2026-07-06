@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import type { BlenderRenderSpec, ProductionAssetSpec } from "./types";
@@ -19,6 +19,8 @@ export interface RenderCacheMetadata {
   readonly transparentBackground: boolean;
   readonly supersample: number;
   readonly renderScriptSha256: string;
+  /** Isolated model registry (absent for legacy static assets). */
+  readonly registry?: string;
 }
 
 export type RenderCacheIndex = Record<string, RenderCacheMetadata>;
@@ -67,16 +69,34 @@ export async function computeRenderCacheKey(
   }
 
   const libDir = join(dirname(pythonScript), "render_asset_lib");
-  const domain = modelToDomain(spec.model);
-  const [entry, coreModule, materialsModule, registryModule, domainModule] = await Promise.all([
-    readFile(pythonScript),
-    readFile(join(libDir, "core.py")),
-    readFile(join(libDir, "materials.py")),
-    readFile(join(libDir, "registry.py")),
-    readFile(join(libDir, `${domain}.py`))
-  ]);
-
-  const composite = Buffer.concat([entry, coreModule, materialsModule, registryModule, domainModule]);
+  const registry = asset.source.registry;
+  let composite: Buffer;
+  if (registry === undefined) {
+    // Legacy static path: byte-identical key input so the 387 existing
+    // renders stay cached forever.
+    const domain = modelToDomain(spec.model);
+    const [entry, coreModule, materialsModule, registryModule, domainModule] = await Promise.all([
+      readFile(pythonScript),
+      readFile(join(libDir, "core.py")),
+      readFile(join(libDir, "materials.py")),
+      readFile(join(libDir, "registry.py")),
+      readFile(join(libDir, `${domain}.py`))
+    ]);
+    composite = Buffer.concat([entry, coreModule, materialsModule, registryModule, domainModule]);
+  } else {
+    // Isolated registry: hash its entry script plus every module of
+    // render_asset_lib/<registry>/ (and the shared core/materials, which the
+    // isolated builders also import). The static registry.py stays out.
+    const registryDir = join(libDir, registry);
+    const moduleNames = (await readdir(registryDir)).filter((name) => name.endsWith(".py")).sort();
+    const buffers = await Promise.all([
+      readFile(pythonScript),
+      readFile(join(libDir, "core.py")),
+      readFile(join(libDir, "materials.py")),
+      ...moduleNames.map((name) => readFile(join(registryDir, name)))
+    ]);
+    composite = Buffer.concat(buffers);
+  }
   const renderScriptSha256 = sha256Hex(composite);
 
   const metadata: RenderCacheMetadata = {
@@ -94,7 +114,8 @@ export async function computeRenderCacheKey(
     renderSpec: spec.renderSpec,
     transparentBackground: spec.transparentBackground,
     supersample: spec.supersample ?? 1,
-    renderScriptSha256
+    renderScriptSha256,
+    ...(registry === undefined ? {} : { registry })
   };
 
   const keyInput = {
@@ -104,7 +125,8 @@ export async function computeRenderCacheKey(
     anchor: metadata.anchor,
     renderSpec: metadata.renderSpec,
     transparentBackground: metadata.transparentBackground,
-    supersample: metadata.supersample
+    supersample: metadata.supersample,
+    ...(registry === undefined ? {} : { registry })
   };
 
   return {
@@ -201,7 +223,8 @@ function parseRenderCacheMetadata(value: unknown): RenderCacheMetadata | null {
     renderSpec: requiredString(record.renderSpec, "renderSpec"),
     transparentBackground: requiredBoolean(record.transparentBackground, "transparentBackground"),
     supersample: typeof record.supersample === "number" ? record.supersample : 1,
-    renderScriptSha256: requiredString(record.renderScriptSha256, "renderScriptSha256")
+    renderScriptSha256: requiredString(record.renderScriptSha256, "renderScriptSha256"),
+    ...(typeof record.registry === "string" && record.registry.length > 0 ? { registry: record.registry } : {})
   };
 }
 

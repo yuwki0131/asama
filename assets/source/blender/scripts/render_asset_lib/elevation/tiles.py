@@ -1,0 +1,528 @@
+"""Elevation tile builders (P4c, docs/10_development/elevation-contract.md).
+
+Cliff faces (natural rock), ishigaki revetments, SE outer corners, slopes
+(dirt cutting / stone stairway) and slope side wedges.
+
+Conventions
+-----------
+- One elevation step = 24 screen px = LEVEL world units of z (sqrt(6)/4:
+  24 / (PX_PER_UNIT * sin 60deg)).
+- Face / corner tiles: the OWNING (high) cell's top surface plane is z = 0
+  and the footprint center is the origin, exactly like a flat terrain tile.
+  The face descends to z = -h * LEVEL. Canvas 64 x (32 + 24h), anchor
+  (32, 16): the top diamond projects where the cell's surface tile will be
+  drawn afterwards, so everything at z >= 0 near the top edge may be
+  overdrawn by the surface tile by design.
+- Slope tiles: low edge at z = 0, high edge at z = +LEVEL. Canvas 64x56,
+  anchor (32, 40) (24 px of headroom above a normal tile).
+- Ishigaki walls keep their BASE on the cell boundary and lean back with a
+  concave sori profile; the (hidden) physical top edge sits inside the
+  diamond where the surface tile covers it. This keeps every canvas within
+  the contract size (a base flaring outward would overflow 64x(32+24h)).
+"""
+from __future__ import annotations
+
+import math
+
+import bpy
+
+from .. import core
+from ..core import add_beam, add_box, add_mesh, finish_material, make_material, map_box, map_xy
+from ..materials import (
+    make_bank_material,
+    make_mud_material,
+    make_noise_material,
+)
+
+LEVEL = math.sqrt(6.0) / 4.0  # world z per elevation step == 24 screen px
+BLEED = 0.03  # seam guard along tile joins, same spirit as TERRAIN_BLEED
+
+
+def _hash01(*values: float) -> float:
+    """Deterministic pseudo-random in [0,1) from a few floats."""
+    x = 0.0
+    for index, value in enumerate(values):
+        x += math.sin((value + 1.37) * (12.9898 + 7.77 * index)) * 43758.5453
+    return x - math.floor(x)
+
+
+# --- shared materials --------------------------------------------------------
+
+def _rock_materials() -> list[bpy.types.Material]:
+    """Stylized bedrock in three value steps: strata segments pick one each
+    so the face reads as layered rock, not coursed masonry."""
+    return [
+        make_noise_material("CliffRockD", (0.082, 0.075, 0.064), (0.158, 0.146, 0.126), scale=4.0),
+        make_noise_material("CliffRockM", (0.140, 0.128, 0.108), (0.262, 0.245, 0.212), scale=4.0),
+        make_noise_material("CliffRockL", (0.188, 0.174, 0.150), (0.330, 0.310, 0.270), scale=4.0),
+    ]
+
+
+def _elev_ishigaki_material(name: str = "ElevIshigakiStone") -> bpy.types.Material:
+    """Nozura-zumi masonry for the 1-tile revetments: same palette and seam
+    treatment as the tenshu's make_ishigaki_material, but with larger stones
+    (voronoi 3.4 instead of 5.5) so a 24px-per-step wall reads at the same
+    boulder scale as the big keep mound it sits beside."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    voronoi = nodes.new("ShaderNodeTexVoronoi")
+    voronoi.feature = "DISTANCE_TO_EDGE"
+    voronoi.inputs["Scale"].default_value = 3.4
+
+    seam_ramp = nodes.new("ShaderNodeValToRGB")
+    seam_ramp.color_ramp.elements[0].position = 0.0
+    seam_ramp.color_ramp.elements[0].color = (0.22, 0.20, 0.17, 1.0)
+    seam_ramp.color_ramp.elements[1].position = 0.09
+    seam_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    links.new(voronoi.outputs["Distance"], seam_ramp.inputs["Fac"])
+
+    stone_noise = nodes.new("ShaderNodeTexNoise")
+    stone_noise.inputs["Scale"].default_value = 2.6
+    stone_ramp = nodes.new("ShaderNodeValToRGB")
+    stone_ramp.color_ramp.elements[0].position = 0.3
+    stone_ramp.color_ramp.elements[0].color = (0.150, 0.130, 0.100, 1.0)
+    stone_ramp.color_ramp.elements[1].position = 0.8
+    stone_ramp.color_ramp.elements[1].color = (0.265, 0.235, 0.185, 1.0)
+    links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
+
+    mix = nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    mix.inputs["Factor"].default_value = 1.0
+    links.new(stone_ramp.outputs["Color"], mix.inputs["A"])
+    links.new(seam_ramp.outputs["Color"], mix.inputs["B"])
+    if core.CURRENT_STYLE == "pbr":
+        links.new(mix.outputs["Result"], bsdf.inputs["Base Color"])
+    else:
+        finish_material(material, mix.outputs["Result"])
+    return material
+
+
+def _step_stone_material() -> bpy.types.Material:
+    """Cut stone slabs for stairways, lighter than the rough ishigaki."""
+    return make_noise_material("StepStone", (0.165, 0.155, 0.135), (0.290, 0.275, 0.245), scale=7.0)
+
+
+def _quoin_material() -> bpy.types.Material:
+    """Dressed sangi-zumi corner stones, a touch lighter than the wall."""
+    return make_noise_material("QuoinStone", (0.150, 0.140, 0.118), (0.252, 0.238, 0.205), scale=3.0)
+
+
+def _moss_material() -> bpy.types.Material:
+    return make_material("BaseMoss", (0.078, 0.098, 0.062, 1.0))
+
+
+def _grass_lip_materials() -> tuple[bpy.types.Material, bpy.types.Material]:
+    return (
+        make_material("LipGrassD", (0.105, 0.150, 0.070, 1.0)),
+        make_material("LipGrassL", (0.158, 0.202, 0.096, 1.0)),
+    )
+
+
+def _root_material() -> bpy.types.Material:
+    return make_material("RootWood", (0.088, 0.066, 0.042, 1.0))
+
+
+# --- face-space helpers ------------------------------------------------------
+# Faces live on the S (map y=+0.5) or E (map x=+0.5) boundary of the owning
+# cell. "a" runs along the edge in [-0.5, 0.5]; "o" is the inset measured
+# INWARD from the boundary (o=0 on the boundary, positive into the cell).
+
+def _face_box(scene, name: str, face: str, a0: float, a1: float,
+              o0: float, o1: float, z0: float, z1: float, material) -> None:
+    if face == "s":
+        low, high = (a0, 0.5 - o1, z0), (a1, 0.5 - o0, z1)
+    else:
+        low, high = (0.5 - o1, a0, z0), (0.5 - o0, a1, z1)
+    add_box(scene, name, *map_box(low, high), material)
+
+
+def _face_point(face: str, a: float, o: float, z: float) -> tuple[float, float, float]:
+    if face == "s":
+        return (a, 0.5 - o, z)
+    return (0.5 - o, a, z)
+
+
+def _grass_overhang(scene, face: str, seed: float, count: int = 9, heavy: bool = True,
+                    o_base: float = -0.022, z_base: float = -0.002) -> None:
+    """Grass fringe drooping over the visible top of a face, plus a couple of
+    exposed roots (cliff only).
+
+    Thin slabs hugging the face just below the perceived lip. (o_base,
+    z_base) anchor the fringe: vertical cliffs keep the default (cell
+    boundary, just under z=0); battered ishigaki passes the sori inset at a
+    z low enough not to be covered by the surface tile drawn afterwards."""
+    grass_dark, grass_light = _grass_lip_materials()
+    root = _root_material()
+    for index in range(count):
+        t = -0.46 + 0.92 * index / max(1, count - 1)
+        a = t + 0.04 * (_hash01(seed, index, 1.0) - 0.5)
+        width = 0.09 + 0.09 * _hash01(seed, index, 2.0)
+        droop = 0.035 + 0.075 * _hash01(seed, index, 3.0)
+        material = grass_dark if _hash01(seed, index, 6.0) < 0.6 else grass_light
+        _face_box(scene, f"Tuft{face}{index}", face, a - width / 2.0, a + width / 2.0,
+                  o_base, o_base + 0.026, z_base - droop, z_base, material)
+    if heavy:
+        for index in range(2):
+            a = -0.25 + 0.55 * index + 0.1 * _hash01(seed, index, 4.0)
+            tip_out = 0.06 + 0.03 * _hash01(seed, index, 5.0)
+            start = _face_point(face, a, o_base + 0.027, z_base - 0.06)
+            end = _face_point(face, a + 0.05, o_base - tip_out, z_base - 0.22)
+            add_beam(scene, f"Root{face}{index}", start, end, 0.026, root, tip_thickness=0.010)
+
+
+# --- cliff (natural rock) ----------------------------------------------------
+
+def _band_layout(h: int, seed: float) -> list[tuple[float, float, float, int]]:
+    """Irregular strata: list of (z0, z1, base_inset, tone) from bottom to top.
+
+    Band heights vary, the top band hugs the cell boundary (o~0) so it meets
+    the surface tile, lower bands jitter inward. Adjacent bands with
+    different insets produce lit ledges (band tops) and shadowed overhangs
+    under the fixed painterly light."""
+    depth = h * LEVEL
+    n_bands = 3 * h
+    weights = [0.65 + 0.7 * _hash01(seed, band, 21.0) for band in range(n_bands)]
+    total = sum(weights)
+    layout: list[tuple[float, float, float, int]] = []
+    z = -depth
+    for band in range(n_bands):
+        z0 = z
+        z = min(0.0, z + depth * weights[band] / total)
+        z1 = 0.0 if band == n_bands - 1 else min(0.0, z + 0.012)
+        top_band = band == n_bands - 1
+        base = 0.012 * _hash01(seed, band, 23.0) if top_band else 0.025 + 0.115 * _hash01(seed, band, 11.0)
+        tone = int(3.0 * _hash01(seed, band, 22.0)) % 3
+        layout.append((z0, z1, base, tone))
+    return layout
+
+
+def _cliff_wall(scene, face: str, h: int, rocks, seed: float,
+                a_end_fn=None) -> None:
+    """One rock wall along a face. a_end_fn(inset) clips the far (corner)
+    end per band so the corner piece can interlock its two walls."""
+    for band, (z0, z1, base, tone) in enumerate(_band_layout(h, seed)):
+        top_band = z1 >= 0.0
+        segments = 3 + int(2.0 * _hash01(seed, band, 31.0))
+        a_start = -0.5 - 0.02
+        a_stop = 0.5 + 0.02 if a_end_fn is None else a_end_fn(base)
+        span = a_stop - a_start
+        # Staggered joints: jittered per band so segments do not align in
+        # columns (which would read as coursed masonry).
+        offsets = sorted(_hash01(seed, band, 41.0 + k) for k in range(segments - 1))
+        cuts = [a_start] + [a_start + span * o for o in offsets] + [a_stop]
+        for seg in range(segments):
+            a0, a1 = cuts[seg], cuts[seg + 1] + 0.004
+            if a1 - a0 < 0.03:
+                continue
+            inset = base if top_band else max(0.012, min(0.19, base + 0.09 * (_hash01(seed, band, seg) - 0.5)))
+            # Tone drifts per SEGMENT around the band's tone so joints read
+            # as broken rock, not running masonry courses.
+            seg_tone = tone
+            roll = _hash01(seed, band, 61.0 + seg)
+            if roll > 0.72:
+                seg_tone = min(2, tone + 1)
+            elif roll < 0.28:
+                seg_tone = max(0, tone - 1)
+            _face_box(scene, f"Rock{face}{band}{seg}", face, a0, a1,
+                      inset, inset + 0.19, z0, z1, rocks[seg_tone])
+
+
+def build_cliff_face(scene: bpy.types.Scene, face: str, h: int) -> None:
+    """Natural rock cliff, S or E face, h steps tall. Canvas 64x(32+24h),
+    anchor (32,16)."""
+    rocks = _rock_materials()
+    seed = (1.0 if face == "s" else 2.0) + 10.0 * h
+    _cliff_wall(scene, face, h, rocks, seed)
+    _grass_overhang(scene, face, seed)
+
+
+def build_cliff_corner(scene: bpy.types.Scene, h: int) -> None:
+    """SE outer corner of a rock cliff: complete replacement piece carrying
+    BOTH the S and the E face of the owning cell (draw it INSTEAD of
+    face.s + face.e when both edges drop by h)."""
+    rocks = _rock_materials()
+    seed_s, seed_e = 3.0 + 10.0 * h, 4.0 + 10.0 * h
+    _cliff_wall(scene, "s", h, rocks, seed_s)
+    _cliff_wall(scene, "e", h, rocks, seed_e)
+    # Craggy buttress softening the arris where the two jittered walls meet.
+    depth = h * LEVEL
+    n_blocks = 2 * h + 1
+    for block in range(n_blocks):
+        z0 = -depth + depth * block / n_blocks
+        z1 = min(0.0, z0 + depth / n_blocks + 0.01)
+        o_s = 0.010 + 0.06 * _hash01(seed_s, block, 51.0)
+        o_e = 0.010 + 0.06 * _hash01(seed_e, block, 51.0)
+        size = 0.16 + 0.06 * _hash01(seed_s, block, 52.0)
+        tone = int(3.0 * _hash01(seed_e, block, 53.0)) % 3
+        low = (0.5 - o_e - size, 0.5 - o_s - size, z0)
+        high = (0.5 - o_e, 0.5 - o_s, z1)
+        add_box(scene, f"Arris{block}", *map_box(low, high), rocks[tone])
+    _grass_overhang(scene, "s", seed_s, count=5)
+    _grass_overhang(scene, "e", seed_e, count=5)
+
+
+# --- ishigaki (castle revetment) ---------------------------------------------
+
+ISHIGAKI_BATTER = 0.30  # top inset as a fraction of the wall height (sori)
+SORI_ROWS = 4
+
+
+def _sori_inset(s: float, height: float) -> float:
+    """Concave ishigaki profile: vertical at the top, flaring at the base.
+    s runs 0 (base, on the cell boundary) .. 1 (top)."""
+    return ISHIGAKI_BATTER * height * (1.0 - (1.0 - s) ** 2)
+
+
+def _ishigaki_strip(scene, name: str, face: str, h: int, stone,
+                    a_start: float, a_end_fn) -> None:
+    """Battered wall strip along one face. a_end_fn(inset) gives the far end
+    of each row so the corner piece can taper both walls onto the arris."""
+    height = h * LEVEL
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for k in range(SORI_ROWS + 1):
+        s = k / SORI_ROWS
+        inset = _sori_inset(s, height)
+        z = -height + height * s
+        p0 = _face_point(face, a_start, inset, z)
+        p1 = _face_point(face, a_end_fn(inset), inset, z)
+        vertices.append((*map_xy(p0[0], p0[1]), p0[2]))
+        vertices.append((*map_xy(p1[0], p1[1]), p1[2]))
+        if k > 0:
+            base = 2 * (k - 1)
+            faces.append((base, base + 1, base + 3, base + 2))
+    add_mesh(scene, name, vertices, faces, stone)
+
+
+def _ishigaki_base_moss(scene, face: str, h: int, a0: float, a1: float) -> None:
+    """Damp moss line where the wall meets the lower ground (aging)."""
+    height = h * LEVEL
+    moss = _moss_material()
+    _face_box(scene, f"Moss{face}", face, a0, a1, -0.008, 0.0, -height, -height + 0.06, moss)
+
+
+def _ishigaki_fringe_anchor(h: int) -> tuple[float, float]:
+    """(o_base, z_base) putting the grass fringe on the battered wall surface
+    just below the screen line where the surface tile stops covering it."""
+    height = h * LEVEL
+    z_base = -0.18 * height
+    o_base = _sori_inset(1.0 + z_base / height, height) - 0.022
+    return o_base, z_base
+
+
+def build_ishigaki_face(scene: bpy.types.Scene, face: str, h: int) -> None:
+    """Nozura-zumi ishigaki, S or E face, h steps tall; same masonry material
+    and batter language as the tenshu mound. Canvas 64x(32+24h), anchor (32,16)."""
+    stone = _elev_ishigaki_material()
+    _ishigaki_strip(scene, f"Wall{face}", face, h, stone,
+                    -0.5 - BLEED, lambda inset: 0.5 + BLEED)
+    _ishigaki_base_moss(scene, face, h, -0.5 - BLEED, 0.5 + BLEED)
+    seed = (5.0 if face == "s" else 6.0) + 10.0 * h
+    o_base, z_base = _ishigaki_fringe_anchor(h)
+    _grass_overhang(scene, face, seed, count=5, heavy=False, o_base=o_base, z_base=z_base)
+
+
+def build_ishigaki_corner(scene: bpy.types.Scene, h: int) -> None:
+    """SE outer ishigaki corner with sangi-zumi quoins: complete replacement
+    piece carrying BOTH faces (draw INSTEAD of face.s + face.e)."""
+    stone = _elev_ishigaki_material()
+    quoin = _quoin_material()
+    height = h * LEVEL
+
+    # Both faces taper onto the shared arris (x = y = 0.5 - inset(s)).
+    _ishigaki_strip(scene, "WallS", "s", h, stone, -0.5 - BLEED, lambda inset: 0.5 - inset)
+    _ishigaki_strip(scene, "WallE", "e", h, stone, -0.5 - BLEED, lambda inset: 0.5 - inset)
+    _ishigaki_base_moss(scene, "s", h, -0.5 - BLEED, 0.5)
+    _ishigaki_base_moss(scene, "e", h, -0.5 - BLEED, 0.5)
+
+    # Sangi-zumi: alternating long/short dressed stones down the arris,
+    # following the sori profile and protruding slightly past both faces.
+    # The inset is sampled at the BOTTOM of each course so the stone never
+    # floats in front of the flaring wall below it.
+    n_quoins = 3 * h
+    for j in range(n_quoins):
+        s0 = j / n_quoins
+        s1 = (j + 1) / n_quoins
+        z0 = -height + height * s0
+        z1 = -height + height * s1
+        corner = 0.5 - _sori_inset(s0, height)
+        out = corner + 0.022
+        long_side = 0.23 + 0.04 * _hash01(7.0, j, h)
+        if j % 2 == 0:
+            low = (corner - long_side, corner - 0.11, z0)
+            high = (out, out, z1 + 0.004)
+        else:
+            low = (corner - 0.11, corner - long_side, z0)
+            high = (out, out, z1 + 0.004)
+        add_box(scene, f"Quoin{j}", *map_box(low, high), quoin)
+
+    o_base, z_base = _ishigaki_fringe_anchor(h)
+    _grass_overhang(scene, "s", 8.0 + h, count=3, heavy=False, o_base=o_base, z_base=z_base)
+    _grass_overhang(scene, "e", 9.0 + h, count=3, heavy=False, o_base=o_base, z_base=z_base)
+
+
+# --- slopes ------------------------------------------------------------------
+# Slope space: u runs 0 (low boundary) .. 1 (high boundary), v across the
+# ramp in [-0.5, 0.5]. z(u) = u * LEVEL.
+
+def _slope_axes(toward: str):
+    if toward == "n":
+        return lambda u, v: (v, 0.5 - u)
+    if toward == "s":
+        return lambda u, v: (v, -0.5 + u)
+    if toward == "e":
+        return lambda u, v: (-0.5 + u, v)
+    return lambda u, v: (0.5 - u, v)
+
+
+def _slope_quad(scene, name: str, pt, u0: float, u1: float, v0: float, v1: float,
+                lift: float, material) -> None:
+    """Quad following the slope surface, lifted `lift` above it."""
+    corners = [(u0, v0), (u1, v0), (u1, v1), (u0, v1)]
+    vertices = [(*map_xy(*pt(u, v)), u * LEVEL + lift) for u, v in corners]
+    add_mesh(scene, name, vertices, [(0, 1, 2, 3)], material)
+
+
+def _slope_side_walls(scene, pt, material) -> None:
+    """Vertical earth/stone walls closing the wedge at v=+-0.5. They project
+    into the slope's own diamond, so same-level neighbours drawn later cover
+    them and they only show where the terrain beside the ramp is lower
+    (built-in fallback for the dedicated side tiles)."""
+    for side_index, v in enumerate((-0.5, 0.5)):
+        vertices = [
+            (*map_xy(*pt(0.0, v)), 0.0),
+            (*map_xy(*pt(1.0, v)), LEVEL),
+            (*map_xy(*pt(1.0, v)), 0.0),
+        ]
+        add_mesh(scene, f"SideWall{side_index}", vertices, [(0, 1, 2)], material)
+
+
+def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
+    """Dirt cutting (mountain path) climbing one step toward `toward`.
+    Canvas 64x56, anchor (32,40)."""
+    pt = _slope_axes(toward)
+    mud = make_mud_material("SlopeMud")
+    margin = make_material("SlopeMargin", (0.096, 0.078, 0.052, 1.0))
+    rib = make_material("SlopeRib", (0.072, 0.056, 0.038, 1.0))
+    stone = make_noise_material("SlopeStone", (0.108, 0.100, 0.090), (0.172, 0.162, 0.146), scale=6.0)
+    bank = make_bank_material(seed=2.0)
+
+    _slope_quad(scene, "Surface", pt, -BLEED, 1.0 + BLEED, -0.5 - BLEED, 0.5 + BLEED, 0.0, mud)
+    _slope_side_walls(scene, pt, bank)
+    # Worn shoulders framing the trodden center.
+    for side_index, (v0, v1) in enumerate(((-0.5 - BLEED, -0.40), (0.40, 0.5 + BLEED))):
+        _slope_quad(scene, f"Margin{side_index}", pt, -BLEED, 1.0 + BLEED, v0, v1, 0.004, margin)
+    # Erosion bars / footholds across the path.
+    for index, u in enumerate((0.20, 0.45, 0.70, 0.92)):
+        jitter = 0.04 * (_hash01(20.0, index, 1.0) - 0.5)
+        _slope_quad(scene, f"Rib{index}", pt, u + jitter, u + jitter + 0.055,
+                    -0.42, 0.42, 0.012, rib)
+    # A few half-buried stones along the shoulders.
+    for index in range(3):
+        u = 0.15 + 0.65 * _hash01(21.0, index, 1.0)
+        v = (-0.35 if index % 2 == 0 else 0.31) + 0.08 * _hash01(21.0, index, 2.0)
+        size = 0.035 + 0.03 * _hash01(21.0, index, 3.0)
+        x, y = pt(u, v)
+        z = u * LEVEL
+        add_box(scene, f"PathStone{index}",
+                *map_box((x - size, y - size, z - 0.03), (x + size, y + size, z + 0.022)), stone)
+
+
+def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
+    """Stone stairway (castle interior) climbing one step toward `toward`.
+    Six slab courses of 4px rise each. Canvas 64x56, anchor (32,40)."""
+    pt = _slope_axes(toward)
+    stone = _step_stone_material()
+    worn = make_noise_material("StepStoneWorn", (0.132, 0.128, 0.112), (0.235, 0.228, 0.205), scale=7.0)
+
+    n_steps = 6
+    for k in range(n_steps):
+        u0 = k / n_steps - (BLEED if k == 0 else 0.015)
+        u1 = (k + 1) / n_steps + (BLEED if k == n_steps - 1 else 0.0)
+        z_top = LEVEL * (k + 1) / n_steps
+        # Each course is 2-3 slabs with jittered joints (aged, hand-fit).
+        cuts = [-0.5, -0.5 + 0.34 + 0.10 * _hash01(30.0, k, 1.0),
+                0.5 - 0.30 - 0.10 * _hash01(30.0, k, 2.0), 0.5]
+        for slab in range(3):
+            v0, v1 = cuts[slab], cuts[slab + 1]
+            if v1 - v0 < 0.05:
+                continue
+            du = 0.012 * (_hash01(30.0, k, 3.0 + slab) - 0.5)
+            material = worn if _hash01(31.0, k, float(slab)) > 0.72 else stone
+            x0, y0 = pt(u0 + du, v0)
+            x1, y1 = pt(u1 + du, v1)
+            low = (min(x0, x1), min(y0, y1), 0.0)
+            high = (max(x0, x1), max(y0, y1), z_top - 0.006 * (slab % 2))
+            add_box(scene, f"Step{k}{slab}", *map_box(low, high), material)
+
+
+def build_slope(scene: bpy.types.Scene, skin: str, toward: str) -> None:
+    if skin == "dirt":
+        build_slope_dirt(scene, toward)
+    else:
+        build_slope_ishigaki(scene, toward)
+
+
+# --- slope side wedges -------------------------------------------------------
+
+def build_slope_side(scene: bpy.types.Scene, skin: str, toward: str, side: str) -> None:
+    """Triangular cheek wall under a slope's open flank (drawn when the cell
+    beside the ramp sits at the slope's base level). side "e" = wall on the
+    ramp's map x=+0.5 boundary, side "s" = map y=+0.5 boundary.
+    Canvas 64x56, anchor (32,40)."""
+    # Height profile along the boundary, in the boundary's own coordinate t.
+    if side == "e":
+        edge_point = lambda t, o, z: (0.5 - o, t, z)
+        rising = toward == "s"  # z grows toward t=+0.5?
+    else:
+        edge_point = lambda t, o, z: (t, 0.5 - o, z)
+        rising = toward == "e"
+
+    def z_top(t: float) -> float:
+        s = (t + 0.5) if rising else (0.5 - t)
+        return LEVEL * max(0.0, min(1.0, s))
+
+    grass_dark, grass_light = _grass_lip_materials()
+    if skin == "dirt":
+        material = make_bank_material(seed=3.0)
+        batter = 0.0
+    else:
+        material = _elev_ishigaki_material()
+        batter = 0.22  # top inset fraction of local height, scaled so the
+        # zero-height end stays exactly on the boundary corner.
+
+    steps = 6
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for i in range(steps + 1):
+        t = -0.5 - BLEED + (1.0 + 2 * BLEED) * i / steps
+        height = z_top(max(-0.5, min(0.5, t)))
+        top = edge_point(t, batter * height, height)
+        bottom = edge_point(t, 0.0, 0.0)
+        vertices.append((*map_xy(top[0], top[1]), top[2]))
+        vertices.append((*map_xy(bottom[0], bottom[1]), bottom[2]))
+        if i > 0:
+            base = 2 * (i - 1)
+            faces.append((base, base + 1, base + 3, base + 2))
+    add_mesh(scene, "SideWedge", vertices, faces, material)
+
+    # Grass lip tumbling over the slanted top edge.
+    for index in range(4):
+        t = -0.35 + 0.70 * index / 3.0 + 0.05 * (_hash01(40.0, index, 1.0) - 0.5)
+        height = z_top(t)
+        if height < 0.10:
+            continue
+        droop = 0.05 + 0.05 * _hash01(40.0, index, 2.0)
+        o_top = batter * height
+        p_low = edge_point(t - 0.045, o_top - 0.015, height - droop)
+        p_high = edge_point(t + 0.045, o_top + 0.045, height - 0.002)
+        low = (min(p_low[0], p_high[0]), min(p_low[1], p_high[1]), p_low[2])
+        high = (max(p_low[0], p_high[0]), max(p_low[1], p_high[1]), p_high[2])
+        add_box(scene, f"SideTuft{index}", *map_box(low, high),
+                grass_dark if index % 2 == 0 else grass_light)

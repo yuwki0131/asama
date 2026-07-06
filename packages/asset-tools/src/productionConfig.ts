@@ -93,13 +93,20 @@ function parseSource(value: unknown, index: number): AssetSource {
     }
     assertString(source.renderSpec, `assets[${index}].source.renderSpec`);
     const supersample = parseSupersample(source.supersample, index);
+    if (source.registry !== undefined) {
+      assertString(source.registry, `assets[${index}].source.registry`);
+      if (!/^[a-z][a-z0-9_]*$/.test(source.registry)) {
+        throw new Error(`Invalid assets[${index}].source.registry`);
+      }
+    }
     return {
       type: "blender",
       ...(source.model === undefined ? {} : { model: source.model }),
       ...(source.scene === undefined ? {} : { scene: source.scene }),
       ...(source.collection === undefined ? {} : { collection: source.collection }),
       renderSpec: source.renderSpec,
-      ...(supersample === undefined ? {} : { supersample })
+      ...(supersample === undefined ? {} : { supersample }),
+      ...(source.registry === undefined ? {} : { registry: source.registry })
     };
   }
   if (source.type === "raster") {

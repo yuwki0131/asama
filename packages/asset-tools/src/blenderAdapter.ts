@@ -79,6 +79,19 @@ export function defaultBlenderRenderScript(repoRoot: string): string {
   return join(repoRoot, "assets/source/blender/scripts/render_asset.py");
 }
 
+/**
+ * Entry script for an asset: definitions may opt into an isolated model
+ * registry (source.registry) rendered by its own scripts/render_<registry>_asset.py.
+ * Assets without a registry keep the legacy render_asset.py, byte-identical
+ * pipeline behavior.
+ */
+export function blenderRenderScriptForAsset(repoRoot: string, asset: ProductionAssetSpec): string {
+  if (asset.source.type === "blender" && asset.source.registry !== undefined) {
+    return join(repoRoot, `assets/source/blender/scripts/render_${asset.source.registry}_asset.py`);
+  }
+  return defaultBlenderRenderScript(repoRoot);
+}
+
 function appendOptional(args: unknown[], flag: string, value: string | number | undefined): void {
   if (value !== undefined) {
     args.push(flag, String(value));
