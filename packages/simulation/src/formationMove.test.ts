@@ -285,24 +285,42 @@ describe("attack move and stop", () => {
       expect.unreachable();
       return;
     }
-    // Put an enemy on the route, well inside aggro range of the column.
-    enemy.position = { x: 58, y: 62 };
+    // Scenario-agnostic setup: march from the units' own centroid and put
+    // the enemy directly on that route, inside aggro range.
+    const marchers = world.units.filter((unit) => ids.includes(unit.id));
+    const cx = Math.round(marchers.reduce((s, u) => s + u.position.x, 0) / marchers.length);
+    const cy = Math.round(marchers.reduce((s, u) => s + u.position.y, 0) / marchers.length);
 
-    const rejection = applyCommand(world, {
-      type: "attackMoveUnits",
-      unitIds: ids,
-      destination: { x: 50, y: 66 },
-      issuedAtTick: 0,
-      clientSequence: 1
-    });
+    // Find a passable march destination around the garrison, then put the
+    // enemy on the straight line toward it, inside aggro range.
+    let rejection: string | null = "no destination tried";
+    let dest = { x: cx, y: cy };
+    for (const [dx, dy] of [[8, 8], [-8, -8], [8, -8], [-8, 8], [12, 0], [0, 12], [-12, 0], [0, -12]]) {
+      dest = { x: cx + dx, y: cy + dy };
+      enemy.position = { x: cx + dx - Math.sign(dx), y: cy + dy - Math.sign(dy) };
+      rejection = applyCommand(world, {
+        type: "attackMoveUnits",
+        unitIds: ids,
+        destination: dest,
+        issuedAtTick: 0,
+        clientSequence: 1
+      });
+      if (rejection === null) {
+        break;
+      }
+    }
     expect(rejection).toBeNull();
 
-    for (let i = 0; i < 60; i += 1) {
+    // Engagement is transient (the column may kill the enemy well before the
+    // march ends), so observe it during the run instead of at the end.
+    let engagedAtSomePoint = false;
+    for (let i = 0; i < 300 && !engagedAtSomePoint; i += 1) {
       updateWorld(world);
+      engagedAtSomePoint = world.units.some(
+        (unit) => ids.includes(unit.id) && unit.targetId === enemy.id
+      );
     }
-
-    const engaged = world.units.filter((unit) => ids.includes(unit.id) && unit.targetId === enemy.id);
-    expect(engaged.length).toBeGreaterThan(0);
+    expect(engagedAtSomePoint).toBe(true);
   });
 
   it("stop clears movement, targets and tasks", () => {

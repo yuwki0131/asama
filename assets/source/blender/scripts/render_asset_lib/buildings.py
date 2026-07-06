@@ -646,16 +646,18 @@ def build_tenshu_graybox(scene: bpy.types.Scene) -> None:
     # NOTE: no yard apron in the sprite — the courtyard ground is rendered
     # as terrain (sim converts lot cells to dirt), otherwise the flat ground
     # pixels break Y-sorting against neighbouring tall decorations.
-    cx, cy = -4.0, -4.0  # lot center
+    # Lot is 7x7 and the ishigaki fills it almost fully so the blocked
+    # footprint matches what the player sees (no invisible dead ring).
+    cx, cy = -3.5, -3.5  # lot center
 
     def centered(w: float):
         return (cx - w / 2, cy - w / 2), (cx + w / 2, cy + w / 2)
 
     # Ishigaki: two battered stages.
     (l0, _), (h0, _2) = (centered(7.4)[0], None), (centered(7.4)[1], None)
-    low, high = centered(6.6)
+    low, high = centered(6.8)
     add_frustum(scene, "IshigakiLower", low, high, 0.0, 0.85, 0.75, stone)
-    low, high = centered(5.2)
+    low, high = centered(5.4)
     add_frustum(scene, "IshigakiUpper", low, high, 0.85, 1.5, 0.5, stone)
 
     # Tiers: (width, body height, roof rise, ridge axis) — tall tower with

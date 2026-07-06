@@ -4923,8 +4923,8 @@
         "file": "assets/source/raster/building-tenshu-v2.png"
       },
       "geometry": {
-        "footprintWidth": 8,
-        "footprintHeight": 8,
+        "footprintWidth": 7,
+        "footprintHeight": 7,
         "canvasWidth": 640,
         "canvasHeight": 520,
         "anchorX": 320,

@@ -209,7 +209,7 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     type: "tenshu",
     category: "objective",
     maxHp: 9999,
-    footprint: { width: 8, height: 8 },
+    footprint: { width: 7, height: 7 },
     passable: false,
     assetId: "building.tenshu.main",
     gateState: null
