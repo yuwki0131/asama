@@ -92,6 +92,9 @@ importers:
         specifier: workspace:*
         version: link:../shared
     devDependencies:
+      '@asama/simulation':
+        specifier: workspace:*
+        version: link:../simulation
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
