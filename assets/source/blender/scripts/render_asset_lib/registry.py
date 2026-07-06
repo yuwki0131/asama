@@ -9,6 +9,7 @@ from .terrain import (
     build_terrain_mask, build_terrain_base,
     build_road_mask, build_dry_moat_mask, build_water_moat_mask, build_trench_moat,
     build_earth_bridge, build_wood_bridge,
+    build_earth_bridge_span, build_wood_bridge_span,
 )
 from .buildings import (
     build_storehouse_graybox, build_storehouse_showcase,
@@ -45,6 +46,10 @@ MODEL_REGISTRY = {
     "building-earth-bridge-y": lambda scene: build_earth_bridge(scene, axis="y"),
     "building-wood-bridge": build_wood_bridge,
     "building-wood-bridge-y": lambda scene: build_wood_bridge(scene, axis="y"),
+    "building-wood-bridge-x3": build_wood_bridge_span,
+    "building-wood-bridge-y3": lambda scene: build_wood_bridge_span(scene, axis="y"),
+    "building-earth-bridge-x3": build_earth_bridge_span,
+    "building-earth-bridge-y3": lambda scene: build_earth_bridge_span(scene, axis="y"),
     "unit-engineer": build_unit_engineer,
     "wall-ladder": build_wall_ladder,
     "tree-pine": build_tree_pine,

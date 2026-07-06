@@ -38,17 +38,21 @@ describe("functional: move all units", () => {
   });
 
   it("all player units arrive near destination after moveUnits command", async () => {
-    const destination = { x: 68, y: 58 }; // open terrain east of player spawn
     const formationRange = 10;
 
-    // Get initial snapshot info
+    // Scenario-agnostic destination: a short march from the units' own
+    // centroid, so it works wherever the scenario spawns the garrison
+    // (inside castle walls included).
     const initial = await page.evaluate(() => {
       const snap = window.__asamaTest?.getSnapshot();
       if (!snap) throw new Error("no snapshot");
-      const playerIds = snap.units.filter((u) => u.owner === "player").map((u) => u.id);
-      return { playerIds, baseTick: snap.currentTick };
+      const players = snap.units.filter((u) => u.owner === "player");
+      const playerIds = players.map((u) => u.id);
+      const cx = Math.round(players.reduce((s, u) => s + u.position.x, 0) / players.length);
+      const cy = Math.round(players.reduce((s, u) => s + u.position.y, 0) / players.length);
+      return { playerIds, baseTick: snap.currentTick, destination: { x: cx + 4, y: cy + 4 } };
     });
-    const { playerIds, baseTick } = initial;
+    const { playerIds, baseTick, destination } = initial;
     expect(playerIds.length, "No player units found").toBeGreaterThan(0);
 
     // Issue select + move commands
@@ -68,6 +72,9 @@ describe("functional: move all units", () => {
     let unitPositions: { id: string; x: number; y: number }[] = [];
 
     while (Date.now() < deadline) {
+      // Re-assert 4x each iteration: the UI's own speed state can race a
+      // single early setSpeed call and drop the sim back to 1x.
+      await page.evaluate(() => window.__asamaTest?.setSpeed(4));
       const current = await page.evaluate(
         (tgt) => {
           const snap = window.__asamaTest?.getSnapshot();

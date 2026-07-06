@@ -1,7 +1,9 @@
 import { createInitialWorld, applyCommand, deserializeWorld, serializeWorld, snapshotWorld, updateWorld } from "@asama/simulation";
+import { DEFAULT_SCENARIO } from "@asama/content";
 import { SIM_TICKS_PER_SECOND, SNAPSHOTS_PER_SECOND, type MainToWorkerMessage, type WorkerToMainMessage } from "@asama/shared";
 
-let world = createInitialWorld();
+// The game boots the first-play scenario; sim tests keep their own fixtures.
+let world = createInitialWorld(DEFAULT_SCENARIO);
 let speed: 0 | 1 | 2 | 4 = 0;
 let lastTime = performance.now();
 let accumulatedMs = 0;
@@ -13,7 +15,7 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
   const message = event.data;
 
   if (message.type === "init") {
-    world = createInitialWorld();
+    world = createInitialWorld(DEFAULT_SCENARIO);
     lastSnapshotTick = world.currentTick;
     post({ type: "ready", snapshot: snapshotWorld(world, { includeMapCells: true }) });
     return;

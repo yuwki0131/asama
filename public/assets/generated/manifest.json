@@ -2357,6 +2357,50 @@
       }
     },
     {
+      "assetId": "building.wood_bridge.x3",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-x3.png",
+      "width": 192,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.625
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y3",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y3.png",
+      "width": 192,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.625
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x3",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-x3.png",
+      "width": 192,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.625
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y3",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-y3.png",
+      "width": 192,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.625
+      }
+    },
+    {
       "assetId": "terrain.grass.base",
       "kind": "terrain",
       "file": "generated/terrain-grass-base.png",

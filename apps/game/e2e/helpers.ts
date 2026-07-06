@@ -200,9 +200,10 @@ export function countFallbackPixels(png: PngData): number {
 }
 
 // Minimum connected-component size to be counted as a fallback sprite.
-// Terrain anti-aliasing produces isolated pixels or pairs; an actual
-// overlay.cell.selected fallback sprite produces ~240 adjacent pixels.
-const MIN_FALLBACK_CLUSTER = 8;
+// An actual overlay.cell.selected fallback renders ~240 adjacent pixels;
+// legitimate sprites (gold trim, sunlit wood) can produce clusters up to
+// ~10px, so the floor sits well above noise and well below a real hit.
+const MIN_FALLBACK_CLUSTER = 40;
 
 export function countFallbackPixelsDebug(png: PngData): { count: number; samples: Array<{ x: number; y: number; r: number; g: number; b: number }> } {
   const { data, width, height } = png;
