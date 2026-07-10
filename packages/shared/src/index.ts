@@ -213,6 +213,10 @@ export interface ScenarioDefinition {
   /** Terrain elevation layout (hills, terraces, ramps). Omitted = fully flat
    *  map (all cells at elevation 0) — existing scenarios need no change. */
   readonly elevation?: ScenarioElevationDefinition;
+  /** Extra map decorations placed at fixed cells (added on top of the
+   *  procedural scatter). Used by dev fixtures for deterministic visual
+   *  verification, e.g. a tree directly in front of a cliff face. */
+  readonly decorations?: readonly MapDecoration[];
   readonly victory: {
     /** Defender wins by holding the honmaru until this tick (null: no time victory). */
     readonly holdTicks: number | null;

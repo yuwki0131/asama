@@ -40,6 +40,9 @@ const BASE_SPEAR_CELL = { x: 40, y: 72 }; // level 0
 const TERRACE_MOVE_TARGET = { x: 37, y: 66 }; // level 1
 const TERRACE_BUILD_CELL = { x: 36, y: 60 }; // level 2 (ishigaki)
 const HILL_VIEW_CELL = { x: 40, y: 63 };
+// Fixture cedar standing on level 1 directly in front (south) of the h2 rock
+// outcrop cliff faces — its crown overlaps the wall on screen.
+const CLIFF_FRONT_TREE_CELL = { x: 46, y: 58 };
 
 beforeAll(async () => {
   browser = await launchBrowser();
@@ -133,6 +136,39 @@ describe("elevation: terraced hill rendering", () => {
     const png = parsePng(buf);
     expect(countFallbackPixels(png), "gold missing-asset fallback visible around the hill").toBe(0);
     expect(noErrors(), "console errors during terraced hill render").toHaveLength(0);
+  });
+
+  it("tree in front of a cliff paints over the face (depth-sorted cliff faces)", async () => {
+    await centerOnHill();
+    const canvas = page.locator(".game-view canvas:not(.minimap)");
+    const box = await canvas.boundingBox();
+    expect(box).not.toBeNull();
+    const point = await cellToScreen(page, CLIFF_FRONT_TREE_CELL);
+    expect(point).not.toBeNull();
+
+    // The cedar's crown occupies roughly 20..90px above its (lifted) anchor —
+    // exactly the screen band where the h2 cliff face behind it is drawn.
+    // With the correct painter's order the band shows green foliage; when the
+    // cliff face wrongly paints above the scene it shows only rock/stone.
+    const buf = await canvas.screenshot({ type: "png" });
+    const png = parsePng(buf);
+    const cx = Math.round(point!.x - box!.x);
+    const cy = Math.round(point!.y - box!.y);
+    let greenish = 0;
+    for (let y = cy - 90; y <= cy - 20; y += 1) {
+      for (let x = cx - 16; x <= cx + 16; x += 1) {
+        if (x < 0 || y < 0 || x >= png.width || y >= png.height) continue;
+        const i = (y * png.width + x) * 4;
+        const r = png.data[i]!;
+        const g = png.data[i + 1]!;
+        const b = png.data[i + 2]!;
+        if (g > r + 8 && g > b + 8) greenish += 1;
+      }
+    }
+    expect(
+      greenish,
+      "cedar crown in front of the h2 cliff face is not visible — cliff render order regressed"
+    ).toBeGreaterThan(150);
   });
 });
 

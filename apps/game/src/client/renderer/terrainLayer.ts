@@ -5,10 +5,11 @@ import { clearLayer, createSpriteFromCandidates, type LoadedAsset } from "./asse
 import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera";
 import {
   cellAt,
+  cliffInfoFor,
   ELEVATION_PIXELS_PER_LEVEL,
   slopeAssetSkin,
   tileOffsetY,
-  type CellCliffInfo,
+  type ElevationMapLike,
   type CliffFace
 } from "./elevation";
 
@@ -27,6 +28,11 @@ const CLIFF_FALLBACK_COLORS: Record<ElevationSkin, { s: number; e: number; slope
   cliff: { s: 0x4f4a43, e: 0x3f3b36, slope: 0x77694c },
   ishigaki: { s: 0x7e7566, e: 0x685f52, slope: 0x8d8578 }
 };
+
+/** Sideways/downward bleed (px) of the opaque backdrop behind cliff face
+ *  sprites; covers sub-pixel AA seams between adjacent faces, at SE corner
+ *  junctions and against the low-side floor tile. */
+const CLIFF_BACKDROP_BLEED = 2;
 
 interface TerrainChunkBounds {
   readonly minX: number;
@@ -123,12 +129,12 @@ export function buildTerrainChunks(
 
     const container = new Container();
     for (const cell of cells) {
-      // Cliff terrain cells are drawn in the separate cliffOverlayLayer
-      // (above buildings/units). Skip both the terrain sprite and cliff face
-      // drawing here; non-cliff cells no longer own their own cliff faces.
-      if (cell.terrain !== "cliff") {
-        addTerrainSprite(container, cell, assets);
-      }
+      // Every cell draws its ground tile here — including cliff cells, whose
+      // floor (the low-side terrain, original assetId preserved by the sim's
+      // insertCliffCells) must read as continuous lowland ground. The cliff
+      // FACES themselves are depth-sorted into the retained scene layer
+      // (sceneLayer.ts) so trees/buildings in front of a cliff paint over it.
+      addTerrainSprite(container, cell, snapshot.map, assets);
     }
     (container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = bounds;
     terrainLayer.addChild(container);
@@ -164,7 +170,7 @@ export function buildTerrainChunks(
       capGraphics
         .moveTo(screenX, screenY - TILE_HEIGHT / 2)
         .lineTo(screenX - TILE_WIDTH / 2, screenY)
-        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7 });
+        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7, cap: "round" });
     }
 
     // NE cap line: top → right diamond vertex.
@@ -173,38 +179,25 @@ export function buildTerrainChunks(
       capGraphics
         .moveTo(screenX, screenY - TILE_HEIGHT / 2)
         .lineTo(screenX + TILE_WIDTH / 2, screenY)
-        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7 });
+        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7, cap: "round" });
     }
   }
   terrainLayer.addChild(capGraphics);
 }
 
 /**
- * Builds the cliff-face overlay layer from dedicated cliff terrain cells.
- * This layer is rendered ABOVE the scene layer (buildings/units) so cliff
- * faces visually cover building bases that protrude into the cliff area.
- * Call when the terrain key changes (same cadence as buildTerrainChunks).
+ * Draws a dedicated cliff terrain cell's face/corner sprites into `layer`.
+ *
+ * Called from the retained scene layer (sceneLayer.ts) where the cliff cell
+ * participates in the isometric painter's sort with its OWN cell coordinate
+ * as the depth key: buildings on the high side (smaller x+y) paint first so
+ * the face covers their protruding bases, while trees on the low side
+ * (larger x+y) paint after and correctly appear in front of the wall.
  */
-export function buildCliffOverlayLayer(
-  overlayLayer: Container,
-  snapshot: WorldSnapshot,
-  assets: ReadonlyMap<string, LoadedAsset>
-): void {
-  clearLayer(overlayLayer);
-
-  const cliffCells = snapshot.map.cells
-    .filter(c => c.terrain === "cliff")
-    .sort((a, b) => (a.coord.x + a.coord.y) - (b.coord.x + b.coord.y));
-
-  for (const cell of cliffCells) {
-    renderCliffCell(overlayLayer, cell, snapshot.map, assets);
-  }
-}
-
-function renderCliffCell(
+export function addCliffCellSprites(
   layer: Container,
   cell: TerrainCellSnapshot,
-  map: { readonly width: number; readonly height: number; readonly cells: readonly TerrainCellSnapshot[] },
+  map: ElevationMapLike,
   assets: ReadonlyMap<string, LoadedAsset>
 ): void {
   if (cell.cliffFace === undefined || cell.cliffHeight === undefined) return;
@@ -258,15 +251,22 @@ function renderCliffCell(
     assetId: `terrain.${skin}.face.${edge}.h${h}`
   };
 
+  // Always draw the fallback polygon first as an opaque stone-coloured
+  // backdrop: cliff sprites have transparent anti-aliased edge pixels that
+  // would otherwise show the dark underlay / canvas as gaps along the cliff
+  // bottom and at the seams between neighbouring faces. The backdrop bleeds
+  // a couple of px sideways and downward (same trick as the river bank
+  // strips) so sub-pixel AA seams between adjacent cliff cells, at the SE
+  // corner junction and against the low-side floor tile stay covered.
+  const backdrop = new Graphics();
+  drawFallbackFace(backdrop, highPoint, skin, face, CLIFF_BACKDROP_BLEED);
+  layer.addChild(backdrop);
+
   const asset = assets.get(face.assetId);
   if (asset !== undefined) {
     const sprite = createSpriteFromCandidates([face.assetId], assets);
     sprite.position.set(highPoint.x, anchorY);
     layer.addChild(sprite);
-  } else {
-    const fallback = new Graphics();
-    drawFallbackFace(fallback, highPoint, skin, face);
-    layer.addChild(fallback);
   }
 }
 
@@ -290,12 +290,17 @@ export function updateTerrainChunkVisibility(
   }
 }
 
-function addTerrainSprite(layer: Container, cell: TerrainCellSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
+function addTerrainSprite(
+  layer: Container,
+  cell: TerrainCellSnapshot,
+  map: ElevationMapLike,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
   const point = cellToWorld(cell.coord);
   const offsetY = tileOffsetY(cell);
 
   if (cell.slope !== null) {
-    addSlopeTile(layer, cell, assets);
+    addSlopeTile(layer, cell, map, assets);
     return;
   }
 
@@ -309,14 +314,27 @@ function addTerrainSprite(layer: Container, cell: TerrainCellSnapshot, assets: R
  * like a flat tile of the LOW side. Until the P4c assets land, the fallback
  * draws the base terrain tile plus an opaque ramp polygon: the tile diamond
  * with the two uphill corners lifted one level.
+ *
+ * The slope's two SIDE edges are cliff walls with a slanted top
+ * (`terrain.slope.<skin>.<dir>.side.<s|e>`); they are not covered by the
+ * dedicated cliff cells (no elevation drop at the base level) so they are
+ * drawn here, from the slope cell itself.
  */
-function addSlopeTile(layer: Container, cell: TerrainCellSnapshot, assets: ReadonlyMap<string, LoadedAsset>): void {
+function addSlopeTile(
+  layer: Container,
+  cell: TerrainCellSnapshot,
+  map: ElevationMapLike,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
   const point = cellToWorld(cell.coord);
   const offsetY = tileOffsetY(cell);
   const slope = cell.slope;
   if (slope === null) {
     return;
   }
+
+  // Slanted side walls first — they hang below/behind the ramp surface.
+  addSlopeSideWalls(layer, cell, map, assets);
 
   const slopeAssetId = `terrain.slope.${slopeAssetSkin(cell.elevationSkin)}.${slope.toLowerCase()}`;
   const asset = assets.get(slopeAssetId);
@@ -349,6 +367,36 @@ function addSlopeTile(layer: Container, cell: TerrainCellSnapshot, assets: Reado
   layer.addChild(ramp);
 }
 
+/**
+ * Slanted side walls of a slope cell (the S/E edges whose surface height is
+ * undefined — `cliffInfoFor` returns them with topA !== topB). Flat drops on
+ * the slope's up/downhill axis are owned by dedicated cliff cells instead
+ * and are filtered out here to avoid double drawing.
+ */
+function addSlopeSideWalls(
+  layer: Container,
+  cell: TerrainCellSnapshot,
+  map: ElevationMapLike,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  const point = cellToWorld(cell.coord);
+  const anchorY = point.y + tileOffsetY(cell);
+  const sideFaces = cliffInfoFor(map, cell).faces.filter((face) => face.topA !== face.topB);
+
+  for (const face of sideFaces) {
+    const asset = assets.get(face.assetId);
+    if (asset !== undefined) {
+      const sprite = createSpriteFromCandidates([face.assetId], assets);
+      sprite.position.set(point.x, anchorY);
+      layer.addChild(sprite);
+      continue;
+    }
+    const fallback = new Graphics();
+    drawFallbackFace(fallback, point, cell.elevationSkin, face);
+    layer.addChild(fallback);
+  }
+}
+
 /** Diamond corners lifted one extra level on a slope tile: the two corners of
  *  the uphill edge (N edge = n+e corners, E edge = s+e, S = w+s, W = w+n). */
 function liftedCorners(slope: "N" | "E" | "S" | "W"): Set<"n" | "e" | "s" | "w"> {
@@ -364,79 +412,48 @@ function liftedCorners(slope: "N" | "E" | "S" | "W"): Set<"n" | "e" | "s" | "w">
   }
 }
 
-/**
- * Cliff walls on the S/E edges of a high cell. Uses the contract sprites
- * (`terrain.<skin>.face.<s|e>.h<n>`, `terrain.<skin>.corner.se.h<n>`,
- * `terrain.slope.<skin>.<dir>.side.<s|e>`) when loaded; otherwise draws
- * opaque quad polygons so terraces stay readable before P4c delivers tiles.
- * Sprites are anchored at the cell's ground-tile position (top surface) —
- * their art extends downward from the tile's S/E diamond edge.
- */
-function addCliffFaces(
-  layer: Container,
-  cell: TerrainCellSnapshot,
-  info: CellCliffInfo,
-  assets: ReadonlyMap<string, LoadedAsset>
-): void {
-  const point = cellToWorld(cell.coord);
-  const anchorY = point.y + tileOffsetY(cell);
-  let fallback: Graphics | null = null;
-
-  for (const face of info.faces) {
-    const asset = assets.get(face.assetId);
-    if (asset !== undefined) {
-      const sprite = createSpriteFromCandidates([face.assetId], assets);
-      sprite.position.set(point.x, anchorY);
-      layer.addChild(sprite);
-      continue;
-    }
-    fallback ??= new Graphics();
-    drawFallbackFace(fallback, point, cell.elevationSkin, face);
-  }
-
-  if (fallback !== null) {
-    layer.addChild(fallback);
-    // Fallback polygons already tile the full silhouette; the corner sprite
-    // is only meaningful with real face art.
-    return;
-  }
-
-  if (info.cornerAssetId !== null) {
-    const cornerAsset = assets.get(info.cornerAssetId);
-    if (cornerAsset !== undefined) {
-      const sprite = createSpriteFromCandidates([info.cornerAssetId], assets);
-      sprite.position.set(point.x, anchorY);
-      layer.addChild(sprite);
-    }
-  }
-}
-
 /** Quad from the face's top edge (at the lifted tile edge) straight down to
- *  the neighbour's surface level. Vertex A/B order matches CliffFace. */
+ *  the neighbour's surface level. Vertex A/B order matches CliffFace.
+ *  `bleed` extends the quad along the edge direction (both ends) and below
+ *  its bottom edge, tucking backdrop polygons under the neighbouring faces
+ *  and the low-side floor tile so AA seams never expose the dark underlay. */
 function drawFallbackFace(
   graphics: Graphics,
   point: { x: number; y: number },
   skin: ElevationSkin,
-  face: CliffFace
+  face: CliffFace,
+  bleed = 0
 ): void {
   const px = ELEVATION_PIXELS_PER_LEVEL;
   // Diamond edge vertices at ground (elevation 0) height.
-  const vertexA =
+  let vertexA =
     face.edge === "s"
       ? { x: point.x - TILE_WIDTH / 2, y: point.y } // W corner
       : { x: point.x, y: point.y + TILE_HEIGHT / 2 }; // S corner
-  const vertexB =
+  let vertexB =
     face.edge === "s"
       ? { x: point.x, y: point.y + TILE_HEIGHT / 2 } // S corner
       : { x: point.x + TILE_WIDTH / 2, y: point.y }; // E corner
+
+  let bottomExtra = 0;
+  if (bleed > 0) {
+    const dx = vertexB.x - vertexA.x;
+    const dy = vertexB.y - vertexA.y;
+    const length = Math.hypot(dx, dy);
+    const fx = (dx / length) * bleed;
+    const fy = (dy / length) * bleed;
+    vertexA = { x: vertexA.x - fx, y: vertexA.y - fy };
+    vertexB = { x: vertexB.x + fx, y: vertexB.y + fy };
+    bottomExtra = bleed;
+  }
 
   const color = CLIFF_FALLBACK_COLORS[skin][face.edge];
   graphics
     .poly([
       vertexA.x, vertexA.y - face.topA * px,
       vertexB.x, vertexB.y - face.topB * px,
-      vertexB.x, vertexB.y - face.bottom * px,
-      vertexA.x, vertexA.y - face.bottom * px
+      vertexB.x, vertexB.y - face.bottom * px + bottomExtra,
+      vertexA.x, vertexA.y - face.bottom * px + bottomExtra
     ])
     .fill({ color, alpha: 1 });
 
@@ -461,6 +478,14 @@ function terrainFallbackAssetId(cell: TerrainCellSnapshot): string {
     return "terrain.dirt.variant.1";
   }
 
+  // Cliff cells keep their original floor assetId (sim insertCliffCells);
+  // when that id is unavailable (legacy saves carry the retired
+  // "terrain.cliff.placeholder") fall back to plain grass — there is no
+  // terrain.cliff.base tile.
+  if (cell.terrain === "cliff") {
+    return "terrain.grass.base";
+  }
+
   return `terrain.${cell.terrain}.base`;
 }
 
@@ -479,7 +504,9 @@ function addTerrainUnderlay(graphics: Graphics, cell: TerrainCellSnapshot, nearW
   // Elevated cells lift their underlay diamond with the tile so it keeps
   // backing that tile's AA edges (the whole underlay layer paints below
   // every sprite chunk, so the lift cannot cover anything).
-  const color = nearWater ? 0x0d1e2a : 0x63753a;
+  // Elevated cells that don't border water get a slightly darker green so
+  // the tile's AA edge bleeds into a natural shadow rather than bright grass.
+  const color = nearWater ? 0x0d1e2a : cell.elevation > 0 ? 0x4a5a28 : 0x63753a;
 
   graphics
     .poly([

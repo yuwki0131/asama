@@ -79,14 +79,15 @@ function insertCliffCells(map: WorldState["map"]): void {
       const dirUpper = dir === "s" ? "S" : "E";
       if (cell.slope === dirUpper || neighbor.slope === oppDir) continue;
 
-      // Rewrite neighbour as a cliff cell.
+      // Rewrite neighbour as a cliff cell. The original assetId is kept so
+      // the renderer can draw the cell's floor tile (grass/dirt) under the
+      // cliff face — otherwise only the flat underlay diamond shows through.
       const idx = ny * width + nx;
       cells[idx] = {
         ...neighbor,
         terrain: "cliff",
         passable: false,
         movementCost: 99,
-        assetId: "terrain.cliff.placeholder",
         cliffFace: dir,
         cliffHeight: drop,
         elevationSkin: cell.elevationSkin
@@ -114,7 +115,6 @@ function insertCliffCells(map: WorldState["map"]): void {
         terrain: "cliff",
         passable: false,
         movementCost: 99,
-        assetId: "terrain.cliff.placeholder",
         cliffFace: "se",
         cliffHeight: cell.elevation - se.elevation,
         elevationSkin: cell.elevationSkin
@@ -171,6 +171,10 @@ export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScen
   }
   // Insert dedicated cliff cells at elevation boundaries (no-op for flat maps).
   insertCliffCells(world.map);
+  // Fixed scenario decorations (dev fixtures) on top of the procedural scatter.
+  if (scenario.decorations !== undefined && scenario.decorations.length > 0) {
+    world.map.decorations.push(...scenario.decorations);
+  }
 
   seedInitialBuildings(world, scenario);
   // Units spawn after buildings so building placement validation does not
