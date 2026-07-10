@@ -4,12 +4,12 @@ import { screenToWorld, TILE_HEIGHT, TILE_WIDTH, type CameraState } from "./came
 /**
  * Renderer-side elevation helpers (docs/10_development/elevation-contract.md).
  *
- * One elevation level lifts a cell's drawing 24 screen px upward. Elevation
+ * One elevation level lifts a cell's drawing 40 screen px upward. Elevation
  * NEVER participates in depth sorting — with the fixed isometric camera a
  * lifted cell only slides up-screen; painter's order stays cell-coordinate
  * based everywhere.
  */
-export const ELEVATION_PIXELS_PER_LEVEL = 24;
+export const ELEVATION_PIXELS_PER_LEVEL = 40;
 
 /** The subset of `WorldSnapshot["map"]` the elevation helpers need. */
 export interface ElevationMapLike {
@@ -42,7 +42,7 @@ export function tileOffsetYAt(map: ElevationMapLike | null, cell: CellCoord): nu
 
 /**
  * Y offset (≤ 0) of the WALKING SURFACE of a cell: units standing on a slope
- * sit at the mid height -(elevation + 0.5) * 24 (elevation-contract.md §5).
+ * sit at the mid height -(elevation + 0.5) * 40 (elevation-contract.md §5).
  */
 export function surfaceOffsetYAt(map: ElevationMapLike | null, cell: CellCoord): number {
   if (map === null) {
@@ -197,7 +197,7 @@ export function mapHasElevation(map: ElevationMapLike): boolean {
 
 /**
  * Elevation-aware screen → cell inverse. A cell drawn at elevation e is
- * lifted 24e px, so the inverse tries each level from the highest down: the
+ * lifted 40e px, so the inverse tries each level from the highest down: the
  * click point is projected onto the "lifted" grid of that level and accepted
  * when the cell found there really is drawn at that level (slope cells span
  * two levels and accept both). The first hit wins — exactly the tile whose

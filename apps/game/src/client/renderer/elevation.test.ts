@@ -49,9 +49,9 @@ function cellAt(map: ElevationMapLike, x: number, y: number): TerrainCellSnapsho
 const CAMERA: CameraState = { x: 0, y: 0, zoom: 1 };
 
 describe("offsets", () => {
-  it("lifts tiles 24px per elevation level", () => {
+  it("lifts tiles 40px per elevation level", () => {
     const map = makeMap(4, 4, { "1,1": { elevation: 2 } });
-    expect(tileOffsetYAt(map, { x: 1, y: 1 })).toBe(-48);
+    expect(tileOffsetYAt(map, { x: 1, y: 1 })).toBe(-80);
     expect(tileOffsetYAt(map, { x: 0, y: 0 })).toBe(0);
     expect(tileOffsetYAt(map, { x: -1, y: 0 })).toBe(0);
     expect(tileOffsetYAt(null, { x: 1, y: 1 })).toBe(0);
@@ -176,13 +176,13 @@ describe("pickCellAtScreenPoint", () => {
   });
 
   it("prefers the high cell where its lifted diamond covers cells behind it", () => {
-    // (3,3) at level 3: flat center (0, 96) lifts to (0, 24). The flat-grid
-    // inverse of (0, 24) would be (1, 1) — but what is painted there is the
-    // summit of (3,3), so the pick must return (3,3).
+    // (3,3) at level 3: flat center (0, 96) lifts to (0, 96-3*40) = (0, -24).
+    // The flat-grid inverse of (0, -24) would be (-1, -1) — but what is
+    // painted there is the summit of (3,3), so the pick must return (3,3).
     const map = makeMap(8, 8, { "3,3": { elevation: 3 } });
     const summit = cellToWorld({ x: 3, y: 3 });
     const lifted = { x: summit.x, y: summit.y - 3 * ELEVATION_PIXELS_PER_LEVEL };
-    expect(screenToCell(lifted.x, lifted.y, CAMERA)).toEqual({ x: 1, y: 1 });
+    expect(screenToCell(lifted.x, lifted.y, CAMERA)).toEqual({ x: -1, y: -1 });
     expect(pickCellAtScreenPoint(lifted.x, lifted.y, CAMERA, map)).toEqual({ x: 3, y: 3 });
     // The uncovered ground of (2,2) (screen y 64: below the lifted summit
     // diamond, above the flat position of (3,3)) still picks (2,2).

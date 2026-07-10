@@ -55,6 +55,8 @@ export async function loadGeneratedAssets(): Promise<ReadonlyMap<string, LoadedA
   const manifest = (await response.json()) as AssetManifest;
   const loaded = new Map<string, LoadedAsset>();
   for (const asset of manifest.assets) {
+    // Blender renders PNG with straight alpha; no alphaMode override needed.
+    // If bright fringing appears at tile edges, try: { alphaMode: ALPHA_MODES.PREMULTIPLIED_ALPHA }
     const texture = await Assets.load<Texture>(`/assets/${asset.file}`);
     loaded.set(asset.assetId, {
       texture,
