@@ -369,6 +369,10 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
     return bridgeOrientedAssetId(world, building);
   }
 
+  if (building.type === "town_block") {
+    return townBlockVariantAssetId(building.position);
+  }
+
   const family = connectedAssetFamily(building.type);
   if (family === null) {
     return building.assetId;
@@ -393,6 +397,23 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
   }
 
   return `${family}.connected.${mask}`;
+}
+
+/**
+ * Town blocks come in visual variants so streets read as a townscape rather
+ * than a repeated tile. Selection is a pure hash of the lot anchor cell —
+ * the same map coordinate always yields the same variant (deterministic
+ * across save/load and restarts, mirroring connectedTerrainAssetId).
+ * Variant 0 keeps the original assetId so old snapshots and missing variant
+ * art fall back to the existing sprite.
+ */
+export const TOWN_BLOCK_VARIANT_COUNT = 5;
+
+export function townBlockVariantAssetId(position: CellCoord): string {
+  let h = (position.x * 374761393 + position.y * 668265263 + 912367) >>> 0;
+  h = (h ^ (h >>> 13)) >>> 0;
+  const variant = h % TOWN_BLOCK_VARIANT_COUNT;
+  return variant === 0 ? "building.town_block" : `building.town_block.v${variant + 1}`;
 }
 
 function connectedGateAssetId(world: WorldState, gate: BuildingState): string {

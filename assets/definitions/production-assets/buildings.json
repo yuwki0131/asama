@@ -152,6 +152,106 @@
       }
     },
     {
+      "assetId": "building.town_block.v2",
+      "kind": "building",
+      "output": "building-town-block-v2.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/building-town-block-v2.png"
+      },
+      "geometry": {
+        "footprintWidth": 6,
+        "footprintHeight": 6,
+        "canvasWidth": 416,
+        "canvasHeight": 304,
+        "anchorX": 208,
+        "anchorY": 272
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.town_block.v3",
+      "kind": "building",
+      "output": "building-town-block-v3.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/building-town-block-v3.png"
+      },
+      "geometry": {
+        "footprintWidth": 6,
+        "footprintHeight": 6,
+        "canvasWidth": 416,
+        "canvasHeight": 304,
+        "anchorX": 208,
+        "anchorY": 272
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.town_block.v4",
+      "kind": "building",
+      "output": "building-town-block-v4.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/building-town-block-v4.png"
+      },
+      "geometry": {
+        "footprintWidth": 6,
+        "footprintHeight": 6,
+        "canvasWidth": 416,
+        "canvasHeight": 304,
+        "anchorX": 208,
+        "anchorY": 272
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.town_block.v5",
+      "kind": "building",
+      "output": "building-town-block-v5.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/building-town-block-v5.png"
+      },
+      "geometry": {
+        "footprintWidth": 6,
+        "footprintHeight": 6,
+        "canvasWidth": 416,
+        "canvasHeight": 304,
+        "anchorX": 208,
+        "anchorY": 272
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
       "assetId": "building.tenshu.test",
       "kind": "building",
       "output": "building-tenshu-test.png",
