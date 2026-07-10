@@ -1,22 +1,42 @@
-# asama — 日本城郭RTS(ローカル・シングルプレイヤー)
+# 浅間 (Asama)
 
-Stronghold風の固定アイソメトリック2D RTS。城と城下町を築き、兵糧を回し、攻め寄せる波状攻撃から本丸を守り抜きます。MVP実装済み(詳細は `docs/10_development/mvp-scope.md`)。
+> 日本戦国時代を舞台にしたブラウザ動作のアイソメトリックRTS
 
-## 起動
+![霞ヶ峰城 — 高低差ショーケース](docs/screenshots/mountain-castle.png)
 
-```sh
-nix-shell          # nodejs / pnpm / blender が入る
-pnpm install
-pnpm run dev       # クライアント http://127.0.0.1:5173
-```
+## ゲーム概要
 
-セーブ機能を使う場合は別ターミナルでローカルAPIも起動します:
+プレイヤーは城主となり、迫り来る敵の波状攻撃から城を守る。壁・堀・石垣を築き、槍足軽・弓兵・騎馬・鉄砲衆を指揮して本丸を死守せよ。Stronghold風の固定アイソメトリック2D RTSで、ブラウザ完結・インストール不要。
 
-```sh
-pnpm --filter @asama/game dev:server   # http://127.0.0.1:3000 (viteがproxy)
-```
+**ゲームの特徴:**
+- 高低差地形 — 石垣で高台を作り、高地から一方的に攻撃
+- 6種類のユニット — 槍足軽・刀足軽・弓兵・鉄砲・騎馬・工兵
+- 動く植生 — 樹木や旗が風になびくリアルタイムアニメーション
+- 4シナリオ + 自由演習 — 入門から高低差城まで
 
-## 主な操作
+## スクリーンショット
+
+### 霞ヶ峰城 (高低差ショーケース)
+![霞ヶ峰城](docs/screenshots/mountain-castle.png)
+
+### 環郭の城 (入門)
+![環郭の城](docs/screenshots/concentric-castle.png)
+
+### 連郭の城 / 川沿いの城
+
+| 連郭の城 | 川沿いの城 |
+|---|---|
+| ![連郭](docs/screenshots/linear-fortress.png) | ![川城](docs/screenshots/riverside-defense.png) |
+
+## 遊び方
+
+1. ブラウザで `http://localhost:5173` を開くとシナリオ選択画面
+2. シナリオを選んでゲーム開始
+3. ユニットをクリックして選択 → 移動先を右クリックで移動指示
+4. 建物はパネルから選択して配置
+5. 敵の進軍を食い止めながら本丸を守れ
+
+### 主な操作
 
 | 操作 | 動作 |
 |---|---|
@@ -29,6 +49,37 @@ pnpm --filter @asama/game dev:server   # http://127.0.0.1:3000 (viteがproxy)
 | ホイール | ズーム |
 | Space / ⏸ 1x 2x 4x | 一時停止・速度変更 |
 | 梯子設置・堀埋めボタン | 工兵を選択して対象セルを指定 |
+
+## シナリオ一覧
+
+| シナリオ | 難易度 | 特徴 |
+|---|---|---|
+| 環郭の城 | 入門 | 同心円防衛・補給荷車撃破 |
+| 連郭の城 | 標準 | 東西二方向・騎馬奇襲 |
+| 川沿いの城 | 上級 | 橋頭堡防衛・工兵橋破壊 |
+| 霞ヶ峰城 | v2.0ショーケース | 三段石垣・高低差戦略 |
+| 自由演習 | — | 資源無制限サンドボックス |
+
+## 開発・起動
+
+```sh
+nix-shell          # nodejs / pnpm / blender が入る
+pnpm install
+pnpm run dev       # http://localhost:5173
+```
+
+セーブ機能を使う場合は別ターミナルでローカルAPIも起動:
+
+```sh
+pnpm --filter @asama/game dev:server   # http://127.0.0.1:3000 (viteがproxy)
+```
+
+## 技術スタック
+
+- **フロントエンド**: React 19 + PixiJS v8.6 (WebGL/WebGPU)
+- **ゲームロジック**: Web Worker 上で動作するピュアTypeScript
+- **アセット**: Blender 5.1 → PNG パイプライン(手続き的モデリング)
+- **テスト**: Vitest + Playwright E2E
 
 ## 開発コマンド
 
