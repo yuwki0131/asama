@@ -4,18 +4,25 @@
 
 ## 現在のフェーズ
 
-- **2.0 完了 + 2.1 拡張対応中**
-- 完了してmainに統合済み: P1〜P7全17PR(#23〜#36) + 追加修正 #37・#38・#41
+- **大方針: 高低差ビジュアル品質向上 (専用クリフセル方式への移行中)**
+- 完了してmainに統合済み: #23〜#44 (2.0全PR + 2.1拡張10PR)
 
 ## 進行中の作業 (2026-07-11現在)
 
-| PR | 内容 | 状態 |
+| PR/Branch | 内容 | 状態 |
 |---|---|---|
-| #39 feat/gate-wide-3 | 門1×3・中央セルのみ通行可 | E2E修正中(fix agent走行) |
-| #40 fix/blender-asset-quality | 坂タイル土質感・天守二重描画解消・背景黒化 | CI再走行中(rebase済) |
-| #42 docs/readme-game-showcase | README ゲーム紹介ページ化 | CI待ち |
-| #43 feat/terrain-building | 盛土/削土/坂設置/坂撤去コマンド+UI(Stronghold方式) | CI待ち |
-| (PR未) free-play scenario | 無制限リソース・ゲームオーバーなしサンドボックス | agent走行中 |
+| #39 feat/gate-wide-3 | 門1×3・中央セルのみ通行可 | E2E CI実行中 |
+| feat/cliff-cell-architecture | 専用クリフセル方式アーキテクチャ移行 | agent走行中 |
+| fix/elevation-visual-quality | 石垣背景/エッジ/坂接続/ヒット判定/建物突き抜け修正 | agent走行中 |
+
+## 大方針メモ
+
+- **高低差ビジュアル**: 「1マス使い切りクリフセル」方式に移行確定(2026-07-11)
+  - cliff terrain タイプを自動生成、選択不可・通行不可・建築不可
+  - 崖フェイスはクリフセルが所有、建物/ユニットの上に描画(突き抜け解消)
+- **視覚品質基準**: Stronghold 参照 + ユーザー最終判定(実際に遊んで違和感なし)
+  - サブゴール: 石垣の積み石感/高さの直感的な読み取り/天守が石垣上に乗る感
+- **地形建築制約**: 建物がある地面は盛土/削土不可(実装済み PR#43)
 
 ## 完了済みマイルストーン
 
@@ -33,14 +40,17 @@
 - 2026-07-10: **シナリオ選択バグ修正**(#37)。scenarioForId が全IDを DEFAULT_SCENARIO に落としていた。scenarios.find() に修正。content tsconfig.json から test.ts を除外
 - 2026-07-10: **高低差レンダラー品質改善**(#38)。ELEVATION_PIXELS_PER_LEVEL 24→40px。NW/NE 上辺キャップ線(dark brown 2px)追加。elevation.test.ts座標更新
 - 2026-07-10: **歩行アニメーション実装**(#41)。sceneLayer.ts walk state 遷移修正(unit.type キー修正)・アニメ6箇所のシートキー参照を正しいパターンに統一
+- 2026-07-11: **Blender資産品質改善**(#40)。坂タイル土質感(noise material)・天守石垣二重描画解消・背景黒化でフリンジ解消
+- 2026-07-11: **README ゲーム紹介ページ化**(#42)。スクリーンショット4枚・操作説明・シナリオ一覧
+- 2026-07-11: **地形建築実装**(#43)。raiseTerrain(50G)/lowerTerrain(20G)/placeSlope(30G)/removeSlope(10G)。Stronghold方式リアルタイム地形操作。建物あり・水タイル・MAX_ELEVATION超は拒否
+- 2026-07-11: **自由演習シナリオ追加**(#44)。資源無制限・ゲームオーバーなし・兵糧接続バグ修正(ユニット初期配置)
 
 ## 次のアクション(キュー)
 
-1. PR #39 E2E 修正 → merge
-2. PR #40 CI pass → merge
-3. PR #42, #43 CI pass → merge
-4. free-play agent 完了後 PR 作成 → merge
-5. 全PR統合後 v2-run-state.md 最終更新
+1. PR #39 CI pass → merge
+2. feat/cliff-cell-architecture agent 完了 → CI → merge (大PR)
+3. fix/elevation-visual-quality agent 完了 → CI → merge
+4. 全PR統合後 v2-run-state.md 最終更新
 
 ## 運用メモ
 
