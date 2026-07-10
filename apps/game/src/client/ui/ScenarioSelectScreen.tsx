@@ -4,6 +4,7 @@ import {
   linearFortressScenario,
   riversideDefenseScenario,
   mountainCastleScenario,
+  freePlayScenario,
 } from "@asama/content";
 
 interface ScenarioSelectScreenProps {
@@ -46,6 +47,13 @@ const SCENARIO_CARDS: readonly ScenarioCard[] = [
     difficulty: "2.0 SHOWCASE",
     description: mountainCastleScenario.description ?? "",
     isShowcase: true,
+  },
+  {
+    id: freePlayScenario.id,
+    name: freePlayScenario.name,
+    difficulty: "自由演習",
+    description: freePlayScenario.description ?? "",
+    isShowcase: false,
   },
 ];
 
