@@ -46,6 +46,8 @@ export function deserializeWorld(serialized: SerializedWorld): WorldState {
   world.map.decorations ??= [];
   // Pre-P6 saves: start with an empty combat-event buffer.
   world.combatEvents ??= [];
+  // Pre-terrain-building saves: start revision at 0.
+  world.terrainRevision ??= 0;
   world.economy ??= {
     gold: ECONOMY_BALANCE.initialGold,
     weapons: ECONOMY_BALANCE.initialWeapons,

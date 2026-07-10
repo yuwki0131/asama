@@ -72,6 +72,17 @@ export function addCellActionPreview(
     return;
   }
 
+  // Terrain modification tools: show a plain selected-cell highlight.
+  if (
+    buildTool === "raiseTerrain" ||
+    buildTool === "lowerTerrain" ||
+    buildTool === "placeSlope" ||
+    buildTool === "removeSlope"
+  ) {
+    addOverlaySprite(layer, cell, "overlay.cell.selected", assets, map);
+    return;
+  }
+
   if (buildTool === "demolish") {
     const hasBuilding = findBuildingAtCell(cell, snapshot) !== null;
     addOverlaySprite(layer, cell, hasBuilding ? "overlay.demolish.target" : "overlay.build.invalid", assets, map);

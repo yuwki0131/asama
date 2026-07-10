@@ -1,14 +1,15 @@
 import { mvpDefenseScenario } from "@asama/content";
+import { MAX_ELEVATION } from "@asama/shared";
 import type { CellCoord, EconomySnapshot, FoodSnapshot, PlayerCommand, WorldSnapshot } from "@asama/shared";
 import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
 import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, bridgeAbsoluteFootprint, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
 import { getAttackTarget, areEnemies, updateAttackMoveBehavior, updateCombat } from "./combat";
 import { updateEconomy, applyMarketTrade, applyRecruitCommand, populationCapacity, currentApproval, maxRecruitPool } from "./economy";
-import { applyScenarioElevation, elevationAt, stepTicksFor } from "./elevation";
+import { applyScenarioElevation, elevationAt, slopeVector, stepTicksFor } from "./elevation";
 import { updateEnemyAi } from "./enemyAi";
 import { applyEngineerTaskCommand, updateEngineerTasks } from "./engineer";
 import { requiredFoodPerCycle, updateFoodSupply } from "./food";
-import { createInitialMap } from "./map";
+import { createInitialMap, getCell } from "./map";
 import { findPath, formationSlots, isPassable } from "./pathfinding";
 import { deserializeWorld, serializeWorld } from "./serialization";
 import { createUnit } from "./units";
@@ -18,6 +19,7 @@ import {
   FOOD_BALANCE,
   SEASONS,
   SIEGE_BALANCE,
+  TERRAIN_COSTS,
   WORLD_RNG_SEED,
   cellKey,
   clampCell,
@@ -44,6 +46,7 @@ export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScen
     invalidMoveTarget: null,
     outcome: null,
     nextWaveIndex: 0,
+    terrainRevision: 0,
     scenario: {
       waves: scenario.waves,
       victory: scenario.victory
@@ -331,6 +334,75 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     return applyEngineerTaskCommand(world, command.unitIds, command.task, clampCell(command.position));
   }
 
+  if (command.type === "raiseTerrain") {
+    const pos = clampCell(command.position);
+    const index = pos.y * world.map.width + pos.x;
+    const cell = world.map.cells[index];
+    if (cell === undefined) return "Invalid position";
+    if (cell.terrain === "water") return "Cannot raise water tiles";
+    if (cell.elevation >= MAX_ELEVATION) return "Already at maximum elevation";
+    if (world.economy.gold < TERRAIN_COSTS.raiseTerrain) return "Insufficient gold";
+    if (getBuildingAt(world, pos) !== null) return "Cannot raise terrain under a building";
+    world.map.cells[index] = { ...cell, elevation: cell.elevation + 1, elevationSkin: "ishigaki" };
+    world.economy.gold -= TERRAIN_COSTS.raiseTerrain;
+    world.terrainRevision += 1;
+    world.invalidMoveTarget = null;
+    return null;
+  }
+
+  if (command.type === "lowerTerrain") {
+    const pos = clampCell(command.position);
+    const index = pos.y * world.map.width + pos.x;
+    const cell = world.map.cells[index];
+    if (cell === undefined) return "Invalid position";
+    if (cell.elevation <= 0) return "Already at ground level";
+    if (world.economy.gold < TERRAIN_COSTS.lowerTerrain) return "Insufficient gold";
+    if (getBuildingAt(world, pos) !== null) return "Cannot lower terrain under a building";
+    // Remove any slope before lowering (slope would become geometrically invalid).
+    world.map.cells[index] = { ...cell, elevation: cell.elevation - 1, slope: null };
+    world.economy.gold -= TERRAIN_COSTS.lowerTerrain;
+    world.terrainRevision += 1;
+    world.invalidMoveTarget = null;
+    return null;
+  }
+
+  if (command.type === "placeSlope") {
+    const pos = clampCell(command.position);
+    const index = pos.y * world.map.width + pos.x;
+    const cell = world.map.cells[index];
+    if (cell === undefined) return "Invalid position";
+    if (cell.terrain === "water") return "Cannot place slope on water";
+    if (cell.slope !== null) return "Slope already exists here";
+    if (world.economy.gold < TERRAIN_COSTS.placeSlope) return "Insufficient gold";
+    // The adjacent cell in the `toward` direction must be exactly one level higher.
+    const vec = slopeVector(command.toward);
+    const adjPos = { x: pos.x + vec.x, y: pos.y + vec.y };
+    if (adjPos.x < 0 || adjPos.y < 0 || adjPos.x >= world.map.width || adjPos.y >= world.map.height) {
+      return "Cannot place slope at map edge";
+    }
+    const adjCell = getCell(world, adjPos);
+    if (adjCell.elevation !== cell.elevation + 1) return "Adjacent cell must be one level higher";
+    world.map.cells[index] = { ...cell, slope: command.toward };
+    world.economy.gold -= TERRAIN_COSTS.placeSlope;
+    world.terrainRevision += 1;
+    world.invalidMoveTarget = null;
+    return null;
+  }
+
+  if (command.type === "removeSlope") {
+    const pos = clampCell(command.position);
+    const index = pos.y * world.map.width + pos.x;
+    const cell = world.map.cells[index];
+    if (cell === undefined) return "Invalid position";
+    if (cell.slope === null) return "No slope here";
+    if (world.economy.gold < TERRAIN_COSTS.removeSlope) return "Insufficient gold";
+    world.map.cells[index] = { ...cell, slope: null };
+    world.economy.gold -= TERRAIN_COSTS.removeSlope;
+    world.terrainRevision += 1;
+    world.invalidMoveTarget = null;
+    return null;
+  }
+
   return null;
 }
 
@@ -470,6 +542,7 @@ export function snapshotWorld(world: WorldState, options: SnapshotOptions = {}):
     outcome: world.outcome,
     food: snapshotFood(world),
     economy: snapshotEconomy(world),
+    terrainRevision: world.terrainRevision,
     supplyRetreat: {
       active: world.supplyState.retreatTimerActive,
       remainingTicks: world.supplyState.retreatTimerRemaining

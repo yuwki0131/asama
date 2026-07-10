@@ -22,7 +22,16 @@ import { RetainedScene } from "./sceneLayer";
 import { updateTerrainChunkVisibility } from "./terrainLayer";
 import { TONE_MATRIX_C } from "./toneGrade";
 
-export type ToolMode = BuildingType | "demolish" | "ladder" | "fillMoat" | null;
+export type ToolMode =
+  | BuildingType
+  | "demolish"
+  | "ladder"
+  | "fillMoat"
+  | "raiseTerrain"
+  | "lowerTerrain"
+  | "placeSlope"
+  | "removeSlope"
+  | null;
 
 export interface GameCanvasHandle {
   jumpCameraToCell: (cell: CellCoord) => void;
@@ -53,6 +62,10 @@ interface GameCanvasProps {
   readonly onGroupSave: (groupNum: number, unitIds: readonly UnitId[]) => void;
   readonly onGroupRecall: (groupNum: number, jump: boolean) => void;
   readonly onCancelBuildTool: () => void;
+  readonly onRaiseTerrain: (position: CellCoord) => void;
+  readonly onLowerTerrain: (position: CellCoord) => void;
+  readonly onPlaceSlope: (position: CellCoord) => void;
+  readonly onRemoveSlope: (position: CellCoord) => void;
 }
 
 /** Initial state for the in-game debug toggle; the Debug button in the top
@@ -78,7 +91,11 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   onCellSelected,
   onGroupSave,
   onGroupRecall,
-  onCancelBuildTool
+  onCancelBuildTool,
+  onRaiseTerrain,
+  onLowerTerrain,
+  onPlaceSlope,
+  onRemoveSlope
 }: GameCanvasProps, ref) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
@@ -111,6 +128,10 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const onGroupSaveRef = useRef(onGroupSave);
   const onGroupRecallRef = useRef(onGroupRecall);
   const onCancelBuildToolRef = useRef(onCancelBuildTool);
+  const onRaiseTerrainRef = useRef(onRaiseTerrain);
+  const onLowerTerrainRef = useRef(onLowerTerrain);
+  const onPlaceSlopeRef = useRef(onPlaceSlope);
+  const onRemoveSlopeRef = useRef(onRemoveSlope);
   const heldKeysRef = useRef<Set<string>>(new Set());
   const minimapRef = useRef<HTMLCanvasElement | null>(null);
   const minimapTerrainRef = useRef<MinimapTerrainCache | null>(null);
@@ -225,6 +246,22 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   useEffect(() => {
     onCancelBuildToolRef.current = onCancelBuildTool;
   }, [onCancelBuildTool]);
+
+  useEffect(() => {
+    onRaiseTerrainRef.current = onRaiseTerrain;
+  }, [onRaiseTerrain]);
+
+  useEffect(() => {
+    onLowerTerrainRef.current = onLowerTerrain;
+  }, [onLowerTerrain]);
+
+  useEffect(() => {
+    onPlaceSlopeRef.current = onPlaceSlope;
+  }, [onPlaceSlope]);
+
+  useEffect(() => {
+    onRemoveSlopeRef.current = onRemoveSlope;
+  }, [onRemoveSlope]);
 
   useImperativeHandle(ref, () => ({
     jumpCameraToCell: (cell: CellCoord) => {
@@ -476,7 +513,11 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         onStopSelectedRef,
         onGroupSaveRef,
         onGroupRecallRef,
-        onCancelBuildToolRef
+        onCancelBuildToolRef,
+        onRaiseTerrainRef,
+        onLowerTerrainRef,
+        onPlaceSlopeRef,
+        onRemoveSlopeRef
       },
       scheduleCameraRender,
       setHoverCell,

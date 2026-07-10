@@ -120,6 +120,9 @@ export interface WorldState {
   invalidMoveTarget: CellCoord | null;
   outcome: GameOutcome | null;
   nextWaveIndex: number;
+  /** Incremented by each successful terrain-modification command so the
+   *  renderer can detect when to rebuild terrain chunks. */
+  terrainRevision: number;
   scenario: {
     waves: readonly ScenarioWave[];
     victory: ScenarioDefinition["victory"];
@@ -264,6 +267,14 @@ export const ORTHOGONAL_DIRECTIONS: readonly CellCoord[] = [
   { x: 0, y: -1 }
 ];
 export const BLOCKED_MOVEMENT_COST = 9999;
+
+/** Gold costs for player terrain-modification commands. */
+export const TERRAIN_COSTS = {
+  raiseTerrain: 50,
+  lowerTerrain: 20,
+  placeSlope: 30,
+  removeSlope: 10
+} as const;
 
 // Unit stats live in @asama/content; the simulation derives tick-based
 // cooldowns from the content's seconds.
