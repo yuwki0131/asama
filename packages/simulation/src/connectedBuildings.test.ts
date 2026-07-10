@@ -166,6 +166,41 @@ describe("connected building asset masks", () => {
   });
 });
 
+describe("town block visual variants", () => {
+  function freshWorld(): WorldState {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    return world;
+  }
+
+  it("assigns a variant assetId from the town block family", () => {
+    const world = freshWorld();
+    place(world, "town_block", { x: 40, y: 40 });
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toMatch(/^building\.town_block(\.v[2-5])?$/);
+  });
+
+  it("is deterministic for the same coordinate across worlds", () => {
+    const first = freshWorld();
+    const second = freshWorld();
+    for (const position of [{ x: 40, y: 40 }, { x: 52, y: 40 }, { x: 40, y: 52 }, { x: 64, y: 64 }]) {
+      place(first, "town_block", position);
+      place(second, "town_block", position);
+      expect(buildingAt(first, position).assetId).toBe(buildingAt(second, position).assetId);
+    }
+  });
+
+  it("varies across a street of adjacent lots", () => {
+    const world = freshWorld();
+    const positions = [40, 46, 52, 58, 64].map((x) => ({ x, y: 40 }));
+    for (const position of positions) {
+      place(world, "town_block", position);
+    }
+    const ids = new Set(positions.map((position) => buildingAt(world, position).assetId));
+    expect(ids.size).toBeGreaterThanOrEqual(3);
+  });
+});
+
 describe("bridge orientation", () => {
   it("places x3 bridge over N-S river (water north and south, land east and west)", () => {
     const world = createInitialWorld();
