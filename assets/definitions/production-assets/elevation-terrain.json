@@ -506,6 +506,342 @@
       }
     },
     {
+      "assetId": "terrain.cliff.face.s.h4",
+      "kind": "terrain",
+      "output": "terrain-cliff-face-s-h4.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-cliff-face-s-h4",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.cliff.face.s.h5",
+      "kind": "terrain",
+      "output": "terrain-cliff-face-s-h5.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-cliff-face-s-h5",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 152,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.cliff.face.e.h4",
+      "kind": "terrain",
+      "output": "terrain-cliff-face-e-h4.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-cliff-face-e-h4",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.cliff.face.e.h5",
+      "kind": "terrain",
+      "output": "terrain-cliff-face-e-h5.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-cliff-face-e-h5",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 152,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.cliff.corner.se.h4",
+      "kind": "terrain",
+      "output": "terrain-cliff-corner-se-h4.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-cliff-corner-se-h4",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.cliff.corner.se.h5",
+      "kind": "terrain",
+      "output": "terrain-cliff-corner-se-h5.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-cliff-corner-se-h5",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 152,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.ishigaki.face.s.h4",
+      "kind": "terrain",
+      "output": "terrain-ishigaki-face-s-h4.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-ishigaki-face-s-h4",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.ishigaki.face.s.h5",
+      "kind": "terrain",
+      "output": "terrain-ishigaki-face-s-h5.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-ishigaki-face-s-h5",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 152,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.ishigaki.face.e.h4",
+      "kind": "terrain",
+      "output": "terrain-ishigaki-face-e-h4.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-ishigaki-face-e-h4",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.ishigaki.face.e.h5",
+      "kind": "terrain",
+      "output": "terrain-ishigaki-face-e-h5.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-ishigaki-face-e-h5",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 152,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.ishigaki.corner.se.h4",
+      "kind": "terrain",
+      "output": "terrain-ishigaki-corner-se-h4.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-ishigaki-corner-se-h4",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.ishigaki.corner.se.h5",
+      "kind": "terrain",
+      "output": "terrain-ishigaki-corner-se-h5.png",
+      "source": {
+        "type": "blender",
+        "model": "elev-ishigaki-corner-se-h5",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "elevation"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 152,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
       "assetId": "terrain.slope.dirt.n",
       "kind": "terrain",
       "output": "terrain-slope-dirt-n.png",
