@@ -10,7 +10,7 @@ export type OwnerId = "player" | "enemy" | "neutral";
 export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer" | "engineer" | "musketeer" | "cavalry" | "supply_cart";
 
 export type EngineerTaskKind = "ladder" | "fillMoat";
-export type TerrainType = "grass" | "dirt" | "water" | "stone";
+export type TerrainType = "grass" | "dirt" | "water" | "stone" | "cliff";
 
 // --- Elevation (docs/10_development/elevation-contract.md) ------------------
 
@@ -73,6 +73,10 @@ export interface TerrainCellSnapshot {
   readonly slope: SlopeDirection | null;
   /** Skin used for cliff faces / slope tiles rendered around this cell. */
   readonly elevationSkin: ElevationSkin;
+  /** cliff cells only: which face this cell renders ("s" | "e" | "se"). */
+  readonly cliffFace?: "s" | "e" | "se";
+  /** cliff cells only: elevation drop from the adjacent high cell. */
+  readonly cliffHeight?: number;
 }
 
 export interface UnitSnapshot {

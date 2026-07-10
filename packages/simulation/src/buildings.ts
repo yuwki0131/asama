@@ -99,6 +99,11 @@ export function canPlaceBuilding(world: WorldState, position: CellCoord, definit
   if (!footprint.every((cell) => canPlaceOnCell(world, cell, definition))) {
     return false;
   }
+  // Cliff terrain cells are visual-only cliff face holders: never allow any
+  // building, including honmaru (which bypasses the passable check above).
+  if (footprint.some((cell) => getCell(world, cell).terrain === "cliff")) {
+    return false;
+  }
   // Buildings sit on uniform elevation and never on ramp cells
   // (elevation-contract.md: 建物と高低差).
   const anchorElevation = getCell(world, position).elevation;
@@ -325,7 +330,9 @@ export function snapshotCell(cell: TerrainCellState): TerrainCellSnapshot {
     assetId: cell.assetId,
     elevation: cell.elevation,
     slope: cell.slope,
-    elevationSkin: cell.elevationSkin
+    elevationSkin: cell.elevationSkin,
+    ...(cell.cliffFace !== undefined ? { cliffFace: cell.cliffFace } : {}),
+    ...(cell.cliffHeight !== undefined ? { cliffHeight: cell.cliffHeight } : {})
   };
 }
 

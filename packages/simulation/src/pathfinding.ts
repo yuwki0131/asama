@@ -183,6 +183,10 @@ export function isPassable(world: WorldState, coord: CellCoord, perspective?: "p
   }
 
   const cell = getCell(world, coord);
+  // Cliff terrain cells are visual-only cliff face holders; never passable.
+  if (cell.terrain === "cliff") {
+    return false;
+  }
   const building = getBuildingAt(world, coord);
   if (building !== null) {
     // Supply perspective: player gates are always passable for food connectivity

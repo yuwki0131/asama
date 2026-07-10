@@ -102,6 +102,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const worldRef = useRef<Container | null>(null);
   const terrainLayerRef = useRef<Container | null>(null);
   const overlayLayerRef = useRef<Container | null>(null);
+  const cliffOverlayLayerRef = useRef<Container | null>(null);
   const debugLayerRef = useRef<Container | null>(null);
   const toneFilterRef = useRef<ColorMatrixFilter | null>(null);
   const aerialOverlayRef = useRef<Sprite | null>(null);
@@ -346,11 +347,19 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         const world = new Container();
         const terrainLayer = new Container();
         const overlayLayer = new Container();
+        const cliffOverlayLayer = new Container();
         const retainedScene = new RetainedScene();
         const effectsLayer = new EffectsLayer();
         effectsLayerRef.current = effectsLayer;
         const debugLayer = new Container();
-        world.addChild(terrainLayer, overlayLayer, retainedScene.root, effectsLayer.root, debugLayer);
+        // Layer order (bottom → top):
+        //   1. terrainLayer     — ground tiles (no cliff faces)
+        //   2. overlayLayer     — path dots, hover rings, build previews
+        //   3. retainedScene    — buildings and units
+        //   4. cliffOverlayLayer — cliff faces drawn above buildings
+        //   5. effectsLayer     — combat VFX (arrows, smoke, …)
+        //   6. debugLayer       — dev alignment overlay
+        world.addChild(terrainLayer, overlayLayer, retainedScene.root, cliffOverlayLayer, effectsLayer.root, debugLayer);
         app.stage.addChild(world);
 
         // Grade C "大河ドラマ" color matrix over the whole world (terrain,
@@ -378,6 +387,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         worldRef.current = world;
         terrainLayerRef.current = terrainLayer;
         overlayLayerRef.current = overlayLayer;
+        cliffOverlayLayerRef.current = cliffOverlayLayer;
         debugLayerRef.current = debugLayer;
         retainedSceneRef.current = retainedScene;
         centerCameraOnCell({ x: 64, y: 64 }, host, cameraRef.current);
@@ -428,6 +438,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       worldRef.current = null;
       terrainLayerRef.current = null;
       overlayLayerRef.current = null;
+      cliffOverlayLayerRef.current = null;
       debugLayerRef.current = null;
       toneFilterRef.current = null;
       aerialOverlayRef.current = null;
@@ -471,6 +482,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       terrainLayerRef.current,
       overlayLayerRef.current,
       debugLayerRef.current,
+      cliffOverlayLayerRef.current,
       lastTerrainKeyRef,
       snapshot,
       assets,

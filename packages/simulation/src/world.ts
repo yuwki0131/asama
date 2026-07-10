@@ -36,6 +36,93 @@ export type { WorldState } from "./types";
 export { ECONOMY_BALANCE, FOOD_BALANCE, SIEGE_BALANCE } from "./types";
 export { serializeWorld, deserializeWorld } from "./serialization";
 
+type Mutable<T> = { -readonly [P in keyof T]: T[P] };
+
+/**
+ * Inserts dedicated "cliff" terrain cells at high-low elevation boundaries.
+ * For every cell with elevation > 0, its S and E neighbours with a lower
+ * elevation are converted to cliff cells (terrain="cliff", passable=false).
+ * Slope cells that bridge the height difference are left untouched.
+ * An SE corner cliff is added where both the S and E neighbours are cliff cells.
+ */
+function insertCliffCells(map: WorldState["map"]): void {
+  const { cells, width, height } = map;
+
+  function cellAtCoord(x: number, y: number): Mutable<typeof cells[number]> | undefined {
+    if (x < 0 || y < 0 || x >= width || y >= height) return undefined;
+    return cells[y * width + x] as Mutable<typeof cells[number]> | undefined;
+  }
+
+  // Pass 1: S and E edges of high cells.
+  // Iterate a snapshot of the original cell list so we don't re-process newly
+  // written cliff cells that happen to share an index.
+  const originalCells = [...cells];
+  for (const cell of originalCells) {
+    const cellElev = cell.elevation;
+    if (cellElev <= 0 && cell.slope === null) continue;
+
+    for (const dir of ["s", "e"] as const) {
+      const nx = cell.coord.x + (dir === "e" ? 1 : 0);
+      const ny = cell.coord.y + (dir === "s" ? 1 : 0);
+      const neighbor = cellAtCoord(nx, ny);
+      if (neighbor === undefined) continue;
+      if (neighbor.terrain === "cliff") continue; // already a cliff cell
+
+      const neighborElev = neighbor.elevation;
+      const drop = cellElev - neighborElev;
+      if (drop <= 0) continue; // no height difference
+
+      // Skip if a slope bridges this edge.
+      // "oppDir" is the slope direction at the LOW cell (neighbor) that
+      // points back toward the HIGH cell (cell).
+      const oppDir = dir === "s" ? "N" : "W";
+      const dirUpper = dir === "s" ? "S" : "E";
+      if (cell.slope === dirUpper || neighbor.slope === oppDir) continue;
+
+      // Rewrite neighbour as a cliff cell.
+      const idx = ny * width + nx;
+      cells[idx] = {
+        ...neighbor,
+        terrain: "cliff",
+        passable: false,
+        movementCost: 99,
+        assetId: "terrain.cliff.placeholder",
+        cliffFace: dir,
+        cliffHeight: drop,
+        elevationSkin: cell.elevationSkin
+      } as typeof cells[number];
+    }
+  }
+
+  // Pass 2: SE corner where both S and E neighbours are cliff cells.
+  for (const cell of cells) {
+    if (cell.elevation <= 0) continue;
+    const cx = cell.coord.x;
+    const cy = cell.coord.y;
+    const se = cellAtCoord(cx + 1, cy + 1);
+    const s = cellAtCoord(cx, cy + 1);
+    const e = cellAtCoord(cx + 1, cy);
+    if (
+      se !== undefined &&
+      se.terrain !== "cliff" &&
+      s?.terrain === "cliff" &&
+      e?.terrain === "cliff"
+    ) {
+      const idx = (cy + 1) * width + (cx + 1);
+      cells[idx] = {
+        ...se,
+        terrain: "cliff",
+        passable: false,
+        movementCost: 99,
+        assetId: "terrain.cliff.placeholder",
+        cliffFace: "se",
+        cliffHeight: cell.elevation - se.elevation,
+        elevationSkin: cell.elevationSkin
+      } as typeof cells[number];
+    }
+  }
+}
+
 /** Compatibility export: the default scenario's waves (tests, tooling). */
 export const ENEMY_WAVES: readonly ScenarioWave[] = mvpDefenseScenario.waves;
 
@@ -82,6 +169,8 @@ export function createInitialWorld(scenario: ScenarioDefinition = mvpDefenseScen
   if (scenario.elevation !== undefined) {
     applyScenarioElevation(world.map, scenario.elevation);
   }
+  // Insert dedicated cliff cells at elevation boundaries (no-op for flat maps).
+  insertCliffCells(world.map);
 
   seedInitialBuildings(world, scenario);
   // Units spawn after buildings so building placement validation does not

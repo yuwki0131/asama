@@ -35,6 +35,10 @@ export interface TerrainCellState {
   readonly slope: SlopeDirection | null;
   /** Skin for cliff faces / slope tiles around this cell. */
   readonly elevationSkin: ElevationSkin;
+  /** cliff cells only: which face this cell renders ("s" | "e" | "se"). */
+  readonly cliffFace?: "s" | "e" | "se";
+  /** cliff cells only: elevation drop from the adjacent high cell. */
+  readonly cliffHeight?: number;
 }
 
 export interface UnitState {
