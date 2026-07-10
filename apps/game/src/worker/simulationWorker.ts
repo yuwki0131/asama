@@ -1,5 +1,5 @@
 import { createInitialWorld, applyCommand, deserializeWorld, serializeWorld, snapshotWorld, updateWorld } from "@asama/simulation";
-import { DEFAULT_SCENARIO } from "@asama/content";
+import { DEFAULT_SCENARIO, scenarios } from "@asama/content";
 import {
   SIM_TICKS_PER_SECOND,
   SNAPSHOTS_PER_SECOND,
@@ -9,11 +9,13 @@ import {
 } from "@asama/shared";
 import { elevationFixtureScenario } from "../dev/elevationFixtureScenario";
 
-/** DEV-only fixture scenarios selectable via the init message's scenarioId
- *  (page URL `?scenario=...`). Production always boots DEFAULT_SCENARIO. */
 function scenarioForId(scenarioId: string | undefined): ScenarioDefinition {
   if (import.meta.env.DEV && scenarioId === "elevation-fixture") {
     return elevationFixtureScenario;
+  }
+  if (scenarioId !== undefined) {
+    const found = scenarios.find(s => s.id === scenarioId);
+    if (found) return found;
   }
   return DEFAULT_SCENARIO;
 }
