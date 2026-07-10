@@ -87,7 +87,7 @@ export interface RenderPoint extends WorldPoint {
 /**
  * Like `interpolateUnitWorldPosition`, but lifts the unit by the walking
  * surface offset of the cell(s) it moves across. `surfaceOffsetAt` returns
- * the offset in world px (≤ 0; e.g. -24×elevation, slope cells at half a
+ * the offset in world px (≤ 0; e.g. -40×elevation, slope cells at half a
  * level extra). The offset is interpolated with the same movement fraction,
  * so a unit walking onto a slope and up a terrace rises smoothly instead of
  * popping per cell.

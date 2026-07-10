@@ -3,6 +3,7 @@ import type { ElevationSkin, TerrainCellSnapshot, WorldSnapshot } from "@asama/s
 import { clearLayer, createSpriteFromCandidates, type LoadedAsset } from "./assets";
 import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera";
 import {
+  cellAt,
   cliffInfoFor,
   ELEVATION_PIXELS_PER_LEVEL,
   tileOffsetY,
@@ -66,7 +67,7 @@ export function buildTerrainChunks(
     }
     entry.cells.push(cell);
     const world = cellToWorld(cell.coord);
-    // Elevated cells draw their tile up to 24*elevation px higher; include
+    // Elevated cells draw their tile up to 40*elevation px higher; include
     // that lift in the culling bounds so hilltops don't vanish at the screen
     // edge.
     const lift = cell.elevation * ELEVATION_PIXELS_PER_LEVEL;
@@ -129,6 +130,50 @@ export function buildTerrainChunks(
     (container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = bounds;
     terrainLayer.addChild(container);
   }
+
+  // Phase 4 — upper cap lines: NW and NE edges of elevated cells whose
+  // uphill neighbours are lower (or absent). In isometric view these edges
+  // form the top rim of a terrace; without a visible line they blend into
+  // the tile behind and the step is hard to read.
+  //
+  // Isometric neighbour mapping for a cell at (cx, cy):
+  //   NW (screen upper-left)  = (cx-1, cy)   — world shifts (-32, -16)
+  //   NE (screen upper-right) = (cx, cy-1)   — world shifts (+32, -16)
+  //
+  // Tile diamond vertices (TILE_WIDTH=64, TILE_HEIGHT=32) relative to the
+  // cell's world center with elevation offset applied:
+  //   Top/N corner = (screenX,        screenY - TILE_HEIGHT/2)
+  //   Left/W corner = (screenX - TILE_WIDTH/2, screenY)
+  //   Right/E corner = (screenX + TILE_WIDTH/2, screenY)
+  const capGraphics = new Graphics();
+  for (const cell of snapshot.map.cells) {
+    if (cell.elevation <= 0) {
+      continue;
+    }
+    const point = cellToWorld(cell.coord);
+    const offsetY = tileOffsetY(cell);
+    const screenX = point.x;
+    const screenY = point.y + offsetY;
+
+    // NW cap line: top → left diamond vertex.
+    const nwNeighbour = cellAt(snapshot.map, cell.coord.x - 1, cell.coord.y);
+    if ((nwNeighbour?.elevation ?? 0) < cell.elevation) {
+      capGraphics
+        .moveTo(screenX, screenY - TILE_HEIGHT / 2)
+        .lineTo(screenX - TILE_WIDTH / 2, screenY)
+        .stroke({ color: 0x4a3018, width: 2, alpha: 0.85 });
+    }
+
+    // NE cap line: top → right diamond vertex.
+    const neNeighbour = cellAt(snapshot.map, cell.coord.x, cell.coord.y - 1);
+    if ((neNeighbour?.elevation ?? 0) < cell.elevation) {
+      capGraphics
+        .moveTo(screenX, screenY - TILE_HEIGHT / 2)
+        .lineTo(screenX + TILE_WIDTH / 2, screenY)
+        .stroke({ color: 0x4a3018, width: 2, alpha: 0.85 });
+    }
+  }
+  terrainLayer.addChild(capGraphics);
 }
 
 export function updateTerrainChunkVisibility(
