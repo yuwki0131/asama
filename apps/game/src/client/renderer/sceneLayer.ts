@@ -337,17 +337,17 @@ export class RetainedScene {
       if (visual === undefined) {
         visual = createUnitVisual(unit, assets, snapshot.map);
         // Initialize animState if sheets are available for this unit type
-        const walkSheetKey = `${unit.assetId}.anim.walk`;
-        if (sheets.has(walkSheetKey)) {
-          visual.animState = createAnimState(unit.id, unit.assetId, "idle", sheets);
+        const animBase = `unit.${unit.type}`;
+        if (sheets.has(`${animBase}.anim.walk`)) {
+          visual.animState = createAnimState(unit.id, animBase, "idle", sheets);
         }
         this.unitVisuals.set(unit.id, visual);
         this.unitsLayer.addChild(visual.container);
       }
 
       // Late-init animState when sheets became available after visual creation
-      if (visual.animState === null && sheets.has(`${unit.assetId}.anim.walk`)) {
-        visual.animState = createAnimState(unit.id, unit.assetId, "idle", sheets);
+      if (visual.animState === null && sheets.has(`unit.${unit.type}.anim.walk`)) {
+        visual.animState = createAnimState(unit.id, `unit.${unit.type}`, "idle", sheets);
       }
 
       visual.unit = unit;
@@ -365,7 +365,7 @@ export class RetainedScene {
 
         if (attackerIds.has(unit.id) && st.currentAction !== "attack" && st.currentAction !== "death") {
           // Trigger attack animation for one cycle
-          const attackSheetKey = `${unit.assetId}.anim.attack`;
+          const attackSheetKey = `unit.${unit.type}.anim.attack`;
           if (sheets.has(attackSheetKey)) {
             st.currentAction = "attack";
             st.attackCyclesLeft = 1;
@@ -385,7 +385,7 @@ export class RetainedScene {
             if (st.currentAction !== "idle") {
               st.currentAction = "idle";
               // Apply phase offset when entering idle
-              const idleSheet = sheets.get(`${unit.assetId}.anim.idle`);
+              const idleSheet = sheets.get(`unit.${unit.type}.anim.idle`);
               if (idleSheet !== undefined) {
                 st.frameIndex = st.phaseOffset % idleSheet.frames;
               } else {
@@ -411,7 +411,7 @@ export class RetainedScene {
     const st = visual.animState;
     if (st === null) return;
 
-    const sheetKey = `${visual.assetId}.anim.${st.currentAction}`;
+    const sheetKey = `unit.${visual.unit.type}.anim.${st.currentAction}`;
     const sheet = this.lastSheets?.get(sheetKey);
     if (sheet === undefined) return;
 
@@ -444,7 +444,7 @@ export class RetainedScene {
     }
 
     // Look up the sheet for the (possibly updated) current action
-    const currentSheetKey = `${visual.assetId}.anim.${st.currentAction}`;
+    const currentSheetKey = `unit.${visual.unit.type}.anim.${st.currentAction}`;
     const currentSheet = this.lastSheets?.get(currentSheetKey);
     if (currentSheet === undefined) return;
 
