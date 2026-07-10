@@ -37,7 +37,10 @@ interface TerrainChunkBounds {
 export function terrainKeyFor(snapshot: WorldSnapshot, assets: ReadonlyMap<string, LoadedAsset>): string {
   const firstCell = snapshot.map.cells[0]?.coord;
   const lastCell = snapshot.map.cells[snapshot.map.cells.length - 1]?.coord;
-  return `${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}`;
+  // terrainRevision increments on player terrain modifications so the chunk
+  // cache is rebuilt to reflect new elevation / slope data.
+  const rev = snapshot.terrainRevision ?? 0;
+  return `${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}:r${rev}`;
 }
 
 export function buildTerrainChunks(

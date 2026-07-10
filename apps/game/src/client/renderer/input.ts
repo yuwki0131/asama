@@ -49,6 +49,10 @@ export interface InputRefs {
   readonly onGroupSaveRef: MutableRefObject<(groupNum: number, unitIds: readonly UnitId[]) => void>;
   readonly onGroupRecallRef: MutableRefObject<(groupNum: number, jump: boolean) => void>;
   readonly onCancelBuildToolRef: MutableRefObject<() => void>;
+  readonly onRaiseTerrainRef: MutableRefObject<(position: CellCoord) => void>;
+  readonly onLowerTerrainRef: MutableRefObject<(position: CellCoord) => void>;
+  readonly onPlaceSlopeRef: MutableRefObject<(position: CellCoord) => void>;
+  readonly onRemoveSlopeRef: MutableRefObject<(position: CellCoord) => void>;
 }
 
 export interface PointerInputOptions {
@@ -339,6 +343,30 @@ export function registerPointerInput({
     if (activeBuildTool === "ladder" || activeBuildTool === "fillMoat") {
       setSelectedCell(clickedCell);
       refs.onEngineerTaskRef.current(activeBuildTool, clickedCell);
+      return;
+    }
+
+    if (activeBuildTool === "raiseTerrain") {
+      setSelectedCell(clickedCell);
+      refs.onRaiseTerrainRef.current(clickedCell);
+      return;
+    }
+
+    if (activeBuildTool === "lowerTerrain") {
+      setSelectedCell(clickedCell);
+      refs.onLowerTerrainRef.current(clickedCell);
+      return;
+    }
+
+    if (activeBuildTool === "placeSlope") {
+      setSelectedCell(clickedCell);
+      refs.onPlaceSlopeRef.current(clickedCell);
+      return;
+    }
+
+    if (activeBuildTool === "removeSlope") {
+      setSelectedCell(clickedCell);
+      refs.onRemoveSlopeRef.current(clickedCell);
       return;
     }
 

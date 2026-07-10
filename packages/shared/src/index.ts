@@ -344,6 +344,10 @@ export interface WorldSnapshot {
   readonly outcome: GameOutcome | null;
   readonly food: FoodSnapshot;
   readonly economy: EconomySnapshot;
+  /** Increments on every terrain-mutation command (raiseTerrain / lowerTerrain
+   *  / placeSlope / removeSlope). The renderer uses this to know when to
+   *  rebuild terrain chunks. Absent on legacy payloads (treat as 0). */
+  readonly terrainRevision?: number;
   readonly map: {
     readonly width: number;
     readonly height: number;
@@ -433,6 +437,37 @@ export type PlayerCommand =
       readonly type: "engineerTask";
       readonly unitIds: readonly UnitId[];
       readonly task: EngineerTaskKind;
+      readonly position: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      /** Raise the target cell one elevation level (50 gold). */
+      readonly type: "raiseTerrain";
+      readonly position: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      /** Lower the target cell one elevation level (20 gold). */
+      readonly type: "lowerTerrain";
+      readonly position: CellCoord;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      /** Place a ramp on the target cell rising toward `toward` (30 gold).
+       *  The cell in the `toward` direction must be at exactly elevation+1. */
+      readonly type: "placeSlope";
+      readonly position: CellCoord;
+      readonly toward: SlopeDirection;
+      readonly issuedAtTick: number;
+      readonly clientSequence: number;
+    }
+  | {
+      /** Remove the slope from the target cell, restoring it to a flat surface
+       *  at its current elevation (10 gold). */
+      readonly type: "removeSlope";
       readonly position: CellCoord;
       readonly issuedAtTick: number;
       readonly clientSequence: number;

@@ -49,7 +49,14 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
     if (rejectionReason !== null) {
       post({ type: "commandRejected", reason: rejectionReason });
     }
-    post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: false }) });
+    // Terrain mutation commands require fresh cell data so the renderer can
+    // rebuild its chunk cache with the updated elevation/slope state.
+    const isTerrainCommand =
+      message.command.type === "raiseTerrain" ||
+      message.command.type === "lowerTerrain" ||
+      message.command.type === "placeSlope" ||
+      message.command.type === "removeSlope";
+    post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: isTerrainCommand }) });
     return;
   }
 

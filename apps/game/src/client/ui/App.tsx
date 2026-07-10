@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, UnitId, UnitType, WorldSnapshot } from "@asama/shared";
+import type { BuildingType, CellCoord, EntityId, MarketTrade, Season, SlopeDirection, UnitId, UnitType, WorldSnapshot } from "@asama/shared";
 import type {} from "../testBridge";
 import { unitSpecs } from "@asama/content";
 import { DEBUG_OVERLAY_DEFAULT_ENABLED, GameCanvas, type GameCanvasHandle, type ToolMode } from "../renderer/GameCanvas";
@@ -37,11 +37,12 @@ export function App() {
   const gameCanvasRef = useRef<GameCanvasHandle | null>(null);
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(null);
-  const buildToolRef = useRef<BuildingType | "demolish" | "ladder" | "fillMoat" | null>(null);
+  const buildToolRef = useRef<ToolMode>(null);
   const tickWaitersRef = useRef<Map<number, Array<(s: WorldSnapshot) => void>>>(new Map());
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [simulationStatus, setSimulationStatus] = useState("starting");
   const [buildTool, setBuildTool] = useState<ToolMode>(null);
+  const [slopeDirection, setSlopeDirection] = useState<SlopeDirection>("S");
   const [debugVisible, setDebugVisible] = useState(DEBUG_STATUS_PANEL_ENABLED || DEBUG_OVERLAY_DEFAULT_ENABLED);
   const [speed, setSpeed] = useState<0 | 1 | 2 | 4>(1);
   const lastRunningSpeedRef = useRef<1 | 2 | 4>(1);
@@ -411,6 +412,55 @@ export function App() {
     setBuildTool(null);
   }, []);
 
+  const handleRaiseTerrain = useCallback(
+    (position: CellCoord) => {
+      simulationRef.current?.enqueueCommand({
+        type: "raiseTerrain",
+        position,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
+
+  const handleLowerTerrain = useCallback(
+    (position: CellCoord) => {
+      simulationRef.current?.enqueueCommand({
+        type: "lowerTerrain",
+        position,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
+
+  const handlePlaceSlope = useCallback(
+    (position: CellCoord) => {
+      simulationRef.current?.enqueueCommand({
+        type: "placeSlope",
+        position,
+        toward: slopeDirection,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick, slopeDirection]
+  );
+
+  const handleRemoveSlope = useCallback(
+    (position: CellCoord) => {
+      simulationRef.current?.enqueueCommand({
+        type: "removeSlope",
+        position,
+        issuedAtTick: snapshot?.currentTick ?? 0,
+        clientSequence: Date.now()
+      });
+    },
+    [snapshot?.currentTick]
+  );
+
   const handleRecruit = useCallback(
     (unitType: UnitType) => {
       simulationRef.current?.enqueueCommand({
@@ -545,6 +595,48 @@ export function App() {
           onClick={() => setBuildTool("demolish")}
         >
           解体
+        </button>
+        <span className="bar-divider" />
+        <span className="bar-group-label">地形</span>
+        <button
+          className={buildTool === "raiseTerrain" ? "active" : ""}
+          type="button"
+          onClick={() => setBuildTool("raiseTerrain")}
+        >
+          盛土 (50G)
+        </button>
+        <button
+          className={buildTool === "lowerTerrain" ? "active" : ""}
+          type="button"
+          onClick={() => setBuildTool("lowerTerrain")}
+        >
+          削土 (20G)
+        </button>
+        <span className="bar-divider" />
+        <span className="bar-group-label">坂道</span>
+        {SLOPE_DIRECTIONS.map((dir) => (
+          <button
+            key={dir.value}
+            className={slopeDirection === dir.value ? "active" : ""}
+            type="button"
+            onClick={() => setSlopeDirection(dir.value)}
+          >
+            {dir.label}
+          </button>
+        ))}
+        <button
+          className={buildTool === "placeSlope" ? "active" : ""}
+          type="button"
+          onClick={() => setBuildTool("placeSlope")}
+        >
+          坂設置 (30G)
+        </button>
+        <button
+          className={buildTool === "removeSlope" ? "active" : ""}
+          type="button"
+          onClick={() => setBuildTool("removeSlope")}
+        >
+          坂撤去 (10G)
         </button>
       </div>
 
@@ -691,6 +783,10 @@ export function App() {
           onGroupSave={handleGroupSave}
           onGroupRecall={handleGroupRecall}
           onCancelBuildTool={handleCancelBuildTool}
+          onRaiseTerrain={handleRaiseTerrain}
+          onLowerTerrain={handleLowerTerrain}
+          onPlaceSlope={handlePlaceSlope}
+          onRemoveSlope={handleRemoveSlope}
         />
         <SelectionInfoPanel selectedUnits={selectedUnits} selectedBuilding={selectedBuilding} />
         {debugVisible ? (
@@ -906,6 +1002,13 @@ const INFRA_TOOLS: readonly { readonly type: BuildingType; readonly label: strin
   { type: "road", label: "道" },
   { type: "earth_bridge", label: "土橋" },
   { type: "wood_bridge", label: "木橋" }
+];
+
+const SLOPE_DIRECTIONS: readonly { readonly value: SlopeDirection; readonly label: string }[] = [
+  { value: "N", label: "北↑" },
+  { value: "E", label: "東→" },
+  { value: "S", label: "南↓" },
+  { value: "W", label: "西←" }
 ];
 
 const ECONOMY_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [
