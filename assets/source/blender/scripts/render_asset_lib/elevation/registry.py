@@ -2,8 +2,8 @@
 
 Model naming mirrors the runtime asset ids of the elevation contract:
 
-    elev-<cliff|ishigaki>-face-<s|e>-h<1..3>
-    elev-<cliff|ishigaki>-corner-se-h<1..3>
+    elev-<cliff|ishigaki>-face-<s|e>-h<1..5>
+    elev-<cliff|ishigaki>-corner-se-h<1..5>
     elev-slope-<dirt|ishigaki>-<n|e|s|w>
     elev-slope-<dirt|ishigaki>-<n|e|s|w>-side-<s|e>
 """
@@ -21,21 +21,21 @@ from .tiles import (
 )
 
 ELEVATION_MODEL_PATTERNS = (
-    "elev-(cliff|ishigaki)-face-(s|e)-h[123]",
-    "elev-(cliff|ishigaki)-corner-se-h[123]",
+    "elev-(cliff|ishigaki)-face-(s|e)-h[12345]",
+    "elev-(cliff|ishigaki)-corner-se-h[12345]",
     "elev-slope-(dirt|ishigaki)-[nesw]",
     "elev-slope-(dirt|ishigaki)-[nesw]-side-(s|e)",
 )
 
 
 def resolve_model(name: str):
-    face = re.fullmatch(r"elev-(cliff|ishigaki)-face-([se])-h([123])", name)
+    face = re.fullmatch(r"elev-(cliff|ishigaki)-face-([se])-h([12345])", name)
     if face is not None:
         skin, direction, h = face.group(1), face.group(2), int(face.group(3))
         builder = build_cliff_face if skin == "cliff" else build_ishigaki_face
         return lambda scene: builder(scene, direction, h)
 
-    corner = re.fullmatch(r"elev-(cliff|ishigaki)-corner-se-h([123])", name)
+    corner = re.fullmatch(r"elev-(cliff|ishigaki)-corner-se-h([12345])", name)
     if corner is not None:
         skin, h = corner.group(1), int(corner.group(2))
         builder = build_cliff_corner if skin == "cliff" else build_ishigaki_corner

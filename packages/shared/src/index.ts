@@ -14,8 +14,10 @@ export type TerrainType = "grass" | "dirt" | "water" | "stone" | "cliff";
 
 // --- Elevation (docs/10_development/elevation-contract.md) ------------------
 
-/** Discrete terrain height levels: 0 (base plain) .. 3 (highest terrace). */
-export const MAX_ELEVATION = 3;
+/** Discrete terrain height levels: 0 (base plain) .. 5 (highest terrace).
+ *  1-5: 平城・平山城の表現に十分 (姫路城・岡山城の石垣段数).
+ *  6+: 本来の山城用 (将来フェーズで対応予定). */
+export const MAX_ELEVATION = 5;
 
 /** Cardinal direction in cell space (N = -y, E = +x, S = +y, W = -x). */
 export type SlopeDirection = "N" | "E" | "S" | "W";
