@@ -654,11 +654,12 @@ def build_tenshu_graybox(scene: bpy.types.Scene) -> None:
         return (cx - w / 2, cy - w / 2), (cx + w / 2, cy + w / 2)
 
     # Ishigaki: two battered stages.
-    (l0, _), (h0, _2) = (centered(7.4)[0], None), (centered(7.4)[1], None)
-    low, high = centered(6.8)
-    add_frustum(scene, "IshigakiLower", low, high, 0.0, 0.85, 0.75, stone)
-    low, high = centered(5.4)
-    add_frustum(scene, "IshigakiUpper", low, high, 0.85, 1.5, 0.5, stone)
+    # NOTE: IshigakiLower and IshigakiUpper are omitted here — the terrain
+    # elevation system renders dedicated ishigaki revetment tiles that sit
+    # around the tenshu lot.  Including them in the building sprite causes
+    # double-drawing where the two layers overlap.
+    # add_frustum(scene, "IshigakiLower", low, high, 0.0, 0.85, 0.75, stone)
+    # add_frustum(scene, "IshigakiUpper", low, high, 0.85, 1.5, 0.5, stone)
 
     # Tiers: (width, body height, roof rise, ridge axis) — tall tower with
     # walls clearly visible between roofs.
