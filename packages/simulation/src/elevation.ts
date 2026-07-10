@@ -176,6 +176,14 @@ export function applyScenarioElevation(map: WorldState["map"], definition: Scena
     }
   }
 
+  // Slopes are walking ramps: drop decorations (trees, rocks, weeds) that map
+  // generation scattered on cells that have just become slopes — a tree
+  // standing mid-ramp reads as broken art and hides the slope tile.
+  map.decorations = map.decorations.filter((decoration) => {
+    const cell = map.cells[decoration.position.y * map.width + decoration.position.x];
+    return cell === undefined || cell.slope === null;
+  });
+
   validateSlopes(map);
 }
 

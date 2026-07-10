@@ -59,6 +59,17 @@ export function surfaceOffsetYAt(map: ElevationMapLike | null, cell: CellCoord):
 const OPPOSITE: Record<SlopeDirection, SlopeDirection> = { N: "S", E: "W", S: "N", W: "E" };
 
 /**
+ * Slope tile assets are produced per ART skin, not per elevation skin: the
+ * "cliff" (natural rock) elevation skin climbs on a DIRT cutting
+ * (`terrain.slope.dirt.*`), ishigaki on a stone stairway
+ * (`terrain.slope.ishigaki.*`). Map the cell's elevation skin to the asset
+ * naming used by the production pipeline.
+ */
+export function slopeAssetSkin(skin: "cliff" | "ishigaki"): "dirt" | "ishigaki" {
+  return skin === "cliff" ? "dirt" : "ishigaki";
+}
+
+/**
  * Height of the cell surface at the edge facing `direction` (mirror of the
  * sim's `edgeHeight`): flat cells expose `elevation` on every edge, slope
  * cells expose `elevation + 1` uphill, `elevation` downhill and `null` on
@@ -167,7 +178,7 @@ export function cliffInfoFor(map: ElevationMapLike, cell: TerrainCellSnapshot): 
         topA,
         topB,
         bottom: Math.min(bottom, low),
-        assetId: `terrain.slope.${skin}.${slope.toLowerCase()}.side.${edge}`
+        assetId: `terrain.slope.${slopeAssetSkin(skin)}.${slope.toLowerCase()}.side.${edge}`
       });
     }
   }

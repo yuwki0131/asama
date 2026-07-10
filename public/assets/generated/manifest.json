@@ -2339,10 +2339,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-s-h1.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.2857142857142857
+        "y": 0.2222222222222222
       }
     },
     {
@@ -2350,10 +2350,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-s-h2.png",
       "width": 64,
-      "height": 80,
+      "height": 112,
       "anchor": {
         "x": 0.5,
-        "y": 0.2
+        "y": 0.14285714285714285
       }
     },
     {
@@ -2361,10 +2361,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-s-h3.png",
       "width": 64,
-      "height": 104,
+      "height": 152,
       "anchor": {
         "x": 0.5,
-        "y": 0.15384615384615385
+        "y": 0.10526315789473684
       }
     },
     {
@@ -2372,10 +2372,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-e-h1.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.2857142857142857
+        "y": 0.2222222222222222
       }
     },
     {
@@ -2383,10 +2383,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-e-h2.png",
       "width": 64,
-      "height": 80,
+      "height": 112,
       "anchor": {
         "x": 0.5,
-        "y": 0.2
+        "y": 0.14285714285714285
       }
     },
     {
@@ -2394,10 +2394,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-e-h3.png",
       "width": 64,
-      "height": 104,
+      "height": 152,
       "anchor": {
         "x": 0.5,
-        "y": 0.15384615384615385
+        "y": 0.10526315789473684
       }
     },
     {
@@ -2405,10 +2405,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-corner-se-h1.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.2857142857142857
+        "y": 0.2222222222222222
       }
     },
     {
@@ -2416,10 +2416,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-corner-se-h2.png",
       "width": 64,
-      "height": 80,
+      "height": 112,
       "anchor": {
         "x": 0.5,
-        "y": 0.2
+        "y": 0.14285714285714285
       }
     },
     {
@@ -2427,10 +2427,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-corner-se-h3.png",
       "width": 64,
-      "height": 104,
+      "height": 152,
       "anchor": {
         "x": 0.5,
-        "y": 0.15384615384615385
+        "y": 0.10526315789473684
       }
     },
     {
@@ -2438,10 +2438,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-s-h1.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.2857142857142857
+        "y": 0.2222222222222222
       }
     },
     {
@@ -2449,10 +2449,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-s-h2.png",
       "width": 64,
-      "height": 80,
+      "height": 112,
       "anchor": {
         "x": 0.5,
-        "y": 0.2
+        "y": 0.14285714285714285
       }
     },
     {
@@ -2460,10 +2460,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-s-h3.png",
       "width": 64,
-      "height": 104,
+      "height": 152,
       "anchor": {
         "x": 0.5,
-        "y": 0.15384615384615385
+        "y": 0.10526315789473684
       }
     },
     {
@@ -2471,10 +2471,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-e-h1.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.2857142857142857
+        "y": 0.2222222222222222
       }
     },
     {
@@ -2482,10 +2482,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-e-h2.png",
       "width": 64,
-      "height": 80,
+      "height": 112,
       "anchor": {
         "x": 0.5,
-        "y": 0.2
+        "y": 0.14285714285714285
       }
     },
     {
@@ -2493,10 +2493,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-e-h3.png",
       "width": 64,
-      "height": 104,
+      "height": 152,
       "anchor": {
         "x": 0.5,
-        "y": 0.15384615384615385
+        "y": 0.10526315789473684
       }
     },
     {
@@ -2504,10 +2504,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-corner-se-h1.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.2857142857142857
+        "y": 0.2222222222222222
       }
     },
     {
@@ -2515,10 +2515,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-corner-se-h2.png",
       "width": 64,
-      "height": 80,
+      "height": 112,
       "anchor": {
         "x": 0.5,
-        "y": 0.2
+        "y": 0.14285714285714285
       }
     },
     {
@@ -2526,10 +2526,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-corner-se-h3.png",
       "width": 64,
-      "height": 104,
+      "height": 152,
       "anchor": {
         "x": 0.5,
-        "y": 0.15384615384615385
+        "y": 0.10526315789473684
       }
     },
     {
@@ -2537,10 +2537,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-s-h4.png",
       "width": 64,
-      "height": 128,
+      "height": 192,
       "anchor": {
         "x": 0.5,
-        "y": 0.125
+        "y": 0.08333333333333333
       }
     },
     {
@@ -2548,10 +2548,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-s-h5.png",
       "width": 64,
-      "height": 152,
+      "height": 232,
       "anchor": {
         "x": 0.5,
-        "y": 0.10526315789473684
+        "y": 0.06896551724137931
       }
     },
     {
@@ -2559,10 +2559,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-e-h4.png",
       "width": 64,
-      "height": 128,
+      "height": 192,
       "anchor": {
         "x": 0.5,
-        "y": 0.125
+        "y": 0.08333333333333333
       }
     },
     {
@@ -2570,10 +2570,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-e-h5.png",
       "width": 64,
-      "height": 152,
+      "height": 232,
       "anchor": {
         "x": 0.5,
-        "y": 0.10526315789473684
+        "y": 0.06896551724137931
       }
     },
     {
@@ -2581,10 +2581,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-corner-se-h4.png",
       "width": 64,
-      "height": 128,
+      "height": 192,
       "anchor": {
         "x": 0.5,
-        "y": 0.125
+        "y": 0.08333333333333333
       }
     },
     {
@@ -2592,10 +2592,10 @@
       "kind": "terrain",
       "file": "generated/terrain-cliff-corner-se-h5.png",
       "width": 64,
-      "height": 152,
+      "height": 232,
       "anchor": {
         "x": 0.5,
-        "y": 0.10526315789473684
+        "y": 0.06896551724137931
       }
     },
     {
@@ -2603,10 +2603,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-s-h4.png",
       "width": 64,
-      "height": 128,
+      "height": 192,
       "anchor": {
         "x": 0.5,
-        "y": 0.125
+        "y": 0.08333333333333333
       }
     },
     {
@@ -2614,10 +2614,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-s-h5.png",
       "width": 64,
-      "height": 152,
+      "height": 232,
       "anchor": {
         "x": 0.5,
-        "y": 0.10526315789473684
+        "y": 0.06896551724137931
       }
     },
     {
@@ -2625,10 +2625,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-e-h4.png",
       "width": 64,
-      "height": 128,
+      "height": 192,
       "anchor": {
         "x": 0.5,
-        "y": 0.125
+        "y": 0.08333333333333333
       }
     },
     {
@@ -2636,10 +2636,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-face-e-h5.png",
       "width": 64,
-      "height": 152,
+      "height": 232,
       "anchor": {
         "x": 0.5,
-        "y": 0.10526315789473684
+        "y": 0.06896551724137931
       }
     },
     {
@@ -2647,10 +2647,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-corner-se-h4.png",
       "width": 64,
-      "height": 128,
+      "height": 192,
       "anchor": {
         "x": 0.5,
-        "y": 0.125
+        "y": 0.08333333333333333
       }
     },
     {
@@ -2658,10 +2658,10 @@
       "kind": "terrain",
       "file": "generated/terrain-ishigaki-corner-se-h5.png",
       "width": 64,
-      "height": 152,
+      "height": 232,
       "anchor": {
         "x": 0.5,
-        "y": 0.10526315789473684
+        "y": 0.06896551724137931
       }
     },
     {
@@ -2669,10 +2669,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-n.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2680,10 +2680,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-e.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2691,10 +2691,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-s.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2702,10 +2702,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-w.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2713,10 +2713,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-n-side-e.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2724,10 +2724,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-s-side-e.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2735,10 +2735,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-e-side-s.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2746,10 +2746,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-dirt-w-side-s.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2757,10 +2757,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-n.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2768,10 +2768,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-e.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2779,10 +2779,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-s.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2790,10 +2790,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-w.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2801,10 +2801,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-n-side-e.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2812,10 +2812,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-s-side-e.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2823,10 +2823,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-e-side-s.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {
@@ -2834,10 +2834,10 @@
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-w-side-s.png",
       "width": 64,
-      "height": 56,
+      "height": 72,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.7777777777777778
       }
     },
     {

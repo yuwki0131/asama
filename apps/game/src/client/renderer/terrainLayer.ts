@@ -6,6 +6,7 @@ import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera
 import {
   cellAt,
   ELEVATION_PIXELS_PER_LEVEL,
+  slopeAssetSkin,
   tileOffsetY,
   type CellCliffInfo,
   type CliffFace
@@ -317,7 +318,7 @@ function addSlopeTile(layer: Container, cell: TerrainCellSnapshot, assets: Reado
     return;
   }
 
-  const slopeAssetId = `terrain.slope.${cell.elevationSkin}.${slope.toLowerCase()}`;
+  const slopeAssetId = `terrain.slope.${slopeAssetSkin(cell.elevationSkin)}.${slope.toLowerCase()}`;
   const asset = assets.get(slopeAssetId);
   if (asset !== undefined) {
     const sprite = createSpriteFromCandidates([slopeAssetId], assets);
