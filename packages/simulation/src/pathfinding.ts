@@ -191,6 +191,20 @@ export function isPassable(world: WorldState, coord: CellCoord, perspective?: "p
       perspective === "supply" && building.owner === "player" && isGate(building.type)
         ? true
         : building.passable;
+
+    // gate_wide_3 / gate_wide_3_ne_sw (3-cell gate): when passable, only the
+    // center cell (footprint[1]) acts as the opening. The two end cells are
+    // gate pillars and remain impassable regardless of open/closed state.
+    if (
+      (building.type === "gate_wide_3" || building.type === "gate_wide_3_ne_sw") &&
+      effectivePassable
+    ) {
+      const centerCell = building.footprint[Math.floor(building.footprint.length / 2)];
+      if (centerCell === undefined || !sameCell(coord, centerCell)) {
+        return false;
+      }
+    }
+
     return effectivePassable && (cell.passable || isBridge(building.type));
   }
 
