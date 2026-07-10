@@ -6,6 +6,7 @@ import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera
 import {
   cellAt,
   cliffInfoFor,
+  edgeSurfaceHeight,
   ELEVATION_PIXELS_PER_LEVEL,
   slopeAssetSkin,
   tileOffsetY,
@@ -193,6 +194,13 @@ export function buildTerrainChunks(
  * as the depth key: buildings on the high side (smaller x+y) paint first so
  * the face covers their protruding bases, while trees on the low side
  * (larger x+y) paint after and correctly appear in front of the wall.
+ *
+ * Faces are derived from the MAP GEOMETRY, not from the single `cliffFace`
+ * tag: a low cell in a concave corner of the boundary has BOTH a higher N
+ * neighbour (its S face) and a higher W neighbour (its E face), but the sim
+ * can only tag one direction per cell — trusting the tag left the second
+ * face undrawn, exposing a bare-canvas hole at every inside turn of a
+ * cliff/ishigaki line.
  */
 export function addCliffCellSprites(
   layer: Container,
@@ -202,71 +210,76 @@ export function addCliffCellSprites(
 ): void {
   if (cell.cliffFace === undefined || cell.cliffHeight === undefined) return;
 
-  const skin = cell.elevationSkin;
-  const h = Math.min(cell.cliffHeight, MAX_ELEVATION);
-
-  // Determine the high cell position based on cliffFace direction.
-  let highX: number;
-  let highY: number;
-  if (cell.cliffFace === "s") {
-    highX = cell.coord.x;
-    highY = cell.coord.y - 1;
-  } else if (cell.cliffFace === "e") {
-    highX = cell.coord.x - 1;
-    highY = cell.coord.y;
-  } else {
-    // "se" corner: high cell is diagonally up-left.
-    highX = cell.coord.x - 1;
-    highY = cell.coord.y - 1;
-  }
-
-  const highCell = cellAt(map, highX, highY);
-  if (highCell === null) return;
-
-  const highPoint = cellToWorld({ x: highX, y: highY });
-  const anchorY = highPoint.y + tileOffsetY(highCell);
-  const topElev = highCell.elevation;
-  const bottomElev = cell.elevation;
-
   if (cell.cliffFace === "se") {
-    // SE corner: individual S and E cliff cells draw the faces;
-    // this cell only draws the convex corner sprite.
-    const cornerAssetId = `terrain.${skin}.corner.se.h${h}`;
-    const cornerAsset = assets.get(cornerAssetId);
-    if (cornerAsset !== undefined) {
+    // Convex SE corner: the adjacent S and E cliff cells draw the faces;
+    // this cell only draws the corner sprite over their shared vertical seam.
+    const highCell = cellAt(map, cell.coord.x - 1, cell.coord.y - 1);
+    if (highCell === null) return;
+    const h = Math.min(cell.cliffHeight, MAX_ELEVATION);
+    const cornerAssetId = `terrain.${cell.elevationSkin}.corner.se.h${h}`;
+    if (assets.get(cornerAssetId) !== undefined) {
       const sprite = createSpriteFromCandidates([cornerAssetId], assets);
-      sprite.position.set(highPoint.x, anchorY);
+      const highPoint = cellToWorld(highCell.coord);
+      sprite.position.set(highPoint.x, highPoint.y + tileOffsetY(highCell));
       layer.addChild(sprite);
     }
     return;
   }
 
-  // "s" or "e" face.
-  const edge = cell.cliffFace;
-  const face: CliffFace = {
-    edge,
-    topA: topElev,
-    topB: topElev,
-    bottom: bottomElev,
-    assetId: `terrain.${skin}.face.${edge}.h${h}`
-  };
+  // One face per higher straight neighbour: the N neighbour's S face and/or
+  // the W neighbour's E face (the fixed camera only ever sees S/E faces).
+  const specs = [
+    { dx: 0, dy: -1, edge: "s" as const, facing: "S" as const },
+    { dx: -1, dy: 0, edge: "e" as const, facing: "E" as const }
+  ];
+  const faces: Array<{ face: CliffFace; skin: ElevationSkin; highPoint: { x: number; y: number }; anchorY: number }> = [];
+  for (const spec of specs) {
+    const high = cellAt(map, cell.coord.x + spec.dx, cell.coord.y + spec.dy);
+    if (high === null) continue;
+    // Height of the high cell's edge facing this cell; null on a slope's
+    // side edge (the slope draws its own slanted side wall there).
+    const top = edgeSurfaceHeight(high, spec.facing);
+    if (top === null) continue;
+    const drop = top - cell.elevation;
+    if (drop < 1) continue;
+    const h = Math.min(drop, MAX_ELEVATION);
+    const skin = high.elevationSkin;
+    const highPoint = cellToWorld(high.coord);
+    faces.push({
+      face: {
+        edge: spec.edge,
+        topA: top,
+        topB: top,
+        bottom: cell.elevation,
+        assetId: `terrain.${skin}.face.${spec.edge}.h${h}`
+      },
+      skin,
+      highPoint,
+      anchorY: highPoint.y + tileOffsetY(high)
+    });
+  }
 
-  // Always draw the fallback polygon first as an opaque stone-coloured
-  // backdrop: cliff sprites have transparent anti-aliased edge pixels that
+  // Always draw the fallback polygons first as opaque stone-coloured
+  // backdrops: cliff sprites have transparent anti-aliased edge pixels that
   // would otherwise show the dark underlay / canvas as gaps along the cliff
   // bottom and at the seams between neighbouring faces. The backdrop bleeds
   // a couple of px sideways and downward (same trick as the river bank
-  // strips) so sub-pixel AA seams between adjacent cliff cells, at the SE
-  // corner junction and against the low-side floor tile stay covered.
+  // strips) so sub-pixel AA seams between adjacent cliff cells, at corner
+  // junctions and against the low-side floor tile stay covered. Both
+  // backdrops paint before either sprite so a bleed never overlaps the
+  // neighbouring face's texture.
   const backdrop = new Graphics();
-  drawFallbackFace(backdrop, highPoint, skin, face, CLIFF_BACKDROP_BLEED);
+  for (const { face, skin, highPoint } of faces) {
+    drawFallbackFace(backdrop, highPoint, skin, face, CLIFF_BACKDROP_BLEED);
+  }
   layer.addChild(backdrop);
 
-  const asset = assets.get(face.assetId);
-  if (asset !== undefined) {
-    const sprite = createSpriteFromCandidates([face.assetId], assets);
-    sprite.position.set(highPoint.x, anchorY);
-    layer.addChild(sprite);
+  for (const { face, highPoint, anchorY } of faces) {
+    if (assets.get(face.assetId) !== undefined) {
+      const sprite = createSpriteFromCandidates([face.assetId], assets);
+      sprite.position.set(highPoint.x, anchorY);
+      layer.addChild(sprite);
+    }
   }
 }
 
@@ -333,7 +346,9 @@ function addSlopeTile(
     return;
   }
 
-  // Slanted side walls first — they hang below/behind the ramp surface.
+  // Back-edge fill first (behind everything of this cell), then the slanted
+  // side walls — both hang below/behind the ramp surface.
+  addSlopeBackFill(layer, cell, map);
   addSlopeSideWalls(layer, cell, map, assets);
 
   const slopeAssetId = `terrain.slope.${slopeAssetSkin(cell.elevationSkin)}.${slope.toLowerCase()}`;
@@ -395,6 +410,61 @@ function addSlopeSideWalls(
     drawFallbackFace(fallback, point, cell.elevationSkin, face);
     layer.addChild(fallback);
   }
+}
+
+/**
+ * Fills the screen-space gap on a slope's BACK side edge (the NW or NE
+ * diamond edge adjacent to the uphill edge). Lifting the uphill corners
+ * detaches that edge from the back neighbour's tile, exposing a dark
+ * triangle of bare canvas/underlay between the ramp and the neighbour
+ * (previously a "deep blue hole" beside every ramp). The fill drops from
+ * the slanted lifted edge down to the back neighbour's surface level.
+ */
+function addSlopeBackFill(layer: Container, cell: TerrainCellSnapshot, map: ElevationMapLike): void {
+  const slope = cell.slope;
+  if (slope === null) {
+    return;
+  }
+
+  const point = cellToWorld(cell.coord);
+  const elev = cell.elevation;
+  const px = ELEVATION_PIXELS_PER_LEVEL;
+  const ground = {
+    n: { x: point.x, y: point.y - TILE_HEIGHT / 2 },
+    e: { x: point.x + TILE_WIDTH / 2, y: point.y },
+    s: { x: point.x, y: point.y + TILE_HEIGHT / 2 },
+    w: { x: point.x - TILE_WIDTH / 2, y: point.y }
+  };
+
+  // Back edge adjacent to the uphill edge, per slope direction:
+  //   N: NW edge (neighbour W = (x-1,y)), corners n(high) → w(low)
+  //   E: NE edge (neighbour N = (x,y-1)), corners e(high) → n(low)
+  //   S: NW edge (neighbour W),           corners w(high) → n(low)
+  //   W: NE edge (neighbour N),           corners n(high) → e(low)
+  const spec =
+    slope === "N" ? { dx: -1, dy: 0, facing: "E" as const, high: ground.n, low: ground.w, shade: "s" as const }
+    : slope === "E" ? { dx: 0, dy: -1, facing: "S" as const, high: ground.e, low: ground.n, shade: "e" as const }
+    : slope === "S" ? { dx: -1, dy: 0, facing: "E" as const, high: ground.w, low: ground.n, shade: "s" as const }
+    : /* W */         { dx: 0, dy: -1, facing: "S" as const, high: ground.n, low: ground.e, shade: "e" as const };
+
+  const neighbour = cellAt(map, cell.coord.x + spec.dx, cell.coord.y + spec.dy);
+  const neighbourSurface =
+    neighbour === null ? 0 : edgeSurfaceHeight(neighbour, spec.facing) ?? neighbour.elevation;
+  if (neighbourSurface >= elev + 1) {
+    return; // back neighbour covers the lifted edge — nothing exposed
+  }
+  const bottom = Math.min(neighbourSurface, elev);
+
+  const fill = new Graphics();
+  fill
+    .poly([
+      spec.low.x, spec.low.y - elev * px,
+      spec.high.x, spec.high.y - (elev + 1) * px,
+      spec.high.x, spec.high.y - bottom * px,
+      spec.low.x, spec.low.y - bottom * px
+    ])
+    .fill({ color: CLIFF_FALLBACK_COLORS[cell.elevationSkin][spec.shade], alpha: 1 });
+  layer.addChild(fill);
 }
 
 /** Diamond corners lifted one extra level on a slope tile: the two corners of
