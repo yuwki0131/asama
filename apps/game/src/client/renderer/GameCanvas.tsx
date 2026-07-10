@@ -116,6 +116,11 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const sheetsRef = useRef<ReadonlyMap<string, AnimationSheetAsset>>(new Map());
   const fpsSamplesRef = useRef<number[]>([]);
   const buildToolRef = useRef<ToolMode>(buildTool);
+  // Keep in sync synchronously during render — DOM event handlers (pointerdown
+  // etc.) fire before useEffect runs (which only executes after browser paint),
+  // so a useEffect-based update creates a race where fast real clicks or
+  // Playwright CDP commands read a stale null value before the ref is updated.
+  buildToolRef.current = buildTool;
   const onSelectUnitsRef = useRef(onSelectUnits);
   const onAttackTargetRef = useRef(onAttackTarget);
   const onPlaceBuildingRef = useRef(onPlaceBuilding);
@@ -194,10 +199,6 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   useEffect(() => {
     speedRef.current = speed;
   }, [speed]);
-
-  useEffect(() => {
-    buildToolRef.current = buildTool;
-  }, [buildTool]);
 
   useEffect(() => {
     onSelectUnitsRef.current = onSelectUnits;

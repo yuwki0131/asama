@@ -347,4 +347,118 @@ describe("gate passability", () => {
     expect(isPassable(world, { x: 12, y: 12 })).toBe(true);
     expect(isPassable(world, { x: 12, y: 12 }, "player")).toBe(true);
   });
+
+  function placeWide3Gate(world: WorldState, position: CellCoord): void {
+    const error = applyCommand(
+      world,
+      command({ type: "placeBuilding", buildingType: "gate_wide_3", position })
+    );
+    expect(error).toBeNull();
+  }
+
+  function placeWide3GateNeSw(world: WorldState, position: CellCoord): void {
+    const error = applyCommand(
+      world,
+      command({ type: "placeBuilding", buildingType: "gate_wide_3_ne_sw", position })
+    );
+    expect(error).toBeNull();
+  }
+
+  // gate_wide_3 (NW-SE): footprint x,x+1,x+2 — only center cell (x+1) is passable when open.
+  it("gate_wide_3 open: only center cell is passable, end cells are impassable", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    // Place at x=20; footprint covers x=20, x=21, x=22
+    placeWide3Gate(world, { x: 20, y: 30 });
+
+    const gate = world.buildings.find((b) => b.type === "gate_wide_3");
+    expect(gate?.gateState).toBe("open");
+
+    // Left pillar — impassable even when open
+    expect(isPassable(world, { x: 20, y: 30 })).toBe(false);
+    // Center — the gate opening, passable when open
+    expect(isPassable(world, { x: 21, y: 30 })).toBe(true);
+    expect(isPassable(world, { x: 21, y: 30 }, "player")).toBe(true);
+    // Right pillar — impassable even when open
+    expect(isPassable(world, { x: 22, y: 30 })).toBe(false);
+  });
+
+  it("gate_wide_3 closed: all three cells are impassable", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    placeWide3Gate(world, { x: 20, y: 30 });
+    applyCommand(world, command({ type: "toggleGate", position: { x: 20, y: 30 } }));
+
+    const gate = world.buildings.find((b) => b.type === "gate_wide_3");
+    expect(gate?.gateState).toBe("closed");
+
+    expect(isPassable(world, { x: 20, y: 30 })).toBe(false);
+    expect(isPassable(world, { x: 21, y: 30 })).toBe(false);
+    expect(isPassable(world, { x: 22, y: 30 })).toBe(false);
+  });
+
+  it("gate_wide_3 open: pathfinding routes through center cell only", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    // Wall row at y=30 with gate_wide_3 at x=20 (footprint x=20,21,22)
+    placeWall(world, { x: 18, y: 30 });
+    placeWall(world, { x: 19, y: 30 });
+    placeWide3Gate(world, { x: 20, y: 30 });
+    placeWall(world, { x: 23, y: 30 });
+    placeWall(world, { x: 24, y: 30 });
+
+    // Path from y=28 to y=32 must cross only through x=21 (center)
+    const path = findPath(world, { x: 21, y: 28 }, { x: 21, y: 32 });
+    expect(path.length).toBeGreaterThan(0);
+    expect(path.some((c) => c.x === 21 && c.y === 30)).toBe(true);
+    expect(path.some((c) => c.x === 20 && c.y === 30)).toBe(false);
+    expect(path.some((c) => c.x === 22 && c.y === 30)).toBe(false);
+  });
+
+  // gate_wide_3_ne_sw (NE-SW): footprint y,y+1,y+2 — only center cell (y+1) is passable when open.
+  it("gate_wide_3_ne_sw open: only center cell is passable, end cells are impassable", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    // Place at y=30; footprint covers y=30, y=31, y=32
+    placeWide3GateNeSw(world, { x: 30, y: 30 });
+
+    const gate = world.buildings.find((b) => b.type === "gate_wide_3_ne_sw");
+    expect(gate?.gateState).toBe("open");
+
+    expect(isPassable(world, { x: 30, y: 30 })).toBe(false);
+    expect(isPassable(world, { x: 30, y: 31 })).toBe(true);
+    expect(isPassable(world, { x: 30, y: 32 })).toBe(false);
+  });
+
+  it("gate_wide_3 supply perspective: center cell passable even when closed", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    placeWide3Gate(world, { x: 20, y: 30 });
+    // Close the gate
+    applyCommand(world, command({ type: "toggleGate", position: { x: 20, y: 30 } }));
+
+    const gate = world.buildings.find((b) => b.type === "gate_wide_3");
+    expect(gate?.gateState).toBe("closed");
+
+    // Supply perspective: closed player gate center cell is still passable for food routing
+    expect(isPassable(world, { x: 21, y: 30 }, "supply")).toBe(true);
+    // Pillar cells remain impassable even for supply
+    expect(isPassable(world, { x: 20, y: 30 }, "supply")).toBe(false);
+    expect(isPassable(world, { x: 22, y: 30 }, "supply")).toBe(false);
+  });
 });
