@@ -220,8 +220,12 @@ def setup_production_lighting(scene: bpy.types.Scene) -> None:
     world.use_nodes = True
     background = world.node_tree.nodes.get("Background")
     if background is not None:
-        background.inputs["Color"].default_value = (0.62, 0.66, 0.72, 1.0)
-        background.inputs["Strength"].default_value = 0.55
+        # Black world background prevents bright-fringe artifacts on transparent
+        # PNG edges (colour spill from alpha premultiplication). Ambient fill
+        # now comes solely from the sun lamp above; strength 0 so the black
+        # environment contributes no indirect light.
+        background.inputs["Color"].default_value = (0.0, 0.0, 0.0, 1.0)
+        background.inputs["Strength"].default_value = 0.0
     scene.world = world
 
 

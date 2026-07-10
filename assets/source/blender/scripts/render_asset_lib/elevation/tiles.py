@@ -30,6 +30,7 @@ from .. import core
 from ..core import add_beam, add_box, add_mesh, finish_material, make_material, map_box, map_xy
 from ..materials import (
     make_bank_material,
+    make_grass_material,
     make_mud_material,
     make_noise_material,
 )
@@ -405,15 +406,25 @@ def _slope_side_walls(scene, pt, material) -> None:
 
 def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
     """Dirt cutting (mountain path) climbing one step toward `toward`.
-    Canvas 64x56, anchor (32,40)."""
+    Canvas 64x56, anchor (32,40).
+
+    Material layering (low→high u):
+    - Slope face: warm-earth noise dirt (richer contrast than road mud).
+    - Shoulders: darker margin strips framing the path.
+    - Erosion ribs: four footholds stepping up the incline.
+    - Grass cap: thin grass strip at the top edge (u≈0.87..1.0) so the tile
+      reads as cutting through a grassy hillside rather than a flat brown slab.
+    """
     pt = _slope_axes(toward)
-    mud = make_mud_material("SlopeMud")
-    margin = make_material("SlopeMargin", (0.096, 0.078, 0.052, 1.0))
-    rib = make_material("SlopeRib", (0.072, 0.056, 0.038, 1.0))
+    # Richer warm-earth noise: two-stop value spread, Roughness 0.85 in PBR.
+    dirt = make_noise_material("SlopeDirt", (0.120, 0.090, 0.055), (0.295, 0.230, 0.145), scale=8.0)
+    margin = make_material("SlopeMargin", (0.082, 0.062, 0.040, 1.0))
+    rib = make_material("SlopeRib", (0.065, 0.050, 0.032, 1.0))
     stone = make_noise_material("SlopeStone", (0.108, 0.100, 0.090), (0.172, 0.162, 0.146), scale=6.0)
     bank = make_bank_material(seed=2.0)
+    grass = make_grass_material()
 
-    _slope_quad(scene, "Surface", pt, -BLEED, 1.0 + BLEED, -0.5 - BLEED, 0.5 + BLEED, 0.0, mud)
+    _slope_quad(scene, "Surface", pt, -BLEED, 1.0 + BLEED, -0.5 - BLEED, 0.5 + BLEED, 0.0, dirt)
     _slope_side_walls(scene, pt, bank)
     # Worn shoulders framing the trodden center.
     for side_index, (v0, v1) in enumerate(((-0.5 - BLEED, -0.40), (0.40, 0.5 + BLEED))):
@@ -432,6 +443,9 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
         z = u * LEVEL
         add_box(scene, f"PathStone{index}",
                 *map_box((x - size, y - size, z - 0.03), (x + size, y + size, z + 0.022)), stone)
+    # Grass cap: blends the top edge into the flat terrain tile above.
+    # Lifted 0.006 above the dirt surface so the grass reads on top.
+    _slope_quad(scene, "GrassCap", pt, 0.87, 1.0 + BLEED, -0.5 - BLEED, 0.5 + BLEED, 0.006, grass)
 
 
 def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
