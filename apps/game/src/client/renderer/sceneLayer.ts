@@ -1,5 +1,13 @@
 import { Container, Graphics, Rectangle, Sprite, Texture } from "pixi.js";
-import type { BuildingSnapshot, CellCoord, MapDecoration, UnitId, UnitSnapshot, WorldSnapshot } from "@asama/shared";
+import type {
+  BuildingSnapshot,
+  CellCoord,
+  MapDecoration,
+  TerrainCellSnapshot,
+  UnitId,
+  UnitSnapshot,
+  WorldSnapshot
+} from "@asama/shared";
 import { clearLayer, createSprite, createSpriteFromCandidates, type AnimationSheetAsset, type LoadedAsset } from "./assets";
 import {
   cellToWorld,
@@ -14,6 +22,7 @@ import { buildingAssetCandidates } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
+import { addCliffCellSprites } from "./terrainLayer";
 
 interface AnimState {
   currentAction: "idle" | "walk" | "attack" | "death";
@@ -60,10 +69,11 @@ interface FlagVisual {
 }
 
 /**
- * Retained scene graph for buildings, decorations and units.
+ * Retained scene graph for buildings, decorations, cliff faces and units.
  *
- * - Buildings + decorations are rebuilt only when their visual signature
- *   changes (id / asset / state / zoom step), not per snapshot or per frame.
+ * - Buildings + decorations + cliff faces are rebuilt only when their visual
+ *   signature changes (id / asset / state / zoom step / terrain revision),
+ *   not per snapshot or per frame.
  * - Units are kept in a Map keyed by unit id; per frame only position,
  *   depth (zIndex Y-sort) and visibility are updated. Sprites are created
  *   and destroyed exclusively on unit add/remove.
@@ -244,11 +254,17 @@ export class RetainedScene {
       }
     }
 
-    // Merge buildings and decorations into a single Y-sorted list so decorations
-    // participate in the same painter's-order as buildings (fixes trees rendering
-    // on top of tenshu/honmaru regardless of their Y position). All decorations
+    // Merge buildings, decorations and cliff faces into a single Y-sorted list
+    // so they all participate in the same painter's-order (fixes trees rendering
+    // on top of tenshu/honmaru regardless of their Y position, and trees in
+    // front of a cliff being swallowed by the cliff face). All decorations
     // are included; camera culling happens per frame via sprite visibility.
     // Elevation only offsets draw positions; it never feeds the sort.
+    //
+    // Cliff faces sort by their own (low-side) cliff cell coordinate: a
+    // building on the high terrace (smaller x+y) paints BEFORE the face — the
+    // face covers its protruding base — while a tree on the low side (larger
+    // x+y) paints AFTER and correctly appears in front of the wall.
     const sceneItems: SceneItemForSort[] = [];
     for (const building of snapshot.buildings) {
       sceneItems.push({ kind: "building", item: building });
@@ -259,10 +275,17 @@ export class RetainedScene {
       }
       sceneItems.push({ kind: "decoration", item: decoration });
     }
+    for (const cell of snapshot.map.cells) {
+      if (cell.terrain === "cliff") {
+        sceneItems.push({ kind: "cliff", item: cell });
+      }
+    }
     isoSort(sceneItems);
 
     for (const entry of sceneItems) {
-      if (entry.kind === "building") {
+      if (entry.kind === "cliff") {
+        addCliffCellSprites(this.staticLayer, entry.item, snapshot.map, assets);
+      } else if (entry.kind === "building") {
         addBuildingSprite(this.staticLayer, entry.item, assets, zoom);
         // Flag pennant for castle buildings on intact structures only.
         const building = entry.item;
@@ -489,11 +512,16 @@ function createFlagGraphics(building: BuildingSnapshot, zoom: number): Graphics 
 }
 
 /**
- * Signature of everything the static (buildings + decorations) layer renders.
- * Zoom participates because sprite positions are rounded per zoom step.
+ * Signature of everything the static (buildings + decorations + cliff faces)
+ * layer renders. Zoom participates because sprite positions are rounded per
+ * zoom step; terrainRevision because player terrain edits move cliff cells.
  */
 function staticSceneSignature(snapshot: WorldSnapshot, zoom: number): string {
-  const parts: string[] = [`z:${zoom}`, `d:${snapshot.map.decorations.length}`];
+  const parts: string[] = [
+    `z:${zoom}`,
+    `d:${snapshot.map.decorations.length}`,
+    `r:${snapshot.terrainRevision ?? 0}`
+  ];
   for (const building of snapshot.buildings) {
     parts.push(
       `${building.id}|${building.assetId}|${building.position.x},${building.position.y}|` +
@@ -699,13 +727,24 @@ function addDecorationSprite(
 
 type SceneItemForSort =
   | { readonly kind: "building"; readonly item: BuildingSnapshot }
-  | { readonly kind: "decoration"; readonly item: MapDecoration };
+  | { readonly kind: "decoration"; readonly item: MapDecoration }
+  | { readonly kind: "cliff"; readonly item: TerrainCellSnapshot };
 
 function sceneItemId(entry: SceneItemForSort): string {
-  return entry.kind === "building" ? entry.item.id : `dec:${entry.item.position.x},${entry.item.position.y}`;
+  if (entry.kind === "building") {
+    return entry.item.id;
+  }
+  if (entry.kind === "cliff") {
+    return `cliff:${entry.item.coord.x},${entry.item.coord.y}`;
+  }
+  return `dec:${entry.item.position.x},${entry.item.position.y}`;
 }
 
 function sceneItemRect(entry: SceneItemForSort): FootprintRect {
+  if (entry.kind === "cliff") {
+    const { x, y } = entry.item.coord;
+    return { minX: x, maxX: x, minY: y, maxY: y };
+  }
   if (entry.kind === "building") {
     const fp = entry.item.footprint;
     if (fp.length === 0) {
@@ -738,10 +777,19 @@ function isoSort(items: SceneItemForSort[]): void {
     const rb = sceneItemRect(b);
     const diff = (ra.maxX + ra.maxY) - (rb.maxX + rb.maxY);
     if (diff !== 0) return diff;
+    // Same-depth tie: cliff faces paint first. A building whose south corner
+    // lies on the same diagonal sits on the HIGH terrace behind the face (the
+    // bubble passes keep it there), while a decoration on the cliff cell
+    // itself stands on the low-side floor in front of the wall.
+    if (a.kind === "cliff" && b.kind !== "cliff") return -1;
+    if (b.kind === "cliff" && a.kind !== "cliff") return 1;
     return sceneItemId(a).localeCompare(sceneItemId(b));
   });
 
-  const PASSES = 3;
+  // Enough passes for a terrace-top building to bubble back past the row of
+  // cliff cells hanging off its south/east edge (up to footprint-width swaps;
+  // the widest building, the 7x7 tenshu, needs 7).
+  const PASSES = 8;
   for (let pass = 0; pass < PASSES; pass++) {
     let swapped = false;
     for (let i = 0; i < items.length - 1; i++) {

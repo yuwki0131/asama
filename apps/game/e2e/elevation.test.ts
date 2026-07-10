@@ -40,6 +40,11 @@ const BASE_SPEAR_CELL = { x: 40, y: 72 }; // level 0
 const TERRACE_MOVE_TARGET = { x: 37, y: 66 }; // level 1
 const TERRACE_BUILD_CELL = { x: 36, y: 60 }; // level 2 (ishigaki)
 const HILL_VIEW_CELL = { x: 40, y: 63 };
+// Fixture pine standing on level 1 in front (screen-south) of the h2 rock
+// outcrop: its crown-left overlaps the outcrop's wall band on screen
+// (measured live: crown x in anchor-30..anchor, y in anchor-70..anchor-5
+// lies over the face/backdrop area of cliff cells (46..47, 57)).
+const CLIFF_FRONT_TREE_CELL = { x: 47, y: 58 };
 
 beforeAll(async () => {
   browser = await launchBrowser();
@@ -134,6 +139,42 @@ describe("elevation: terraced hill rendering", () => {
     expect(countFallbackPixels(png), "gold missing-asset fallback visible around the hill").toBe(0);
     expect(noErrors(), "console errors during terraced hill render").toHaveLength(0);
   });
+
+  it("tree in front of a cliff paints over the face (depth-sorted cliff faces)", async () => {
+    await centerOnHill();
+    const canvas = page.locator(".game-view canvas:not(.minimap)");
+    const box = await canvas.boundingBox();
+    expect(box).not.toBeNull();
+    const point = await cellToScreen(page, CLIFF_FRONT_TREE_CELL);
+    expect(point).not.toBeNull();
+
+    // The pine's crown-left (x in anchor-30..anchor, y in anchor-70..-5)
+    // sits exactly in the screen band where the h2 cliff face/backdrop
+    // behind it is drawn. With the correct painter's order the band shows
+    // foliage; when cliff faces wrongly paint above the scene it shows only
+    // stone. The tone grade desaturates foliage to sage (g barely above
+    // r/b), so the "greenish" predicate is deliberately loose — measured
+    // live it counts ~1100 crown pixels vs ~150 on bare wall.
+    const buf = await canvas.screenshot({ type: "png" });
+    const png = parsePng(buf);
+    const cx = Math.round(point!.x - box!.x);
+    const cy = Math.round(point!.y - box!.y);
+    let greenish = 0;
+    for (let y = cy - 70; y <= cy - 5; y += 1) {
+      for (let x = cx - 30; x <= cx; x += 1) {
+        if (x < 0 || y < 0 || x >= png.width || y >= png.height) continue;
+        const i = (y * png.width + x) * 4;
+        const r = png.data[i]!;
+        const g = png.data[i + 1]!;
+        const b = png.data[i + 2]!;
+        if (g > r && g > b + 4) greenish += 1;
+      }
+    }
+    expect(
+      greenish,
+      "pine crown in front of the h2 cliff face is not visible — cliff render order regressed"
+    ).toBeGreaterThan(400);
+  });
 });
 
 describe("elevation: interaction on high ground", () => {
@@ -141,16 +182,23 @@ describe("elevation: interaction on high ground", () => {
     await centerOnHill();
     const point = await cellToScreen(page, SUMMIT_ARCHER_CELL);
     expect(point).not.toBeNull();
-    await page.mouse.click(point!.x, point!.y);
 
-    const selected = await page.evaluate(async () => {
-      const bridge = window.__asamaTest;
-      if (!bridge) return null;
-      const tick = bridge.getSnapshot()?.currentTick ?? 0;
-      await bridge.waitForTick(tick + 3);
-      const snap = bridge.getSnapshot();
-      return snap?.units.filter((u) => u.selected).map((u) => ({ type: u.type, x: u.position.x, y: u.position.y })) ?? null;
-    });
+    // The click occasionally lands before the camera jump has fully settled
+    // (pre-existing flake); retry a couple of times before failing.
+    let selected: Array<{ type: string; x: number; y: number }> | null = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await page.mouse.click(point!.x, point!.y);
+      selected = await page.evaluate(async () => {
+        const bridge = window.__asamaTest;
+        if (!bridge) return null;
+        const tick = bridge.getSnapshot()?.currentTick ?? 0;
+        await bridge.waitForTick(tick + 3);
+        const snap = bridge.getSnapshot();
+        return snap?.units.filter((u) => u.selected).map((u) => ({ type: u.type, x: u.position.x, y: u.position.y })) ?? null;
+      });
+      if (selected !== null && selected.length > 0) break;
+      await page.waitForTimeout(400);
+    }
     expect(selected).toEqual([{ type: "archer", x: SUMMIT_ARCHER_CELL.x, y: SUMMIT_ARCHER_CELL.y }]);
 
     // Close-up screenshot: 2x zoom on the summit with the selection ring on

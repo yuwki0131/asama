@@ -22,7 +22,11 @@ export const elevationFixtureScenario: ScenarioDefinition = {
   name: "高低差検証フィクスチャ (dev)",
   initialBuildings: [
     { type: "honmaru", position: { x: 58, y: 62 } },
-    { type: "storehouse", position: { x: 64, y: 62 } }
+    { type: "storehouse", position: { x: 64, y: 62 } },
+    // Yagura (2x2) on the level-2 terrace with its S edge flush against the
+    // terrace rim (cliff cells at y=63): regression check that the cliff face
+    // still covers the building base protruding past the rim.
+    { type: "yagura", position: { x: 36, y: 61 } }
   ],
   initialUnits: [
     // Base of the hill, in front of the 0→1 slope.
@@ -64,5 +68,16 @@ export const elevationFixtureScenario: ScenarioDefinition = {
       { position: { x: 52, y: 56 }, toward: "W" }
     ]
   },
+  // Deterministic trees directly in FRONT (screen-south, low side) of cliff
+  // faces: their crowns overlap the wall and must paint over it, never be
+  // swallowed by it (cliff render-order regression check).
+  decorations: [
+    // In front of the h2 rock outcrop faces (cliff cells at y=57).
+    { assetId: "deco.tree.cedar.1", position: { x: 46, y: 58 } },
+    { assetId: "deco.tree.pine.1", position: { x: 47, y: 58 } },
+    // In front of the level-2 ishigaki terrace S rim (cliff cells at y=63).
+    { assetId: "deco.tree.pine.1", position: { x: 37, y: 64 } },
+    { assetId: "deco.tree.broadleaf.1", position: { x: 43, y: 64 } }
+  ],
   victory: { holdTicks: null }
 };
