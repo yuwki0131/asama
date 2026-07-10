@@ -1,5 +1,6 @@
 import type { BuildingCategory, BuildingType, GateState, ScenarioDefinition, UnitType } from "@asama/shared";
 import { mountainCastleScenario } from "./mountain-castle";
+import { freePlayScenario } from "./free-play";
 
 // --- Building and unit content definitions ---------------------------------
 //
@@ -1299,12 +1300,13 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
 
 /** Scenario roster in ascending difficulty order.
  *  A: 環郭式平城(入門) / B: 連郭式(標準) / C: 川城+門前町(上級) /
- *  D: 山城(2.0ショーケース・高低差) */
+ *  D: 山城(2.0ショーケース・高低差) / Free: 自由演習(サンドボックス) */
 export const scenarios: readonly ScenarioDefinition[] = [
   concentricCastleScenario,
   linearFortressScenario,
   riversideDefenseScenario,
   mountainCastleScenario,
+  freePlayScenario,
 ];
 
 /** デフォルトシナリオ (初回プレイ = 環郭の城・入門)。 */
@@ -1312,3 +1314,4 @@ export const DEFAULT_SCENARIO = concentricCastleScenario;
 
 export * from "./scripts";
 export { mountainCastleScenario } from "./mountain-castle";
+export { freePlayScenario } from "./free-play";
