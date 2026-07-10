@@ -1,5 +1,5 @@
 import { MAX_ELEVATION, type CellCoord, type SlopeDirection, type TerrainCellSnapshot } from "@asama/shared";
-import { screenToWorld, TILE_HEIGHT, TILE_WIDTH, type CameraState } from "./camera";
+import { cellToWorld, screenToWorld, TILE_HEIGHT, TILE_WIDTH, type CameraState } from "./camera";
 
 /**
  * Renderer-side elevation helpers (docs/10_development/elevation-contract.md).
@@ -228,12 +228,28 @@ export function pickCellAtScreenPoint(
     if (candidate === null) {
       continue;
     }
+    // Skip cliff terrain cells: they are visual-only cliff face holders and
+    // must not be returned as interactive pick targets.
+    if (candidate.terrain === "cliff") {
+      continue;
+    }
     const matches =
       candidate.slope !== null
         ? candidate.elevation === level || candidate.elevation + 1 === level
         : candidate.elevation === level;
     if (matches) {
-      return { x, y };
+      // Diamond-in check: accept only when the screen point projects inside
+      // the cell's lifted isometric diamond.  Points in the cliff face area
+      // (below the lifted diamond) fall through to the next lower level.
+      const cw = cellToWorld({ x, y });
+      const dxw = world.x - cw.x;
+      const dyw = world.y - (cw.y - level * ELEVATION_PIXELS_PER_LEVEL);
+      const inDiamond = Math.abs(dxw / (TILE_WIDTH / 2)) + Math.abs(dyw / (TILE_HEIGHT / 2)) <= 1.1;
+      if (inDiamond) {
+        return { x, y };
+      }
+      // Click is in the cliff face region below this cell's lifted diamond;
+      // continue searching at lower elevation levels.
     }
   }
 

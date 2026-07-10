@@ -333,6 +333,19 @@ export function registerPointerInput({
       y: event.clientY - rect.top
     };
     const clickedCell = pickCell(screenPoint.x, screenPoint.y);
+    // Cliff terrain cells are visual-only; treat a click on one as a
+    // plain non-interactive ground click (clear selection, do nothing else).
+    {
+      const snap = refs.snapshotRef.current;
+      const clickedTerrain = snap?.map.cells[clickedCell.y * snap.map.width + clickedCell.x];
+      if (clickedTerrain?.terrain === "cliff") {
+        if (!event.shiftKey) {
+          refs.onSelectUnitsRef.current([], false);
+        }
+        setSelectedCell(null);
+        return;
+      }
+    }
     const activeBuildTool = refs.buildToolRef.current;
     if (activeBuildTool === "demolish") {
       setSelectedCell(clickedCell);

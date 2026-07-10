@@ -346,7 +346,10 @@ describe("scenario vocabulary: minimal hill-fort test scenario", () => {
     },
     initialBuildings: [
       { type: "honmaru", position: { x: 22, y: 60 } },
-      { type: "storehouse", position: { x: 26, y: 57 } }
+      // Storehouse placed at x=27 (3-wide footprint: 27..29, 57..59) to stay
+      // clear of the cliff cells that appear at x=26, y=58..62 (E boundary of
+      // the level-2 ishigaki terrace inserted by insertCliffCells).
+      { type: "storehouse", position: { x: 27, y: 57 } }
     ],
     initialUnits: [
       { type: "spear_ashigaru", position: { x: 22, y: 60 }, owner: "player" },

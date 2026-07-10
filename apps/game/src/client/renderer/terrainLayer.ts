@@ -1,10 +1,10 @@
 import { Container, Graphics } from "pixi.js";
+import { MAX_ELEVATION } from "@asama/shared";
 import type { ElevationSkin, TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
 import { clearLayer, createSpriteFromCandidates, type LoadedAsset } from "./assets";
 import { cellToWorld, type CameraState, TILE_HEIGHT, TILE_WIDTH } from "./camera";
 import {
   cellAt,
-  cliffInfoFor,
   ELEVATION_PIXELS_PER_LEVEL,
   tileOffsetY,
   type CellCliffInfo,
@@ -40,7 +40,8 @@ export function terrainKeyFor(snapshot: WorldSnapshot, assets: ReadonlyMap<strin
   // terrainRevision increments on player terrain modifications so the chunk
   // cache is rebuilt to reflect new elevation / slope data.
   const rev = snapshot.terrainRevision ?? 0;
-  return `${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}:r${rev}`;
+  const cliffCount = snapshot.map.cells.filter(c => c.terrain === "cliff").length;
+  return `${snapshot.map.width}:${snapshot.map.height}:${assets.size}:${snapshot.map.cells.length}:${firstCell?.x ?? 0},${firstCell?.y ?? 0}:${lastCell?.x ?? 0},${lastCell?.y ?? 0}:r${rev}:${cliffCount}`;
 }
 
 export function buildTerrainChunks(
@@ -121,14 +122,12 @@ export function buildTerrainChunks(
 
     const container = new Container();
     for (const cell of cells) {
-      // Per-cell paint order (elevation-contract.md §5): cliff faces first,
-      // then the top tile. Faces are part of the HIGH cell's drawing, so no
-      // extra sorting is needed — painter's order stays (x+y) ascending.
-      const cliffInfo = cliffInfoFor(snapshot.map, cell);
-      if (cliffInfo.faces.length > 0) {
-        addCliffFaces(container, cell, cliffInfo, assets);
+      // Cliff terrain cells are drawn in the separate cliffOverlayLayer
+      // (above buildings/units). Skip both the terrain sprite and cliff face
+      // drawing here; non-cliff cells no longer own their own cliff faces.
+      if (cell.terrain !== "cliff") {
+        addTerrainSprite(container, cell, assets);
       }
-      addTerrainSprite(container, cell, assets);
     }
     (container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = bounds;
     terrainLayer.addChild(container);
@@ -164,7 +163,7 @@ export function buildTerrainChunks(
       capGraphics
         .moveTo(screenX, screenY - TILE_HEIGHT / 2)
         .lineTo(screenX - TILE_WIDTH / 2, screenY)
-        .stroke({ color: 0x4a3018, width: 2, alpha: 0.85 });
+        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7 });
     }
 
     // NE cap line: top → right diamond vertex.
@@ -173,10 +172,101 @@ export function buildTerrainChunks(
       capGraphics
         .moveTo(screenX, screenY - TILE_HEIGHT / 2)
         .lineTo(screenX + TILE_WIDTH / 2, screenY)
-        .stroke({ color: 0x4a3018, width: 2, alpha: 0.85 });
+        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7 });
     }
   }
   terrainLayer.addChild(capGraphics);
+}
+
+/**
+ * Builds the cliff-face overlay layer from dedicated cliff terrain cells.
+ * This layer is rendered ABOVE the scene layer (buildings/units) so cliff
+ * faces visually cover building bases that protrude into the cliff area.
+ * Call when the terrain key changes (same cadence as buildTerrainChunks).
+ */
+export function buildCliffOverlayLayer(
+  overlayLayer: Container,
+  snapshot: WorldSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  clearLayer(overlayLayer);
+
+  const cliffCells = snapshot.map.cells
+    .filter(c => c.terrain === "cliff")
+    .sort((a, b) => (a.coord.x + a.coord.y) - (b.coord.x + b.coord.y));
+
+  for (const cell of cliffCells) {
+    renderCliffCell(overlayLayer, cell, snapshot.map, assets);
+  }
+}
+
+function renderCliffCell(
+  layer: Container,
+  cell: TerrainCellSnapshot,
+  map: { readonly width: number; readonly height: number; readonly cells: readonly TerrainCellSnapshot[] },
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  if (cell.cliffFace === undefined || cell.cliffHeight === undefined) return;
+
+  const skin = cell.elevationSkin;
+  const h = Math.min(cell.cliffHeight, MAX_ELEVATION);
+
+  // Determine the high cell position based on cliffFace direction.
+  let highX: number;
+  let highY: number;
+  if (cell.cliffFace === "s") {
+    highX = cell.coord.x;
+    highY = cell.coord.y - 1;
+  } else if (cell.cliffFace === "e") {
+    highX = cell.coord.x - 1;
+    highY = cell.coord.y;
+  } else {
+    // "se" corner: high cell is diagonally up-left.
+    highX = cell.coord.x - 1;
+    highY = cell.coord.y - 1;
+  }
+
+  const highCell = cellAt(map, highX, highY);
+  if (highCell === null) return;
+
+  const highPoint = cellToWorld({ x: highX, y: highY });
+  const anchorY = highPoint.y + tileOffsetY(highCell);
+  const topElev = highCell.elevation;
+  const bottomElev = cell.elevation;
+
+  if (cell.cliffFace === "se") {
+    // SE corner: individual S and E cliff cells draw the faces;
+    // this cell only draws the convex corner sprite.
+    const cornerAssetId = `terrain.${skin}.corner.se.h${h}`;
+    const cornerAsset = assets.get(cornerAssetId);
+    if (cornerAsset !== undefined) {
+      const sprite = createSpriteFromCandidates([cornerAssetId], assets);
+      sprite.position.set(highPoint.x, anchorY);
+      layer.addChild(sprite);
+    }
+    return;
+  }
+
+  // "s" or "e" face.
+  const edge = cell.cliffFace;
+  const face: CliffFace = {
+    edge,
+    topA: topElev,
+    topB: topElev,
+    bottom: bottomElev,
+    assetId: `terrain.${skin}.face.${edge}.h${h}`
+  };
+
+  const asset = assets.get(face.assetId);
+  if (asset !== undefined) {
+    const sprite = createSpriteFromCandidates([face.assetId], assets);
+    sprite.position.set(highPoint.x, anchorY);
+    layer.addChild(sprite);
+  } else {
+    const fallback = new Graphics();
+    drawFallbackFace(fallback, highPoint, skin, face);
+    layer.addChild(fallback);
+  }
 }
 
 export function updateTerrainChunkVisibility(

@@ -4,7 +4,7 @@ import { clearLayer, type LoadedAsset } from "./assets";
 import { roundScreenPixel, type CameraState } from "./camera";
 import { getSnapshotCell, isInsideSnapshotMap } from "./gameRules";
 import { addAlignmentDebugOverlay, addCellActionPreview, addOverlaySprite, addPathSprites } from "./overlayLayer";
-import { buildTerrainChunks, terrainKeyFor, updateTerrainChunkVisibility } from "./terrainLayer";
+import { buildCliffOverlayLayer, buildTerrainChunks, terrainKeyFor, updateTerrainChunkVisibility } from "./terrainLayer";
 import type { ToolMode } from "./GameCanvas";
 
 /**
@@ -19,6 +19,7 @@ export function renderScene(
   terrainLayer: Container | null,
   overlayLayer: Container | null,
   debugLayer: Container | null,
+  cliffOverlayLayer: Container | null,
   lastTerrainKeyRef: { current: string | null },
   snapshot: WorldSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
@@ -29,7 +30,7 @@ export function renderScene(
   selectedCell: CellCoord | null,
   localInvalidMoveTarget: CellCoord | null
 ): void {
-  if (app === null || world === null || terrainLayer === null || overlayLayer === null || debugLayer === null) {
+  if (app === null || world === null || terrainLayer === null || overlayLayer === null || debugLayer === null || cliffOverlayLayer === null) {
     return;
   }
 
@@ -43,6 +44,7 @@ export function renderScene(
   const terrainKey = terrainKeyFor(snapshot, assets);
   if (lastTerrainKeyRef.current !== terrainKey) {
     buildTerrainChunks(terrainLayer, snapshot, assets);
+    buildCliffOverlayLayer(cliffOverlayLayer, snapshot, assets);
     lastTerrainKeyRef.current = terrainKey;
   }
   updateTerrainChunkVisibility(terrainLayer, camera, app.screen.width, app.screen.height);
