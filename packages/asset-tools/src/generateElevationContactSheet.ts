@@ -5,7 +5,7 @@
  * 2. elevation-kuruwa-mock.png — hand-composited two-level kuruwa (rock hill
  *    at level 1 + ishigaki compound at level 2, dirt cutting and stone stairs,
  *    tenshu on top) following the P4b draw rules: terrain pass in (x+y) order,
- *    per cell "cliff faces -> surface tile", screenY -= elevation * 24.
+ *    per cell "cliff faces -> surface tile", screenY -= elevation * 40.
  *
  * Outputs go to assets/intermediate/spike/. Run:
  *   pnpm --filter @asama/asset-tools assets:elevation:contact-sheet
@@ -16,7 +16,7 @@ import sharp from "sharp";
 import { generatedManifestPath, generatedOutputDir, intermediateAssetsDir, publicAssetsDir } from "./paths";
 import type { GeneratedAsset } from "./types";
 
-const ELEVATION_PX = 24;
+const ELEVATION_PX = 40;
 const TILE_W = 64;
 const TILE_H = 32;
 

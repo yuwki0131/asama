@@ -132,7 +132,8 @@ describe("cliffInfoFor", () => {
     // but its E side is a slanted slope side wall.
     const slope = cliffInfoFor(map, cellAt(map, 1, 1));
     const east = slope.faces.find((f) => f.edge === "e");
-    expect(east?.assetId).toBe("terrain.slope.cliff.n.side.e");
+    // cliff-skinned slopes climb on the dirt-cutting art (slopeAssetSkin).
+    expect(east?.assetId).toBe("terrain.slope.dirt.n.side.e");
     expect(east?.topA).toBe(0); // S corner (downhill end)
     expect(east?.topB).toBe(1); // E corner (uphill end)
     expect(slope.faces.find((f) => f.edge === "s")).toBeUndefined();

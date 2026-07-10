@@ -16,7 +16,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -44,7 +44,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 80,
+        "canvasHeight": 112,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -72,7 +72,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 104,
+        "canvasHeight": 152,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -100,7 +100,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -128,7 +128,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 80,
+        "canvasHeight": 112,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -156,7 +156,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 104,
+        "canvasHeight": 152,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -184,7 +184,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -212,7 +212,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 80,
+        "canvasHeight": 112,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -240,7 +240,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 104,
+        "canvasHeight": 152,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -268,7 +268,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -296,7 +296,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 80,
+        "canvasHeight": 112,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -324,7 +324,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 104,
+        "canvasHeight": 152,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -352,7 +352,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -380,7 +380,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 80,
+        "canvasHeight": 112,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -408,7 +408,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 104,
+        "canvasHeight": 152,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -436,7 +436,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -464,7 +464,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 80,
+        "canvasHeight": 112,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -492,7 +492,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 104,
+        "canvasHeight": 152,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -520,7 +520,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 128,
+        "canvasHeight": 192,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -548,7 +548,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 152,
+        "canvasHeight": 232,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -576,7 +576,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 128,
+        "canvasHeight": 192,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -604,7 +604,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 152,
+        "canvasHeight": 232,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -632,7 +632,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 128,
+        "canvasHeight": 192,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -660,7 +660,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 152,
+        "canvasHeight": 232,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -688,7 +688,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 128,
+        "canvasHeight": 192,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -716,7 +716,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 152,
+        "canvasHeight": 232,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -744,7 +744,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 128,
+        "canvasHeight": 192,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -772,7 +772,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 152,
+        "canvasHeight": 232,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -800,7 +800,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 128,
+        "canvasHeight": 192,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -828,7 +828,7 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 152,
+        "canvasHeight": 232,
         "anchorX": 32,
         "anchorY": 16
       },
@@ -856,9 +856,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -884,9 +884,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -912,9 +912,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -940,9 +940,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -968,9 +968,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -996,9 +996,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1024,9 +1024,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1052,9 +1052,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1080,9 +1080,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1108,9 +1108,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1136,9 +1136,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1164,9 +1164,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1192,9 +1192,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1220,9 +1220,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1248,9 +1248,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {
@@ -1276,9 +1276,9 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 56,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 40
+        "anchorY": 56
       },
       "category": "terrain",
       "postprocess": {

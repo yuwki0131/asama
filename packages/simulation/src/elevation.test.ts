@@ -116,6 +116,21 @@ describe("applyScenarioElevation", () => {
     ).toThrow(/water/);
   });
 
+  it("removes decorations from cells that become slopes (ramps stay clear)", () => {
+    const world = flatWorld();
+    world.map.decorations.push(
+      { assetId: "deco.tree.1", position: { x: 22, y: 63 } },
+      { assetId: "deco.tree.1", position: { x: 21, y: 63 } }
+    );
+    applyScenarioElevation(world.map, {
+      patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }],
+      slopes: [{ position: { x: 22, y: 63 }, toward: "N" }]
+    });
+    expect(world.map.decorations.some((d) => d.position.x === 22 && d.position.y === 63)).toBe(false);
+    // Neighbouring non-slope cells keep their decorations.
+    expect(world.map.decorations.some((d) => d.position.x === 21 && d.position.y === 63)).toBe(true);
+  });
+
   it("width expands the ramp perpendicular to its direction", () => {
     const world = flatWorld();
     applyScenarioElevation(world.map, {
