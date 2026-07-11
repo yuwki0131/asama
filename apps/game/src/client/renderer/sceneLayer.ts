@@ -22,7 +22,7 @@ import { buildingAssetCandidates } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
-import { addCliffCellSprites } from "./terrainLayer";
+import { addCliffCellSprites, addSlopeCellSprites } from "./terrainLayer";
 
 interface AnimState {
   currentAction: "idle" | "walk" | "attack" | "death";
@@ -254,17 +254,23 @@ export class RetainedScene {
       }
     }
 
-    // Merge buildings, decorations and cliff faces into a single Y-sorted list
-    // so they all participate in the same painter's-order (fixes trees rendering
-    // on top of tenshu/honmaru regardless of their Y position, and trees in
-    // front of a cliff being swallowed by the cliff face). All decorations
-    // are included; camera culling happens per frame via sprite visibility.
-    // Elevation only offsets draw positions; it never feeds the sort.
+    // Merge buildings, decorations, cliff faces and slope tiles into a single
+    // Y-sorted list so they all participate in the same painter's-order
+    // (fixes trees rendering on top of tenshu/honmaru regardless of their Y
+    // position, and trees in front of a cliff being swallowed by the cliff
+    // face). All decorations are included; camera culling happens per frame
+    // via sprite visibility. Elevation only offsets draw positions; it never
+    // feeds the sort.
     //
     // Cliff faces sort by their own (low-side) cliff cell coordinate: a
     // building on the high terrace (smaller x+y) paints BEFORE the face — the
     // face covers its protruding base — while a tree on the low side (larger
     // x+y) paints AFTER and correctly appears in front of the wall.
+    //
+    // Slope tiles rise 40 px like a cliff face and sort the same way by
+    // their own cell coordinate: a wall/cliff BEHIND the ramp (smaller x+y)
+    // paints first and the ramp correctly covers it; anything on the low
+    // side in front paints after.
     const sceneItems: SceneItemForSort[] = [];
     for (const building of snapshot.buildings) {
       sceneItems.push({ kind: "building", item: building });
@@ -278,6 +284,8 @@ export class RetainedScene {
     for (const cell of snapshot.map.cells) {
       if (cell.terrain === "cliff") {
         sceneItems.push({ kind: "cliff", item: cell });
+      } else if (cell.slope !== null) {
+        sceneItems.push({ kind: "slope", item: cell });
       }
     }
     isoSort(sceneItems);
@@ -285,6 +293,8 @@ export class RetainedScene {
     for (const entry of sceneItems) {
       if (entry.kind === "cliff") {
         addCliffCellSprites(this.staticLayer, entry.item, snapshot.map, assets);
+      } else if (entry.kind === "slope") {
+        addSlopeCellSprites(this.staticLayer, entry.item, snapshot.map, assets);
       } else if (entry.kind === "building") {
         addBuildingSprite(this.staticLayer, entry.item, assets, zoom);
         // Flag pennant for castle buildings on intact structures only.
@@ -728,20 +738,21 @@ function addDecorationSprite(
 type SceneItemForSort =
   | { readonly kind: "building"; readonly item: BuildingSnapshot }
   | { readonly kind: "decoration"; readonly item: MapDecoration }
-  | { readonly kind: "cliff"; readonly item: TerrainCellSnapshot };
+  | { readonly kind: "cliff"; readonly item: TerrainCellSnapshot }
+  | { readonly kind: "slope"; readonly item: TerrainCellSnapshot };
 
 function sceneItemId(entry: SceneItemForSort): string {
   if (entry.kind === "building") {
     return entry.item.id;
   }
-  if (entry.kind === "cliff") {
-    return `cliff:${entry.item.coord.x},${entry.item.coord.y}`;
+  if (entry.kind === "cliff" || entry.kind === "slope") {
+    return `${entry.kind}:${entry.item.coord.x},${entry.item.coord.y}`;
   }
   return `dec:${entry.item.position.x},${entry.item.position.y}`;
 }
 
 function sceneItemRect(entry: SceneItemForSort): FootprintRect {
-  if (entry.kind === "cliff") {
+  if (entry.kind === "cliff" || entry.kind === "slope") {
     const { x, y } = entry.item.coord;
     return { minX: x, maxX: x, minY: y, maxY: y };
   }
@@ -777,12 +788,15 @@ function isoSort(items: SceneItemForSort[]): void {
     const rb = sceneItemRect(b);
     const diff = (ra.maxX + ra.maxY) - (rb.maxX + rb.maxY);
     if (diff !== 0) return diff;
-    // Same-depth tie: cliff faces paint first. A building whose south corner
-    // lies on the same diagonal sits on the HIGH terrace behind the face (the
-    // bubble passes keep it there), while a decoration on the cliff cell
-    // itself stands on the low-side floor in front of the wall.
-    if (a.kind === "cliff" && b.kind !== "cliff") return -1;
-    if (b.kind === "cliff" && a.kind !== "cliff") return 1;
+    // Same-depth tie: terrain features (cliff faces / slope tiles) paint
+    // first. A building whose south corner lies on the same diagonal sits on
+    // the HIGH terrace behind the face (the bubble passes keep it there),
+    // while a decoration on the cliff cell itself stands on the low-side
+    // floor in front of the wall.
+    const aTerrain = a.kind === "cliff" || a.kind === "slope";
+    const bTerrain = b.kind === "cliff" || b.kind === "slope";
+    if (aTerrain && !bTerrain) return -1;
+    if (bTerrain && !aTerrain) return 1;
     return sceneItemId(a).localeCompare(sceneItemId(b));
   });
 
