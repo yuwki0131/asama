@@ -133,8 +133,9 @@ export function buildTerrainChunks(
       // Every cell draws its ground tile here — including cliff cells, whose
       // floor (the low-side terrain, original assetId preserved by the sim's
       // insertCliffCells) must read as continuous lowland ground. The cliff
-      // FACES themselves are depth-sorted into the retained scene layer
-      // (sceneLayer.ts) so trees/buildings in front of a cliff paint over it.
+      // FACES and the SLOPE tiles are depth-sorted into the retained scene
+      // layer instead (sceneLayer.ts) so trees/buildings in front of a cliff
+      // or ramp paint over it — and never the other way around.
       addTerrainSprite(container, cell, snapshot.map, assets);
     }
     (container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = bounds;
@@ -259,20 +260,33 @@ export function addCliffCellSprites(
     });
   }
 
-  // Always draw the fallback polygons first as opaque stone-coloured
-  // backdrops: cliff sprites have transparent anti-aliased edge pixels that
-  // would otherwise show the dark underlay / canvas as gaps along the cliff
-  // bottom and at the seams between neighbouring faces. The backdrop bleeds
-  // a couple of px sideways and downward (same trick as the river bank
-  // strips) so sub-pixel AA seams between adjacent cliff cells, at corner
-  // junctions and against the low-side floor tile stay covered. Both
-  // backdrops paint before either sprite so a bleed never overlaps the
-  // neighbouring face's texture.
-  const backdrop = new Graphics();
+  // Fallback polygons are drawn ONLY for faces whose sprite asset is missing.
+  //
+  // They must never paint behind an existing sprite as an opaque "backdrop":
+  // face sprites are a full tile diamond wide (64 px) while the geometric
+  // face quad is only half of one (32 px), so neighbouring wall sprites
+  // deliberately overlap each other by half a tile. An always-on backdrop
+  // painted at THIS cell's depth lands on top of the already-drawn
+  // neighbouring sprite, and this cell's own sprite (whose silhouette curves
+  // inward at the top) does not fully re-cover it — every tile of a
+  // connected wall grew a bare grey triangle on its left, and the 2 px
+  // bottom bleed drew grey slivers onto the low-side grass in front of the
+  // wall. The sprites' generous overlap covers the seams the backdrop used
+  // to hide; where a sprite is genuinely missing the opaque fallback quad
+  // (with bleed) still stands in for it.
+  const fallback = new Graphics();
+  let hasFallback = false;
   for (const { face, skin, highPoint } of faces) {
-    drawFallbackFace(backdrop, highPoint, skin, face, CLIFF_BACKDROP_BLEED);
+    if (assets.get(face.assetId) === undefined) {
+      drawFallbackFace(fallback, highPoint, skin, face, CLIFF_BACKDROP_BLEED);
+      hasFallback = true;
+    }
   }
-  layer.addChild(backdrop);
+  if (hasFallback) {
+    layer.addChild(fallback);
+  } else {
+    fallback.destroy();
+  }
 
   for (const { face, highPoint, anchorY } of faces) {
     if (assets.get(face.assetId) !== undefined) {
@@ -313,7 +327,11 @@ function addTerrainSprite(
   const offsetY = tileOffsetY(cell);
 
   if (cell.slope !== null) {
-    addSlopeTile(layer, cell, map, assets);
+    // Slope tiles rise 40 px above their low side and must take part in the
+    // scene's painter's sort (a slope in FRONT of a cliff face has to paint
+    // over it); they are drawn from the retained scene layer instead
+    // (sceneLayer.ts → addSlopeCellSprites). The shared underlay diamond
+    // still backs the cell here.
     return;
   }
 
@@ -324,16 +342,23 @@ function addTerrainSprite(
 
 /**
  * Slope cells draw the contract's `terrain.slope.<skin>.<dir>` tile anchored
- * like a flat tile of the LOW side. Until the P4c assets land, the fallback
- * draws the base terrain tile plus an opaque ramp polygon: the tile diamond
- * with the two uphill corners lifted one level.
+ * like a flat tile of the LOW side. When the tile asset is missing, the
+ * fallback draws the base terrain tile plus an opaque ramp polygon: the tile
+ * diamond with the two uphill corners lifted one level.
  *
  * The slope's two SIDE edges are cliff walls with a slanted top
  * (`terrain.slope.<skin>.<dir>.side.<s|e>`); they are not covered by the
  * dedicated cliff cells (no elevation drop at the base level) so they are
  * drawn here, from the slope cell itself.
+ *
+ * Called from the retained scene layer (sceneLayer.ts), NOT from the terrain
+ * chunks: the ramp rises 40 px above its low side, so — exactly like the
+ * cliff faces — it must participate in the isometric painter's sort with its
+ * own cell coordinate as the depth key. Drawn in the always-below terrain
+ * layer, a slope was overpainted by every cliff face in the scene layer,
+ * including walls BEHIND it (smaller x+y), which swallowed the stairs/ramp.
  */
-function addSlopeTile(
+export function addSlopeCellSprites(
   layer: Container,
   cell: TerrainCellSnapshot,
   map: ElevationMapLike,
