@@ -437,11 +437,12 @@ export function App() {
   );
 
   const handlePlaceSlope = useCallback(
-    (position: CellCoord) => {
+    (position: CellCoord, length: 1 | 2 = 1) => {
       simulationRef.current?.enqueueCommand({
         type: "placeSlope",
         position,
         toward: slopeDirection,
+        length,
         issuedAtTick: snapshot?.currentTick ?? 0,
         clientSequence: Date.now()
       });
@@ -630,6 +631,14 @@ export function App() {
           onClick={() => setBuildTool("placeSlope")}
         >
           坂設置 (30G)
+        </button>
+        <button
+          className={buildTool === "placeSlopeGentle" ? "active" : ""}
+          type="button"
+          onClick={() => setBuildTool("placeSlopeGentle")}
+          title="2マスを使ったなだらかな坂。選択セルが下段、方向の隣が上段"
+        >
+          緩坂設置 (50G)
         </button>
         <button
           className={buildTool === "removeSlope" ? "active" : ""}

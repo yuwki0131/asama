@@ -11,8 +11,10 @@ import type { ScenarioDefinition } from "@asama/shared";
  *
  * Layout: a three-terrace hill around (40, 58) — rock-skinned level 1,
  * ishigaki levels 2 and 3 — with a straight climbing route on x=40/41:
- *   (40..41, 68) slope 0→1, (40..41, 63) slope 1→2, (40, 60) slope 2→3,
- *   plus a single W-facing slope (52, 56) climbing the terrace from the east.
+ *   (40..41, 68..69) GENTLE 2-cell dirt slope 0→1 (lower halves y=69, upper
+ *   halves y=68), (40..41, 63) slope 1→2, (40, 60) slope 2→3, plus a single
+ *   steep W-facing 1-cell dirt slope (52, 56) climbing the terrace from the
+ *   east (kept steep as the 1-cell comparison reference).
  * The honmaru + storehouse sit on flat ground to the east so the game loop
  * (food, victory checks) behaves normally; a never-spawning far-future wave
  * keeps the "annihilation" victory from ending the session instantly.
@@ -58,7 +60,9 @@ export const elevationFixtureScenario: ScenarioDefinition = {
       { area: { kind: "rect", x: 46, y: 55, width: 2, height: 2 }, level: 3 }
     ],
     slopes: [
-      { position: { x: 40, y: 68 }, toward: "N", width: 2 }, // 0 → 1
+      // 0 → 1: gentle 2-cell dirt slope — lower halves at y=69, upper halves
+      // at y=68, meeting the level-1 tongue at y=67.
+      { position: { x: 40, y: 69 }, toward: "N", width: 2, length: 2 },
       { position: { x: 40, y: 63 }, toward: "N", width: 2 }, // 1 → 2
       { position: { x: 40, y: 60 }, toward: "N" }, // 2 → 3 (single-width chokepoint)
       // East approach climbing W onto the level-1 terrace: exercises the

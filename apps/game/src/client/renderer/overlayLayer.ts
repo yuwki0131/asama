@@ -77,6 +77,7 @@ export function addCellActionPreview(
     buildTool === "raiseTerrain" ||
     buildTool === "lowerTerrain" ||
     buildTool === "placeSlope" ||
+    buildTool === "placeSlopeGentle" ||
     buildTool === "removeSlope"
   ) {
     addOverlaySprite(layer, cell, "overlay.cell.selected", assets, map);

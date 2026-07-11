@@ -51,7 +51,7 @@ export interface InputRefs {
   readonly onCancelBuildToolRef: MutableRefObject<() => void>;
   readonly onRaiseTerrainRef: MutableRefObject<(position: CellCoord) => void>;
   readonly onLowerTerrainRef: MutableRefObject<(position: CellCoord) => void>;
-  readonly onPlaceSlopeRef: MutableRefObject<(position: CellCoord) => void>;
+  readonly onPlaceSlopeRef: MutableRefObject<(position: CellCoord, length: 1 | 2) => void>;
   readonly onRemoveSlopeRef: MutableRefObject<(position: CellCoord) => void>;
 }
 
@@ -371,9 +371,9 @@ export function registerPointerInput({
       return;
     }
 
-    if (activeBuildTool === "placeSlope") {
+    if (activeBuildTool === "placeSlope" || activeBuildTool === "placeSlopeGentle") {
       setSelectedCell(clickedCell);
-      refs.onPlaceSlopeRef.current(clickedCell);
+      refs.onPlaceSlopeRef.current(clickedCell, activeBuildTool === "placeSlopeGentle" ? 2 : 1);
       return;
     }
 

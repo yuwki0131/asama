@@ -379,7 +379,9 @@ def build_ishigaki_corner(scene: bpy.types.Scene, h: int) -> None:
 
 # --- slopes ------------------------------------------------------------------
 # Slope space: u runs 0 (low boundary) .. 1 (high boundary), v across the
-# ramp in [-0.5, 0.5]. z(u) = u * LEVEL.
+# ramp in [-0.5, 0.5]. z(u) = u * LEVEL for a full 1-cell slope; gentle
+# 2-cell slope halves remap z to [0, LEVEL/2] (lower) / [LEVEL/2, LEVEL]
+# (upper) so the pair climbs one step over two cells (20px rise per cell).
 
 def _slope_axes(toward: str):
     if toward == "n":
@@ -391,16 +393,27 @@ def _slope_axes(toward: str):
     return lambda u, v: (0.5 - u, v)
 
 
+def _slope_z_of(half: str | None):
+    """z(u) along the ramp axis for a full slope or a gentle half tile."""
+    if half == "lower":
+        return lambda u: 0.5 * LEVEL * u
+    if half == "upper":
+        return lambda u: 0.5 * LEVEL * (1.0 + u)
+    return lambda u: u * LEVEL
+
+
 def _slope_quad(scene, name: str, pt, u0: float, u1: float, v0: float, v1: float,
-                lift: float, material) -> None:
+                lift: float, material, z_of=None) -> None:
     """Quad following the slope surface, lifted `lift` above it."""
+    if z_of is None:
+        z_of = _slope_z_of(None)
     corners = [(u0, v0), (u1, v0), (u1, v1), (u0, v1)]
-    vertices = [(*map_xy(*pt(u, v)), u * LEVEL + lift) for u, v in corners]
+    vertices = [(*map_xy(*pt(u, v)), z_of(u) + lift) for u, v in corners]
     add_mesh(scene, name, vertices, [(0, 1, 2, 3)], material)
 
 
 def _slope_relief_surface(scene, name: str, pt, seed: float, material,
-                          nu: int = 9, nv: int = 7) -> None:
+                          nu: int = 9, nv: int = 7, z_of=None) -> None:
     """Slope surface as a jittered grid instead of one flat quad.
 
     The painterly shader tones a face purely by its normal, so a single
@@ -408,6 +421,8 @@ def _slope_relief_surface(scene, name: str, pt, seed: float, material,
     vertices breaks the plane into subtly tilted quads whose tones drift
     like brush patches. Boundary vertices stay exactly on the analytic
     slope so the tile still meets its neighbours flush."""
+    if z_of is None:
+        z_of = _slope_z_of(None)
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, ...]] = []
     for i in range(nu + 1):
@@ -423,7 +438,7 @@ def _slope_relief_surface(scene, name: str, pt, seed: float, material,
                     + 0.020 * (_hash01(seed, i * 2.3, j * 3.7) - 0.5)
                     - 0.014 * max(0.0, 1.0 - (v / 0.40) ** 2)
                 )
-            vertices.append((*map_xy(*pt(u, v)), u * LEVEL + bump))
+            vertices.append((*map_xy(*pt(u, v)), z_of(u) + bump))
             if i > 0 and j > 0:
                 a = (i - 1) * (nv + 1) + (j - 1)
                 b = (i - 1) * (nv + 1) + j
@@ -433,7 +448,7 @@ def _slope_relief_surface(scene, name: str, pt, seed: float, material,
     add_mesh(scene, name, vertices, faces, material)
 
 
-def _slope_side_walls(scene, pt, material, floor_material) -> None:
+def _slope_side_walls(scene, pt, material, floor_material, z_of=None) -> None:
     """Closing geometry for the open slope wedge.
 
     Only the CAMERA-FACING flank (v=+0.5, which is always the S or E
@@ -443,14 +458,39 @@ def _slope_side_walls(scene, pt, material, floor_material) -> None:
     z~0 catches the remaining sightlines under the surface sheet so nothing
     inside the wedge renders as a dark void. The flank projects into the
     slope's own diamond, so same-level neighbours drawn later cover it and
-    it only shows where the terrain beside the ramp is lower."""
+    it only shows where the terrain beside the ramp is lower. Gentle upper
+    halves start above z=0, so their flank is a quad dropping to the cell's
+    base level instead of the full slope's triangle."""
+    if z_of is None:
+        z_of = _slope_z_of(None)
     v = 0.5 + BLEED
-    vertices = [
-        (*map_xy(*pt(-BLEED, v)), 0.0),
-        (*map_xy(*pt(1.0 + BLEED, v)), LEVEL),
-        (*map_xy(*pt(1.0 + BLEED, v)), 0.0),
-    ]
-    add_mesh(scene, "SideWall", vertices, [(0, 1, 2)], material)
+    z_low = z_of(0.0)
+    z_high = z_of(1.0)
+    if z_low > 0.001:
+        vertices = [
+            (*map_xy(*pt(-BLEED, v)), z_low),
+            (*map_xy(*pt(1.0 + BLEED, v)), z_high),
+            (*map_xy(*pt(1.0 + BLEED, v)), 0.0),
+            (*map_xy(*pt(-BLEED, v)), 0.0),
+        ]
+        add_mesh(scene, "SideWall", vertices, [(0, 1, 2, 3)], material)
+        # End cap closing the raised downhill cross-section (upper half tile):
+        # in game the lower half tile meets this edge flush, but the isolated
+        # render must not show an open dark interior there.
+        cap = [
+            (*map_xy(*pt(-BLEED, -0.5 - BLEED)), 0.0),
+            (*map_xy(*pt(-BLEED, 0.5 + BLEED)), 0.0),
+            (*map_xy(*pt(-BLEED, 0.5 + BLEED)), z_low),
+            (*map_xy(*pt(-BLEED, -0.5 - BLEED)), z_low),
+        ]
+        add_mesh(scene, "LowEndCap", cap, [(0, 1, 2, 3)], material)
+    else:
+        vertices = [
+            (*map_xy(*pt(-BLEED, v)), 0.0),
+            (*map_xy(*pt(1.0 + BLEED, v)), z_high),
+            (*map_xy(*pt(1.0 + BLEED, v)), 0.0),
+        ]
+        add_mesh(scene, "SideWall", vertices, [(0, 1, 2)], material)
     floor = [
         (*map_xy(*pt(-BLEED, -0.5 - BLEED)), -0.004),
         (*map_xy(*pt(1.0 + BLEED, -0.5 - BLEED)), -0.004),
@@ -460,9 +500,16 @@ def _slope_side_walls(scene, pt, material, floor_material) -> None:
     add_mesh(scene, "WedgeFloor", floor, [(0, 1, 2, 3)], floor_material)
 
 
-def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
+def build_slope_dirt(scene: bpy.types.Scene, toward: str, half: str | None = None) -> None:
     """Dirt cutting (mountain path) climbing one step toward `toward`.
     Canvas 64x72, anchor (32,56).
+
+    `half` = None renders the legacy steep 1-cell cutting (full 40px rise).
+    `half` = "lower" / "upper" renders one cell of the gentle 2-cell cutting:
+    the same art language with the gradient halved (20px rise per cell);
+    the lower tile melts into the meadow at its toe, the upper tile caps
+    into the high ground, and the shared boundary stays bare dirt so the
+    pair reads as one continuous path.
 
     Material layering (low→high u):
     - Slope face: warm-earth noise dirt on a JITTERED relief grid — a flat
@@ -474,7 +521,9 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
       ends melt into the grassy terrain instead of ending on a straight cut.
     """
     pt = _slope_axes(toward)
+    z_of = _slope_z_of(half)
     seed = {"n": 101.0, "e": 102.0, "s": 103.0, "w": 104.0}[toward]
+    seed += {"lower": 20.0, "upper": 40.0}.get(half or "", 0.0)
     # Richer warm-earth noise: two-stop value spread.
     dirt = make_noise_material("SlopeDirt", (0.120, 0.090, 0.055), (0.295, 0.230, 0.145), scale=8.0)
     margin = make_material("SlopeMargin", (0.082, 0.062, 0.040, 1.0))
@@ -484,8 +533,8 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
     grass = make_grass_material()
     grass_dark, grass_light = _grass_lip_materials()
 
-    _slope_relief_surface(scene, "Surface", pt, seed, dirt)
-    _slope_side_walls(scene, pt, flank, dirt)
+    _slope_relief_surface(scene, "Surface", pt, seed, dirt, z_of=z_of)
+    _slope_side_walls(scene, pt, flank, dirt, z_of=z_of)
     # Worn shoulders framing the trodden center (broken into jittered strips
     # so the margin line does not read as a ruled edge).
     for side_index, (v0, v1) in enumerate(((-0.5 - BLEED, -0.40), (0.40, 0.5 + BLEED))):
@@ -496,7 +545,7 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
             dv = 0.05 * (_hash01(seed, side_index, 40.0 + strip) - 0.5)
             _slope_quad(scene, f"Margin{side_index}_{strip}", pt, u0, u1,
                         v0 + (dv if side_index == 0 else 0.0),
-                        v1 + (dv if side_index == 1 else 0.0), 0.005, margin)
+                        v1 + (dv if side_index == 1 else 0.0), 0.005, margin, z_of=z_of)
     # Erosion lips across the path: thin, jittered, off-centre shadow bands
     # (not planks — just the shadow line each trodden foothold casts).
     for index, u in enumerate((0.16, 0.34, 0.52, 0.70, 0.88)):
@@ -504,36 +553,41 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str) -> None:
         width = 0.26 + 0.14 * _hash01(seed, index, 4.0)
         v_mid = 0.10 * (_hash01(seed, index, 9.0) - 0.5)
         _slope_quad(scene, f"Rib{index}", pt, u + jitter, u + jitter + 0.032,
-                    v_mid - width, v_mid + width, 0.012, rib)
+                    v_mid - width, v_mid + width, 0.012, rib, z_of=z_of)
     # A few half-buried stones along the shoulders.
     for index in range(4):
         u = 0.12 + 0.70 * _hash01(seed, index, 5.0)
         v = (-0.36 if index % 2 == 0 else 0.30) + 0.10 * _hash01(seed, index, 2.0)
         size = 0.035 + 0.03 * _hash01(seed, index, 3.0)
         x, y = pt(u, v)
-        z = u * LEVEL
+        z = z_of(u)
         add_box(scene, f"PathStone{index}",
                 *map_box((x - size, y - size, z - 0.03), (x + size, y + size, z + 0.024)), stone)
     # Grass cap: blends the top edge into the flat terrain tile above. The
     # ragged second row of tufts keeps the dirt/grass line from ruling.
-    _slope_quad(scene, "GrassCap", pt, 0.90, 1.0 + BLEED, -0.5 - BLEED, 0.5 + BLEED, 0.008, grass)
-    for index in range(6):
-        v = -0.42 + 0.84 * index / 5.0 + 0.05 * (_hash01(seed, index, 6.0) - 0.5)
-        depth = 0.05 + 0.06 * _hash01(seed, index, 7.0)
-        _slope_quad(scene, f"CapTuft{index}", pt, 0.90 - depth, 0.92,
-                    v - 0.05, v + 0.05, 0.009,
-                    grass_dark if index % 2 == 0 else grass_light)
+    # A gentle LOWER half keeps its top edge bare dirt instead — it hands the
+    # path over to the upper half tile, not to grass.
+    if half != "lower":
+        _slope_quad(scene, "GrassCap", pt, 0.90, 1.0 + BLEED, -0.5 - BLEED, 0.5 + BLEED, 0.008, grass, z_of=z_of)
+        for index in range(6):
+            v = -0.42 + 0.84 * index / 5.0 + 0.05 * (_hash01(seed, index, 6.0) - 0.5)
+            depth = 0.05 + 0.06 * _hash01(seed, index, 7.0)
+            _slope_quad(scene, f"CapTuft{index}", pt, 0.90 - depth, 0.92,
+                        v - 0.05, v + 0.05, 0.009,
+                        grass_dark if index % 2 == 0 else grass_light, z_of=z_of)
     # Grass tongues at the low corners: the path narrows into the meadow
     # instead of arriving as a full-width straight cut. Ragged inner edge.
-    for side_index, (v0, v1) in enumerate(((-0.5 - BLEED, -0.30), (0.30, 0.5 + BLEED))):
-        depth = 0.10 + 0.08 * _hash01(seed, side_index, 8.0)
-        _slope_quad(scene, f"ToeGrass{side_index}", pt, -BLEED, depth, v0, v1, 0.006, grass)
-        for tuft in range(3):
-            tv = v0 + (v1 - v0) * (0.15 + 0.35 * tuft)
-            td = depth * (0.4 + 0.6 * _hash01(seed, side_index, 50.0 + tuft))
-            _slope_quad(scene, f"ToeTuft{side_index}_{tuft}", pt, td - 0.02, td + 0.06,
-                        tv - 0.05, tv + 0.05, 0.008,
-                        grass_dark if (side_index + tuft) % 2 == 0 else grass_light)
+    # A gentle UPPER half starts mid-climb on bare dirt — no meadow tongues.
+    if half != "upper":
+        for side_index, (v0, v1) in enumerate(((-0.5 - BLEED, -0.30), (0.30, 0.5 + BLEED))):
+            depth = 0.10 + 0.08 * _hash01(seed, side_index, 8.0)
+            _slope_quad(scene, f"ToeGrass{side_index}", pt, -BLEED, depth, v0, v1, 0.006, grass, z_of=z_of)
+            for tuft in range(3):
+                tv = v0 + (v1 - v0) * (0.15 + 0.35 * tuft)
+                td = depth * (0.4 + 0.6 * _hash01(seed, side_index, 50.0 + tuft))
+                _slope_quad(scene, f"ToeTuft{side_index}_{tuft}", pt, td - 0.02, td + 0.06,
+                            tv - 0.05, tv + 0.05, 0.008,
+                            grass_dark if (side_index + tuft) % 2 == 0 else grass_light, z_of=z_of)
 
 
 def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
@@ -634,6 +688,16 @@ def build_slope(scene: bpy.types.Scene, skin: str, toward: str) -> None:
         build_slope_dirt(scene, toward)
     else:
         build_slope_ishigaki(scene, toward)
+
+
+def build_slope_half(scene: bpy.types.Scene, skin: str, toward: str, half: str) -> None:
+    """Gentle 2-cell slope half tile (20px rise per cell). Dirt only for now;
+    the ishigaki stairway stays a steep 1-cell asset by design."""
+    if skin != "dirt":
+        raise ValueError(f"gentle slope halves are only produced for the dirt skin, got: {skin}")
+    if half not in ("lower", "upper"):
+        raise ValueError(f"unknown slope half: {half}")
+    build_slope_dirt(scene, toward, half)
 
 
 # --- slope side wedges -------------------------------------------------------
