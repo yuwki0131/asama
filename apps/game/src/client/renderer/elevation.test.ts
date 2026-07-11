@@ -15,6 +15,7 @@ import {
 interface CellSpec {
   readonly elevation?: number;
   readonly slope?: SlopeDirection | null;
+  readonly slopeHalf?: "lower" | "upper";
   readonly skin?: "cliff" | "ishigaki";
   readonly terrain?: "grass" | "water";
 }
@@ -33,6 +34,7 @@ function makeMap(width: number, height: number, specs: Record<string, CellSpec> 
         assetId: "terrain.grass.base",
         elevation: spec.elevation ?? 0,
         slope: spec.slope ?? null,
+        ...(spec.slopeHalf !== undefined ? { slopeHalf: spec.slopeHalf } : {}),
         elevationSkin: spec.skin ?? "cliff"
       });
     }
@@ -62,6 +64,15 @@ describe("offsets", () => {
     expect(surfaceOffsetYAt(map, { x: 1, y: 1 })).toBe(-1.5 * ELEVATION_PIXELS_PER_LEVEL);
     expect(surfaceOffsetYAt(map, { x: 0, y: 0 })).toBe(0);
   });
+
+  it("puts the walking surface of gentle slope halves at quarter levels", () => {
+    const map = makeMap(4, 4, {
+      "1,1": { elevation: 1, slope: "N", slopeHalf: "lower" },
+      "1,2": { elevation: 1, slope: "N", slopeHalf: "upper" }
+    });
+    expect(surfaceOffsetYAt(map, { x: 1, y: 1 })).toBe(-1.25 * ELEVATION_PIXELS_PER_LEVEL);
+    expect(surfaceOffsetYAt(map, { x: 1, y: 2 })).toBe(-1.75 * ELEVATION_PIXELS_PER_LEVEL);
+  });
 });
 
 describe("edgeSurfaceHeight", () => {
@@ -78,6 +89,17 @@ describe("edgeSurfaceHeight", () => {
     expect(edgeSurfaceHeight(cell, "S")).toBe(1);
     expect(edgeSurfaceHeight(cell, "E")).toBeNull();
     expect(edgeSurfaceHeight(cell, "W")).toBeNull();
+  });
+
+  it("exposes half-level edges on gentle 2-cell slope halves", () => {
+    const lower = { elevation: 0, slope: "N" as const, slopeHalf: "lower" as const };
+    expect(edgeSurfaceHeight(lower, "N")).toBe(0.5);
+    expect(edgeSurfaceHeight(lower, "S")).toBe(0);
+    expect(edgeSurfaceHeight(lower, "E")).toBeNull();
+    const upper = { elevation: 0, slope: "N" as const, slopeHalf: "upper" as const };
+    expect(edgeSurfaceHeight(upper, "N")).toBe(1);
+    expect(edgeSurfaceHeight(upper, "S")).toBe(0.5);
+    expect(edgeSurfaceHeight(upper, "W")).toBeNull();
   });
 });
 
@@ -137,6 +159,32 @@ describe("cliffInfoFor", () => {
     expect(east?.topA).toBe(0); // S corner (downhill end)
     expect(east?.topB).toBe(1); // E corner (uphill end)
     expect(slope.faces.find((f) => f.edge === "s")).toBeUndefined();
+  });
+
+  it("draws no face along a gentle 2-cell slope chain and slants its sides by half levels", () => {
+    // (1,0) plateau level 1, (1,1) upper half, (1,2) lower half, (1,3) flat 0.
+    const map = makeMap(4, 4, {
+      "1,0": { elevation: 1 },
+      "1,1": { elevation: 0, slope: "N", slopeHalf: "upper" },
+      "1,2": { elevation: 0, slope: "N", slopeHalf: "lower" }
+    });
+    // Plateau S edge meets the upper half's top edge (both 1): no S face.
+    expect(cliffInfoFor(map, cellAt(map, 1, 0)).faces.find((f) => f.edge === "s")).toBeUndefined();
+
+    const upper = cliffInfoFor(map, cellAt(map, 1, 1));
+    expect(upper.faces.find((f) => f.edge === "s")).toBeUndefined(); // meets the lower half
+    const upperSide = upper.faces.find((f) => f.edge === "e");
+    expect(upperSide?.assetId).toBe("terrain.slope2.dirt.n.upper.side.e");
+    expect(upperSide?.topA).toBe(0.5); // S corner (downhill end)
+    expect(upperSide?.topB).toBe(1); // E corner (uphill end)
+    expect(upperSide?.bottom).toBe(0);
+
+    const lower = cliffInfoFor(map, cellAt(map, 1, 2));
+    expect(lower.faces.find((f) => f.edge === "s")).toBeUndefined(); // meets flat 0
+    const lowerSide = lower.faces.find((f) => f.edge === "e");
+    expect(lowerSide?.assetId).toBe("terrain.slope2.dirt.n.lower.side.e");
+    expect(lowerSide?.topA).toBe(0);
+    expect(lowerSide?.topB).toBe(0.5);
   });
 
   it("treats the map border as level 0", () => {
@@ -200,6 +248,24 @@ describe("pickCellAtScreenPoint", () => {
     // Upper level (2): lifted by 48px.
     const upper = { x: point.x, y: point.y - 2 * ELEVATION_PIXELS_PER_LEVEL };
     expect(pickCellAtScreenPoint(upper.x, upper.y, CAMERA, map)).toEqual({ x: 3, y: 3 });
+  });
+
+  it("accepts gentle slope halves at their half-level lifted diamonds", () => {
+    // Plateau chain: (3,2) upper half, (3,3) lower half at elevation 1.
+    const map = makeMap(8, 8, {
+      "3,2": { elevation: 1, slope: "N", slopeHalf: "upper" },
+      "3,3": { elevation: 1, slope: "N", slopeHalf: "lower" }
+    });
+    const lowerPoint = cellToWorld({ x: 3, y: 3 });
+    // Lower half spans levels 1 .. 1.5.
+    const lowerBase = { x: lowerPoint.x, y: lowerPoint.y - 1 * ELEVATION_PIXELS_PER_LEVEL };
+    const lowerTop = { x: lowerPoint.x, y: lowerPoint.y - 1.5 * ELEVATION_PIXELS_PER_LEVEL };
+    expect(pickCellAtScreenPoint(lowerBase.x, lowerBase.y, CAMERA, map)).toEqual({ x: 3, y: 3 });
+    expect(pickCellAtScreenPoint(lowerTop.x, lowerTop.y, CAMERA, map)).toEqual({ x: 3, y: 3 });
+    // Upper half spans levels 1.5 .. 2.
+    const upperPoint = cellToWorld({ x: 3, y: 2 });
+    const upperTop = { x: upperPoint.x, y: upperPoint.y - 2 * ELEVATION_PIXELS_PER_LEVEL };
+    expect(pickCellAtScreenPoint(upperTop.x, upperTop.y, CAMERA, map)).toEqual({ x: 3, y: 2 });
   });
 
   it("honours camera pan and zoom", () => {

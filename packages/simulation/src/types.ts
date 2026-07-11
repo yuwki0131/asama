@@ -18,6 +18,7 @@ import {
   type ScenarioWave,
   type Season,
   type SlopeDirection,
+  type SlopeHalf,
   type TerrainType,
   type UnitId,
   type UnitType
@@ -33,6 +34,8 @@ export interface TerrainCellState {
   readonly elevation: number;
   /** Ramp toward this direction (+1 level); side edges are cliffs. */
   readonly slope: SlopeDirection | null;
+  /** 2-cell gentle slope half (slope cells only); undefined = 1-cell slope. */
+  readonly slopeHalf?: SlopeHalf;
   /** Skin for cliff faces / slope tiles around this cell. */
   readonly elevationSkin: ElevationSkin;
   /** cliff cells only: which face this cell renders ("s" | "e" | "se"). */
@@ -277,6 +280,8 @@ export const TERRAIN_COSTS = {
   raiseTerrain: 50,
   lowerTerrain: 20,
   placeSlope: 30,
+  /** Gentle 2-cell ramp (placeSlope with length 2). */
+  placeSlopeGentle: 50,
   removeSlope: 10
 } as const;
 

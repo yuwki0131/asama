@@ -9,6 +9,7 @@ import {
   edgeSurfaceHeight,
   ELEVATION_PIXELS_PER_LEVEL,
   slopeAssetSkin,
+  slopeRise,
   tileOffsetY,
   type ElevationMapLike,
   type CliffFace
@@ -376,7 +377,13 @@ export function addSlopeCellSprites(
   addSlopeBackFill(layer, cell, map);
   addSlopeSideWalls(layer, cell, map, assets);
 
-  const slopeAssetId = `terrain.slope.${slopeAssetSkin(cell.elevationSkin)}.${slope.toLowerCase()}`;
+  // Gentle 2-cell slope halves use dedicated half tiles
+  // (terrain.slope2.<skin>.<dir>.<lower|upper>); 1-cell slopes keep the
+  // legacy terrain.slope.<skin>.<dir> tile.
+  const slopeAssetId =
+    cell.slopeHalf === undefined
+      ? `terrain.slope.${slopeAssetSkin(cell.elevationSkin)}.${slope.toLowerCase()}`
+      : `terrain.slope2.${slopeAssetSkin(cell.elevationSkin)}.${slope.toLowerCase()}.${cell.slopeHalf}`;
   const asset = assets.get(slopeAssetId);
   if (asset !== undefined) {
     const sprite = createSpriteFromCandidates([slopeAssetId], assets);
@@ -386,18 +393,22 @@ export function addSlopeCellSprites(
   }
 
   // Fallback: base terrain under the ramp (fills the low-side sliver), then
-  // the ramp polygon.
+  // the ramp polygon (downhill corners at the downhill rise, uphill corners
+  // at the uphill rise — half levels for gentle 2-cell slope halves).
   const base = createSpriteFromCandidates([cell.assetId, terrainFallbackAssetId(cell)], assets);
   base.position.set(point.x, point.y + offsetY);
   layer.addChild(base);
 
   const lifted = liftedCorners(slope);
-  const lift = -ELEVATION_PIXELS_PER_LEVEL;
+  const rise = slopeRise(cell);
+  const downLift = -rise.down * ELEVATION_PIXELS_PER_LEVEL;
+  const upLift = -rise.up * ELEVATION_PIXELS_PER_LEVEL;
+  const cornerLift = (corner: "n" | "e" | "s" | "w"): number => (lifted.has(corner) ? upLift : downLift);
   const corners = {
-    n: { x: point.x, y: point.y - TILE_HEIGHT / 2 + offsetY + (lifted.has("n") ? lift : 0) },
-    e: { x: point.x + TILE_WIDTH / 2, y: point.y + offsetY + (lifted.has("e") ? lift : 0) },
-    s: { x: point.x, y: point.y + TILE_HEIGHT / 2 + offsetY + (lifted.has("s") ? lift : 0) },
-    w: { x: point.x - TILE_WIDTH / 2, y: point.y + offsetY + (lifted.has("w") ? lift : 0) }
+    n: { x: point.x, y: point.y - TILE_HEIGHT / 2 + offsetY + cornerLift("n") },
+    e: { x: point.x + TILE_WIDTH / 2, y: point.y + offsetY + cornerLift("e") },
+    s: { x: point.x, y: point.y + TILE_HEIGHT / 2 + offsetY + cornerLift("s") },
+    w: { x: point.x - TILE_WIDTH / 2, y: point.y + offsetY + cornerLift("w") }
   };
   const ramp = new Graphics();
   ramp
@@ -472,19 +483,22 @@ function addSlopeBackFill(layer: Container, cell: TerrainCellSnapshot, map: Elev
     : slope === "S" ? { dx: -1, dy: 0, facing: "E" as const, high: ground.w, low: ground.n, shade: "s" as const }
     : /* W */         { dx: 0, dy: -1, facing: "S" as const, high: ground.n, low: ground.e, shade: "e" as const };
 
+  const rise = slopeRise(cell);
+  const lowLevel = elev + rise.down;
+  const highLevel = elev + rise.up;
   const neighbour = cellAt(map, cell.coord.x + spec.dx, cell.coord.y + spec.dy);
   const neighbourSurface =
     neighbour === null ? 0 : edgeSurfaceHeight(neighbour, spec.facing) ?? neighbour.elevation;
-  if (neighbourSurface >= elev + 1) {
+  if (neighbourSurface >= highLevel) {
     return; // back neighbour covers the lifted edge — nothing exposed
   }
-  const bottom = Math.min(neighbourSurface, elev);
+  const bottom = Math.min(neighbourSurface, lowLevel);
 
   const fill = new Graphics();
   fill
     .poly([
-      spec.low.x, spec.low.y - elev * px,
-      spec.high.x, spec.high.y - (elev + 1) * px,
+      spec.low.x, spec.low.y - lowLevel * px,
+      spec.high.x, spec.high.y - highLevel * px,
       spec.high.x, spec.high.y - bottom * px,
       spec.low.x, spec.low.y - bottom * px
     ])

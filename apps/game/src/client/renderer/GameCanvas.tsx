@@ -30,6 +30,7 @@ export type ToolMode =
   | "raiseTerrain"
   | "lowerTerrain"
   | "placeSlope"
+  | "placeSlopeGentle"
   | "removeSlope"
   | null;
 
@@ -64,7 +65,7 @@ interface GameCanvasProps {
   readonly onCancelBuildTool: () => void;
   readonly onRaiseTerrain: (position: CellCoord) => void;
   readonly onLowerTerrain: (position: CellCoord) => void;
-  readonly onPlaceSlope: (position: CellCoord) => void;
+  readonly onPlaceSlope: (position: CellCoord, length: 1 | 2) => void;
   readonly onRemoveSlope: (position: CellCoord) => void;
 }
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ScenarioDefinition } from "@asama/shared";
 import { buildingDefinitions, createBuildingState, canPlaceBuilding } from "./buildings";
 import { updateCombat } from "./combat";
-import { ELEVATION_BALANCE, applyScenarioElevation, elevationAt, stepTicksFor } from "./elevation";
+import { ELEVATION_BALANCE, applyScenarioElevation, edgeHeight, elevationAt, stepTicksFor, surfaceLevel } from "./elevation";
 import { computeConnectedStorehouseIds } from "./food";
 import { getCell } from "./map";
 import { canStep, findPath, movementCostForStep } from "./pathfinding";
@@ -340,6 +340,169 @@ describe("food connectivity across elevation", () => {
   it("a slope carries the supply line up the terrace", () => {
     const world = worldWithHonmaruAndStorehouse(true);
     expect(computeConnectedStorehouseIds(world)).toHaveLength(1);
+  });
+});
+
+describe("gentle 2-cell slopes (length: 2)", () => {
+  /** Plateau (rows 58..62 at level 1) plus a gentle N ramp: lower half at
+   *  (22,64), upper half at (22,63) meeting the plateau at (22,62). */
+  function plateauWithGentleSlopeWorld(): WorldState {
+    const world = flatWorld();
+    applyScenarioElevation(world.map, {
+      patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }],
+      slopes: [{ position: { x: 22, y: 64 }, toward: "N", length: 2 }]
+    });
+    return world;
+  }
+
+  it("marks the lower and upper halves along the slope axis", () => {
+    const world = plateauWithGentleSlopeWorld();
+    const lower = getCell(world, { x: 22, y: 64 });
+    const upper = getCell(world, { x: 22, y: 63 });
+    expect(lower.slope).toBe("N");
+    expect(lower.slopeHalf).toBe("lower");
+    expect(upper.slope).toBe("N");
+    expect(upper.slopeHalf).toBe("upper");
+    expect(lower.elevation).toBe(0);
+    expect(upper.elevation).toBe(0);
+  });
+
+  it("exposes half-level edge heights that chain lower -> upper -> plateau", () => {
+    const world = plateauWithGentleSlopeWorld();
+    const lower = getCell(world, { x: 22, y: 64 });
+    const upper = getCell(world, { x: 22, y: 63 });
+    expect(edgeHeight(lower, "S")).toBe(0); // meets flat ground
+    expect(edgeHeight(lower, "N")).toBe(0.5); // meets the upper half
+    expect(edgeHeight(upper, "S")).toBe(0.5);
+    expect(edgeHeight(upper, "N")).toBe(1); // meets the plateau
+    expect(edgeHeight(lower, "E")).toBeNull(); // side edges stay cliffs
+    expect(edgeHeight(upper, "W")).toBeNull();
+    expect(surfaceLevel(lower)).toBe(0.25);
+    expect(surfaceLevel(upper)).toBe(0.75);
+  });
+
+  it("is walkable end to end along its axis and closed on the sides", () => {
+    const world = plateauWithGentleSlopeWorld();
+    // flat -> lower -> upper -> plateau, and back down.
+    expect(canStep(world, { x: 22, y: 65 }, { x: 22, y: 64 })).toBe(true);
+    expect(canStep(world, { x: 22, y: 64 }, { x: 22, y: 63 })).toBe(true);
+    expect(canStep(world, { x: 22, y: 63 }, { x: 22, y: 62 })).toBe(true);
+    expect(canStep(world, { x: 22, y: 62 }, { x: 22, y: 63 })).toBe(true);
+    expect(canStep(world, { x: 22, y: 63 }, { x: 22, y: 64 })).toBe(true);
+    // Side edges of both halves are cliffs.
+    expect(canStep(world, { x: 21, y: 64 }, { x: 22, y: 64 })).toBe(false);
+    expect(canStep(world, { x: 23, y: 64 }, { x: 22, y: 64 })).toBe(false);
+    expect(canStep(world, { x: 21, y: 63 }, { x: 22, y: 63 })).toBe(false);
+    expect(canStep(world, { x: 23, y: 63 }, { x: 22, y: 63 })).toBe(false);
+  });
+
+  it("does not generate cliff cells on the bridged edges (insertCliffCells)", () => {
+    const world = createInitialWorld({
+      ...FLAT_SCENARIO,
+      id: "test-gentle-cliff",
+      elevation: {
+        patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }],
+        slopes: [{ position: { x: 22, y: 64 }, toward: "N", length: 2 }]
+      }
+    });
+    // The two ramp halves stay walkable slope cells.
+    expect(getCell(world, { x: 22, y: 64 }).terrain).not.toBe("cliff");
+    expect(getCell(world, { x: 22, y: 63 }).terrain).not.toBe("cliff");
+    expect(getCell(world, { x: 22, y: 63 }).slope).toBe("N");
+    // Non-bridged plateau S edge cells still become cliff cells.
+    expect(getCell(world, { x: 21, y: 63 }).terrain).toBe("cliff");
+    expect(getCell(world, { x: 23, y: 63 }).terrain).toBe("cliff");
+  });
+
+  it("pathfinding climbs the gentle ramp with per-step climb penalties", () => {
+    const world = plateauWithGentleSlopeWorld();
+    const path = findPath(world, { x: 22, y: 55 }, { x: 22, y: 60 });
+    expect(path.length).toBeGreaterThan(0);
+    expect(path.some((step) => step.x === 22 && step.y === 64)).toBe(true);
+    expect(path.some((step) => step.x === 22 && step.y === 63)).toBe(true);
+    expect(path.at(-1)).toEqual({ x: 22, y: 60 });
+
+    // Each of the three ascending steps gains height -> climb ticks apply.
+    const climber = createUnit("unit:test:gentle", "player", "spear_ashigaru", { x: 22, y: 65 });
+    climber.path = [{ x: 22, y: 64 }];
+    world.units.push(climber);
+    expect(stepTicksFor(world, climber)).toBe(climber.ticksPerStep + ELEVATION_BALANCE.climbExtraTicksPerStep);
+    climber.position = { x: 22, y: 64 };
+    climber.path = [{ x: 22, y: 63 }];
+    expect(stepTicksFor(world, climber)).toBe(climber.ticksPerStep + ELEVATION_BALANCE.climbExtraTicksPerStep);
+    climber.position = { x: 22, y: 63 };
+    climber.path = [{ x: 22, y: 62 }];
+    expect(stepTicksFor(world, climber)).toBe(climber.ticksPerStep + ELEVATION_BALANCE.climbExtraTicksPerStep);
+    // Downhill is free.
+    climber.position = { x: 22, y: 63 };
+    climber.path = [{ x: 22, y: 64 }];
+    expect(stepTicksFor(world, climber)).toBe(climber.ticksPerStep);
+  });
+
+  it("units on either half count as the slope's lower level in combat", () => {
+    const world = plateauWithGentleSlopeWorld();
+    expect(elevationAt(world, { x: 22, y: 64 })).toBe(0);
+    expect(elevationAt(world, { x: 22, y: 63 })).toBe(0);
+  });
+
+  it("snapshots carry slopeHalf for gentle ramp cells only", () => {
+    const world = createInitialWorld({
+      ...FLAT_SCENARIO,
+      id: "test-gentle-snapshot",
+      elevation: {
+        patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }],
+        slopes: [
+          { position: { x: 22, y: 64 }, toward: "N", length: 2 },
+          { position: { x: 20, y: 63 }, toward: "N" } // steep 1-cell for contrast
+        ]
+      }
+    });
+    const snapshot = snapshotWorld(world);
+    const at = (x: number, y: number) => snapshot.map.cells.find((c) => c.coord.x === x && c.coord.y === y);
+    expect(at(22, 64)?.slopeHalf).toBe("lower");
+    expect(at(22, 63)?.slopeHalf).toBe("upper");
+    expect(at(20, 63)?.slope).toBe("N");
+    expect(at(20, 63)?.slopeHalf).toBeUndefined();
+  });
+
+  it("throws when the gentle ramp does not connect two levels across its two cells", () => {
+    const world = flatWorld();
+    expect(() =>
+      applyScenarioElevation(world.map, {
+        patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }],
+        // Upper half would land ON the plateau: geometrically invalid.
+        slopes: [{ position: { x: 22, y: 63 }, toward: "N", length: 2 }]
+      })
+    ).toThrow(/does not connect/);
+  });
+
+  it("removes decorations from both halves", () => {
+    const world = flatWorld();
+    world.map.decorations.push(
+      { assetId: "deco.tree.1", position: { x: 22, y: 64 } },
+      { assetId: "deco.tree.1", position: { x: 22, y: 63 } },
+      { assetId: "deco.tree.1", position: { x: 21, y: 64 } }
+    );
+    applyScenarioElevation(world.map, {
+      patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }],
+      slopes: [{ position: { x: 22, y: 64 }, toward: "N", length: 2 }]
+    });
+    expect(world.map.decorations.some((d) => d.position.x === 22 && d.position.y === 64)).toBe(false);
+    expect(world.map.decorations.some((d) => d.position.x === 22 && d.position.y === 63)).toBe(false);
+    expect(world.map.decorations.some((d) => d.position.x === 21 && d.position.y === 64)).toBe(true);
+  });
+
+  it("width expands a gentle ramp into parallel lower/upper columns", () => {
+    const world = flatWorld();
+    applyScenarioElevation(world.map, {
+      patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }],
+      slopes: [{ position: { x: 21, y: 64 }, toward: "N", width: 2, length: 2 }]
+    });
+    for (const x of [21, 22]) {
+      expect(getCell(world, { x, y: 64 }).slopeHalf).toBe("lower");
+      expect(getCell(world, { x, y: 63 }).slopeHalf).toBe("upper");
+    }
+    expect(getCell(world, { x: 23, y: 64 }).slope).toBeNull();
   });
 });
 

@@ -19,10 +19,18 @@ describe("elevationFixtureScenario", () => {
     expect(cell(40, 57).elevation).toBe(3); // summit
     expect(cell(40, 57).elevationSkin).toBe("ishigaki");
 
-    // Climbing route: 0→1, 1→2 (width 2), 2→3 (width 1).
+    // Climbing route: 0→1 (gentle 2-cell), 1→2 (width 2), 2→3 (width 1).
+    expect(cell(40, 69).slope).toBe("N");
+    expect(cell(40, 69).slopeHalf).toBe("lower");
+    expect(cell(41, 69).slopeHalf).toBe("lower");
     expect(cell(40, 68).slope).toBe("N");
-    expect(cell(41, 68).slope).toBe("N");
+    expect(cell(40, 68).slopeHalf).toBe("upper");
+    expect(cell(41, 68).slopeHalf).toBe("upper");
     expect(cell(40, 68).elevation).toBe(0);
+    expect(cell(40, 69).elevation).toBe(0);
+    // The steep 1-cell comparison slope keeps no half marker.
+    expect(cell(52, 56).slope).toBe("W");
+    expect(cell(52, 56).slopeHalf).toBeUndefined();
     expect(cell(40, 63).slope).toBe("N");
     expect(cell(40, 63).elevation).toBe(1);
     expect(cell(40, 60).slope).toBe("N");

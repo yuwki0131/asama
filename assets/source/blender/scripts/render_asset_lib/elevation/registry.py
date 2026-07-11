@@ -6,6 +6,7 @@ Model naming mirrors the runtime asset ids of the elevation contract:
     elev-<cliff|ishigaki>-corner-se-h<1..5>
     elev-slope-<dirt|ishigaki>-<n|e|s|w>
     elev-slope-<dirt|ishigaki>-<n|e|s|w>-side-<s|e>
+    elev-slope2-dirt-<n|e|s|w>-<lower|upper>   (gentle 2-cell dirt ramp halves)
 """
 from __future__ import annotations
 
@@ -17,6 +18,7 @@ from .tiles import (
     build_ishigaki_corner,
     build_ishigaki_face,
     build_slope,
+    build_slope_half,
     build_slope_side,
 )
 
@@ -25,6 +27,7 @@ ELEVATION_MODEL_PATTERNS = (
     "elev-(cliff|ishigaki)-corner-se-h[12345]",
     "elev-slope-(dirt|ishigaki)-[nesw]",
     "elev-slope-(dirt|ishigaki)-[nesw]-side-(s|e)",
+    "elev-slope2-dirt-[nesw]-(lower|upper)",
 )
 
 
@@ -50,5 +53,10 @@ def resolve_model(name: str):
     if slope is not None:
         skin, toward = slope.group(1), slope.group(2)
         return lambda scene: build_slope(scene, skin, toward)
+
+    slope_half = re.fullmatch(r"elev-slope2-(dirt)-([nesw])-(lower|upper)", name)
+    if slope_half is not None:
+        skin, toward, half = slope_half.group(1), slope_half.group(2), slope_half.group(3)
+        return lambda scene: build_slope_half(scene, skin, toward, half)
 
     return None

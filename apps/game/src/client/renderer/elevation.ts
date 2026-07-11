@@ -40,9 +40,24 @@ export function tileOffsetYAt(map: ElevationMapLike | null, cell: CellCoord): nu
   return tileOffsetY(cellAt(map, cell.x, cell.y));
 }
 
+/** Surface rise of a slope cell above its base elevation, in levels (mirror
+ *  of the sim's `slopeRise`): a 1-cell slope climbs down 0 → up 1; gentle
+ *  2-cell slope halves climb 0 → 0.5 (lower) / 0.5 → 1 (upper). */
+export function slopeRise(cell: Pick<TerrainCellSnapshot, "slopeHalf">): { down: number; up: number } {
+  if (cell.slopeHalf === "lower") {
+    return { down: 0, up: 0.5 };
+  }
+  if (cell.slopeHalf === "upper") {
+    return { down: 0.5, up: 1 };
+  }
+  return { down: 0, up: 1 };
+}
+
 /**
  * Y offset (≤ 0) of the WALKING SURFACE of a cell: units standing on a slope
- * sit at the mid height -(elevation + 0.5) * 40 (elevation-contract.md §5).
+ * sit at the mid height between the slope's two edge levels — -(elevation +
+ * 0.5) * 40 on a 1-cell slope, -(elevation + 0.25/0.75) * 40 on gentle 2-cell
+ * slope halves (elevation-contract.md §5).
  */
 export function surfaceOffsetYAt(map: ElevationMapLike | null, cell: CellCoord): number {
   if (map === null) {
@@ -52,7 +67,11 @@ export function surfaceOffsetYAt(map: ElevationMapLike | null, cell: CellCoord):
   if (terrain === null) {
     return 0;
   }
-  const level = terrain.elevation + (terrain.slope !== null ? 0.5 : 0);
+  let level = terrain.elevation;
+  if (terrain.slope !== null) {
+    const rise = slopeRise(terrain);
+    level += (rise.down + rise.up) / 2;
+  }
   return -(level * ELEVATION_PIXELS_PER_LEVEL) || 0;
 }
 
@@ -72,21 +91,23 @@ export function slopeAssetSkin(skin: "cliff" | "ishigaki"): "dirt" | "ishigaki" 
 /**
  * Height of the cell surface at the edge facing `direction` (mirror of the
  * sim's `edgeHeight`): flat cells expose `elevation` on every edge, slope
- * cells expose `elevation + 1` uphill, `elevation` downhill and `null` on
- * their two side edges (those sides are cliffs).
+ * cells expose their uphill rise on the uphill edge, their downhill rise on
+ * the downhill edge (full levels for 1-cell slopes, half levels for gentle
+ * 2-cell halves) and `null` on their two side edges (those sides are cliffs).
  */
 export function edgeSurfaceHeight(
-  cell: Pick<TerrainCellSnapshot, "elevation" | "slope">,
+  cell: Pick<TerrainCellSnapshot, "elevation" | "slope" | "slopeHalf">,
   direction: SlopeDirection
 ): number | null {
   if (cell.slope === null) {
     return cell.elevation;
   }
+  const rise = slopeRise(cell);
   if (cell.slope === direction) {
-    return cell.elevation + 1;
+    return cell.elevation + rise.up;
   }
   if (cell.slope === OPPOSITE[direction]) {
-    return cell.elevation;
+    return cell.elevation + rise.down;
   }
   return null;
 }
@@ -142,23 +163,27 @@ export function cliffInfoFor(map: ElevationMapLike, cell: TerrainCellSnapshot): 
     const top = edgeSurfaceHeight(cell, direction);
 
     if (top !== null) {
-      // Flat (or slope axis) edge: plain face of height top - bottom.
+      // Flat (or slope axis) edge: plain face of height top - bottom. Half
+      // levels can make the drop fractional; the sprite id keeps integer
+      // heights (floor) while the geometry uses the exact top/bottom.
       const drop = top - bottom;
       if (drop >= 1) {
-        const h = Math.min(drop, MAX_ELEVATION);
+        const h = Math.min(Math.floor(drop), MAX_ELEVATION);
         faces.push({ edge, topA: top, topB: top, bottom, assetId: `terrain.${skin}.face.${edge}.h${h}` });
         flatFaceHeights = { ...flatFaceHeights, [edge]: h };
       }
       continue;
     }
 
-    // Slope side edge: slanted wall from `elevation` to `elevation + 1`.
-    // The two lifted diamond corners are the ones on the uphill edge, so the
-    // side wall's top is high at the corner shared with the uphill edge and
-    // low at the corner shared with the downhill edge.
+    // Slope side edge: slanted wall from the downhill to the uphill edge
+    // level (a full level apart on 1-cell slopes, half a level on gentle
+    // 2-cell halves). The two lifted diamond corners are the ones on the
+    // uphill edge, so the side wall's top is high at the corner shared with
+    // the uphill edge and low at the corner shared with the downhill edge.
     const slope = cell.slope as SlopeDirection;
-    const low = cell.elevation;
-    const high = cell.elevation + 1;
+    const rise = slopeRise(cell);
+    const low = cell.elevation + rise.down;
+    const high = cell.elevation + rise.up;
     let topA: number;
     let topB: number;
     if (edge === "s") {
@@ -173,12 +198,18 @@ export function cliffInfoFor(map: ElevationMapLike, cell: TerrainCellSnapshot): 
       topB = slope === "N" ? high : low;
     }
     if (Math.max(topA, topB) > bottom) {
+      // Gentle 2-cell halves get their own side ids (no sprites produced yet
+      // — the renderer falls back to the slanted polygon walls for them).
+      const assetId =
+        cell.slopeHalf === undefined
+          ? `terrain.slope.${slopeAssetSkin(skin)}.${slope.toLowerCase()}.side.${edge}`
+          : `terrain.slope2.${slopeAssetSkin(skin)}.${slope.toLowerCase()}.${cell.slopeHalf}.side.${edge}`;
       faces.push({
         edge,
         topA,
         topB,
         bottom: Math.min(bottom, low),
-        assetId: `terrain.slope.${slopeAssetSkin(skin)}.${slope.toLowerCase()}.side.${edge}`
+        assetId
       });
     }
   }
@@ -231,7 +262,11 @@ export function pickCellAtScreenPoint(
     return flat;
   }
 
-  for (let level = MAX_ELEVATION; level >= 0; level -= 1) {
+  // Half-level steps: gentle 2-cell slope halves draw their diamonds lifted
+  // by fractional (0.5) levels, so the inverse scans the lifted grids in 0.5
+  // increments (flat cells still only match their integer level).
+  for (let halfStep = MAX_ELEVATION * 2; halfStep >= 0; halfStep -= 1) {
+    const level = halfStep / 2;
     const liftedY = world.y + level * ELEVATION_PIXELS_PER_LEVEL;
     const x = Math.round(liftedY / TILE_HEIGHT + world.x / TILE_WIDTH);
     const y = Math.round(liftedY / TILE_HEIGHT - world.x / TILE_WIDTH);
@@ -244,10 +279,14 @@ export function pickCellAtScreenPoint(
     if (candidate.terrain === "cliff") {
       continue;
     }
-    const matches =
-      candidate.slope !== null
-        ? candidate.elevation === level || candidate.elevation + 1 === level
-        : candidate.elevation === level;
+    let matches: boolean;
+    if (candidate.slope !== null) {
+      // A slope cell spans the levels between its downhill and uphill edges.
+      const rise = slopeRise(candidate);
+      matches = level >= candidate.elevation + rise.down && level <= candidate.elevation + rise.up;
+    } else {
+      matches = candidate.elevation === level;
+    }
     if (matches) {
       // Diamond-in check: accept only when the screen point projects inside
       // the cell's lifted isometric diamond.  Points in the cliff face area

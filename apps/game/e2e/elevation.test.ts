@@ -116,7 +116,8 @@ describe("elevation: fixture boot", () => {
     });
     expect(summary.cellCount).toBeGreaterThan(0);
     expect(summary.maxElevation).toBe(3);
-    expect(summary.slopeCount).toBe(6);
+    // 0→1 gentle 2-cell x width 2 (4 cells) + 1→2 width 2 (2) + 2→3 (1) + W (1).
+    expect(summary.slopeCount).toBe(8);
     expect(summary.summit).toBe(3);
     expect(summary.summitSkin).toBe("ishigaki");
     expect(summary.units).toBe(4);
