@@ -3,7 +3,8 @@ import {
   type CellCoord,
   type ScenarioElevationDefinition,
   type ScenarioSlope,
-  type SlopeDirection
+  type SlopeDirection,
+  type SlopeHalf
 } from "@asama/shared";
 import type { TerrainCellState, UnitState, WorldState } from "./types";
 
@@ -48,21 +49,37 @@ export function stepDirection(from: CellCoord, to: CellCoord): SlopeDirection | 
   return null;
 }
 
+/** Surface rise of a slope cell above its base elevation, in levels:
+ *  downhill edge at `down`, uphill edge at `up`. 1-cell slope climbs a full
+ *  level; gentle 2-cell slope halves climb 0 → 0.5 (lower) / 0.5 → 1 (upper). */
+export function slopeRise(cell: Pick<TerrainCellState, "slopeHalf">): { down: number; up: number } {
+  if (cell.slopeHalf === "lower") {
+    return { down: 0, up: 0.5 };
+  }
+  if (cell.slopeHalf === "upper") {
+    return { down: 0.5, up: 1 };
+  }
+  return { down: 0, up: 1 };
+}
+
 /**
  * Height of the cell's surface at the edge facing `direction`.
- * Flat cell: elevation on every edge. Slope cell: elevation + 1 on the uphill
- * edge (`slope`), elevation on the downhill edge, and null (cliff) on the two
- * side edges — slopes are traversable only along their axis.
+ * Flat cell: elevation on every edge. Slope cell: the slope's uphill rise on
+ * the uphill edge (`slope`), its downhill rise on the downhill edge, and null
+ * (cliff) on the two side edges — slopes are traversable only along their
+ * axis. Gentle 2-cell slopes expose half-level (0.5) edge heights where the
+ * two halves meet, so traversal chains lower ↔ upper seamlessly.
  */
 export function edgeHeight(cell: TerrainCellState, direction: SlopeDirection): number | null {
   if (cell.slope === null) {
     return cell.elevation;
   }
+  const rise = slopeRise(cell);
   if (cell.slope === direction) {
-    return cell.elevation + 1;
+    return cell.elevation + rise.up;
   }
   if (cell.slope === OPPOSITE[direction]) {
-    return cell.elevation;
+    return cell.elevation + rise.down;
   }
   return null;
 }
@@ -87,9 +104,14 @@ export function canTraverseElevation(world: WorldState, from: CellCoord, to: Cel
   return exitHeight !== null && entryHeight !== null && exitHeight === entryHeight;
 }
 
-/** Continuous surface level used for climb detection (slope midpoint = +0.5). */
+/** Continuous surface level used for climb detection (slope midpoint: +0.5
+ *  for a 1-cell slope, +0.25 / +0.75 for gentle 2-cell slope halves). */
 export function surfaceLevel(cell: TerrainCellState): number {
-  return cell.elevation + (cell.slope !== null ? 0.5 : 0);
+  if (cell.slope === null) {
+    return cell.elevation;
+  }
+  const rise = slopeRise(cell);
+  return cell.elevation + (rise.down + rise.up) / 2;
 }
 
 /** True when stepping from `from` to `to` gains height (uphill step). */
@@ -157,7 +179,7 @@ export function applyScenarioElevation(map: WorldState["map"], definition: Scena
 
   const slopes = definition.slopes ?? [];
   for (const slope of slopes) {
-    for (const coord of slopeCells(slope)) {
+    for (const { coord, half } of slopeCells(slope)) {
       if (coord.x < 0 || coord.y < 0 || coord.x >= map.width || coord.y >= map.height) {
         throw new Error(`Slope at ${coord.x},${coord.y} is outside the map`);
       }
@@ -172,7 +194,7 @@ export function applyScenarioElevation(map: WorldState["map"], definition: Scena
       if (cell.elevation >= MAX_ELEVATION) {
         throw new Error(`Slope at ${coord.x},${coord.y} cannot rise above MAX_ELEVATION`);
       }
-      map.cells[index] = { ...cell, slope: slope.toward };
+      map.cells[index] = { ...cell, slope: slope.toward, ...(half !== undefined ? { slopeHalf: half } : {}) };
     }
   }
 
@@ -187,12 +209,20 @@ export function applyScenarioElevation(map: WorldState["map"], definition: Scena
   validateSlopes(map);
 }
 
-function slopeCells(slope: ScenarioSlope): CellCoord[] {
+function slopeCells(slope: ScenarioSlope): Array<{ coord: CellCoord; half: SlopeHalf | undefined }> {
   const width = Math.max(1, Math.floor(slope.width ?? 1));
+  const gentle = (slope.length ?? 1) === 2;
   const lateral: CellCoord = slope.toward === "N" || slope.toward === "S" ? { x: 1, y: 0 } : { x: 0, y: 1 };
-  const cells: CellCoord[] = [];
+  const uphill = SLOPE_VECTORS[slope.toward];
+  const cells: Array<{ coord: CellCoord; half: SlopeHalf | undefined }> = [];
   for (let i = 0; i < width; i += 1) {
-    cells.push({ x: slope.position.x + lateral.x * i, y: slope.position.y + lateral.y * i });
+    const base = { x: slope.position.x + lateral.x * i, y: slope.position.y + lateral.y * i };
+    if (gentle) {
+      cells.push({ coord: base, half: "lower" });
+      cells.push({ coord: { x: base.x + uphill.x, y: base.y + uphill.y }, half: "upper" });
+    } else {
+      cells.push({ coord: base, half: undefined });
+    }
   }
   return cells;
 }
@@ -244,14 +274,18 @@ function validateSlopes(map: WorldState["map"]): void {
     const downCell = map.cells[downCoord.y * map.width + downCoord.x];
     const upEdge = upCell !== undefined && insideMap(map, upCoord) ? edgeHeight(upCell, downDir) : null;
     const downEdge = downCell !== undefined && insideMap(map, downCoord) ? edgeHeight(downCell, upDir) : null;
-    if (upEdge !== cell.elevation + 1) {
+    // The neighbours' facing edges must meet this cell's own edge heights
+    // (full levels for 1-cell slopes, half levels where 2-cell halves chain).
+    const expectedUp = edgeHeight(cell, upDir);
+    const expectedDown = edgeHeight(cell, downDir);
+    if (upEdge !== expectedUp) {
       throw new Error(
-        `Slope at ${cell.coord.x},${cell.coord.y} toward ${upDir} does not connect to a level-${cell.elevation + 1} surface`
+        `Slope at ${cell.coord.x},${cell.coord.y} toward ${upDir} does not connect to a level-${expectedUp} surface`
       );
     }
-    if (downEdge !== cell.elevation) {
+    if (downEdge !== expectedDown) {
       throw new Error(
-        `Slope at ${cell.coord.x},${cell.coord.y} toward ${upDir} does not connect to a level-${cell.elevation} surface at its base`
+        `Slope at ${cell.coord.x},${cell.coord.y} toward ${upDir} does not connect to a level-${expectedDown} surface at its base`
       );
     }
   }

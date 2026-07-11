@@ -123,6 +123,43 @@ function insertCliffCells(map: WorldState["map"]): void {
   }
 }
 
+/**
+ * Clears the slope marker on the cell at `pos`. When the cell is one half of
+ * a gentle 2-cell slope, the partner half (uphill of a lower half, downhill
+ * of an upper half) is cleared too — a lone half is geometrically invalid.
+ */
+function clearSlopeAt(world: WorldState, pos: CellCoord): void {
+  const index = pos.y * world.map.width + pos.x;
+  const cell = world.map.cells[index];
+  if (cell === undefined || cell.slope === null) {
+    return;
+  }
+  const { slope, slopeHalf } = cell;
+  const { slopeHalf: _cellHalf, ...cellRest } = cell;
+  world.map.cells[index] = { ...cellRest, slope: null };
+  if (slopeHalf === undefined) {
+    return;
+  }
+  const vec = slopeVector(slope);
+  const partnerPos =
+    slopeHalf === "lower"
+      ? { x: pos.x + vec.x, y: pos.y + vec.y }
+      : { x: pos.x - vec.x, y: pos.y - vec.y };
+  if (partnerPos.x < 0 || partnerPos.y < 0 || partnerPos.x >= world.map.width || partnerPos.y >= world.map.height) {
+    return;
+  }
+  const partnerIndex = partnerPos.y * world.map.width + partnerPos.x;
+  const partner = world.map.cells[partnerIndex];
+  if (
+    partner !== undefined &&
+    partner.slope === slope &&
+    partner.slopeHalf === (slopeHalf === "lower" ? "upper" : "lower")
+  ) {
+    const { slopeHalf: _partnerHalf, ...partnerRest } = partner;
+    world.map.cells[partnerIndex] = { ...partnerRest, slope: null };
+  }
+}
+
 /** Compatibility export: the default scenario's waves (tests, tooling). */
 export const ENEMY_WAVES: readonly ScenarioWave[] = mvpDefenseScenario.waves;
 
@@ -451,8 +488,12 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     if (cell.elevation <= 0) return "Already at ground level";
     if (world.economy.gold < TERRAIN_COSTS.lowerTerrain) return "Insufficient gold";
     if (getBuildingAt(world, pos) !== null) return "Cannot lower terrain under a building";
-    // Remove any slope before lowering (slope would become geometrically invalid).
-    world.map.cells[index] = { ...cell, elevation: cell.elevation - 1, slope: null };
+    // Remove any slope before lowering (slope would become geometrically
+    // invalid); a gentle 2-cell slope loses its partner half too.
+    clearSlopeAt(world, pos);
+    const flattened = world.map.cells[index];
+    if (flattened === undefined) return "Invalid position";
+    world.map.cells[index] = { ...flattened, elevation: flattened.elevation - 1 };
     world.economy.gold -= TERRAIN_COSTS.lowerTerrain;
     world.terrainRevision += 1;
     world.invalidMoveTarget = null;
@@ -461,22 +502,48 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
 
   if (command.type === "placeSlope") {
     const pos = clampCell(command.position);
+    const gentle = (command.length ?? 1) === 2;
+    const cost = gentle ? TERRAIN_COSTS.placeSlopeGentle : TERRAIN_COSTS.placeSlope;
     const index = pos.y * world.map.width + pos.x;
     const cell = world.map.cells[index];
     if (cell === undefined) return "Invalid position";
     if (cell.terrain === "water") return "Cannot place slope on water";
     if (cell.slope !== null) return "Slope already exists here";
-    if (world.economy.gold < TERRAIN_COSTS.placeSlope) return "Insufficient gold";
-    // The adjacent cell in the `toward` direction must be exactly one level higher.
+    if (world.economy.gold < cost) return "Insufficient gold";
     const vec = slopeVector(command.toward);
-    const adjPos = { x: pos.x + vec.x, y: pos.y + vec.y };
-    if (adjPos.x < 0 || adjPos.y < 0 || adjPos.x >= world.map.width || adjPos.y >= world.map.height) {
-      return "Cannot place slope at map edge";
+
+    if (!gentle) {
+      // The adjacent cell in the `toward` direction must be exactly one level higher.
+      const adjPos = { x: pos.x + vec.x, y: pos.y + vec.y };
+      if (adjPos.x < 0 || adjPos.y < 0 || adjPos.x >= world.map.width || adjPos.y >= world.map.height) {
+        return "Cannot place slope at map edge";
+      }
+      const adjCell = getCell(world, adjPos);
+      if (adjCell.elevation !== cell.elevation + 1) return "Adjacent cell must be one level higher";
+      world.map.cells[index] = { ...cell, slope: command.toward };
+    } else {
+      // Gentle 2-cell ramp: `pos` (lower half) + the next cell toward (upper
+      // half) must both be free flat land at the same level; the plateau
+      // beyond the upper cell must be exactly one level higher.
+      const upperPos = { x: pos.x + vec.x, y: pos.y + vec.y };
+      const plateauPos = { x: pos.x + 2 * vec.x, y: pos.y + 2 * vec.y };
+      const inMap = (p: CellCoord): boolean =>
+        p.x >= 0 && p.y >= 0 && p.x < world.map.width && p.y < world.map.height;
+      if (!inMap(upperPos) || !inMap(plateauPos)) return "Cannot place slope at map edge";
+      const upperCell = getCell(world, upperPos);
+      if (upperCell.terrain === "water") return "Cannot place slope on water";
+      if (upperCell.slope !== null) return "Slope already exists here";
+      if (upperCell.elevation !== cell.elevation) return "Both ramp cells must be on the same level";
+      if (getBuildingAt(world, pos) !== null || getBuildingAt(world, upperPos) !== null) {
+        return "Cannot place slope under a building";
+      }
+      const plateauCell = getCell(world, plateauPos);
+      if (plateauCell.elevation !== cell.elevation + 1) return "Adjacent cell must be one level higher";
+      const upperIndex = upperPos.y * world.map.width + upperPos.x;
+      world.map.cells[index] = { ...cell, slope: command.toward, slopeHalf: "lower" };
+      world.map.cells[upperIndex] = { ...upperCell, slope: command.toward, slopeHalf: "upper" };
     }
-    const adjCell = getCell(world, adjPos);
-    if (adjCell.elevation !== cell.elevation + 1) return "Adjacent cell must be one level higher";
-    world.map.cells[index] = { ...cell, slope: command.toward };
-    world.economy.gold -= TERRAIN_COSTS.placeSlope;
+    world.economy.gold -= cost;
     world.terrainRevision += 1;
     world.invalidMoveTarget = null;
     return null;
@@ -489,7 +556,8 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     if (cell === undefined) return "Invalid position";
     if (cell.slope === null) return "No slope here";
     if (world.economy.gold < TERRAIN_COSTS.removeSlope) return "Insufficient gold";
-    world.map.cells[index] = { ...cell, slope: null };
+    // Gentle 2-cell slopes are removed as a pair (a lone half is invalid).
+    clearSlopeAt(world, pos);
     world.economy.gold -= TERRAIN_COSTS.removeSlope;
     world.terrainRevision += 1;
     world.invalidMoveTarget = null;

@@ -330,6 +330,7 @@ export function snapshotCell(cell: TerrainCellState): TerrainCellSnapshot {
     assetId: cell.assetId,
     elevation: cell.elevation,
     slope: cell.slope,
+    ...(cell.slopeHalf !== undefined ? { slopeHalf: cell.slopeHalf } : {}),
     elevationSkin: cell.elevationSkin,
     ...(cell.cliffFace !== undefined ? { cliffFace: cell.cliffFace } : {}),
     ...(cell.cliffHeight !== undefined ? { cliffHeight: cell.cliffHeight } : {})

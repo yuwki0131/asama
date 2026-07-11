@@ -22,6 +22,12 @@ export const MAX_ELEVATION = 5;
 /** Cardinal direction in cell space (N = -y, E = +x, S = +y, W = -x). */
 export type SlopeDirection = "N" | "E" | "S" | "W";
 
+/** Half marker for gentle 2-cell slopes: the ramp spans TWO cells along its
+ *  axis, each climbing half a level. "lower" = base cell (surface e → e+0.5
+ *  uphill), "upper" = crest cell (e+0.5 → e+1, meeting the e+1 plateau).
+ *  Absent/undefined on a slope cell = legacy steep 1-cell slope (full level). */
+export type SlopeHalf = "lower" | "upper";
+
 /** Visual skin for elevation edges: natural rock face or castle stone wall. */
 export type ElevationSkin = "cliff" | "ishigaki";
 export type BuildingType =
@@ -73,6 +79,9 @@ export interface TerrainCellSnapshot {
    *  `elevation`; the opposite edge exits at `elevation`. The two side edges
    *  of a slope cell are cliffs (impassable). null = flat cell. */
   readonly slope: SlopeDirection | null;
+  /** 2-cell gentle slope half (slope cells only; additive field). Undefined
+   *  on a slope cell = steep 1-cell slope climbing a full level. */
+  readonly slopeHalf?: SlopeHalf;
   /** Skin used for cliff faces / slope tiles rendered around this cell. */
   readonly elevationSkin: ElevationSkin;
   /** cliff cells only: which face this cell renders ("s" | "e" | "se"). */
@@ -192,11 +201,15 @@ export interface ScenarioElevationPatch {
 
 /** Declares a ramp. `position` is the LOW cell of the ramp; walking `toward`
  *  from it exits one level higher. `width` extends the ramp perpendicular to
- *  `toward` (in +x for N/S ramps, +y for E/W ramps), default 1. */
+ *  `toward` (in +x for N/S ramps, +y for E/W ramps), default 1.
+ *  `length: 2` makes a gentle 2-cell ramp: `position` and the next cell
+ *  toward `toward` each climb half a level (lower/upper halves); the plateau
+ *  connects beyond the upper cell. Default 1 = steep single-cell ramp. */
 export interface ScenarioSlope {
   readonly position: CellCoord;
   readonly toward: SlopeDirection;
   readonly width?: number;
+  readonly length?: 1 | 2;
 }
 
 export interface ScenarioElevationDefinition {
@@ -466,17 +479,23 @@ export type PlayerCommand =
       readonly clientSequence: number;
     }
   | {
-      /** Place a ramp on the target cell rising toward `toward` (30 gold).
-       *  The cell in the `toward` direction must be at exactly elevation+1. */
+      /** Place a ramp on the target cell rising toward `toward` (30 gold;
+       *  gentle 2-cell ramp 50 gold). `length: 2` places a gentle 2-cell ramp
+       *  on `position` (lower half) and the next cell toward `toward` (upper
+       *  half); the plateau beyond the upper cell must be at exactly
+       *  elevation+1. Default 1: the cell in the `toward` direction must be
+       *  at exactly elevation+1. */
       readonly type: "placeSlope";
       readonly position: CellCoord;
       readonly toward: SlopeDirection;
+      readonly length?: 1 | 2;
       readonly issuedAtTick: number;
       readonly clientSequence: number;
     }
   | {
       /** Remove the slope from the target cell, restoring it to a flat surface
-       *  at its current elevation (10 gold). */
+       *  at its current elevation (10 gold). Removing either half of a gentle
+       *  2-cell ramp removes both halves. */
       readonly type: "removeSlope";
       readonly position: CellCoord;
       readonly issuedAtTick: number;

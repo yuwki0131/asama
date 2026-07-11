@@ -352,3 +352,106 @@ describe("removeSlope", () => {
     expect(getCell(world, TEST_CELL).slope).toBe("S");
   });
 });
+
+// ─── placeSlope (gentle 2-cell, length: 2) ───────────────────────────────────
+
+describe("placeSlope gentle 2-cell", () => {
+  /** Flat TEST_CELL + (x,y+1); plateau at (x,y+2) raised to level 1 so a
+   *  gentle slope toward S fits: lower TEST_CELL, upper (x,y+1). */
+  function worldGentleSlopeReady(): WorldState {
+    const world = freshWorld();
+    applyScenarioElevation(world.map, {
+      patches: [
+        { area: { kind: "rect", x: TEST_CELL.x, y: TEST_CELL.y + 2, width: 1, height: 1 }, level: 1 }
+      ]
+    });
+    return world;
+  }
+
+  function placeGentle(world: WorldState): string | null {
+    return applyCommand(world, {
+      type: "placeSlope",
+      position: TEST_CELL,
+      toward: "S",
+      length: 2,
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+  }
+
+  it("marks both cells as lower/upper halves and deducts the gentle cost", () => {
+    const world = worldGentleSlopeReady();
+    const goldBefore = world.economy.gold;
+    const result = placeGentle(world);
+    expect(result).toBeNull();
+    const lower = getCell(world, TEST_CELL);
+    const upper = getCell(world, { x: TEST_CELL.x, y: TEST_CELL.y + 1 });
+    expect(lower.slope).toBe("S");
+    expect(lower.slopeHalf).toBe("lower");
+    expect(upper.slope).toBe("S");
+    expect(upper.slopeHalf).toBe("upper");
+    expect(world.economy.gold).toBe(goldBefore - TERRAIN_COSTS.placeSlopeGentle);
+  });
+
+  it("rejects when the plateau beyond the upper cell is not one level higher", () => {
+    const world = freshWorld();
+    const result = placeGentle(world);
+    expect(result).not.toBeNull();
+    expect(getCell(world, TEST_CELL).slope).toBeNull();
+    expect(getCell(world, { x: TEST_CELL.x, y: TEST_CELL.y + 1 }).slope).toBeNull();
+  });
+
+  it("rejects when the two ramp cells are not on the same level", () => {
+    const world = freshWorld();
+    applyScenarioElevation(world.map, {
+      patches: [
+        // Upper cell already raised: uneven ramp base.
+        { area: { kind: "rect", x: TEST_CELL.x, y: TEST_CELL.y + 1, width: 1, height: 2 }, level: 1 }
+      ]
+    });
+    const result = placeGentle(world);
+    expect(result).not.toBeNull();
+    expect(getCell(world, TEST_CELL).slope).toBeNull();
+  });
+
+  it("rejects when the upper cell already has a slope", () => {
+    const world = worldGentleSlopeReady();
+    applyCommand(world, {
+      type: "placeSlope",
+      position: { x: TEST_CELL.x, y: TEST_CELL.y + 1 },
+      toward: "S",
+      issuedAtTick: 0,
+      clientSequence: 1
+    });
+    expect(getCell(world, { x: TEST_CELL.x, y: TEST_CELL.y + 1 }).slope).toBe("S");
+    const result = placeGentle(world);
+    expect(result).not.toBeNull();
+    expect(getCell(world, TEST_CELL).slope).toBeNull();
+  });
+
+  it("rejects when gold is insufficient for the gentle cost", () => {
+    const world = worldGentleSlopeReady();
+    world.economy.gold = TERRAIN_COSTS.placeSlopeGentle - 1;
+    const result = placeGentle(world);
+    expect(result).not.toBeNull();
+    expect(getCell(world, TEST_CELL).slope).toBeNull();
+  });
+
+  it("removeSlope on either half removes the whole gentle ramp", () => {
+    for (const target of [TEST_CELL, { x: TEST_CELL.x, y: TEST_CELL.y + 1 }]) {
+      const world = worldGentleSlopeReady();
+      expect(placeGentle(world)).toBeNull();
+      const result = applyCommand(world, {
+        type: "removeSlope",
+        position: target,
+        issuedAtTick: 0,
+        clientSequence: 2
+      });
+      expect(result).toBeNull();
+      expect(getCell(world, TEST_CELL).slope).toBeNull();
+      expect(getCell(world, TEST_CELL).slopeHalf).toBeUndefined();
+      expect(getCell(world, { x: TEST_CELL.x, y: TEST_CELL.y + 1 }).slope).toBeNull();
+      expect(getCell(world, { x: TEST_CELL.x, y: TEST_CELL.y + 1 }).slopeHalf).toBeUndefined();
+    }
+  });
+});
