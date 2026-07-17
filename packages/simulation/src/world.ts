@@ -9,7 +9,7 @@ import { applyScenarioElevation, elevationAt, slopeVector, stepTicksFor } from "
 import { updateEnemyAi } from "./enemyAi";
 import { applyEngineerTaskCommand, updateEngineerTasks } from "./engineer";
 import { requiredFoodPerCycle, updateFoodSupply } from "./food";
-import { createInitialMap, getCell } from "./map";
+import { createInitialMap, createTerrainCell, getCell } from "./map";
 import { findPath, formationSlots, isPassable } from "./pathfinding";
 import { deserializeWorld, serializeWorld } from "./serialization";
 import { createUnit } from "./units";
@@ -38,14 +38,25 @@ export { serializeWorld, deserializeWorld } from "./serialization";
 
 type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
+type CliffBounds = {
+  readonly x0: number;
+  readonly y0: number;
+  readonly x1: number;
+  readonly y1: number;
+};
+
 /**
  * Inserts dedicated "cliff" terrain cells at high-low elevation boundaries.
  * For every cell with elevation > 0, its S and E neighbours with a lower
  * elevation are converted to cliff cells (terrain="cliff", passable=false).
  * Slope cells that bridge the height difference are left untouched.
  * An SE corner cliff is added where both the S and E neighbours are cliff cells.
+ *
+ * With `bounds` the derivation is restricted to driver cells inside the box
+ * (expanded one cell to the N/W so outside drivers still write cliffs onto
+ * restored cells inside it) — used for incremental runtime re-derivation.
  */
-function insertCliffCells(map: WorldState["map"]): void {
+function insertCliffCells(map: WorldState["map"], bounds?: CliffBounds): void {
   const { cells, width, height } = map;
 
   function cellAtCoord(x: number, y: number): Mutable<typeof cells[number]> | undefined {
@@ -53,11 +64,19 @@ function insertCliffCells(map: WorldState["map"]): void {
     return cells[y * width + x] as Mutable<typeof cells[number]> | undefined;
   }
 
+  function isDriver(coord: CellCoord): boolean {
+    return (
+      bounds === undefined ||
+      (coord.x >= bounds.x0 - 1 && coord.x <= bounds.x1 && coord.y >= bounds.y0 - 1 && coord.y <= bounds.y1)
+    );
+  }
+
   // Pass 1: S and E edges of high cells.
   // Iterate a snapshot of the original cell list so we don't re-process newly
   // written cliff cells that happen to share an index.
   const originalCells = [...cells];
   for (const cell of originalCells) {
+    if (!isDriver(cell.coord)) continue;
     const cellElev = cell.elevation;
     if (cellElev <= 0 && cell.slope === null) continue;
 
@@ -90,13 +109,15 @@ function insertCliffCells(map: WorldState["map"]): void {
         movementCost: 99,
         cliffFace: dir,
         cliffHeight: drop,
-        elevationSkin: cell.elevationSkin
+        elevationSkin: cell.elevationSkin,
+        cliffOrigin: { terrain: neighbor.terrain, movementCost: neighbor.movementCost, passable: neighbor.passable }
       } as typeof cells[number];
     }
   }
 
   // Pass 2: SE corner where both S and E neighbours are cliff cells.
   for (const cell of cells) {
+    if (!isDriver(cell.coord)) continue;
     if (cell.elevation <= 0) continue;
     const cx = cell.coord.x;
     const cy = cell.coord.y;
@@ -123,10 +144,69 @@ function insertCliffCells(map: WorldState["map"]): void {
         movementCost: 99,
         cliffFace: "se",
         cliffHeight: cell.elevation - se.elevation,
-        elevationSkin: cell.elevationSkin
+        elevationSkin: cell.elevationSkin,
+        cliffOrigin: { terrain: se.terrain, movementCost: se.movementCost, passable: se.passable }
       } as typeof cells[number];
     }
   }
+}
+
+/** Restores a cliff cell to its pre-cliff terrain. Elevation, slope, asset
+ *  and skin are kept as-is; saves that predate `cliffOrigin` fall back to the
+ *  procedural base cell. */
+function restoreCliffCell(map: WorldState["map"], index: number): void {
+  const cell = map.cells[index];
+  if (cell === undefined || cell.terrain !== "cliff") return;
+  let origin = cell.cliffOrigin;
+  if (origin === undefined) {
+    const base = createTerrainCell(cell.coord);
+    origin = { terrain: base.terrain, movementCost: base.movementCost, passable: base.passable };
+  }
+  const { cliffFace: _face, cliffHeight: _height, cliffOrigin: _origin, ...rest } = cell;
+  map.cells[index] = {
+    ...rest,
+    terrain: origin.terrain,
+    movementCost: origin.movementCost,
+    passable: origin.passable
+  };
+}
+
+/**
+ * Incrementally re-derives cliff cells after a runtime terrain edit at `pos`.
+ * A cell's cliff status depends only on its own elevation/slope and its
+ * N/W/NW neighbours', and an edit touches at most `pos` ±1 (gentle-slope
+ * partner), so a ±2 window covers every cell whose status can change. Cliff
+ * cells inside the window revert to their stored origin, then the boot
+ * derivation runs bounded to the window.
+ */
+function rederiveCliffsAround(world: WorldState, pos: CellCoord): void {
+  const { map } = world;
+  const x0 = Math.max(0, pos.x - 2);
+  const y0 = Math.max(0, pos.y - 2);
+  const x1 = Math.min(map.width - 1, pos.x + 2);
+  const y1 = Math.min(map.height - 1, pos.y + 2);
+  const wasCliff = new Set<string>();
+  for (let y = y0; y <= y1; y += 1) {
+    for (let x = x0; x <= x1; x += 1) {
+      const index = y * map.width + x;
+      if (map.cells[index]?.terrain === "cliff") {
+        wasCliff.add(cellKey({ x, y }));
+        restoreCliffCell(map, index);
+      }
+    }
+  }
+  insertCliffCells(map, { x0, y0, x1, y1 });
+  // Unit paths crossing the edited cell or a newly minted cliff are stale.
+  const blocked: CellCoord[] = [pos];
+  for (let y = y0; y <= y1; y += 1) {
+    for (let x = x0; x <= x1; x += 1) {
+      const cell = map.cells[y * map.width + x];
+      if (cell !== undefined && cell.terrain === "cliff" && !wasCliff.has(cellKey(cell.coord))) {
+        blocked.push(cell.coord);
+      }
+    }
+  }
+  clearUnitPathsThrough(world, blocked);
 }
 
 /**
@@ -480,6 +560,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     if (world.economy.gold < TERRAIN_COSTS.raiseTerrain) return "Insufficient gold";
     if (getBuildingAt(world, pos) !== null) return "Cannot raise terrain under a building";
     world.map.cells[index] = { ...cell, elevation: cell.elevation + 1, elevationSkin: "ishigaki" };
+    rederiveCliffsAround(world, pos);
     world.economy.gold -= TERRAIN_COSTS.raiseTerrain;
     world.terrainRevision += 1;
     world.invalidMoveTarget = null;
@@ -500,6 +581,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     const flattened = world.map.cells[index];
     if (flattened === undefined) return "Invalid position";
     world.map.cells[index] = { ...flattened, elevation: flattened.elevation - 1 };
+    rederiveCliffsAround(world, pos);
     world.economy.gold -= TERRAIN_COSTS.lowerTerrain;
     world.terrainRevision += 1;
     world.invalidMoveTarget = null;
@@ -549,6 +631,10 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
       world.map.cells[index] = { ...cell, slope: command.toward, slopeHalf: "lower" };
       world.map.cells[upperIndex] = { ...upperCell, slope: command.toward, slopeHalf: "upper" };
     }
+    // A slope bridges (or a removed one exposes) an elevation edge, so cliff
+    // cells around it must be re-derived — e.g. building a ramp onto a
+    // boot-time cliff cell restores it to walkable slope terrain.
+    rederiveCliffsAround(world, pos);
     world.economy.gold -= cost;
     world.terrainRevision += 1;
     world.invalidMoveTarget = null;
@@ -564,6 +650,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     if (world.economy.gold < TERRAIN_COSTS.removeSlope) return "Insufficient gold";
     // Gentle 2-cell slopes are removed as a pair (a lone half is invalid).
     clearSlopeAt(world, pos);
+    rederiveCliffsAround(world, pos);
     world.economy.gold -= TERRAIN_COSTS.removeSlope;
     world.terrainRevision += 1;
     world.invalidMoveTarget = null;
