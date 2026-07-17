@@ -5020,7 +5020,7 @@
       "output": "building-tenshu-main.png",
       "source": {
         "type": "raster",
-        "file": "assets/source/raster/building-tenshu-v2.png"
+        "file": "assets/source/raster/building-tenshu-v3.png"
       },
       "geometry": {
         "footprintWidth": 7,
