@@ -7,7 +7,7 @@ import { computeConnectedStorehouseIds } from "./food";
 import { getCell } from "./map";
 import { canStep, findPath, movementCostForStep } from "./pathfinding";
 import { createUnit } from "./units";
-import { createInitialWorld, snapshotWorld, updateWorld } from "./world";
+import { applyCommand, createInitialWorld, snapshotWorld, updateWorld } from "./world";
 import type { WorldState } from "./types";
 
 // All test coordinates live in a grass-only region of the procedural map
@@ -535,6 +535,183 @@ describe("gentle 2-cell slopes (length: 2)", () => {
       expect(getCell(world, { x, y: 63 }).slopeHalf).toBe("upper");
     }
     expect(getCell(world, { x: 23, y: 64 }).slope).toBeNull();
+  });
+});
+
+describe("runtime terrain edits re-derive cliff cells", () => {
+  // Grass-only region away from river (y~41), stone ridge (x~84), dirt zone.
+  const P = { x: 30, y: 66 };
+
+  function raise(world: WorldState, position = P, sequence = 1): string | null {
+    return applyCommand(world, { type: "raiseTerrain", position, issuedAtTick: 0, clientSequence: sequence });
+  }
+
+  function lower(world: WorldState, position = P, sequence = 9): string | null {
+    return applyCommand(world, { type: "lowerTerrain", position, issuedAtTick: 0, clientSequence: sequence });
+  }
+
+  it("raiseTerrain converts the S/E neighbours and SE diagonal into cliff cells", () => {
+    const world = flatWorld();
+    world.economy.gold = 1000;
+    expect(raise(world)).toBeNull();
+
+    const s = getCell(world, { x: P.x, y: P.y + 1 });
+    const e = getCell(world, { x: P.x + 1, y: P.y });
+    const se = getCell(world, { x: P.x + 1, y: P.y + 1 });
+    for (const cell of [s, e, se]) {
+      expect(cell.terrain).toBe("cliff");
+      expect(cell.passable).toBe(false);
+      expect(cell.cliffHeight).toBe(1);
+    }
+    expect(s.cliffFace).toBe("s");
+    expect(e.cliffFace).toBe("e");
+    expect(se.cliffFace).toBe("se");
+    // The raised cell itself stays walkable ground; N/W boundaries render no
+    // cliff cell (only S/E faces are drawn).
+    expect(getCell(world, P).terrain).toBe("grass");
+    expect(getCell(world, P).elevation).toBe(1);
+    expect(getCell(world, { x: P.x, y: P.y - 1 }).terrain).not.toBe("cliff");
+    expect(getCell(world, { x: P.x - 1, y: P.y }).terrain).not.toBe("cliff");
+  });
+
+  it("lowerTerrain back to flat restores the cliff cells to walkable original terrain", () => {
+    const world = flatWorld();
+    world.economy.gold = 1000;
+    expect(raise(world)).toBeNull();
+    expect(lower(world)).toBeNull();
+
+    for (const coord of [
+      { x: P.x, y: P.y + 1 },
+      { x: P.x + 1, y: P.y },
+      { x: P.x + 1, y: P.y + 1 }
+    ]) {
+      const cell = getCell(world, coord);
+      expect(cell.terrain).toBe("grass");
+      expect(cell.passable).toBe(true);
+      expect(cell.movementCost).toBe(1);
+      expect(cell.cliffFace).toBeUndefined();
+      expect(cell.cliffHeight).toBeUndefined();
+    }
+    expect(canStep(world, P, { x: P.x, y: P.y + 1 })).toBe(true);
+  });
+
+  it("restores dirt terrain with its movement cost via cliffOrigin", () => {
+    const world = flatWorld();
+    world.economy.gold = 1000;
+    const dirtPos = { x: 50, y: 75 }; // inside the procedural dirt zone
+    const south = { x: 50, y: 76 };
+    expect(getCell(world, south).terrain).toBe("dirt");
+    expect(raise(world, dirtPos)).toBeNull();
+    expect(getCell(world, south).terrain).toBe("cliff");
+    expect(getCell(world, south).movementCost).toBe(99);
+    expect(lower(world, dirtPos)).toBeNull();
+    expect(getCell(world, south).terrain).toBe("dirt");
+    expect(getCell(world, south).movementCost).toBe(3);
+    expect(getCell(world, south).passable).toBe(true);
+  });
+
+  it("two adjacent raised cells merge into one rim with corners and no height-0 cliffs", () => {
+    const world = flatWorld();
+    world.economy.gold = 1000;
+    expect(raise(world)).toBeNull();
+    // Second raise targets the cell that just became the first cell's e-cliff:
+    // it must be restored to walkable top ground, not stay a cliff.
+    const second = { x: P.x + 1, y: P.y };
+    expect(raise(world, second, 2)).toBeNull();
+
+    const top = getCell(world, second);
+    expect(top.terrain).toBe("grass");
+    expect(top.elevation).toBe(1);
+    // No cliff between the two same-height tops.
+    expect(canStep(world, P, second)).toBe(true);
+
+    expect(getCell(world, { x: P.x, y: P.y + 1 }).cliffFace).toBe("s");
+    expect(getCell(world, { x: P.x + 1, y: P.y + 1 }).cliffFace).toBe("s");
+    expect(getCell(world, { x: P.x + 2, y: P.y }).cliffFace).toBe("e");
+    expect(getCell(world, { x: P.x + 2, y: P.y + 1 }).cliffFace).toBe("se");
+
+    // Regression guard: incremental re-derivation must never mint
+    // cliffHeight-0 cells (same rule as the boot Pass2 drop>0 guard).
+    for (const cell of world.map.cells) {
+      if (cell.terrain === "cliff") {
+        expect(cell.cliffHeight ?? 0).toBeGreaterThan(0);
+      }
+    }
+    // Flat ground beyond the rim stays walkable.
+    expect(getCell(world, { x: P.x, y: P.y + 2 }).passable).toBe(true);
+    expect(getCell(world, { x: P.x + 3, y: P.y }).passable).toBe(true);
+  });
+
+  it("lowering one of two adjacent raised cells re-derives the shared edge", () => {
+    const world = flatWorld();
+    world.economy.gold = 1000;
+    expect(raise(world)).toBeNull();
+    const second = { x: P.x + 1, y: P.y };
+    expect(raise(world, second, 2)).toBeNull();
+    expect(lower(world, second)).toBeNull();
+
+    // `second` drops back to 0: it becomes the e-cliff of the remaining hill.
+    const cell = getCell(world, second);
+    expect(cell.terrain).toBe("cliff");
+    expect(cell.cliffFace).toBe("e");
+    expect(cell.cliffHeight).toBe(1);
+    // The far rim of the removed hill is restored to walkable ground.
+    expect(getCell(world, { x: P.x + 2, y: P.y }).terrain).toBe("grass");
+    expect(getCell(world, { x: P.x + 2, y: P.y }).passable).toBe(true);
+    expect(getCell(world, { x: P.x + 2, y: P.y + 1 }).terrain).toBe("grass");
+    for (const c of world.map.cells) {
+      if (c.terrain === "cliff") {
+        expect(c.cliffHeight ?? 0).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("raiseTerrain clears unit paths that crossed a newly cliffed cell", () => {
+    const world = flatWorld();
+    world.economy.gold = 1000;
+    const walker = createUnit("unit:test:walker", "player", "spear_ashigaru", { x: P.x, y: P.y + 3 });
+    walker.path = [
+      { x: P.x, y: P.y + 2 },
+      { x: P.x, y: P.y + 1 },
+      { x: P.x, y: P.y }
+    ];
+    walker.destination = { x: P.x, y: P.y };
+    world.units.push(walker);
+    expect(raise(world)).toBeNull();
+    expect(walker.path).toEqual([]);
+    expect(walker.destination).toBeNull();
+  });
+
+  it("placing a ramp onto a boot-time cliff cell restores it; removing re-cliffs it", () => {
+    const world = createInitialWorld({
+      ...FLAT_SCENARIO,
+      id: "test-runtime-slope-cliff",
+      elevation: {
+        patches: [{ area: { kind: "rect", x: 20, y: 58, width: 5, height: 5 }, level: 1 }]
+      }
+    });
+    world.economy.gold = 1000;
+    const rim = { x: 21, y: 63 }; // boot cliff on the plateau's S rim
+    expect(getCell(world, rim).terrain).toBe("cliff");
+
+    expect(
+      applyCommand(world, { type: "placeSlope", position: rim, toward: "N", issuedAtTick: 0, clientSequence: 1 })
+    ).toBeNull();
+    const ramp = getCell(world, rim);
+    expect(ramp.terrain).toBe("grass");
+    expect(ramp.slope).toBe("N");
+    expect(ramp.passable).toBe(true);
+    expect(canStep(world, { x: 21, y: 64 }, rim)).toBe(true);
+    expect(canStep(world, rim, { x: 21, y: 62 })).toBe(true);
+
+    expect(
+      applyCommand(world, { type: "removeSlope", position: rim, issuedAtTick: 0, clientSequence: 2 })
+    ).toBeNull();
+    const back = getCell(world, rim);
+    expect(back.terrain).toBe("cliff");
+    expect(back.passable).toBe(false);
+    expect(back.cliffFace).toBe("s");
+    expect(back.cliffHeight).toBe(1);
   });
 });
 

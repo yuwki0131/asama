@@ -42,6 +42,13 @@ export interface TerrainCellState {
   readonly cliffFace?: "s" | "e" | "se";
   /** cliff cells only: elevation drop from the adjacent high cell. */
   readonly cliffHeight?: number;
+  /** cliff cells only: pre-cliff terrain fields, kept so runtime terrain
+   *  edits (raise/lower/slope) can restore the cell when the drop vanishes. */
+  readonly cliffOrigin?: {
+    readonly terrain: TerrainType;
+    readonly movementCost: number;
+    readonly passable: boolean;
+  };
 }
 
 export interface UnitState {
