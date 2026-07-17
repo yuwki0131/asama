@@ -1,11 +1,6 @@
 import { useState } from "react";
-import {
-  concentricCastleScenario,
-  linearFortressScenario,
-  riversideDefenseScenario,
-  mountainCastleScenario,
-  freePlayScenario,
-} from "@asama/content";
+import { scenarios } from "@asama/content";
+import type { ContentScenarioDefinition } from "@asama/content";
 
 interface ScenarioSelectScreenProps {
   onSelect: (scenarioId: string) => void;
@@ -19,43 +14,31 @@ interface ScenarioCard {
   readonly isShowcase: boolean;
 }
 
-const SCENARIO_CARDS: readonly ScenarioCard[] = [
-  {
-    id: concentricCastleScenario.id,
-    name: concentricCastleScenario.name,
-    difficulty: "入門",
-    description: concentricCastleScenario.description ?? "",
-    isShowcase: false,
-  },
-  {
-    id: linearFortressScenario.id,
-    name: linearFortressScenario.name,
-    difficulty: "標準",
-    description: linearFortressScenario.description ?? "",
-    isShowcase: false,
-  },
-  {
-    id: riversideDefenseScenario.id,
-    name: riversideDefenseScenario.name,
-    difficulty: "上級",
-    description: riversideDefenseScenario.description ?? "",
-    isShowcase: false,
-  },
-  {
-    id: mountainCastleScenario.id,
-    name: mountainCastleScenario.name,
-    difficulty: "2.0 SHOWCASE",
-    description: mountainCastleScenario.description ?? "",
-    isShowcase: true,
-  },
-  {
-    id: freePlayScenario.id,
-    name: freePlayScenario.name,
-    difficulty: "自由演習",
-    description: freePlayScenario.description ?? "",
-    isShowcase: false,
-  },
-];
+// シナリオごとの表示メタデータ (難度ラベルとショーケース強調)。
+// roster (@asama/content の scenarios) に無い id は「標準」扱いで表示する。
+const SCENARIO_META: Record<string, { difficulty: string; isShowcase?: boolean }> = {
+  "concentric-castle": { difficulty: "入門" },
+  "linear-fortress": { difficulty: "標準" },
+  "riverside-defense": { difficulty: "上級" },
+  "mountain-castle": { difficulty: "2.0 SHOWCASE", isShowcase: true },
+  "water-castle": { difficulty: "標準" },
+  "castle-town-gate": { difficulty: "標準" },
+  "cut-pass-fort": { difficulty: "標準" },
+  "stepped-fortress": { difficulty: "上級" },
+  "five-tier-keep": { difficulty: "上級" },
+  "free-play": { difficulty: "自由演習" },
+};
+
+const SCENARIO_CARDS: readonly ScenarioCard[] = scenarios.map((scenario) => {
+  const meta = SCENARIO_META[scenario.id] ?? { difficulty: "標準" };
+  return {
+    id: scenario.id,
+    name: scenario.name,
+    difficulty: meta.difficulty,
+    description: (scenario as ContentScenarioDefinition).description ?? "",
+    isShowcase: meta.isShowcase ?? false,
+  };
+});
 
 export function ScenarioSelectScreen({ onSelect }: ScenarioSelectScreenProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
