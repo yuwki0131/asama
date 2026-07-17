@@ -1,6 +1,11 @@
 import type { BuildingCategory, BuildingType, GateState, ScenarioDefinition, UnitType } from "@asama/shared";
 import { mountainCastleScenario } from "./mountain-castle";
 import { freePlayScenario } from "./free-play";
+import { waterCastleScenario } from "./water-castle";
+import { fiveTierKeepScenario } from "./five-tier-keep";
+import { cutPassFortScenario } from "./cut-pass-fort";
+import { castleTownGateScenario } from "./castle-town-gate";
+import { steppedFortressScenario } from "./stepped-fortress";
 
 // --- Building and unit content definitions ---------------------------------
 //
@@ -1300,12 +1305,18 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
 
 /** Scenario roster in ascending difficulty order.
  *  A: 環郭式平城(入門) / B: 連郭式(標準) / C: 川城+門前町(上級) /
- *  D: 山城(2.0ショーケース・高低差) / Free: 自由演習(サンドボックス) */
+ *  D: 山城(2.0ショーケース・高低差) / 追加5種 (浮城/五段積/切通し/城下/段郭) /
+ *  Free: 自由演習(サンドボックス) */
 export const scenarios: readonly ScenarioDefinition[] = [
   concentricCastleScenario,
   linearFortressScenario,
   riversideDefenseScenario,
   mountainCastleScenario,
+  waterCastleScenario,
+  castleTownGateScenario,
+  cutPassFortScenario,
+  steppedFortressScenario,
+  fiveTierKeepScenario,
   freePlayScenario,
 ];
 
@@ -1315,3 +1326,8 @@ export const DEFAULT_SCENARIO = concentricCastleScenario;
 export * from "./scripts";
 export { mountainCastleScenario } from "./mountain-castle";
 export { freePlayScenario } from "./free-play";
+export { waterCastleScenario } from "./water-castle";
+export { fiveTierKeepScenario } from "./five-tier-keep";
+export { cutPassFortScenario } from "./cut-pass-fort";
+export { castleTownGateScenario } from "./castle-town-gate";
+export { steppedFortressScenario } from "./stepped-fortress";
