@@ -298,6 +298,132 @@ export function addCliffCellSprites(
   }
 }
 
+/** Screen-space bounding box of a cliff-face / slope sprite, used by the
+ *  retained scene to find lifted floors that a face behind them would
+ *  otherwise paint over. */
+export interface FeatureScreenRect {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+  /** Painter's-sort depth key (x+y) of the owning scene item. */
+  depthKey: number;
+  /** Elevation of the feature's foot. Floors AT this level touch the wall
+   *  naturally (the sprite's bottom half-diamond is the intended ground
+   *  contact) and must not be re-layered above it. */
+  bottomElevation: number;
+}
+
+/** Mirrors the face derivation of `addCliffCellSprites` but only reports the
+ *  sprite rects (64 px wide, 32+40h tall, anchored 16 px above the high
+ *  cell's tile center). */
+export function cliffFeatureScreenRects(
+  cell: TerrainCellSnapshot,
+  map: ElevationMapLike
+): FeatureScreenRect[] {
+  if (cell.cliffFace === undefined || cell.cliffHeight === undefined) return [];
+  const depthKey = cell.coord.x + cell.coord.y;
+  const rects: FeatureScreenRect[] = [];
+
+  const pushRect = (high: TerrainCellSnapshot, h: number): void => {
+    const highPoint = cellToWorld(high.coord);
+    const top = highPoint.y + tileOffsetY(high) - TILE_HEIGHT / 2;
+    rects.push({
+      minX: highPoint.x - TILE_WIDTH / 2,
+      maxX: highPoint.x + TILE_WIDTH / 2,
+      minY: top,
+      maxY: top + TILE_HEIGHT + h * ELEVATION_PIXELS_PER_LEVEL,
+      depthKey,
+      bottomElevation: cell.elevation
+    });
+  };
+
+  if (cell.cliffFace === "se") {
+    const highCell = cellAt(map, cell.coord.x - 1, cell.coord.y - 1);
+    if (highCell !== null) {
+      pushRect(highCell, Math.min(cell.cliffHeight, MAX_ELEVATION));
+    }
+    return rects;
+  }
+  for (const spec of [
+    { dx: 0, dy: -1, facing: "S" as const },
+    { dx: -1, dy: 0, facing: "E" as const }
+  ]) {
+    const high = cellAt(map, cell.coord.x + spec.dx, cell.coord.y + spec.dy);
+    if (high === null) continue;
+    const top = edgeSurfaceHeight(high, spec.facing);
+    if (top === null) continue;
+    const drop = top - cell.elevation;
+    if (drop < 1) continue;
+    pushRect(high, Math.min(drop, MAX_ELEVATION));
+  }
+  return rects;
+}
+
+/** Screen rect of a slope cell's ramp sprite (rises one level above its
+ *  low-side anchor). */
+export function slopeFeatureScreenRect(cell: TerrainCellSnapshot): FeatureScreenRect {
+  const point = cellToWorld(cell.coord);
+  const anchorY = point.y + tileOffsetY(cell);
+  return {
+    minX: point.x - TILE_WIDTH / 2,
+    maxX: point.x + TILE_WIDTH / 2,
+    minY: anchorY - TILE_HEIGHT / 2 - ELEVATION_PIXELS_PER_LEVEL,
+    maxY: anchorY + TILE_HEIGHT / 2,
+    depthKey: cell.coord.x + cell.coord.y,
+    bottomElevation: cell.elevation
+  };
+}
+
+/**
+ * Re-draws a lifted floor tile inside the retained scene.
+ *
+ * Ground tiles normally live in the always-below terrain layer, but a floor
+ * lifted by elevation slides UP the screen into the body of cliff-face /
+ * slope sprites belonging to cells BEHIND it — and, drawn in a lower layer,
+ * it loses to them no matter what ("a far tile paints over a near one").
+ * The scene layer duplicates exactly those floors as depth-sorted items so
+ * the near floor wins; the terrain-layer copy simply stays underneath.
+ * Cap lines (see the terrain layer's Phase 4) are re-drawn too, or the rim
+ * marking would stay buried under the face sprite.
+ */
+export function addElevatedFloorSprites(
+  layer: Container,
+  cell: TerrainCellSnapshot,
+  map: ElevationMapLike,
+  assets: ReadonlyMap<string, LoadedAsset>
+): void {
+  const point = cellToWorld(cell.coord);
+  const screenY = point.y + tileOffsetY(cell);
+  const sprite = createSpriteFromCandidates([cell.assetId, terrainFallbackAssetId(cell)], assets);
+  sprite.position.set(point.x, screenY);
+  layer.addChild(sprite);
+
+  const caps = new Graphics();
+  let hasCaps = false;
+  const nwNeighbour = cellAt(map, cell.coord.x - 1, cell.coord.y);
+  if ((nwNeighbour?.elevation ?? 0) < cell.elevation) {
+    caps
+      .moveTo(point.x, screenY - TILE_HEIGHT / 2)
+      .lineTo(point.x - TILE_WIDTH / 2, screenY)
+      .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7, cap: "round" });
+    hasCaps = true;
+  }
+  const neNeighbour = cellAt(map, cell.coord.x, cell.coord.y - 1);
+  if ((neNeighbour?.elevation ?? 0) < cell.elevation) {
+    caps
+      .moveTo(point.x, screenY - TILE_HEIGHT / 2)
+      .lineTo(point.x + TILE_WIDTH / 2, screenY)
+      .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7, cap: "round" });
+    hasCaps = true;
+  }
+  if (hasCaps) {
+    layer.addChild(caps);
+  } else {
+    caps.destroy();
+  }
+}
+
 export function updateTerrainChunkVisibility(
   terrainLayer: Container,
   camera: CameraState,
