@@ -15,6 +15,8 @@ import {
   isVisibleCell,
   roundWorldPixel,
   type CameraState,
+  TILE_HEIGHT,
+  TILE_WIDTH,
   UNIT_GROUND_OFFSET_Y
 } from "./camera";
 import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
@@ -22,7 +24,14 @@ import { buildingAssetCandidates } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
-import { addCliffCellSprites, addSlopeCellSprites } from "./terrainLayer";
+import {
+  addCliffCellSprites,
+  addElevatedFloorSprites,
+  addSlopeCellSprites,
+  cliffFeatureScreenRects,
+  slopeFeatureScreenRect,
+  type FeatureScreenRect
+} from "./terrainLayer";
 
 interface AnimState {
   currentAction: "idle" | "walk" | "attack" | "death";
@@ -281,11 +290,42 @@ export class RetainedScene {
       }
       sceneItems.push({ kind: "decoration", item: decoration });
     }
+    const featureRects: FeatureScreenRect[] = [];
     for (const cell of snapshot.map.cells) {
       if (cell.terrain === "cliff") {
         sceneItems.push({ kind: "cliff", item: cell });
+        featureRects.push(...cliffFeatureScreenRects(cell, snapshot.map));
       } else if (cell.slope !== null) {
         sceneItems.push({ kind: "slope", item: cell });
+        featureRects.push(slopeFeatureScreenRect(cell));
+      }
+    }
+    // Lifted floors normally live in the terrain layer (below everything
+    // here), so a face/slope sprite of a cell BEHIND them can wrongly paint
+    // on top once elevation slides the floor up-screen into its rect. Any
+    // such floor is duplicated into this depth sort; the terrain-layer copy
+    // stays harmlessly underneath.
+    for (const cell of snapshot.map.cells) {
+      if (cell.elevation < 1 || cell.slope !== null) {
+        continue;
+      }
+      const point = cellToWorld(cell.coord);
+      const top = point.y + tileOffsetYAt(snapshot.map, cell.coord) - TILE_HEIGHT / 2;
+      const bottom = top + TILE_HEIGHT;
+      const left = point.x - TILE_WIDTH / 2;
+      const right = point.x + TILE_WIDTH / 2;
+      const floorKey = cell.coord.x + cell.coord.y;
+      const covered = featureRects.some(
+        (r) =>
+          r.depthKey < floorKey &&
+          r.bottomElevation < cell.elevation &&
+          r.minX < right &&
+          r.maxX > left &&
+          r.minY < bottom &&
+          r.maxY > top
+      );
+      if (covered) {
+        sceneItems.push({ kind: "floor", item: cell });
       }
     }
     isoSort(sceneItems);
@@ -293,6 +333,8 @@ export class RetainedScene {
     for (const entry of sceneItems) {
       if (entry.kind === "cliff") {
         addCliffCellSprites(this.staticLayer, entry.item, snapshot.map, assets);
+      } else if (entry.kind === "floor") {
+        addElevatedFloorSprites(this.staticLayer, entry.item, snapshot.map, assets);
       } else if (entry.kind === "slope") {
         addSlopeCellSprites(this.staticLayer, entry.item, snapshot.map, assets);
       } else if (entry.kind === "building") {
@@ -739,20 +781,27 @@ type SceneItemForSort =
   | { readonly kind: "building"; readonly item: BuildingSnapshot }
   | { readonly kind: "decoration"; readonly item: MapDecoration }
   | { readonly kind: "cliff"; readonly item: TerrainCellSnapshot }
-  | { readonly kind: "slope"; readonly item: TerrainCellSnapshot };
+  | { readonly kind: "slope"; readonly item: TerrainCellSnapshot }
+  | { readonly kind: "floor"; readonly item: TerrainCellSnapshot };
+
+function sceneItemRank(entry: SceneItemForSort): number {
+  if (entry.kind === "floor") return 0;
+  if (entry.kind === "cliff" || entry.kind === "slope") return 1;
+  return 2;
+}
 
 function sceneItemId(entry: SceneItemForSort): string {
   if (entry.kind === "building") {
     return entry.item.id;
   }
-  if (entry.kind === "cliff" || entry.kind === "slope") {
+  if (entry.kind === "cliff" || entry.kind === "slope" || entry.kind === "floor") {
     return `${entry.kind}:${entry.item.coord.x},${entry.item.coord.y}`;
   }
   return `dec:${entry.item.position.x},${entry.item.position.y}`;
 }
 
 function sceneItemRect(entry: SceneItemForSort): FootprintRect {
-  if (entry.kind === "cliff" || entry.kind === "slope") {
+  if (entry.kind === "cliff" || entry.kind === "slope" || entry.kind === "floor") {
     const { x, y } = entry.item.coord;
     return { minX: x, maxX: x, minY: y, maxY: y };
   }
@@ -788,15 +837,16 @@ function isoSort(items: SceneItemForSort[]): void {
     const rb = sceneItemRect(b);
     const diff = (ra.maxX + ra.maxY) - (rb.maxX + rb.maxY);
     if (diff !== 0) return diff;
-    // Same-depth tie: terrain features (cliff faces / slope tiles) paint
-    // first. A building whose south corner lies on the same diagonal sits on
-    // the HIGH terrace behind the face (the bubble passes keep it there),
-    // while a decoration on the cliff cell itself stands on the low-side
-    // floor in front of the wall.
-    const aTerrain = a.kind === "cliff" || a.kind === "slope";
-    const bTerrain = b.kind === "cliff" || b.kind === "slope";
-    if (aTerrain && !bTerrain) return -1;
-    if (bTerrain && !aTerrain) return 1;
+    // Same-depth tie: duplicated lifted floors paint before terrain features
+    // (a face/slope on the same diagonal stands on or in front of the floor),
+    // and terrain features paint before buildings/decorations. A building
+    // whose south corner lies on the same diagonal sits on the HIGH terrace
+    // behind the face (the bubble passes keep it there), while a decoration
+    // on the cliff cell itself stands on the low-side floor in front of the
+    // wall.
+    const rankA = sceneItemRank(a);
+    const rankB = sceneItemRank(b);
+    if (rankA !== rankB) return rankA - rankB;
     return sceneItemId(a).localeCompare(sceneItemId(b));
   });
 
