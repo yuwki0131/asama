@@ -101,7 +101,19 @@ async function writeGeneratedManifest(
 
 export async function renderBlenderAssets(): Promise<BlenderRenderBatchResult> {
   const config = await readProductionAssetConfigDir(productionConfigDir);
-  const blenderAssets = config.assets.filter((asset) => asset.source.type === "blender");
+  let blenderAssets = config.assets.filter((asset) => asset.source.type === "blender");
+  // ASAMA_RENDER_ONLY: comma-separated assetId prefixes for targeted
+  // incremental renders (the manifest merge below keeps every other
+  // existing entry untouched). Unset = full batch, unchanged behaviour.
+  const onlyPrefixes = (process.env.ASAMA_RENDER_ONLY ?? "")
+    .split(",")
+    .map((prefix) => prefix.trim())
+    .filter((prefix) => prefix.length > 0);
+  if (onlyPrefixes.length > 0) {
+    blenderAssets = blenderAssets.filter((asset) =>
+      onlyPrefixes.some((prefix) => asset.assetId.startsWith(prefix))
+    );
+  }
   if (blenderAssets.length === 0) {
     return { total: 0, rendered: 0, cachedHit: 0 };
   }

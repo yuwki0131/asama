@@ -111,6 +111,95 @@ def build_water_shore_tile(scene: bpy.types.Scene, mask: str, variant: int = 0) 
                 [(0, 1, 2, 3)], wet)
 
 
+def build_water_transition_tile(scene: bpy.types.Scene, corner: str, variant: int = 0) -> None:
+    """Diagonal shore transition tile for the river's outer corners.
+
+    ``corner`` names the two orthogonal WATER neighbours ("ne", "es", "sw",
+    "wn"); the tile splits along the diagonal between the two land-adjacent
+    tile corners: water surface (WATER_DEPTH below ground, flush with the
+    neighbouring water tiles) on the corner side, grass at ground level on
+    the other, separated by the same wavy rim/bank/wet-lap treatment as the
+    straight shore tiles so the two read as one continuous painterly bank.
+    """
+    import math as _math
+
+    b = TERRAIN_BLEED
+    # Water under everything, full tile + bleed (same as the shore tiles).
+    water = make_noise_material("TransWater", (0.032, 0.070, 0.098), (0.062, 0.115, 0.150), scale=4.0)
+    add_flat_quad(scene, "Water", (-0.5 - b, -0.5 - b), (0.5 + b, 0.5 + b), -WATER_DEPTH, water)
+
+    # Diagonal endpoints A/B (tile corners between land and water edges),
+    # unit normal pointing from the diagonal toward the water side, and the
+    # land polygon (diagonal + the two land edges, extended by the bleed so
+    # grass meets the land neighbours without seams).
+    nw, ne, se, sw = (-0.5, -0.5), (0.5, -0.5), (0.5, 0.5), (-0.5, 0.5)
+    inv = 1.0 / _math.sqrt(2.0)
+    if corner == "ne":
+        a_pt, b_pt, normal = nw, se, (inv, -inv)
+        land = [nw, se, (se[0], se[1] + b), (nw[0] - b, se[1] + b), (nw[0] - b, nw[1])]
+    elif corner == "sw":
+        a_pt, b_pt, normal = nw, se, (-inv, inv)
+        land = [nw, se, (se[0] + b, se[1]), (se[0] + b, nw[1] - b), (nw[0], nw[1] - b)]
+    elif corner == "es":
+        a_pt, b_pt, normal = ne, sw, (inv, inv)
+        land = [ne, sw, (sw[0] - b, sw[1]), (sw[0] - b, ne[1] - b), (ne[0], ne[1] - b)]
+    elif corner == "wn":
+        a_pt, b_pt, normal = ne, sw, (-inv, -inv)
+        land = [ne, sw, (sw[0], sw[1] + b), (ne[0] + b, sw[1] + b), (ne[0] + b, ne[1])]
+    else:
+        raise ValueError(f"Unknown water transition corner: {corner}")
+
+    grass = TERRAIN_STYLES["grass"]["surface"]()
+    add_mesh(scene, "Land", [(*map_xy(x, y), 0.0) for x, y in land], [tuple(range(len(land)))], grass)
+
+    style = TERRAIN_STYLES["water"]
+    rim = make_material("TransRim", (*style["edge"], 1.0))
+    bank = make_bank_material()
+    wet = make_material("TransWet", (0.030, 0.062, 0.080, 1.0))
+
+    def jitter(i: int, count: int) -> float:
+        # Same envelope trick as the shore tiles: endpoints pinned to zero so
+        # the diagonal bank meets the neighbouring tiles' straight banks at
+        # the shared tile corners.
+        seed = sum(ord(c) for c in corner) + variant * 97
+        raw = 0.05 * _math.sin(seed * 2.13 + i * 2.9) + 0.03 * _math.sin(seed * 5.7 + i * 6.1)
+        envelope = _math.sin(_math.pi * i / count)
+        return raw * envelope
+
+    segments = 8
+    depth_base = 0.08
+    lap = 0.06
+    ax, ay = a_pt
+    dx, dy = b_pt[0] - a_pt[0], b_pt[1] - a_pt[1]
+    for i in range(segments):
+        t0 = i / segments
+        t1 = (i + 1) / segments
+        # Extend past the tile corners into the bleed zone (shore lesson:
+        # otherwise a sliver of bare water shows at the seams).
+        if i == 0:
+            t0 = -TERRAIN_BLEED
+        if i == segments - 1:
+            t1 = 1.0 + TERRAIN_BLEED
+        d0 = depth_base + jitter(i, segments)
+        d1 = depth_base + jitter(i + 1, segments)
+        p0 = (ax + dx * t0, ay + dy * t0)
+        p1 = (ax + dx * t1, ay + dy * t1)
+        q0 = (p0[0] + normal[0] * d0, p0[1] + normal[1] * d0)
+        q1 = (p1[0] + normal[0] * d1, p1[1] + normal[1] * d1)
+        add_mesh(scene, f"Rim{corner}{variant}{i}",
+            [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*q1), 0.0), (*map_xy(*q0), 0.0)],
+            [(0, 1, 2, 3)], rim)
+        add_mesh(scene, f"Bank{corner}{variant}{i}",
+            [(*map_xy(*q0), 0.0), (*map_xy(*q1), 0.0), (*map_xy(*q1), -WATER_DEPTH), (*map_xy(*q0), -WATER_DEPTH)],
+            [(0, 1, 2, 3)], bank)
+        w0 = (q0[0] + normal[0] * lap, q0[1] + normal[1] * lap)
+        w1 = (q1[0] + normal[0] * lap, q1[1] + normal[1] * lap)
+        add_mesh(scene, f"Wet{corner}{variant}{i}",
+            [(*map_xy(*q0), -WATER_DEPTH + 0.004), (*map_xy(*q1), -WATER_DEPTH + 0.004),
+             (*map_xy(*w1), -WATER_DEPTH + 0.004), (*map_xy(*w0), -WATER_DEPTH + 0.004)],
+            [(0, 1, 2, 3)], wet)
+
+
 def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
     if terrain == "water":
         build_water_shore_tile(scene, mask, variant=0)
