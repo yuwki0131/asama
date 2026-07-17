@@ -107,7 +107,13 @@ function insertCliffCells(map: WorldState["map"]): void {
       se !== undefined &&
       se.terrain !== "cliff" &&
       s?.terrain === "cliff" &&
-      e?.terrain === "cliff"
+      e?.terrain === "cliff" &&
+      // A corner only exists over an actual drop. Without this guard a
+      // cliff cell (which keeps the LOW side's elevation) acts as the
+      // driver next to same-height ground and mints a cliffHeight-0
+      // corner, which then chains cell by cell into an invisible
+      // impassable corridor across flat terrain.
+      cell.elevation - se.elevation > 0
     ) {
       const idx = (cy + 1) * width + (cx + 1);
       cells[idx] = {

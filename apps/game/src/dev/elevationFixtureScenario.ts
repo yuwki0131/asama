@@ -57,7 +57,14 @@ export const elevationFixtureScenario: ScenarioDefinition = {
       { area: { kind: "rect", x: 38, y: 56, width: 4, height: 4 }, level: 3, skin: "ishigaki" },
       // Unreachable rock outcrop east of the summit: rises 1 → 3 in one step,
       // exercising the h2 cliff faces (and their stacked joint lines).
-      { area: { kind: "rect", x: 46, y: 55, width: 2, height: 2 }, level: 3 }
+      { area: { kind: "rect", x: 46, y: 55, width: 2, height: 2 }, level: 3 },
+      // MAX_ELEVATION towers on flat ground east of the hill: the only place
+      // in the repo that puts the #47 h4/h5 face tiles on screen (both
+      // skins), for judging the equal-cross-section stretch at full height.
+      { area: { kind: "rect", x: 56, y: 48, width: 3, height: 3 }, level: 4, skin: "ishigaki" },
+      { area: { kind: "rect", x: 62, y: 48, width: 3, height: 3 }, level: 5, skin: "ishigaki" },
+      { area: { kind: "rect", x: 68, y: 48, width: 3, height: 3 }, level: 4 },
+      { area: { kind: "rect", x: 74, y: 48, width: 3, height: 3 }, level: 5 }
     ],
     slopes: [
       // 0 → 1: gentle 2-cell dirt slope — lower halves at y=69, upper halves

@@ -414,6 +414,38 @@ describe("gentle 2-cell slopes (length: 2)", () => {
     expect(getCell(world, { x: 23, y: 63 }).terrain).toBe("cliff");
   });
 
+  it("never mints cliffHeight-0 SE corners next to a taller outcrop (insertCliffCells)", () => {
+    // Regression: a level-3 outcrop one cell east of a level-2 terrace rim.
+    // The rim's e-cliff column and the outcrop's s-cliff row meet at a cliff
+    // driver cell whose SE diagonal is same-height ground; the corner pass
+    // used to mint a cliffHeight-0 corner there and then chain southwards,
+    // carving an invisible impassable corridor across the flat terrace.
+    const world = createInitialWorld({
+      ...FLAT_SCENARIO,
+      id: "test-corner-chain",
+      elevation: {
+        patches: [
+          { area: { kind: "rect", x: 55, y: 50, width: 20, height: 20 }, level: 1 },
+          { area: { kind: "rect", x: 55, y: 50, width: 6, height: 12 }, level: 2 },
+          { area: { kind: "rect", x: 62, y: 52, width: 2, height: 2 }, level: 3 }
+        ]
+      }
+    });
+    for (const cell of world.map.cells) {
+      if (cell.terrain === "cliff") {
+        expect(cell.cliffHeight ?? 0).toBeGreaterThan(0);
+      }
+    }
+    // The flat level-1 cells south of the outcrop's cliff row stay walkable.
+    for (let y = 55; y <= 58; y += 1) {
+      for (let x = 62; x <= 64; x += 1) {
+        const cell = getCell(world, { x, y });
+        expect(cell.terrain).not.toBe("cliff");
+        expect(cell.passable).toBe(true);
+      }
+    }
+  });
+
   it("pathfinding climbs the gentle ramp with per-step climb penalties", () => {
     const world = plateauWithGentleSlopeWorld();
     const path = findPath(world, { x: 22, y: 55 }, { x: 22, y: 60 });
