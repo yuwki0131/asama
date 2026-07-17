@@ -6,6 +6,7 @@ import re
 from .core import build_calibration_tile, build_calibration_cube, build_calibration_grid, build_calibration_chirality
 from .terrain import (
     build_terrain_grass, build_terrain_macro_tile, build_water_shore_tile,
+    build_water_transition_tile,
     build_terrain_mask, build_terrain_base,
     build_road_mask, build_dry_moat_mask, build_water_moat_mask, build_trench_moat,
     build_earth_bridge, build_wood_bridge,
@@ -100,6 +101,11 @@ def resolve_model(name: str):
     if shore_v is not None:
         mask, v = shore_v.group(1), int(shore_v.group(2))
         return lambda scene: build_water_shore_tile(scene, mask, variant=v)
+    transition = re.fullmatch(r"terrain-water-transition-(ne|es|sw|wn)(?:-v([12]))?", name)
+    if transition is not None:
+        corner = transition.group(1)
+        v = 0 if transition.group(2) is None else int(transition.group(2))
+        return lambda scene: build_water_transition_tile(scene, corner, variant=v)
     macro = re.fullmatch(r"terrain-(grass|dirt|water)-macro-v(\d)-(\d)-(\d)", name)
     if macro is not None:
         t, v, tx, ty = macro.group(1), int(macro.group(2)), int(macro.group(3)), int(macro.group(4))
