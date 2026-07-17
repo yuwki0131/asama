@@ -115,7 +115,8 @@ describe("elevation: fixture boot", () => {
       };
     });
     expect(summary.cellCount).toBeGreaterThan(0);
-    expect(summary.maxElevation).toBe(3);
+    // 5 = the MAX_ELEVATION judgment towers east of the hill (h4/h5 tiles).
+    expect(summary.maxElevation).toBe(5);
     // 0→1 gentle 2-cell x width 2 (4 cells) + 1→2 width 2 (2) + 2→3 (1) + W (1).
     expect(summary.slopeCount).toBe(8);
     expect(summary.summit).toBe(3);
@@ -224,38 +225,56 @@ describe("elevation: interaction on high ground", () => {
 
   it("orders a base unit up the slopes onto the level-1 terrace", async () => {
     await centerOnHill();
-    // Select the spearman at the base of the hill…
-    const spearPoint = await cellToScreen(page, BASE_SPEAR_CELL);
-    expect(spearPoint).not.toBeNull();
-    await page.mouse.click(spearPoint!.x, spearPoint!.y);
-    const spearId = await page.evaluate(async () => {
-      const bridge = window.__asamaTest;
-      if (!bridge) return null;
-      const tick = bridge.getSnapshot()?.currentTick ?? 0;
-      await bridge.waitForTick(tick + 3);
-      return bridge.getSnapshot()?.units.find((u) => u.selected)?.id ?? null;
-    });
+    // Select the spearman at the base of the hill. Grabbing "the selected
+    // unit" right after one click is racy: the previous test leaves the
+    // archer selected, and if the click lands late the snapshot still shows
+    // the archer — the test then tracks the wrong unit while the real
+    // spearman walks off, and a retry right-click hits its now-occupied
+    // destination ("not passable"). Poll until the selection is exactly the
+    // base spearman, re-clicking as needed.
+    let spearId: string | null = null;
+    for (let attempt = 0; attempt < 5 && spearId === null; attempt += 1) {
+      const spearPoint = await cellToScreen(page, BASE_SPEAR_CELL);
+      expect(spearPoint).not.toBeNull();
+      await page.mouse.click(spearPoint!.x, spearPoint!.y);
+      spearId = await page.evaluate(async (cell) => {
+        const bridge = window.__asamaTest;
+        if (!bridge) return null;
+        const tick = bridge.getSnapshot()?.currentTick ?? 0;
+        await bridge.waitForTick(tick + 3);
+        const selected = bridge.getSnapshot()?.units.filter((u) => u.selected) ?? [];
+        const spear = selected.find(
+          (u) => u.type === "spear_ashigaru" && u.position.x === cell.x && u.position.y === cell.y
+        );
+        return selected.length === 1 && spear ? spear.id : null;
+      }, BASE_SPEAR_CELL);
+    }
     expect(spearId, "base spearman was not selected").not.toBeNull();
 
     // …then right-click the terrace cell (drawn 24px above its flat position).
-    const target = await cellToScreen(page, TERRACE_MOVE_TARGET);
-    expect(target).not.toBeNull();
-    await page.mouse.click(target!.x, target!.y, { button: "right" });
+    // Re-issue the click if it is silently dropped (textures still uploading);
+    // a genuine rejection sets invalidMoveTarget and fails immediately.
+    let orderState: { destination: unknown; invalidMoveTarget: unknown } | null = null;
+    for (let attempt = 0; attempt < 3 && orderState?.destination == null; attempt += 1) {
+      const target = await cellToScreen(page, TERRACE_MOVE_TARGET);
+      expect(target).not.toBeNull();
+      await page.mouse.click(target!.x, target!.y, { button: "right" });
 
-    // The order must not be rejected as unreachable/invalid.
-    const orderState = await page.evaluate(async (id) => {
-      const bridge = window.__asamaTest;
-      if (!bridge) return null;
-      const tick = bridge.getSnapshot()?.currentTick ?? 0;
-      await bridge.waitForTick(tick + 3);
-      const snap = bridge.getSnapshot();
-      const unit = snap?.units.find((u) => u.id === id);
-      return {
-        destination: unit?.destination ?? null,
-        invalidMoveTarget: snap?.invalidMoveTarget ?? null
-      };
-    }, spearId);
-    expect(orderState?.invalidMoveTarget).toBeNull();
+      // The order must not be rejected as unreachable/invalid.
+      orderState = await page.evaluate(async (id) => {
+        const bridge = window.__asamaTest;
+        if (!bridge) return null;
+        const tick = bridge.getSnapshot()?.currentTick ?? 0;
+        await bridge.waitForTick(tick + 5);
+        const snap = bridge.getSnapshot();
+        const unit = snap?.units.find((u) => u.id === id);
+        return {
+          destination: unit?.destination ?? null,
+          invalidMoveTarget: snap?.invalidMoveTarget ?? null
+        };
+      }, spearId);
+      expect(orderState?.invalidMoveTarget).toBeNull();
+    }
     expect(orderState?.destination).not.toBeNull();
 
     // Poll until the unit stands on elevation ≥ 1 near the target (it must
