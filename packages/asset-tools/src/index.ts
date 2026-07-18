@@ -89,6 +89,30 @@ try {
       }
       throw new Error(`Production art audit failed; ${findings.length} candidate/mock runtime assets remain.`);
     }
+  } else if (command === "assets:lint:art") {
+    const { runArtLint, writeArtLintBaseline } = await import("./artLint/run");
+    if (process.argv[3] === "--write-baseline") {
+      const count = await writeArtLintBaseline();
+      console.log(`Wrote art lint baseline with ${count} known violations.`);
+    } else {
+      const report = await runArtLint();
+      for (const violation of report.violations) {
+        console.error(
+          `${violation.assetId} ${violation.ruleId} measured=${violation.measured} threshold=${violation.threshold} — ${violation.message}`
+        );
+      }
+      if (report.staleBaseline.length > 0) {
+        console.warn(
+          `Note: ${report.staleBaseline.length} baseline entries no longer fail (fixed?): ${report.staleBaseline.slice(0, 5).join(", ")}${report.staleBaseline.length > 5 ? ", …" : ""}`
+        );
+      }
+      console.log(
+        `Art lint checked ${report.checkedAssets} assets + ${report.checkedSheets} animation sheets; new violations ${report.violations.length}, baselined ${report.baselined.length}.`
+      );
+      if (report.violations.length > 0) {
+        throw new Error(`Art lint failed; ${report.violations.length} violations not in baseline.`);
+      }
+    }
   } else if (command === "assets:all") {
     await generatePlaceholders();
     await generateGeneratedAssets();
@@ -113,7 +137,7 @@ try {
     console.log("Removed generated assets.");
   } else {
     console.error(
-      "Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|assets:generate:placeholder|assets:render:blender|assets:blender:calibration|assets:import:raster|assets:postprocess|assets:atlas|assets:validate|assets:audit:production|assets:all|validate:manifest|clean>"
+      "Usage: pnpm --filter @asama/asset-tools <generate:placeholders|generate:main2img|assets:generate:placeholder|assets:render:blender|assets:blender:calibration|assets:import:raster|assets:postprocess|assets:atlas|assets:validate|assets:audit:production|assets:lint:art|assets:all|validate:manifest|clean>"
     );
     process.exitCode = 1;
   }

@@ -18,6 +18,7 @@
     "assets:atlas": "tsx src/index.ts assets:atlas",
     "assets:validate": "tsx src/index.ts assets:validate",
     "assets:audit:production": "tsx src/index.ts assets:audit:production",
+    "assets:lint:art": "tsx src/index.ts assets:lint:art",
     "assets:generate:directional-wall-gates": "tsx src/generateDirectionalWallGates.ts",
     "assets:generate:building-scale-up": "tsx src/generateBuildingScaleUp.ts",
     "assets:generate:wide-surfaces": "tsx src/generateWideSurfaceBatch.ts",

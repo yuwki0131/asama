@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "note": "ビジュアルQAゲートの定点観測表。アセット種別ごとに、レビュー時に必ず確認するシナリオ内の実在座標を列挙する。実行: node apps/game/qa/shot.mjs --preset <name> (dev server は port 5196)。cell は packages/content/src/ のシナリオ定義に実在する建物座標から算出(複数セル建物は中心セル)。",
+  "presets": {
+    "ishigaki": {
+      "description": "高石垣ショーケース: 反り(sori)・切込接ぎ目地・壁上端のセル辺ピン留めを確認 (GEO-03 / ISHIGAKI-01 / ISHIGAKI-02)",
+      "shots": [
+        {
+          "name": "takaishigaki-main",
+          "scenario": "takaishigaki-showcase",
+          "cell": { "x": 36, "y": 54 },
+          "zoom": 3,
+          "description": "本丸高石垣の正面。h4/h5 面の上端がセル辺に一致していること(2026-07-19 ドリフトバグの定点)"
+        },
+        {
+          "name": "takaishigaki-corner",
+          "scenario": "takaishigaki-showcase",
+          "cell": { "x": 51, "y": 65 },
+          "zoom": 3,
+          "description": "高石垣コーナー。corner.se の反りと目地連続、隣接タイル間の継ぎ目を確認"
+        }
+      ]
+    },
+    "tenshu": {
+      "description": "天守: 塔状シルエット h/w 1.0〜1.2・最上層屋根幅・石垣マウンド4面 (TENSHU-01/02/03, TONE-01)",
+      "shots": [
+        {
+          "name": "concentric-tenshu",
+          "scenario": "concentric-castle",
+          "cell": { "x": 60, "y": 70 },
+          "zoom": 3,
+          "description": "環郭の城の天守 (4x4 footprint, 原点 58,68)。シルエット比率と経年感を確認"
+        }
+      ]
+    },
+    "farm": {
+      "description": "田畑: 稲は1px線ストロークの扇状、塊化禁止。季節差は ?season= ではなく gallery / setSeason で確認 (FARM-01/02/03)",
+      "shots": [
+        {
+          "name": "concentric-farm",
+          "scenario": "concentric-castle",
+          "cell": { "x": 51, "y": 108 },
+          "zoom": 4,
+          "description": "城下の農地 (51,108)。稲株の線的質感・水面とのコントラストを至近で確認"
+        },
+        {
+          "name": "showcase-farm",
+          "scenario": "takaishigaki-showcase",
+          "cell": { "x": 38, "y": 90 },
+          "zoom": 3,
+          "description": "城下町の農地 (38,90)。周辺の道・町区画との馴染みを確認"
+        }
+      ]
+    },
+    "gate": {
+      "description": "門: 開=通路が見通せる/閉=暗い扉パネル、壁との接続 (GATE-01)",
+      "shots": [
+        {
+          "name": "concentric-gate-wide",
+          "scenario": "concentric-castle",
+          "cell": { "x": 63, "y": 81 },
+          "zoom": 3,
+          "description": "本丸南壁の gate_wide_3 (原点 62,81、x=62..64 占有)。壁との接合と開閉表現を確認"
+        },
+        {
+          "name": "five-tier-gate-narrow",
+          "scenario": "five-tier-keep",
+          "cell": { "x": 58, "y": 64 },
+          "zoom": 3,
+          "description": "五重天守シナリオの gate_narrow_3 (原点 57,64)。狭門の開閉視覚差を確認"
+        }
+      ]
+    }
+  }
+}
