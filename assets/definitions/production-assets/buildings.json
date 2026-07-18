@@ -5503,12 +5503,12 @@
         "supersample": 2
       },
       "geometry": {
-        "footprintWidth": 5,
-        "footprintHeight": 5,
-        "canvasWidth": 384,
-        "canvasHeight": 352,
-        "anchorX": 192,
-        "anchorY": 320
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 320,
+        "canvasHeight": 320,
+        "anchorX": 160,
+        "anchorY": 288
       },
       "category": "building",
       "postprocess": {
