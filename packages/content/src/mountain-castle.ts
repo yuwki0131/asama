@@ -55,7 +55,7 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
   },
   initialBuildings: [
     // === 本丸 (L3, x51..62 y57..64) ===
-    { type: "tenshu", position: { x: 51, y: 57 } },
+    { type: "tenshu", position: { x: 52, y: 58 } },
     { type: "honmaru", position: { x: 60, y: 60 } },
     // 虎口門 — 2→3 坂の出口を塞ぐ。破らない限り本丸に入れない。
     { type: "gate", position: { x: 60, y: 64 } },

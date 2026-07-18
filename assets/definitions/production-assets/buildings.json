@@ -5125,12 +5125,12 @@
         "supersample": 2
       },
       "geometry": {
-        "footprintWidth": 7,
-        "footprintHeight": 7,
-        "canvasWidth": 512,
-        "canvasHeight": 416,
-        "anchorX": 256,
-        "anchorY": 384
+        "footprintWidth": 5,
+        "footprintHeight": 5,
+        "canvasWidth": 384,
+        "canvasHeight": 352,
+        "anchorX": 192,
+        "anchorY": 320
       },
       "category": "building",
       "postprocess": {

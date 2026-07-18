@@ -2258,17 +2258,6 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 512,
-      "height": 416,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.9230769230769231
-      }
-    },
-    {
       "assetId": "building.earth_bridge.y",
       "kind": "building",
       "file": "generated/building-earth-bridge-y.png",
@@ -5566,6 +5555,17 @@
       "anchor": {
         "x": 0.5,
         "y": 0.6666666666666666
+      }
+    },
+    {
+      "assetId": "building.tenshu.main",
+      "kind": "building",
+      "file": "generated/building-tenshu-main.png",
+      "width": 384,
+      "height": 352,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9090909090909091
       }
     }
   ],
