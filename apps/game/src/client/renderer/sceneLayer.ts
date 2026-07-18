@@ -892,7 +892,7 @@ function isoSort(items: SceneItemForSort[]): void {
 
   // Enough passes for a terrace-top building to bubble back past the row of
   // cliff cells hanging off its south/east edge (up to footprint-width swaps;
-  // the widest building, the 7x7 tenshu, needs 7).
+  // the widest building, the 5x5 tenshu, needs 5).
   const PASSES = 8;
   for (let pass = 0; pass < PASSES; pass++) {
     let swapped = false;
