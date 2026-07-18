@@ -9,14 +9,14 @@ so brushwork, noise character and the ridge/plot structure stay identical to
 the original in all four seasons.
 
   spring : verbatim copy of the source painting
-  summer : each seedling grid point becomes a standing rice hill - a 2:1 iso
-           ellipse shaded in three values (sunlit tip / leaf body / foot
-           shadow) with a cast shadow on the darkened paddy water, drawn
+  summer : each seedling grid point becomes a sharp blade tuft - a fountain
+           of 1px strokes fanning up from the base (dark waterline foot /
+           leaf body / bright pointed tip) over darkened paddy water, drawn
            back-to-front so front rows overlap the feet of the rows behind;
            the row (jo-ue) regularity of real transplanted paddies survives
-  autumn : the same hill renderer in ripe-gold styling - heavy drooping ears
-           bulge the hill tops, straw-brown feet, drained field floor of dark
-           wet soil sampled from the ridge statistics
+  autumn : the same tuft renderer in ripe-gold styling - the tall center
+           blades hook over into bright drooping ears, straw feet, drained
+           field floor of dark wet soil sampled from the ridge statistics
   winter : harvested field - interior filled with dry soil texture derived
            from the ridge palette, faint pale stubble dots on the original
            seedling grid, slightly desaturated overall
@@ -109,79 +109,69 @@ def fill_plant_gaps(plants, inner, spacing=8):
     return out
 
 
-def draw_rice_hills(out, plants, field, style, gen):
-    """Paint procedurally shaded rice hills (back-to-front) for summer/autumn.
+def draw_rice_tufts(out, plants, field, style, gen):
+    """Paint rice as sharp blade tufts (back-to-front) for summer/autumn.
 
-    Each hill is an ellipse elongated along the iso row axis (2,1) - real
-    transplanted rows merge into ridge-like bands at this scale - with three
-    value bands (sunlit crown / leaf body / dark foot), a 1px cast shadow on
-    the field floor and a few 1px ticks above the crown (standing leaf tips
-    in summer, nodding ear heads in autumn). Drawing back-to-front lets each
-    front row overlap the feet of the row behind it, which is what sells the
-    standing-plant look. Returns the hill mask."""
+    Real rice reads as spiky, linear texture - each transplanted tuft (株) is
+    a fountain of thin blades rising from one base point and fanning outward,
+    every blade ending in a sharp bright tip. So instead of filled ellipses
+    each tuft is 5-8 one-pixel strokes: dark at the waterline, leaf-green
+    body, light sharp tip. Outer blades are shorter and lean out (the fan),
+    the center blades stand tallest. Autumn adds a drooping ear: the tallest
+    blades hook sideways-down at the top in bright gold (heavy panicles).
+    Back-to-front drawing lets front tufts overlap the feet of the row
+    behind. Returns the tuft mask."""
     h, w = field.shape
-    hills = np.zeros((h, w), bool)
-    hi = np.asarray(style["hi"], np.float64)
-    mid = np.asarray(style["mid"], np.float64)
-    lo = np.asarray(style["lo"], np.float64)
-    tick_c = np.asarray(style["tick"], np.float64)
-    s5 = np.sqrt(5.0)
+    tufts = np.zeros((h, w), bool)
+    base_c = np.asarray(style["base"], np.float64)
+    mid_c = np.asarray(style["mid"], np.float64)
+    tip_c = np.asarray(style["tip"], np.float64)
     for (px, py) in sorted(plants, key=lambda p: (p[1], p[0])):
-        ra = style["ra"] + gen.normal(0, 0.45)  # along-row half length
-        rb = style["rb"] + gen.normal(0, 0.20)  # across-row half width
-        # Vertical extent of the sheared ellipse (for shading / shadow).
-        yext = np.sqrt((ra / s5) ** 2 + (rb * 2.0 / s5) ** 2)
-        xext = np.sqrt((ra * 2.0 / s5) ** 2 + (rb / s5) ** 2)
-        tone = gen.normal(0, style["tone_jit"], 3)  # per-hill hue drift
-        # Cast shadow: darken the floor strip just under the hill.
-        sy = py + int(round(yext))
-        for dx in range(-int(xext), int(xext) + 1):
-            x, y = px + dx, sy + 1
-            if 0 <= x < w and 0 <= y < h and field[y, x] and abs(dx) <= xext * 0.8:
+        tone = gen.normal(0, style["tone_jit"], 3)  # per-tuft hue drift
+        # Small cast shadow at the waterline under the tuft.
+        for dx in range(-2, 3):
+            x, y = px + dx, py + 1
+            if 0 <= x < w and 0 <= y < h and field[y, x]:
                 out[y, x, :3] = np.clip(
                     out[y, x, :3].astype(np.float64) * style["cast"], 0, 255)
-        # Standing leaf tips / ear heads poke above the crown.
-        for _ in range(style["ticks"]):
-            x = px + int(gen.integers(-1, 2))
-            y = py - int(round(yext)) - int(gen.integers(1, style["tick_lift"] + 1))
-            if 0 <= x < w and 0 <= y < h and field[y, x]:
-                out[y, x, :3] = np.clip(tick_c + tone + gen.normal(0, 9, 3), 0, 255)
-                hills[y, x] = True
-        # Hill body: three value bands top-to-bottom.
-        for dy in range(-int(yext) - 1, int(yext) + 2):
-            for dx in range(-int(xext) - 1, int(xext) + 2):
-                pa = (2.0 * dx + dy) / s5      # along the row axis
-                pb = (-dx + 2.0 * dy) / s5     # across the rows
-                d = (pa / ra) ** 2 + (pb / rb) ** 2
-                if d > 1.0 + gen.normal(0, 0.06):
-                    continue
-                x, y = px + dx, py + dy
+        nb = int(gen.integers(style["blades"][0], style["blades"][1] + 1))
+        offs = np.linspace(-style["spread"], style["spread"], nb)
+        gen.shuffle(offs)  # draw order varies so overlaps don't band
+        for off in offs:
+            center = abs(off) < style["spread"] * 0.35
+            length = style["len"] + int(gen.integers(-1, 2))
+            if abs(off) > style["spread"] * 0.6:
+                length = max(2, length - 2)  # outer blades shorter
+            lean = off * style["fan"] + gen.normal(0, 0.3)
+            bx = px + int(round(off * 0.5))
+            top_x = bx
+            for t in range(length + 1):
+                u = t / max(1, length)
+                x = bx + int(round(lean * u))
+                y = py - t
                 if not (0 <= x < w and 0 <= y < h) or not field[y, x]:
                     continue
-                t = dy / yext  # -1 crown .. +1 foot
-                # Three-value shading with dithered band edges (crown
-                # highlight / leaf body / foot shadow) - painterly, not
-                # hard horizontal stripes.
-                u = (t + 1.0) / 2.0 + gen.normal(0, 0.09)
-                u = min(1.0, max(0.0, u))
-                if u < 0.30:
-                    c = hi
-                elif u < 0.42:
-                    k = (u - 0.30) / 0.12
-                    c = hi * (1 - k) + mid * k
-                elif u < 0.72:
-                    c = mid
-                elif u < 0.86:
-                    k = (u - 0.72) / 0.14
-                    c = mid * (1 - k) + lo * k
+                if u < 0.35:
+                    c = base_c
+                elif u < 0.78:
+                    c = mid_c
                 else:
-                    c = lo
-                # Rim rolls darker so each hill reads as a rounded volume.
-                c = c * (1.0 - 0.14 * max(0.0, d - 0.50))
-                c = c + tone + gen.normal(0, style["px_jit"], 3)
-                out[y, x, :3] = np.clip(c, 0, 255)
-                hills[y, x] = True
-    return hills
+                    c = tip_c
+                out[y, x, :3] = np.clip(c + tone + gen.normal(0, style["px_jit"], 3), 0, 255)
+                tufts[y, x] = True
+                top_x = x
+            # Drooping golden ear on the tall center blades (autumn).
+            if style.get("ear") is not None and center and gen.random() < 0.9:
+                ear_c = np.asarray(style["ear"], np.float64)
+                dirx = 1 if gen.random() < 0.5 else -1
+                ey = py - length
+                for k in range(1, style["ear_len"] + 1):
+                    x = top_x + dirx * k
+                    y = ey + (k + 1) // 2  # arcs outward and sags down
+                    if 0 <= x < w and 0 <= y < h and field[y, x]:
+                        out[y, x, :3] = np.clip(ear_c + tone + gen.normal(0, 6, 3), 0, 255)
+                        tufts[y, x] = True
+    return tufts
 
 
 def soften(out, mask, blur_w=0.55):
@@ -216,22 +206,20 @@ def make_summer(a, field, plants, dark_pal, bright_pal, water_pal):
     floor_target = np.array([30.0, 48.0, 44.0])  # dark shaded water
     out[..., :3][field] = np.clip(
         out[..., :3][field].astype(np.float64) * 0.42 + floor_target * 0.58, 0, 255)
-    # Mid-summer rice hills anchored to the painting's green statistics.
+    # Mid-summer blade tufts anchored to the painting's green statistics.
     g_dark = dark_pal.mean(axis=0)
     g_bright = bright_pal.mean(axis=0)
     style = {
-        "ra": 5.9, "rb": 2.4,
-        "hi": np.clip(g_bright * 0.45 + np.array([116, 158, 62]) * 0.55, 0, 255),
-        "mid": np.clip(g_dark * 0.35 + np.array([64, 108, 50]) * 0.65, 0, 255),
-        "lo": np.array([28.0, 52.0, 33.0]),
-        "tick": np.array([122.0, 162.0, 68.0]),
-        "ticks": 2, "tick_lift": 1,
-        "cast": 0.62, "tone_jit": 5.0, "px_jit": 6.0,
+        "blades": (7, 9), "len": 6, "spread": 2.8, "fan": 1.1,
+        "base": np.array([30.0, 55.0, 34.0]),
+        "mid": np.clip(g_dark * 0.35 + np.array([66, 112, 50]) * 0.65, 0, 255),
+        "tip": np.clip(g_bright * 0.40 + np.array([142, 186, 76]) * 0.60, 0, 255),
+        "cast": 0.62, "tone_jit": 5.0, "px_jit": 7.0,
     }
-    hills = draw_rice_hills(out, plants, field, style, gen)
-    painterly_mottle(out, hills, gen, amp=0.06, warm=3.5)
-    soften(out, hills, blur_w=0.35)
-    return out, hills
+    tufts = draw_rice_tufts(out, plants, field, style, gen)
+    painterly_mottle(out, tufts, gen, amp=0.06, warm=3.5)
+    soften(out, tufts, blur_w=0.15)
+    return out, tufts
 
 
 def make_autumn(a, field, plants, soil_pal):
@@ -243,20 +231,20 @@ def make_autumn(a, field, plants, soil_pal):
     jit = gen.normal(0, 4, (field.shape[0], field.shape[1], 3))
     soil_img = base[None, None, :] * (1.0 + noise[..., None] * 0.045) + jit
     out[..., :3][field] = np.clip(soil_img[field], 0, 255)
-    # Ripe rice hills: heavy ears bulge the crowns (slightly rounder than
-    # summer), deep gold body, straw-brown feet on dry stalks.
+    # Ripe blade tufts: dry gold stalks, sharp tips, drooping bright ears
+    # hooking off the tall center blades (heavy panicles).
     style = {
-        "ra": 5.3, "rb": 2.4,
-        "hi": np.array([234.0, 196.0, 96.0]),   # sunlit ear mass
-        "mid": np.array([196.0, 150.0, 58.0]),  # ripe straw body
-        "lo": np.array([116.0, 80.0, 38.0]),    # shaded dry stalk foot
-        "tick": np.array([214.0, 168.0, 74.0]),  # nodding ear heads
-        "ticks": 2, "tick_lift": 1,
+        "blades": (7, 9), "len": 6, "spread": 2.8, "fan": 1.0,
+        "base": np.array([110.0, 80.0, 40.0]),   # shaded dry stalk foot
+        "mid": np.array([192.0, 148.0, 58.0]),   # ripe straw body
+        "tip": np.array([224.0, 186.0, 88.0]),   # sunlit blade tip
+        "ear": np.array([240.0, 206.0, 108.0]),  # drooping panicle
+        "ear_len": 3,
         "cast": 0.66, "tone_jit": 7.0, "px_jit": 6.0,
     }
-    hills = draw_rice_hills(out, plants, field, style, gen)
-    painterly_mottle(out, hills, gen, amp=0.05, warm=4.5)
-    soften(out, hills, blur_w=0.35)
+    tufts = draw_rice_tufts(out, plants, field, style, gen)
+    painterly_mottle(out, tufts, gen, amp=0.05, warm=4.5)
+    soften(out, tufts, blur_w=0.15)
     return out
 
 
