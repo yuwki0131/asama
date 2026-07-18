@@ -97,7 +97,7 @@ def fill_plant_gaps(plants, inner, spacing=8):
         if 0 <= px < w and 0 <= py < h:
             seeds[py, px] = False
     out = list(plants)
-    for _ in range(60):
+    for _ in range(400):
         dist = ndimage.distance_transform_edt(seeds)
         dist[~inner] = 0
         far = float(dist.max())
@@ -126,25 +126,29 @@ def draw_rice_tufts(out, plants, field, style, gen):
     base_c = np.asarray(style["base"], np.float64)
     mid_c = np.asarray(style["mid"], np.float64)
     tip_c = np.asarray(style["tip"], np.float64)
-    for (px, py) in sorted(plants, key=lambda p: (p[1], p[0])):
+    positions = sorted(plants, key=lambda p: (p[1], p[0]))
+    # Cast at most once per pixel: neighbouring tufts (6 px apart, 5 px
+    # shadow) overlap, and stacked multiplications (0.66^2, 0.66^3) turn
+    # the warm floor into near-black pepper speckle.
+    casted = np.zeros((h, w), bool)
+    for (px, py) in positions:
         tone = gen.normal(0, style["tone_jit"], 3)  # per-tuft hue drift
         # Small cast shadow at the waterline under the tuft.
         for dx in range(-2, 3):
             x, y = px + dx, py + 1
-            if 0 <= x < w and 0 <= y < h and field[y, x]:
+            if 0 <= x < w and 0 <= y < h and field[y, x] and not casted[y, x]:
+                casted[y, x] = True
                 out[y, x, :3] = np.clip(
                     out[y, x, :3].astype(np.float64) * style["cast"], 0, 255)
         nb = int(gen.integers(style["blades"][0], style["blades"][1] + 1))
         offs = np.linspace(-style["spread"], style["spread"], nb)
         gen.shuffle(offs)  # draw order varies so overlaps don't band
         for off in offs:
-            center = abs(off) < style["spread"] * 0.35
             length = style["len"] + int(gen.integers(-1, 2))
             if abs(off) > style["spread"] * 0.6:
                 length = max(2, length - 2)  # outer blades shorter
             lean = off * style["fan"] + gen.normal(0, 0.3)
             bx = px + int(round(off * 0.5))
-            top_x = bx
             for t in range(length + 1):
                 u = t / max(1, length)
                 x = bx + int(round(lean * u))
@@ -159,18 +163,35 @@ def draw_rice_tufts(out, plants, field, style, gen):
                     c = tip_c
                 out[y, x, :3] = np.clip(c + tone + gen.normal(0, style["px_jit"], 3), 0, 255)
                 tufts[y, x] = True
-                top_x = x
-            # Drooping golden ear on the tall center blades (autumn).
-            if style.get("ear") is not None and center and gen.random() < 0.9:
-                ear_c = np.asarray(style["ear"], np.float64)
-                dirx = 1 if gen.random() < 0.5 else -1
-                ey = py - length
-                for k in range(1, style["ear_len"] + 1):
-                    x = top_x + dirx * k
-                    y = ey + (k + 1) // 2  # arcs outward and sags down
-                    if 0 <= x < w and 0 <= y < h and field[y, x]:
-                        out[y, x, :3] = np.clip(ear_c + tone + gen.normal(0, 6, 3), 0, 255)
-                        tufts[y, x] = True
+    # Ripe panicles (autumn), drawn as a SECOND pass over the closed canopy:
+    # if ears were drawn per tuft, the blades of later-drawn neighbours
+    # (spacing 6 px, ears 4-7 px long) would overwrite and fragment the
+    # arcs. Each ear rises from the crown, arcs over and sags under the
+    # grain weight, ending in a 2 px grain cluster. A field-wide wind bias
+    # (style["ear_dir"]) combs most ears the same way - the signature
+    # texture of a ripe paddy - with a minority breaking against it so the
+    # field doesn't go mechanical. Ear strokes stay noise-free: pixel
+    # jitter breaks the 1 px arc into confetti and kills legibility.
+    if style.get("ear") is not None:
+        ear_c = np.asarray(style["ear"], np.float64)
+        hi_c = np.asarray(style["ear_hi"], np.float64)
+        for px, py in positions:
+            tone = gen.normal(0, style["tone_jit"] * 0.5, 3)
+            for _ in range(int(gen.integers(2, 5))):
+                sx = px + int(round(gen.normal(0, 1.0)))
+                sy = py - style["len"] + int(gen.integers(-1, 2))
+                dirx = style["ear_dir"] if gen.random() < 0.86 else -style["ear_dir"]
+                elen = int(gen.integers(4, 7))
+                for k in range(elen + 1):
+                    x = sx + dirx * k
+                    y = sy - 1 + int(round(0.16 * k * k))  # rise, then sag
+                    cluster = k >= elen - 1
+                    c = ear_c * 0.88 if k < 2 else (hi_c if cluster else ear_c)
+                    for yy in ((y, y + 1) if cluster else (y,)):
+                        cc = ear_c if yy != y else c  # underside of the grain mass
+                        if 0 <= x < w and 0 <= yy < h and field[yy, x]:
+                            out[yy, x, :3] = np.clip(cc + tone, 0, 255)
+                            tufts[yy, x] = True
     return tufts
 
 
@@ -203,14 +224,17 @@ def make_summer(a, field, plants, dark_pal, bright_pal, water_pal):
     w_mean = water_pal.mean(axis=0)
     out[..., :3][green_px] = np.clip(
         a[..., :3][green_px].astype(np.float64) * 0.30 + w_mean * 0.70, 0, 255)
-    floor_target = np.array([30.0, 48.0, 44.0])  # dark shaded water
+    floor_target = np.array([26.0, 46.0, 36.0])  # dark shaded water, green-leaning
     out[..., :3][field] = np.clip(
         out[..., :3][field].astype(np.float64) * 0.42 + floor_target * 0.58, 0, 255)
     # Mid-summer blade tufts anchored to the painting's green statistics.
     g_dark = dark_pal.mean(axis=0)
     g_bright = bright_pal.mean(axis=0)
+    # Mid-summer canopy nearly closes: more and taller blades per tuft so
+    # neighbouring tufts touch and the flooded floor only glints through in
+    # the row gaps (a real July paddy is a solid green pile with row seams).
     style = {
-        "blades": (7, 9), "len": 6, "spread": 2.8, "fan": 1.1,
+        "blades": (10, 13), "len": 7, "spread": 3.4, "fan": 1.1,
         "base": np.array([30.0, 55.0, 34.0]),
         "mid": np.clip(g_dark * 0.35 + np.array([66, 112, 50]) * 0.65, 0, 255),
         "tip": np.clip(g_bright * 0.40 + np.array([142, 186, 76]) * 0.60, 0, 255),
@@ -225,21 +249,34 @@ def make_summer(a, field, plants, dark_pal, bright_pal, water_pal):
 def make_autumn(a, field, plants, soil_pal):
     gen = np.random.default_rng(12)
     out = a.copy()
-    # Drained field floor: dark damp soil from the ridge statistics.
-    base = soil_pal.mean(axis=0) * 0.60
+    # The base painting's near-black waterline pixels are excluded from the
+    # field mask, so they would survive the floor fill as pepper speckle on
+    # the golden canopy. Reclaim the ones in the paddy interior (eroding
+    # keeps the ridge-outline blacks intact) into the autumn field.
+    nb = (a[..., 3] > 128) & (a[..., :3].max(axis=2) < 40)
+    interior = ndimage.binary_erosion(field | nb, iterations=2)
+    field = field | (nb & interior)
+    # Field floor: a ripe paddy hides its soil completely - what shows
+    # between the rows is the shaded lower straw, so the floor is a dark
+    # warm gold, not damp earth. This keeps the canopy reading as one
+    # continuous golden surface instead of bright dots on dark ground.
+    base = np.array([112.0, 88.0, 46.0])
     noise = smooth_noise(field.shape, 6, 14.0, gen)
     jit = gen.normal(0, 4, (field.shape[0], field.shape[1], 3))
-    soil_img = base[None, None, :] * (1.0 + noise[..., None] * 0.045) + jit
+    soil_img = base[None, None, :] * (1.0 + noise[..., None] * 0.06) + jit
     out[..., :3][field] = np.clip(soil_img[field], 0, 255)
     # Ripe blade tufts: dry gold stalks, sharp tips, drooping bright ears
     # hooking off the tall center blades (heavy panicles).
+    # Ripe paddy: dense straw body with the blade tips held below the ear
+    # tone, so the drooping gold panicles read as the top layer of the field.
     style = {
-        "blades": (7, 9), "len": 6, "spread": 2.8, "fan": 1.0,
-        "base": np.array([110.0, 80.0, 40.0]),   # shaded dry stalk foot
-        "mid": np.array([192.0, 148.0, 58.0]),   # ripe straw body
-        "tip": np.array([224.0, 186.0, 88.0]),   # sunlit blade tip
-        "ear": np.array([240.0, 206.0, 108.0]),  # drooping panicle
-        "ear_len": 3,
+        "blades": (9, 11), "len": 7, "spread": 3.0, "fan": 1.0,
+        "base": np.array([128.0, 98.0, 50.0]),   # shaded stalk foot, near the floor tone
+        "mid": np.array([186.0, 142.0, 56.0]),   # ripe straw body
+        "tip": np.array([208.0, 168.0, 78.0]),   # blade tip, kept under the ears
+        "ear": np.array([238.0, 202.0, 100.0]),  # panicle stem and grains
+        "ear_hi": np.array([252.0, 224.0, 128.0]),  # sunlit grain cluster
+        "ear_dir": 1 if gen.random() < 0.5 else -1,  # field-wide wind bias
         "cast": 0.66, "tone_jit": 7.0, "px_jit": 6.0,
     }
     tufts = draw_rice_tufts(out, plants, field, style, gen)
@@ -291,7 +328,7 @@ def main():
     opaque, near_black, soil, field, inner = build_masks(a)
     plants = detect_plants(a, field, inner)
     dark_pal, bright_pal, water_pal, soil_pal = collect_palettes(a, field, soil)
-    grown = fill_plant_gaps(plants, inner)
+    grown = fill_plant_gaps(plants, inner, spacing=6)
     print(f"plants={len(plants)} grown={len(grown)} field={int(field.sum())} soil={int(soil.sum())}")
 
     spring = a.copy()
