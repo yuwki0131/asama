@@ -245,17 +245,6 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 640,
-      "height": 520,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8269230769230769
-      }
-    },
-    {
       "assetId": "unit.spear_ashigaru.idle.south",
       "kind": "unit",
       "file": "generated/unit-spear-ashigaru-idle-south.png",
@@ -5390,6 +5379,17 @@
       "anchor": {
         "x": 0.5,
         "y": 0.4
+      }
+    },
+    {
+      "assetId": "building.tenshu.main",
+      "kind": "building",
+      "file": "generated/building-tenshu-main.png",
+      "width": 640,
+      "height": 520,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8269230769230769
       }
     }
   ],

@@ -5019,8 +5019,10 @@
       "kind": "building",
       "output": "building-tenshu-main.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/building-tenshu-v3.png"
+        "type": "blender",
+        "model": "building-tenshu",
+        "renderSpec": "painterly",
+        "supersample": 2
       },
       "geometry": {
         "footprintWidth": 7,

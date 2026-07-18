@@ -703,6 +703,385 @@ def build_tenshu_graybox(scene: bpy.types.Scene) -> None:
 
 
 
+# ---------------------------------------------------------------------------
+# Production tenshu (five-tier keep on an ishigaki mound, 7x7 lot)
+# ---------------------------------------------------------------------------
+
+# Selection-gate variants (orchestrator picks the default):
+#   A: five roofs, strong tier reduction — grounded borogata silhouette
+#   B: five roofs, gentle reduction — slimmer soto-gata column
+#   C: four roofs with oversized chidori-hafu
+TENSHU_DEFAULT_VARIANT = "A"
+
+TENSHU_ISHIGAKI_TOP = 1.45
+
+TENSHU_VARIANTS = {
+    "A": {
+        "tiers": ((4.55, 1.00), (3.70, 0.90), (2.95, 0.84), (2.30, 0.78), (1.75, 0.70)),
+        "rises": (0.36, 0.34, 0.32, 0.30),
+        "top_rise": 0.58,
+        "hafu": ((1, "S", 0.46), (2, "E", 0.44)),
+    },
+    "B": {
+        "tiers": ((4.25, 0.94), (3.75, 0.88), (3.25, 0.82), (2.75, 0.76), (2.25, 0.70)),
+        "rises": (0.34, 0.33, 0.32, 0.31),
+        "top_rise": 0.52,
+        "hafu": ((2, "S", 0.40),),
+    },
+    "C": {
+        "tiers": ((4.60, 1.10), (3.55, 1.00), (2.65, 0.92), (1.90, 0.82)),
+        "rises": (0.40, 0.38, 0.36),
+        "top_rise": 0.66,
+        "hafu": ((0, "S", 0.60), (1, "E", 0.55)),
+    },
+}
+
+
+def _tenshu_boulder_ishigaki(name: str = "TenshuIshigaki") -> bpy.types.Material:
+    """Nozura-zumi at boulder scale for the 7x7 keep mound. Same palette and
+    seam treatment as make_ishigaki_material, but voronoi 3.0 so the stones
+    read at the scale of the elevation revetment tiles beside the lot."""
+    from . import core as _core
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    voronoi = nodes.new("ShaderNodeTexVoronoi")
+    voronoi.feature = "DISTANCE_TO_EDGE"
+    voronoi.inputs["Scale"].default_value = 4.2
+
+    seam_ramp = nodes.new("ShaderNodeValToRGB")
+    seam_ramp.color_ramp.elements[0].position = 0.0
+    seam_ramp.color_ramp.elements[0].color = (0.22, 0.20, 0.17, 1.0)
+    seam_ramp.color_ramp.elements[1].position = 0.09
+    seam_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    links.new(voronoi.outputs["Distance"], seam_ramp.inputs["Fac"])
+
+    stone_noise = nodes.new("ShaderNodeTexNoise")
+    stone_noise.inputs["Scale"].default_value = 3.4
+    stone_ramp = nodes.new("ShaderNodeValToRGB")
+    stone_ramp.color_ramp.elements[0].position = 0.3
+    stone_ramp.color_ramp.elements[0].color = (0.150, 0.130, 0.100, 1.0)
+    stone_ramp.color_ramp.elements[1].position = 0.8
+    stone_ramp.color_ramp.elements[1].color = (0.265, 0.235, 0.185, 1.0)
+    links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
+
+    # Weathering: slow moss/grime drift darkens patches of the wall face.
+    moss_noise = nodes.new("ShaderNodeTexNoise")
+    moss_noise.inputs["Scale"].default_value = 1.1
+    moss_noise.inputs["Detail"].default_value = 2.0
+    moss_ramp = nodes.new("ShaderNodeValToRGB")
+    moss_ramp.color_ramp.interpolation = "EASE"
+    moss_ramp.color_ramp.elements[0].position = 0.36
+    moss_ramp.color_ramp.elements[0].color = (0.80, 0.85, 0.72, 1.0)
+    moss_ramp.color_ramp.elements[1].position = 0.60
+    moss_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    links.new(moss_noise.outputs["Fac"], moss_ramp.inputs["Fac"])
+
+    def multiply(a, b):
+        node = nodes.new("ShaderNodeMix")
+        node.data_type = "RGBA"
+        node.blend_type = "MULTIPLY"
+        node.inputs["Factor"].default_value = 1.0
+        links.new(a, node.inputs["A"])
+        links.new(b, node.inputs["B"])
+        return node.outputs["Result"]
+
+    shaded = multiply(stone_ramp.outputs["Color"], seam_ramp.outputs["Color"])
+    shaded = multiply(shaded, moss_ramp.outputs["Color"])
+    if _core.CURRENT_STYLE == "pbr":
+        links.new(shaded, bsdf.inputs["Base Color"])
+    else:
+        _core.finish_material(material, shaded)
+    return material
+
+
+def _tenshu_skirt_roof(
+    scene: bpy.types.Scene,
+    name: str,
+    cx: float,
+    cy: float,
+    outer_w: float,
+    inner_w: float,
+    z_eave: float,
+    z_top: float,
+    mats: dict,
+) -> None:
+    """Hipped kawara skirt roof ring between two keep stories: four sori-curved
+    slopes, trim hip ridges (sumimune), eave fascia and rafter tips."""
+    from .core import ROOF_CURVE_EXPONENT, add_beam
+    trim = mats["trim"]
+    seg = 4
+    oh = outer_w / 2.0
+    ih = inner_w / 2.0
+
+    def ring(t: float) -> tuple[float, float]:
+        h = oh + (ih - oh) * t
+        z = z_eave + (z_top - z_eave) * (t ** ROOF_CURVE_EXPONENT)
+        return h, z
+
+    rings = [ring(i / seg) for i in range(seg + 1)]
+    # Slopes facing map N/S carry the x-banded tile columns, E/W the y-banded
+    # ones, so the seams always run straight down the slope.
+    for axis, mat in (("y", mats["roof"]), ("x", mats["roof_y"])):
+        vertices: list[tuple[float, float, float]] = []
+        faces: list[tuple[int, ...]] = []
+        for side in (-1.0, 1.0):
+            base = len(vertices)
+            for h, z in rings:
+                if axis == "y":
+                    a = (cx - h, cy + side * h)
+                    b = (cx + h, cy + side * h)
+                else:
+                    a = (cx + side * h, cy - h)
+                    b = (cx + side * h, cy + h)
+                vertices.append((*map_xy(*a), z))
+                vertices.append((*map_xy(*b), z))
+            for i in range(seg):
+                faces.append((base + 2 * i, base + 2 * i + 1, base + 2 * i + 3, base + 2 * i + 2))
+        add_mesh(scene, f"{name}Slope{axis}", vertices, faces, mat)
+
+    # Hip ridges follow the sagging profile in two segments.
+    mid_h, mid_z = ring(0.5)
+    for sx in (-1.0, 1.0):
+        for sy in (-1.0, 1.0):
+            a = (cx + sx * oh, cy + sy * oh, z_eave + 0.005)
+            m = (cx + sx * mid_h, cy + sy * mid_h, mid_z + 0.035)
+            b = (cx + sx * ih, cy + sy * ih, z_top + 0.045)
+            add_beam(scene, f"{name}Hip{sx:+.0f}{sy:+.0f}a", a, m, 0.10, trim, tip_thickness=0.085)
+            add_beam(scene, f"{name}Hip{sx:+.0f}{sy:+.0f}b", m, b, 0.085, trim, tip_thickness=0.07)
+            # Corner onigawara block at the eave end of the hip.
+            ox, oy = cx + sx * oh, cy + sy * oh
+            add_box(scene, f"{name}Oni{sx:+.0f}{sy:+.0f}", *map_box((ox - 0.075, oy - 0.075, z_eave - 0.02), (ox + 0.075, oy + 0.075, z_eave + 0.10)), trim)
+
+    # Eave fascia and rafter tips on all four sides.
+    x0, y0 = cx - oh, cy - oh
+    x1, y1 = cx + oh, cy + oh
+    for ey in (y0, y1):
+        add_box(scene, f"{name}FasciaX{ey:.2f}", *map_box((x0, ey - 0.04, z_eave - 0.055), (x1, ey + 0.04, z_eave - 0.005)), trim)
+    for ex in (x0, x1):
+        add_box(scene, f"{name}FasciaY{ex:.2f}", *map_box((ex - 0.04, y0, z_eave - 0.055), (ex + 0.04, y1, z_eave - 0.005)), trim)
+    pitch = 1.0 / 9.0
+    count = int(outer_w / pitch)
+    for i in range(count + 1):
+        e = x0 + i * pitch - 0.028
+        if e + 0.056 > x1 + 0.03:
+            continue
+        for ey in (y0, y1):
+            add_box(scene, f"{name}EaveX{i}{ey:.2f}", *map_box((e, ey - 0.05, z_eave - 0.07), (e + 0.056, ey + 0.05, z_eave + 0.005)), trim)
+        for ex in (x0, x1):
+            add_box(scene, f"{name}EaveY{i}{ex:.2f}", *map_box((ex - 0.05, e, z_eave - 0.07), (ex + 0.05, e + 0.056, z_eave + 0.005)), trim)
+
+
+def _tenshu_chidori_hafu(
+    scene: bpy.types.Scene,
+    name: str,
+    cx: float,
+    cy: float,
+    face: str,
+    width: float,
+    body_half: float,
+    z_eave: float,
+    rise: float,
+    mats: dict,
+) -> None:
+    """Chidori-hafu dormer gable riding a skirt roof slope; the white plaster
+    triangle faces the camera-visible S or E face."""
+    plaster = mats["plaster"]
+    trim = mats["trim"]
+    hw = width / 2.0
+    z0 = z_eave + 0.05
+    z1 = z_eave + rise * 0.92
+    front = body_half + 0.22
+    back = body_half - 0.42
+    if face == "S":
+        low = map_xy(cx - hw, cy + back)
+        high = map_xy(cx + hw, cy + front)
+        lo = (min(low[0], high[0]), min(low[1], high[1]))
+        hi = (max(low[0], high[0]), max(low[1], high[1]))
+        add_gable_roof(scene, f"{name}Roof", lo, hi, z0, z1, "y", mats["roof_y"], end_material=plaster)
+        add_box(scene, f"{name}Cap", *map_box((cx - 0.035, cy + back - 0.02, z1 - 0.015), (cx + 0.035, cy + front + 0.02, z1 + 0.045)), trim)
+        add_box(scene, f"{name}Barge", *map_box((cx - hw - 0.03, cy + front - 0.035, z0 - 0.045), (cx + hw + 0.03, cy + front + 0.035, z0 + 0.005)), trim)
+    else:  # "E"
+        low = map_xy(cx + back, cy - hw)
+        high = map_xy(cx + front, cy + hw)
+        lo = (min(low[0], high[0]), min(low[1], high[1]))
+        hi = (max(low[0], high[0]), max(low[1], high[1]))
+        add_gable_roof(scene, f"{name}Roof", lo, hi, z0, z1, "x", mats["roof"], end_material=plaster)
+        add_box(scene, f"{name}Cap", *map_box((cx + back - 0.02, cy - 0.035, z1 - 0.015), (cx + front + 0.02, cy + 0.035, z1 + 0.045)), trim)
+        add_box(scene, f"{name}Barge", *map_box((cx + front - 0.035, cy - hw - 0.03, z0 - 0.045), (cx + front + 0.035, cy + hw + 0.03, z0 + 0.005)), trim)
+
+
+def _tenshu_windows(
+    scene: bpy.types.Scene,
+    name: str,
+    cx: float,
+    cy: float,
+    w: float,
+    z0: float,
+    h: float,
+    mats: dict,
+) -> None:
+    """Koshi (lattice) window rows on the two camera-visible faces."""
+    plaster = mats["plaster"]
+    trim = mats["trim"]
+    half = w / 2.0
+    count = max(2, int(round(w * 0.85)))
+    ww = 0.30
+    wz0 = z0 + h * 0.40
+    wz1 = z0 + h * 0.68
+    span = w - 0.70
+    step = span / max(1, count - 1) if count > 1 else 0.0
+    for i in range(count):
+        u = cx - span / 2.0 + i * step
+        # South face (y = cy + half).
+        fy = cy + half
+        add_box(scene, f"{name}SFrame{i}", *map_box((u - ww / 2 - 0.035, fy - 0.02, wz0 - 0.035), (u + ww / 2 + 0.035, fy + 0.018, wz1 + 0.035)), plaster)
+        add_box(scene, f"{name}SWin{i}", *map_box((u - ww / 2, fy - 0.01, wz0), (u + ww / 2, fy + 0.024, wz1)), trim)
+        bar = u - ww / 2 + 0.045
+        while bar < u + ww / 2 - 0.02:
+            add_box(scene, f"{name}SBar{i}{bar:.2f}", *map_box((bar, fy - 0.005, wz0), (bar + 0.032, fy + 0.030, wz1)), plaster)
+            bar += 0.085
+        # East face (x = cx + half).
+        v = cy - span / 2.0 + i * step
+        fx = cx + half
+        add_box(scene, f"{name}EFrame{i}", *map_box((fx - 0.02, v - ww / 2 - 0.035, wz0 - 0.035), (fx + 0.018, v + ww / 2 + 0.035, wz1 + 0.035)), plaster)
+        add_box(scene, f"{name}EWin{i}", *map_box((fx - 0.01, v - ww / 2, wz0), (fx + 0.024, v + ww / 2, wz1)), trim)
+        bar = v - ww / 2 + 0.045
+        while bar < v + ww / 2 - 0.02:
+            add_box(scene, f"{name}EBar{i}{bar:.2f}", *map_box((fx - 0.005, bar, wz0), (fx + 0.030, bar + 0.032, wz1)), plaster)
+            bar += 0.085
+
+
+def _tenshu_katomado(
+    scene: bpy.types.Scene,
+    name: str,
+    cx: float,
+    cy: float,
+    half: float,
+    z_center: float,
+    mats: dict,
+) -> None:
+    """Kato-mado (bell-shaped windows) centered on the top story's visible
+    faces: plaster surround with a dark peaked-arch panel."""
+    plaster = mats["plaster"]
+    trim = mats["trim"]
+
+    def pentagon(hw: float, hz: float, peak: float):
+        return [(-hw, -hz), (hw, -hz), (hw, hz), (0.0, hz + peak), (-hw, hz)]
+
+    for face in ("S", "E"):
+        for layer, (hw, hz, peak, proud, material) in enumerate((
+            (0.20, 0.16, 0.10, 0.020, plaster),
+            (0.145, 0.115, 0.075, 0.032, trim),
+        )):
+            vertices = []
+            for u, dz in pentagon(hw, hz, peak):
+                if face == "S":
+                    x, y = cx + u, cy + half + proud
+                else:
+                    x, y = cx + half + proud, cy + u
+                vertices.append((*map_xy(x, y), z_center + dz))
+            add_mesh(scene, f"{name}{face}{layer}", vertices, [tuple(range(5))], material)
+
+
+def _tenshu_koran(
+    scene: bpy.types.Scene,
+    name: str,
+    cx: float,
+    cy: float,
+    offset: float,
+    z_base: float,
+    mats: dict,
+) -> None:
+    """High-rimmed balcony rail (koran) around the top story."""
+    dark = mats["dark_wood"]
+    rail_h = 0.26
+    x0, y0 = cx - offset, cy - offset
+    x1, y1 = cx + offset, cy + offset
+    for rz0, rz1 in ((z_base + rail_h - 0.045, z_base + rail_h), (z_base + 0.08, z_base + 0.115)):
+        add_box(scene, f"{name}RailN{rz0:.2f}", *map_box((x0 - 0.03, y0 - 0.03, rz0), (x1 + 0.03, y0 + 0.03, rz1)), dark)
+        add_box(scene, f"{name}RailS{rz0:.2f}", *map_box((x0 - 0.03, y1 - 0.03, rz0), (x1 + 0.03, y1 + 0.03, rz1)), dark)
+        add_box(scene, f"{name}RailW{rz0:.2f}", *map_box((x0 - 0.03, y0 - 0.03, rz0), (x0 + 0.03, y1 + 0.03, rz1)), dark)
+        add_box(scene, f"{name}RailE{rz0:.2f}", *map_box((x1 - 0.03, y0 - 0.03, rz0), (x1 + 0.03, y1 + 0.03, rz1)), dark)
+    positions = (x0, (x0 + x1) / 2.0, x1)
+    for px in positions:
+        for py in positions:
+            if px in (x0, x1) or py in (y0, y1):
+                add_box(scene, f"{name}Post{px:.2f}{py:.2f}", *map_box((px - 0.028, py - 0.028, z_base), (px + 0.028, py + 0.028, z_base + rail_h)), dark)
+
+
+def _tenshu_shachi(scene: bpy.types.Scene, name: str, x: float, y: float, z: float, gold: bpy.types.Material) -> None:
+    """Simplified shachihoko silhouette: arched body with a raised tail."""
+    from .core import add_beam
+    add_box(scene, f"{name}Body", *map_box((x - 0.055, y - 0.042, z), (x + 0.055, y + 0.042, z + 0.20)), gold)
+    add_beam(scene, f"{name}Tail", (x, y, z + 0.16), (x + 0.0, y + 0.0, z + 0.30), 0.075, gold, tip_thickness=0.035)
+
+
+def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT) -> None:
+    """Production five-tier keep on a 7x7 lot. Canvas 640x520, anchor 320,430.
+
+    Ishigaki mound to its crest, then shrinking stories: dark shitami-ita
+    skirt boards + aged white plaster, koshi window rows, hipped kawara
+    skirt roofs with sumimune hips, chidori-hafu dormers, kato-mado and a
+    koran rail on the top story, gabled top roof with shachi finials.
+    Same shared iso camera as every building, so all ridge lines land on
+    the 2:1 tile angle by construction."""
+    spec = TENSHU_VARIANTS[variant]
+    mats = building_material_set()
+    plaster = mats["plaster"]
+    dark = mats["dark_wood"]
+    trim = mats["trim"]
+    stone = _tenshu_boulder_ishigaki()
+    gold = make_material("TenshuShachi", (0.44, 0.36, 0.155, 1.0))
+
+    cx, cy = -3.5, -3.5  # lot center of the [-7,0]x[-7,0] footprint
+
+    # Ishigaki mound: two battered stages up to the crest, gravel walk on top.
+    add_frustum(scene, "IshigakiLower", (cx - 3.45, cy - 3.45), (cx + 3.45, cy + 3.45), 0.0, 0.90, 0.58, stone)
+    add_frustum(scene, "IshigakiUpper", (cx - 2.87, cy - 2.87), (cx + 2.87, cy + 2.87), 0.90, TENSHU_ISHIGAKI_TOP, 0.34, stone)
+    walk = 2.87 - 0.34 - 0.06
+    add_box(scene, "IshigakiWalk", *map_box((cx - walk, cy - walk, TENSHU_ISHIGAKI_TOP), (cx + walk, cy + walk, TENSHU_ISHIGAKI_TOP + 0.018)), mats["gravel"])
+
+    tiers = spec["tiers"]
+    rises = spec["rises"]
+    hafu_spec = {(t, f): w for t, f, w in spec["hafu"]}
+    z = TENSHU_ISHIGAKI_TOP
+    for index, (w, body_h) in enumerate(tiers):
+        half = w / 2.0
+        low = (cx - half, cy - half)
+        high = (cx + half, cy + half)
+        # Dark shitami-ita skirt band, then aged plaster body.
+        add_box(scene, f"T{index}Skirt", *map_box((low[0] - 0.02, low[1] - 0.02, z), (high[0] + 0.02, high[1] + 0.02, z + 0.17)), dark)
+        add_box(scene, f"T{index}Body", *map_box((low[0], low[1], z + 0.17), (high[0], high[1], z + body_h)), plaster)
+        if index < len(tiers) - 1:
+            _tenshu_windows(scene, f"T{index}", cx, cy, w, z + 0.17, body_h - 0.17, mats)
+            z_eave = z + body_h
+            rise = rises[index]
+            outer_w = w + 0.55
+            inner_w = tiers[index + 1][0] + 0.18
+            _tenshu_skirt_roof(scene, f"T{index}Roof", cx, cy, outer_w, inner_w, z_eave, z_eave + rise, mats)
+            for face in ("S", "E"):
+                hafu_w = hafu_spec.get((index, face))
+                if hafu_w is not None:
+                    _tenshu_chidori_hafu(scene, f"T{index}Hafu{face}", cx, cy, face, w * hafu_w, half, z_eave, rise, mats)
+            z = z_eave + rise - 0.10
+        else:
+            # Top story: koran rail, kato-mado, gabled kawara roof, shachi.
+            _tenshu_koran(scene, "Koran", cx, cy, half + 0.22, z - 0.02, mats)
+            _tenshu_katomado(scene, "Kato", cx, cy, half, z + 0.17 + (body_h - 0.17) * 0.52, mats)
+            z_eave = z + body_h
+            ridge_z = z_eave + spec["top_rise"]
+            roof_low = (cx - half - 0.46, cy - half - 0.40)
+            roof_high = (cx + half + 0.46, cy + half + 0.40)
+            add_kawara_roof(scene, "TopRoof", roof_low, roof_high, z_eave, ridge_z, "x", mats["roof"], trim, verge_material=plaster)
+            for sx in (-1.0, 1.0):
+                _tenshu_shachi(scene, f"Shachi{sx:+.0f}", cx + sx * (half + 0.30), cy, ridge_z + 0.10, gold)
+
+
 def build_farm_paddy(scene: bpy.types.Scene) -> None:
     """Rice paddy filling a 4x4 surface footprint. Canvas 256x128, anchor 128,64."""
     ridge = make_textured_material("AzeDirt", (0.185, 0.150, 0.105), (0.265, 0.220, 0.160), scale=9.0)
