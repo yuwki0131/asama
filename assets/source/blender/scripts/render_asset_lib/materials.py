@@ -727,6 +727,66 @@ def make_mud_material(name: str = "RoadMud") -> bpy.types.Material:
     return material
 
 
+def make_gate_ground_material(axis: str = "nw_se") -> bpy.types.Material:
+    """Trodden earth under gates. Palette matches the terrain dirt tiles
+    (DirtSurface) so the gate sits naturally on dirt ground; the noise is
+    stretched along the direction of travel so it reads as faint ruts and
+    footpath wear — no masonry joints or tile seams."""
+    material = bpy.data.materials.new(f"GateGround_{axis}")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Roughness"].default_value = 1.0
+
+    coords = nodes.new("ShaderNodeTexCoord")
+    mapping = nodes.new("ShaderNodeMapping")
+    # Gate span is map-x for nw_se (travel along world y) and map-y for
+    # ne_sw (travel along world x): compress the noise across the passage,
+    # stretch it along the walking direction.
+    if axis == "nw_se":
+        mapping.inputs["Scale"].default_value = (16.0, 3.0, 6.0)
+    else:
+        mapping.inputs["Scale"].default_value = (3.0, 16.0, 6.0)
+    links.new(coords.outputs["Object"], mapping.inputs["Vector"])
+
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 1.0
+    noise.inputs["Detail"].default_value = 3.0
+    links.new(mapping.outputs["Vector"], noise.inputs["Vector"])
+
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = 0.34
+    ramp.color_ramp.elements[0].color = (0.125, 0.100, 0.068, 1.0)
+    ramp.color_ramp.elements[1].position = 0.78
+    ramp.color_ramp.elements[1].color = (0.225, 0.190, 0.140, 1.0)
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+
+    # Faint dampness mottle (weathering under foot traffic), low contrast.
+    damp = nodes.new("ShaderNodeTexNoise")
+    damp.inputs["Scale"].default_value = 2.2
+    damp.inputs["Detail"].default_value = 2.0
+    damp_band = nodes.new("ShaderNodeMath")
+    damp_band.operation = "MULTIPLY_ADD"
+    damp_band.inputs[1].default_value = 0.18
+    damp_band.inputs[2].default_value = 0.86
+    links.new(damp.outputs["Fac"], damp_band.inputs[0])
+    damp_color = nodes.new("ShaderNodeCombineColor")
+    for channel in ("Red", "Green", "Blue"):
+        links.new(damp_band.outputs["Value"], damp_color.inputs[channel])
+    mixed = nodes.new("ShaderNodeMix")
+    mixed.data_type = "RGBA"
+    mixed.blend_type = "MULTIPLY"
+    mixed.inputs["Factor"].default_value = 1.0
+    links.new(ramp.outputs["Color"], mixed.inputs["A"])
+    links.new(damp_color.outputs["Color"], mixed.inputs["B"])
+    if core.CURRENT_STYLE == "pbr":
+        links.new(mixed.outputs["Result"], bsdf.inputs["Base Color"])
+    else:
+        finish_material(material, mixed.outputs["Result"])
+    return material
+
+
 def make_holdout_material() -> bpy.types.Material:
     material = bpy.data.materials.new("Holdout")
     material.use_nodes = True
