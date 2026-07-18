@@ -245,17 +245,6 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 640,
-      "height": 520,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8269230769230769
-      }
-    },
-    {
       "assetId": "unit.spear_ashigaru.idle.south",
       "kind": "unit",
       "file": "generated/unit-spear-ashigaru-idle-south.png",
@@ -5259,6 +5248,325 @@
         "x": 0.5,
         "y": 0.875
       }
+    },
+    {
+      "assetId": "terrain.water.transition.ne",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-ne.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.ne.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-ne-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.ne.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-ne-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.es",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-es.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.es.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-es-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.es.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-es-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.sw",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-sw.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.sw.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-sw-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.sw.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-sw-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.wn",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-wn.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.wn.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-wn-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.wn.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-wn-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-ne.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-ne-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-ne-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-es.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-es-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-es-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-sw.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-sw-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-sw-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-wn.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-wn-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-wn-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "building.tenshu.main",
+      "kind": "building",
+      "file": "generated/building-tenshu-main.png",
+      "width": 640,
+      "height": 520,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8269230769230769
+      }
+    },
+    {
+      "assetId": "building.farm.spring",
+      "kind": "building",
+      "file": "generated/building-farm-spring.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.summer",
+      "kind": "building",
+      "file": "generated/building-farm-summer.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.autumn",
+      "kind": "building",
+      "file": "generated/building-farm-autumn.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.winter",
+      "kind": "building",
+      "file": "generated/building-farm-winter.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
     }
   ],
   "animations": [
@@ -6052,6 +6360,150 @@
       "anchor": {
         "x": 0.5,
         "y": 0.7916666666666666
+      }
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.attack",
+      "unitAssetId": "unit.sword_ashigaru",
+      "action": "attack",
+      "kind": "unit",
+      "file": "generated/unit-sword-ashigaru-attack-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.death",
+      "unitAssetId": "unit.sword_ashigaru",
+      "action": "death",
+      "kind": "unit",
+      "file": "generated/unit-sword-ashigaru-death-sheet.png",
+      "sheet": {
+        "width": 144,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 3,
+      "fps": 8,
+      "loop": false,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.idle",
+      "unitAssetId": "unit.sword_ashigaru",
+      "action": "idle",
+      "kind": "unit",
+      "file": "generated/unit-sword-ashigaru-idle-sheet.png",
+      "sheet": {
+        "width": 288,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
+      }
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.walk",
+      "unitAssetId": "unit.sword_ashigaru",
+      "action": "walk",
+      "kind": "unit",
+      "file": "generated/unit-sword-ashigaru-walk-sheet.png",
+      "sheet": {
+        "width": 384,
+        "height": 512
+      },
+      "frame": {
+        "width": 48,
+        "height": 64
+      },
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.82
       }
     }
   ]

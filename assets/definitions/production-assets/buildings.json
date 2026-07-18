@@ -302,6 +302,114 @@
       }
     },
     {
+      "assetId": "building.farm.spring",
+      "kind": "building",
+      "output": "building-farm-spring.png",
+      "source": {
+        "type": "blender",
+        "model": "building-farm-paddy-spring",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.summer",
+      "kind": "building",
+      "output": "building-farm-summer.png",
+      "source": {
+        "type": "blender",
+        "model": "building-farm-paddy-summer",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.autumn",
+      "kind": "building",
+      "output": "building-farm-autumn.png",
+      "source": {
+        "type": "blender",
+        "model": "building-farm-paddy-autumn",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.winter",
+      "kind": "building",
+      "output": "building-farm-winter.png",
+      "source": {
+        "type": "blender",
+        "model": "building-farm-paddy-winter",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
       "assetId": "building.road",
       "kind": "building",
       "output": "building-road.png",
@@ -5019,8 +5127,10 @@
       "kind": "building",
       "output": "building-tenshu-main.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/building-tenshu-v2.png"
+        "type": "blender",
+        "model": "building-tenshu",
+        "renderSpec": "painterly",
+        "supersample": 2
       },
       "geometry": {
         "footprintWidth": 7,

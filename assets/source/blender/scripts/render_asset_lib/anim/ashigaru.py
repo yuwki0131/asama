@@ -136,3 +136,35 @@ def build_spear_ashigaru(scene: bpy.types.Scene) -> bpy.types.Object:
     rig_beam(scene, rig, "SpearHead", (-0.128, 0.235, 0.815), (-0.128, 0.288, 0.888), 0.034, steel, "spear")
 
     return rig
+
+
+def build_sword_ashigaru(scene: bpy.types.Scene) -> bpy.types.Object:
+    """Build the spear ashigaru body with a one-handed curved katana.
+
+    Reusing the production spear body keeps its proportions, armor, banner,
+    and rig contract exactly aligned with the other ashigaru.  Only the two
+    spear meshes are replaced; the historical ``spear`` bone name remains as
+    the shared weapon-bone API used by the animation pipeline.
+    """
+    rig = build_spear_ashigaru(scene)
+    rig.name = "SwordAshigaruRig"
+
+    for object_name in ("SpearShaft", "SpearHead"):
+        weapon_part = bpy.data.objects.get(object_name)
+        if weapon_part is not None:
+            bpy.data.objects.remove(weapon_part, do_unlink=True)
+
+    wrapping = make_material("AshigaruKatanaWrapping", (0.105, 0.075, 0.045, 1.0))
+    guard = make_material("AshigaruKatanaGuard", (0.16, 0.12, 0.065, 1.0))
+    steel = make_material("AshigaruKatanaSteel", (0.58, 0.62, 0.68, 1.0))
+
+    # Compact one-handed grip at the right hand, a visible tsuba, then three
+    # subtly offset blade segments.  The offset produces a readable sori
+    # silhouette without changing the shared rig or render contract.
+    rig_beam(scene, rig, "KatanaTsuka", (-0.128, -0.115, 0.205), (-0.128, -0.045, 0.315), 0.032, wrapping, "spear")
+    rig_box(scene, rig, "KatanaTsuba", (-0.174, -0.074, 0.300), (-0.082, -0.016, 0.320), guard, "spear", bevel=0.005)
+    rig_beam(scene, rig, "KatanaBlade.1", (-0.128, -0.030, 0.318), (-0.128, 0.070, 0.470), 0.026, steel, "spear")
+    rig_beam(scene, rig, "KatanaBlade.2", (-0.128, 0.070, 0.470), (-0.128, 0.190, 0.610), 0.023, steel, "spear")
+    rig_beam(scene, rig, "KatanaBlade.3", (-0.128, 0.190, 0.610), (-0.128, 0.330, 0.720), 0.018, steel, "spear")
+
+    return rig

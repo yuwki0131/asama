@@ -408,10 +408,15 @@ def make_namako_material() -> bpy.types.Material:
     return material
 
 
-def make_showcase_plaster() -> bpy.types.Material:
+def make_showcase_plaster(
+    name: str = "ShowcasePlaster",
+    *,
+    dark: tuple[float, float, float] = (0.485, 0.445, 0.365),
+    light: tuple[float, float, float] = (0.615, 0.575, 0.485),
+) -> bpy.types.Material:
     """Aged plaster: subdued warm base, painterly blotches, and vertical
     rain-streak grime (noise stretched along z)."""
-    material = bpy.data.materials.new("ShowcasePlaster")
+    material = bpy.data.materials.new(name)
     material.use_nodes = True
     nodes = material.node_tree.nodes
     links = material.node_tree.links
@@ -422,9 +427,9 @@ def make_showcase_plaster() -> bpy.types.Material:
     ramp = nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE"
     ramp.color_ramp.elements[0].position = 0.25
-    ramp.color_ramp.elements[0].color = (0.485, 0.445, 0.365, 1.0)
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
     ramp.color_ramp.elements[1].position = 0.8
-    ramp.color_ramp.elements[1].color = (0.615, 0.575, 0.485, 1.0)
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
 
     coords = nodes.new("ShaderNodeTexCoord")
@@ -453,11 +458,22 @@ def make_showcase_plaster() -> bpy.types.Material:
     return material
 
 
-def make_showcase_roof(ridge_axis: str = "x") -> bpy.types.Material:
+def make_showcase_roof(
+    ridge_axis: str = "x",
+    *,
+    name: str = "ShowcaseRoof",
+    base_dark: tuple[float, float, float] = (0.052, 0.048, 0.046),
+    base_light: tuple[float, float, float] = (0.125, 0.120, 0.115),
+    mud: tuple[float, float, float] = (0.075, 0.058, 0.038),
+    columns: float = 9.0,
+    courses: float = 15.0,
+    seam: tuple[float, float, float] = (0.42, 0.40, 0.40),
+    grime_strength: float = 0.55,
+) -> bpy.types.Material:
     """Kawara roof calibrated to the tenshu reference: warm dark tiles, tile
     COLUMNS running down the slope (sanigawara rows), horizontal course
     steps, per-column value jitter, and mud grime pooling in the joints."""
-    material = bpy.data.materials.new("ShowcaseRoof")
+    material = bpy.data.materials.new(name)
     material.use_nodes = True
     nodes = material.node_tree.nodes
     links = material.node_tree.links
@@ -471,7 +487,7 @@ def make_showcase_roof(ridge_axis: str = "x") -> bpy.types.Material:
     # as slanted planking instead of kawara.
     col = nodes.new("ShaderNodeMath")
     col.operation = "MULTIPLY"
-    col.inputs[1].default_value = 9.0
+    col.inputs[1].default_value = columns
     links.new(separate.outputs["X" if ridge_axis == "x" else "Y"], col.inputs[0])
     col_id = nodes.new("ShaderNodeMath")
     col_id.operation = "FLOOR"
@@ -495,8 +511,8 @@ def make_showcase_roof(ridge_axis: str = "x") -> bpy.types.Material:
     col_shade.color_ramp.elements[0].color = (1.30, 1.30, 1.34, 1.0)
     col_shade.color_ramp.elements[1].position = 0.24
     col_shade.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
-    seam = col_shade.color_ramp.elements.new(0.46)
-    seam.color = (0.42, 0.40, 0.40, 1.0)
+    seam_element = col_shade.color_ramp.elements.new(0.46)
+    seam_element.color = (*seam, 1.0)
     links.new(col_tri.outputs["Value"], col_shade.inputs["Fac"])
 
     # Per-column value jitter (aged tiles differ slightly).
@@ -512,7 +528,7 @@ def make_showcase_roof(ridge_axis: str = "x") -> bpy.types.Material:
     # Horizontal course steps down the slope.
     course = nodes.new("ShaderNodeMath")
     course.operation = "MULTIPLY"
-    course.inputs[1].default_value = 15.0
+    course.inputs[1].default_value = courses
     links.new(separate.outputs["Z"], course.inputs[0])
     course_fract = nodes.new("ShaderNodeMath")
     course_fract.operation = "FRACT"
@@ -530,9 +546,9 @@ def make_showcase_roof(ridge_axis: str = "x") -> bpy.types.Material:
     base_ramp = nodes.new("ShaderNodeValToRGB")
     base_ramp.color_ramp.interpolation = "EASE"
     base_ramp.color_ramp.elements[0].position = 0.3
-    base_ramp.color_ramp.elements[0].color = (0.052, 0.048, 0.046, 1.0)
+    base_ramp.color_ramp.elements[0].color = (*base_dark, 1.0)
     base_ramp.color_ramp.elements[1].position = 0.75
-    base_ramp.color_ramp.elements[1].color = (0.125, 0.120, 0.115, 1.0)
+    base_ramp.color_ramp.elements[1].color = (*base_light, 1.0)
     links.new(base_noise.outputs["Fac"], base_ramp.inputs["Fac"])
 
     # Mud grime patches.
@@ -543,15 +559,15 @@ def make_showcase_roof(ridge_axis: str = "x") -> bpy.types.Material:
     grime_fac.color_ramp.elements[0].position = 0.42
     grime_fac.color_ramp.elements[0].color = (0.0, 0.0, 0.0, 1.0)
     grime_fac.color_ramp.elements[1].position = 0.72
-    grime_fac.color_ramp.elements[1].color = (0.55, 0.55, 0.55, 1.0)
+    grime_fac.color_ramp.elements[1].color = (grime_strength, grime_strength, grime_strength, 1.0)
     links.new(grime_noise.outputs["Fac"], grime_fac.inputs["Fac"])
     grimed = nodes.new("ShaderNodeMix")
     grimed.data_type = "RGBA"
     links.new(grime_fac.outputs["Color"], grimed.inputs["Factor"])
     links.new(base_ramp.outputs["Color"], grimed.inputs["A"])
-    mud = nodes.new("ShaderNodeRGB")
-    mud.outputs[0].default_value = (0.075, 0.058, 0.038, 1.0)
-    links.new(mud.outputs[0], grimed.inputs["B"])
+    mud_node = nodes.new("ShaderNodeRGB")
+    mud_node.outputs[0].default_value = (*mud, 1.0)
+    links.new(mud_node.outputs[0], grimed.inputs["B"])
 
     def multiply(a, b):
         node = nodes.new("ShaderNodeMix")

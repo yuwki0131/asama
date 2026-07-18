@@ -3,6 +3,7 @@ import type {
   BuildingSnapshot,
   CellCoord,
   MapDecoration,
+  Season,
   TerrainCellSnapshot,
   UnitId,
   UnitSnapshot,
@@ -338,7 +339,7 @@ export class RetainedScene {
       } else if (entry.kind === "slope") {
         addSlopeCellSprites(this.staticLayer, entry.item, snapshot.map, assets);
       } else if (entry.kind === "building") {
-        addBuildingSprite(this.staticLayer, entry.item, assets, zoom);
+        addBuildingSprite(this.staticLayer, entry.item, assets, zoom, snapshot.economy.season);
         // Flag pennant for castle buildings on intact structures only.
         const building = entry.item;
         if (
@@ -567,6 +568,9 @@ function createFlagGraphics(building: BuildingSnapshot, zoom: number): Graphics 
  * Signature of everything the static (buildings + decorations + cliff faces)
  * layer renders. Zoom participates because sprite positions are rounded per
  * zoom step; terrainRevision because player terrain edits move cliff cells.
+ * The season participates only while a farm exists: farm sprites resolve to
+ * seasonal textures, so a season change must rebuild the layer (4x per game
+ * year at most — negligible).
  */
 function staticSceneSignature(snapshot: WorldSnapshot, zoom: number): string {
   const parts: string[] = [
@@ -574,12 +578,17 @@ function staticSceneSignature(snapshot: WorldSnapshot, zoom: number): string {
     `d:${snapshot.map.decorations.length}`,
     `r:${snapshot.terrainRevision ?? 0}`
   ];
+  let hasFarm = false;
   for (const building of snapshot.buildings) {
+    hasFarm ||= building.type === "farm";
     parts.push(
       `${building.id}|${building.assetId}|${building.position.x},${building.position.y}|` +
         `${building.lifecycleState}|${building.gateState ?? "-"}|${building.owner}|` +
         `${building.ladderHp !== null ? 1 : 0}`
     );
+  }
+  if (hasFarm) {
+    parts.push(`s:${snapshot.economy.season}`);
   }
   return parts.join(";");
 }
@@ -733,9 +742,10 @@ function addBuildingSprite(
   layer: Container,
   building: BuildingSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
-  zoom: number
+  zoom: number,
+  season: Season
 ): void {
-  const sprite = createSpriteFromCandidates(buildingAssetCandidates(building), assets);
+  const sprite = createSpriteFromCandidates(buildingAssetCandidates(building, season), assets);
   const point = buildingRenderPoint(building);
   // Buildings sit on uniform-elevation footprints (elevation-contract.md §4);
   // the anchor cell's elevation lifts the whole sprite.

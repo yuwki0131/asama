@@ -16,8 +16,11 @@ describe("connected terrain asset masks", () => {
     // macro field except for stone, which has no macro set.
     const connected = /^terrain\.(grass|dirt|stone|water)\.connected\.[01]{4}(\.v[12])?$/;
     const macro = /^terrain\.(grass|dirt|water)\.macro\.v[01]\.[0-3]\.[0-3]$/;
+    // River corners carry diagonal shore transition tiles (outer grass
+    // corners and inner water-corner chamfers).
+    const transition = /^terrain\.water\.transition\.(inner\.)?(ne|es|sw|wn)(\.v[12])?$/;
     for (const cell of snapshot.map.cells) {
-      const ok = connected.test(cell.assetId) || macro.test(cell.assetId);
+      const ok = connected.test(cell.assetId) || macro.test(cell.assetId) || transition.test(cell.assetId);
       expect(ok, `unexpected terrain assetId: ${cell.assetId}`).toBe(true);
       if (!buildingFootprint.has(`${cell.coord.x},${cell.coord.y}`)) {
         expect(cell.assetId.startsWith(`terrain.${cell.terrain}.`)).toBe(true);

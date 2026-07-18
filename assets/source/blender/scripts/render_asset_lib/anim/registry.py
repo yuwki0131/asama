@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from .actions import ACTIONS
 from .archer import build_archer
-from .ashigaru import build_spear_ashigaru
+from .ashigaru import build_spear_ashigaru, build_sword_ashigaru
 from .cavalry import build_cavalry
 from .engineer import build_engineer
 from .musketeer import build_musketeer
@@ -16,6 +16,7 @@ from .supply_cart import build_supply_cart
 
 ANIM_MODEL_REGISTRY = {
     "unit-spear-ashigaru-rigged": build_spear_ashigaru,
+    "unit-sword-ashigaru-rigged": build_sword_ashigaru,
     "unit-archer-rigged":         build_archer,
     "unit-musketeer-rigged":      build_musketeer,
     "unit-cavalry-rigged":        build_cavalry,

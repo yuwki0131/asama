@@ -6,6 +6,7 @@ import re
 from .core import build_calibration_tile, build_calibration_cube, build_calibration_grid, build_calibration_chirality
 from .terrain import (
     build_terrain_grass, build_terrain_macro_tile, build_water_shore_tile,
+    build_water_transition_tile, build_water_transition_inner_tile,
     build_terrain_mask, build_terrain_base,
     build_road_mask, build_dry_moat_mask, build_water_moat_mask, build_trench_moat,
     build_earth_bridge, build_wood_bridge,
@@ -17,7 +18,7 @@ from .buildings import (
     build_samurai_residence_graybox, build_town_block_graybox,
     build_yagura_small_graybox, build_farm_paddy,
     build_gate_wood, build_wall_plaster_mask, build_fence_wood_mask,
-    build_wall_ladder, build_tenshu_graybox,
+    build_wall_ladder, build_tenshu_graybox, build_tenshu,
 )
 from .vegetation import (
     build_tree_pine, build_tree_cedar, build_tree_broadleaf,
@@ -41,7 +42,15 @@ MODEL_REGISTRY = {
     "building-town-block-graybox": build_town_block_graybox,
     "building-yagura-small-graybox": build_yagura_small_graybox,
     "building-farm-paddy": build_farm_paddy,
+    "building-farm-paddy-spring": lambda scene: build_farm_paddy(scene, season="spring"),
+    "building-farm-paddy-summer": lambda scene: build_farm_paddy(scene, season="summer"),
+    "building-farm-paddy-autumn": lambda scene: build_farm_paddy(scene, season="autumn"),
+    "building-farm-paddy-winter": lambda scene: build_farm_paddy(scene, season="winter"),
     "building-tenshu-graybox": build_tenshu_graybox,
+    "building-tenshu": build_tenshu,
+    "building-tenshu-var-a": lambda scene: build_tenshu(scene, variant="A"),
+    "building-tenshu-var-b": lambda scene: build_tenshu(scene, variant="B"),
+    "building-tenshu-var-c": lambda scene: build_tenshu(scene, variant="C"),
     "building-earth-bridge": build_earth_bridge,
     "building-earth-bridge-y": lambda scene: build_earth_bridge(scene, axis="y"),
     "building-wood-bridge": build_wood_bridge,
@@ -100,6 +109,16 @@ def resolve_model(name: str):
     if shore_v is not None:
         mask, v = shore_v.group(1), int(shore_v.group(2))
         return lambda scene: build_water_shore_tile(scene, mask, variant=v)
+    inner = re.fullmatch(r"terrain-water-transition-inner-(ne|es|sw|wn)(?:-v([12]))?", name)
+    if inner is not None:
+        corner = inner.group(1)
+        v = 0 if inner.group(2) is None else int(inner.group(2))
+        return lambda scene: build_water_transition_inner_tile(scene, corner, variant=v)
+    transition = re.fullmatch(r"terrain-water-transition-(ne|es|sw|wn)(?:-v([12]))?", name)
+    if transition is not None:
+        corner = transition.group(1)
+        v = 0 if transition.group(2) is None else int(transition.group(2))
+        return lambda scene: build_water_transition_tile(scene, corner, variant=v)
     macro = re.fullmatch(r"terrain-(grass|dirt|water)-macro-v(\d)-(\d)-(\d)", name)
     if macro is not None:
         t, v, tx, ty = macro.group(1), int(macro.group(2)), int(macro.group(3)), int(macro.group(4))

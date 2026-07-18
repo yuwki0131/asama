@@ -53,6 +53,31 @@
       ]
     },
     {
+      "assetId": "unit.sword_ashigaru",
+      "kind": "unit",
+      "model": "unit-sword-ashigaru-rigged",
+      "renderSpec": "painterly",
+      "supersample": 2,
+      "directions": 8,
+      "frameCanvas": {
+        "width": 48,
+        "height": 64,
+        "anchorX": 24,
+        "anchorY": 52.48
+      },
+      "postprocess": {
+        "sharpen": {
+          "sigma": 0.45
+        }
+      },
+      "actions": [
+        { "name": "walk",   "frames": 8, "fps": 10, "loop": true },
+        { "name": "idle",   "frames": 6, "fps": 6,  "loop": true },
+        { "name": "attack", "frames": 8, "fps": 12, "loop": true },
+        { "name": "death",  "frames": 3, "fps": 8,  "loop": false }
+      ]
+    },
+    {
       "assetId": "unit.musketeer",
       "kind": "unit",
       "model": "unit-musketeer-rigged",

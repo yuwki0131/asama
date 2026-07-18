@@ -69,8 +69,8 @@ describe("formation movement", () => {
   it("rejects a move into impassable terrain", () => {
     const world = createInitialWorld();
     const ids = playerUnitIds(world);
-    // (40, 38) is mid-river water in the procedural map (river centre ≈ y=37 at x=40).
-    const rejection = applyCommand(world, moveCommand(ids, { x: 40, y: 38 }));
+    // (40, 37) is mid-river water in the procedural map (river centre ≈ y=36 at x=40).
+    const rejection = applyCommand(world, moveCommand(ids, { x: 40, y: 37 }));
     expect(rejection).toBe("That cell is not passable");
   });
 });
