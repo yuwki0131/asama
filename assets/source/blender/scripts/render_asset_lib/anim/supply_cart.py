@@ -13,7 +13,7 @@ import bpy
 
 from ..core import make_material
 from ..materials import make_noise_material, make_plank_material
-from .rig import make_armature, rig_beam, rig_box, rig_slab
+from .rig import make_armature, rig_beam, rig_box, rig_limb
 
 #: All bones that supply_cart actions keyframe.
 CART_BONES = ["cart_body", "wheel.l", "wheel.r"]
@@ -45,42 +45,42 @@ def build_supply_cart(scene: bpy.types.Scene) -> bpy.types.Object:
         (-0.218, -0.168, 0.12), (0.218, -0.145, 0.36), plank, "cart_body", bevel=0.004)
     rig_box(scene, rig, "RearBoard",
         (-0.218,  0.168, 0.12), (0.218,  0.195, 0.36), plank, "cart_body", bevel=0.004)
-    # Cargo: a lumpy box on top
-    rig_box(scene, rig, "Cargo",
-        (-0.175, -0.130, 0.34), (0.175, 0.155, 0.46), cargo, "cart_body")
-    # Cargo rope across top
+    # Cargo: three rice-straw bales (tawara) — two side by side, one on top.
+    for name, bx, bz in (("BaleL", 0.090, 0.395), ("BaleR", -0.090, 0.395), ("BaleTop", 0.0, 0.498)):
+        rig_limb(scene, rig, name,
+            (bx, -0.125, bz), (bx, 0.150, bz),
+            0.058, 0.058, cargo, "cart_body", segments=10, rings=3, bulge=0.04)
+    # Cargo rope across the top bale
     rig_box(scene, rig, "CargoRopeH",
-        (-0.175, -0.005, 0.42), (0.175, 0.015, 0.48), rope_mat, "cart_body", bevel=None)
+        (-0.155, -0.004, 0.495), (0.155, 0.016, 0.562), rope_mat, "cart_body", bevel=None)
     rig_box(scene, rig, "CargoRopeV",
-        (-0.010, -0.130, 0.42), (0.010, 0.155, 0.48), rope_mat, "cart_body", bevel=None)
+        (-0.010, -0.130, 0.520), (0.010, 0.155, 0.566), rope_mat, "cart_body", bevel=None)
     # Axle (passes through both wheel bones)
-    rig_beam(scene, rig, "Axle",
-        (-0.28, 0.0, 0.20), (0.28, 0.0, 0.20), 0.024, axle_mat, "cart_body")
-    # Tow-pole (shaft extending forward from cart)
-    rig_beam(scene, rig, "TowPole",
-        (-0.040, -0.14, 0.18), (-0.040, -0.42, 0.16), 0.022, plank, "cart_body")
-    rig_beam(scene, rig, "TowPoleR",
-        ( 0.040, -0.14, 0.18), ( 0.040, -0.42, 0.16), 0.022, plank, "cart_body")
+    rig_limb(scene, rig, "Axle",
+        (-0.28, 0.0, 0.20), (0.28, 0.0, 0.20),
+        0.013, 0.013, axle_mat, "cart_body", segments=8, rings=2, bulge=0.0, cap="flat")
+    # Tow-poles (round shafts extending forward from cart)
+    for name, px in (("TowPole", -0.040), ("TowPoleR", 0.040)):
+        rig_limb(scene, rig, name,
+            (px, -0.14, 0.18), (px, -0.42, 0.16),
+            0.012, 0.010, plank, "cart_body", segments=8, rings=2, bulge=0.0, cap="round")
 
     # --- wheels (each parented to its own bone so ry makes it spin) ---------
+    # Proper round disc wheel (14-segment cylinder along the axle) with
+    # crossing spokes slightly proud of both faces so the spin reads.
     for side, sx in (("L", 0.26), ("R", -0.26)):
         bone = f"wheel.{side.lower()}"
-        # Outer face plate of the wheel
-        rig_box(scene, rig, f"WheelRim.{side}",
-            (sx - 0.038, -0.178, 0.02), (sx + 0.038, 0.178, 0.38), plank, bone, bevel=0.006)
-        # Hub boss
-        rig_box(scene, rig, f"WheelHub.{side}",
-            (sx - 0.048, -0.040, 0.17), (sx + 0.048, 0.040, 0.23), iron, bone)
-        # Horizontal spoke
+        rig_limb(scene, rig, f"WheelDisc.{side}",
+            (sx - 0.024, 0.0, 0.20), (sx + 0.024, 0.0, 0.20),
+            0.172, 0.172, plank, bone, segments=14, rings=2, bulge=0.0, cap="flat")
+        # Hub boss cylinder
+        rig_limb(scene, rig, f"WheelHub.{side}",
+            (sx - 0.036, 0.0, 0.20), (sx + 0.036, 0.0, 0.20),
+            0.042, 0.042, iron, bone, segments=10, rings=2, bulge=0.0, cap="flat")
+        # Crossing spokes, proud of the disc faces so rotation is visible
         rig_beam(scene, rig, f"SpokeH.{side}",
-            (sx - 0.030, -0.168, 0.20), (sx + 0.030, 0.168, 0.20), 0.028, axle_mat, bone)
-        # Vertical spoke
+            (sx - 0.032, -0.170, 0.20), (sx + 0.032, 0.170, 0.20), 0.030, axle_mat, bone)
         rig_beam(scene, rig, f"SpokeV.{side}",
-            (sx - 0.030, 0.0, 0.04), (sx + 0.030, 0.0, 0.36), 0.028, axle_mat, bone)
-        # Iron tire (thin box around rim outline)
-        rig_box(scene, rig, f"Tire.{side}",
-            (sx - 0.028, -0.188, 0.00), (sx + 0.028, 0.188, 0.04), iron, bone, bevel=None)
-        rig_box(scene, rig, f"TireTop.{side}",
-            (sx - 0.028, -0.188, 0.36), (sx + 0.028, 0.188, 0.40), iron, bone, bevel=None)
+            (sx - 0.032, 0.0, 0.03), (sx + 0.032, 0.0, 0.37), 0.030, axle_mat, bone)
 
     return rig
