@@ -5238,6 +5238,330 @@
           "sigma": 0.3
         }
       }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-ne.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-ne",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v1",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-ne-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-ne-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v2",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-ne-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-ne-v2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-es.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-es",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v1",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-es-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-es-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v2",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-es-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-es-v2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-sw.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-sw",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v1",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-sw-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-sw-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v2",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-sw-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-sw-v2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-wn.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-wn",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v1",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-wn-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-wn-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v2",
+      "kind": "terrain",
+      "output": "terrain-water-transition-inner-wn-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-water-transition-inner-wn-v2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 40,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
     }
   ]
 }
