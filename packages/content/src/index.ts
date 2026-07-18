@@ -44,15 +44,6 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.wall.plaster",
     gateState: null
   },
-  gate: {
-    type: "gate",
-    category: "castle",
-    maxHp: 220,
-    footprint: { width: 1, height: 1 },
-    passable: false,
-    assetId: "building.gate.wood.closed",
-    gateState: "closed"
-  },
   gate_wide_2: {
     type: "gate_wide_2",
     category: "castle",
@@ -71,13 +62,15 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.gate.wood.closed.width3",
     gateState: "closed"
   },
-  gate_ne_sw: {
-    type: "gate_ne_sw",
+  // 狭門: 3マス占有だが通行できるのは中央1マスのみ。両袖は厚い袖壁で、
+  // 1マス幅の通用口を表す (旧1マス門 gate / gate_ne_sw の後継)。
+  gate_narrow_3: {
+    type: "gate_narrow_3",
     category: "castle",
-    maxHp: 220,
-    footprint: { width: 1, height: 1 },
+    maxHp: 380,
+    footprint: { width: 3, height: 1 },
     passable: false,
-    assetId: "building.gate.wood.closed.ne_sw",
+    assetId: "building.gate.wood.closed.narrow3",
     gateState: "closed"
   },
   gate_wide_2_ne_sw: {
@@ -96,6 +89,15 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     footprint: { width: 1, height: 3 },
     passable: false,
     assetId: "building.gate.wood.closed.ne_sw.width3",
+    gateState: "closed"
+  },
+  gate_narrow_3_ne_sw: {
+    type: "gate_narrow_3_ne_sw",
+    category: "castle",
+    maxHp: 380,
+    footprint: { width: 1, height: 3 },
+    passable: false,
+    assetId: "building.gate.wood.closed.ne_sw.narrow3",
     gateState: "closed"
   },
   dry_moat: {
@@ -1024,9 +1026,10 @@ export const linearFortressScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 42, y: 87 } },
     { type: "farm", position: { x: 48, y: 89 } },
 
-    // Enemy staging areas (east and south)
-    { type: "gate", position: { x: 100, y: 62 }, owner: "enemy" },
-    { type: "gate", position: { x: 63, y: 100 }, owner: "enemy" },
+    // Enemy staging areas (east and south) — 狭門 (中央1マス開口) centered on
+    // the old 1-cell gate positions.
+    { type: "gate_narrow_3_ne_sw", position: { x: 100, y: 61 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 62, y: 100 }, owner: "enemy" },
   ],
   initialUnits: [
     // Player garrison in honmaru
@@ -1177,8 +1180,8 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 52, y: 70 } },
 
     // === Bridge approach gates (west shore — choke the exits) ===
-    { type: "gate", position: { x: 56, y: 50 } },
-    { type: "gate", position: { x: 56, y: 66 } },
+    { type: "gate_narrow_3_ne_sw", position: { x: 56, y: 49 } },
+    { type: "gate_narrow_3_ne_sw", position: { x: 56, y: 65 } },
 
     // Roads connecting castle gate to bridge approach gates
     { type: "road", position: { x: 54, y: 57 } },
@@ -1214,7 +1217,7 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
     { type: "road", position: { x: 62, y: 66 } },
 
     // Enemy staging area
-    { type: "gate", position: { x: 80, y: 58 }, owner: "enemy" },
+    { type: "gate_narrow_3_ne_sw", position: { x: 80, y: 57 }, owner: "enemy" },
   ],
   initialUnits: [
     // Player garrison at honmaru

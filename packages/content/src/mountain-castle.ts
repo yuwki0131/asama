@@ -57,8 +57,8 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     // === 本丸 (L3, x51..62 y57..64) ===
     { type: "tenshu", position: { x: 51, y: 57 } },
     { type: "honmaru", position: { x: 60, y: 60 } },
-    // 虎口門 — 2→3 坂の出口を塞ぐ。破らない限り本丸に入れない。
-    { type: "gate", position: { x: 60, y: 64 } },
+    // 虎口門 — 2→3 坂の出口を塞ぐ狭門 (中央 (60,64) のみ通行可)。破らない限り本丸に入れない。
+    { type: "gate_narrow_3", position: { x: 59, y: 64 } },
     // 本丸の兵糧蔵 — マーカー隣接なので包囲されても補給が切れない (籠城の蓄え)。
     { type: "storehouse", position: { x: 60, y: 57 } },
 
@@ -73,8 +73,8 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     // === 三の丸 (L1 帯曲輪) ===
     // 大手門 — 0→1 大手坂の上端を塞ぐ幅2の門。
     { type: "gate_wide_2", position: { x: 56, y: 85 } },
-    // 搦手門 — 0→1 搦手坂の上端を塞ぐ門 (東西向き)。
-    { type: "gate_ne_sw", position: { x: 73, y: 79 } },
+    // 搦手門 — 0→1 搦手坂の上端を塞ぐ狭門 (東西向き、中央 (73,79) のみ通行可)。
+    { type: "gate_narrow_3_ne_sw", position: { x: 73, y: 78 } },
     // 大手坂上の物見櫓と搦手側の物見櫓。
     { type: "yagura", position: { x: 54, y: 82 } },
     { type: "yagura", position: { x: 71, y: 81 } },
@@ -142,14 +142,15 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     { type: "fence", position: { x: 73, y: 107 } },
 
     // 敵の集結地 (南の街道口)。
-    { type: "gate", position: { x: 56, y: 116 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 55, y: 116 }, owner: "enemy" },
   ],
   initialUnits: [
     // 本丸 (L3) — 詰めの守備と南縁の高所射撃 (段3から段2・段1を制圧)。
     // 刀足軽は本丸マーカーセル上に置く (在城中は敵の本丸占拠が成立しない)。
     { type: "sword_ashigaru", position: { x: 60, y: 60 }, owner: "player" },
-    { type: "archer", position: { x: 59, y: 64 }, owner: "player" },
-    { type: "archer", position: { x: 61, y: 64 }, owner: "player" },
+    // 虎口狭門 (59..61,64) の両脇に射手を展開。
+    { type: "archer", position: { x: 57, y: 64 }, owner: "player" },
+    { type: "archer", position: { x: 62, y: 64 }, owner: "player" },
     { type: "archer", position: { x: 58, y: 64 }, owner: "player" },
     // 虎口門の後詰め。(60,63) は本丸への唯一の補給路セルなので空けておく。
     { type: "spear_ashigaru", position: { x: 59, y: 63 }, owner: "player" },

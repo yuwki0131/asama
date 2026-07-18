@@ -100,10 +100,6 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.wall.plaster";
   }
 
-  if (building.type === "gate") {
-    return "building.gate.wood.closed";
-  }
-
   if (building.type === "gate_wide_2") {
     return "building.gate.wood.closed.width2";
   }
@@ -112,8 +108,8 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.gate.wood.closed.width3";
   }
 
-  if (building.type === "gate_ne_sw") {
-    return "building.gate.wood.closed";
+  if (building.type === "gate_narrow_3") {
+    return "building.gate.wood.closed.narrow3";
   }
 
   if (building.type === "gate_wide_2_ne_sw") {
@@ -122,6 +118,10 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
 
   if (building.type === "gate_wide_3_ne_sw") {
     return "building.gate.wood.closed.width3";
+  }
+
+  if (building.type === "gate_narrow_3_ne_sw") {
+    return "building.gate.wood.closed.narrow3";
   }
 
   if (building.type === "dry_moat") {
@@ -197,17 +197,17 @@ function isBridgeBuildTool(buildTool: BuildingType): boolean {
 
 function isNeSwGateType(buildingType: BuildingType): boolean {
   return (
-    buildingType === "gate_ne_sw" ||
     buildingType === "gate_wide_2_ne_sw" ||
-    buildingType === "gate_wide_3_ne_sw"
+    buildingType === "gate_wide_3_ne_sw" ||
+    buildingType === "gate_narrow_3_ne_sw"
   );
 }
 
 function isGateType(buildingType: BuildingType): boolean {
   return (
-    buildingType === "gate" ||
     buildingType === "gate_wide_2" ||
     buildingType === "gate_wide_3" ||
+    buildingType === "gate_narrow_3" ||
     isNeSwGateType(buildingType)
   );
 }

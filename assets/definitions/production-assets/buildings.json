@@ -537,33 +537,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.closed",
-      "kind": "building",
-      "output": "building-gate-wood-closed.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.closed.width2",
       "kind": "building",
       "output": "building-gate-wood-closed-width2.png",
@@ -597,6 +570,33 @@
       "source": {
         "type": "blender",
         "model": "gate-wood-closed-nw_se-w3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.narrow3",
+      "kind": "building",
+      "output": "building-gate-wood-closed-narrow3.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0000",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -2832,114 +2832,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0100",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0100.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0100",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0001",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0001.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0001",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0101",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0101.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0101",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.closed.nw_se.width2.connected.0000",
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width2-connected-0000.png",
@@ -3145,114 +3037,6 @@
         "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.1000",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-1000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-1000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.0010",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-0010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-0010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.1010",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-1010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-1010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
       },
       "category": "building",
       "postprocess": {
@@ -3480,114 +3264,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0100",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0100.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0100",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0001",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0001.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0001",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0101",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0101.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0101",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.open.nw_se.width2.connected.0000",
       "kind": "building",
       "output": "building-gate-wood-open-nw-se-width2-connected-0000.png",
@@ -3804,114 +3480,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.1000",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-1000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-1000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.0010",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-0010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-0010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.1010",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-1010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-1010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.open.ne_sw.width2.connected.0000",
       "kind": "building",
       "output": "building-gate-wood-open-ne-sw-width2-connected-0000.png",
@@ -4107,6 +3675,438 @@
       "source": {
         "type": "blender",
         "model": "gate-wood-open-ne_sw-w3-1010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0100.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0100",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0001.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0001",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0101.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0101",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-1000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-1000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-0010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-0010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-1010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-1010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0100.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0100",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0001.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0001",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0101.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0101",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-1000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-1000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-0010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-0010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-1010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-1010",
         "renderSpec": "painterly",
         "supersample": 2
       },

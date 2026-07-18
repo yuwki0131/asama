@@ -267,28 +267,40 @@ describe("pathfinding", () => {
 });
 
 describe("gate passability", () => {
-  function placeGate(world: WorldState, position: CellCoord): void {
+  function placeNarrowGate(world: WorldState, position: CellCoord): void {
     const error = applyCommand(
       world,
       command({
         type: "placeBuilding",
-        buildingType: "gate",
+        buildingType: "gate_narrow_3",
         position
       })
     );
     expect(error).toBeNull();
   }
 
-  it("player unit cannot path through a closed gate", () => {
+  function placeNarrowGateNeSw(world: WorldState, position: CellCoord): void {
+    const error = applyCommand(
+      world,
+      command({
+        type: "placeBuilding",
+        buildingType: "gate_narrow_3_ne_sw",
+        position
+      })
+    );
+    expect(error).toBeNull();
+  }
+
+  it("player unit cannot path through a closed narrow gate", () => {
     const world = createInitialWorld();
     normalizeMap(world);
     resetBuildings(world);
     world.units = [unit("u1", "player", "spear_ashigaru", { x: 10, y: 12 })];
 
-    // Enclose cell {13,12}: walls on all sides, gate as the only west entry.
-    placeWall(world, { x: 12, y: 11 });
-    placeGate(world, { x: 12, y: 12 });
-    placeWall(world, { x: 12, y: 13 });
+    // Enclose cell {13,12}: walls on three sides, gate_narrow_3_ne_sw on the
+    // west face (footprint (12,11)(12,12)(12,13); center (12,12) is the only
+    // possible entry).
+    placeNarrowGateNeSw(world, { x: 12, y: 11 });
     placeWall(world, { x: 13, y: 11 });
     placeWall(world, { x: 13, y: 13 });
     placeWall(world, { x: 14, y: 11 });
@@ -298,7 +310,7 @@ describe("gate passability", () => {
     // Close the gate (starts open, toggle closes it)
     applyCommand(world, command({ type: "toggleGate", position: { x: 12, y: 12 } }));
 
-    const gate = world.buildings.find((b) => b.type === "gate");
+    const gate = world.buildings.find((b) => b.type === "gate_narrow_3_ne_sw");
     expect(gate?.gateState).toBe("closed");
     expect(gate?.passable).toBe(false);
 
@@ -314,15 +326,15 @@ describe("gate passability", () => {
     expect(error).toBe("No path to that cell");
   });
 
-  it("closed gate is impassable to all perspectives", () => {
+  it("closed narrow gate is impassable on all three cells", () => {
     const world = createInitialWorld();
     normalizeMap(world);
     resetBuildings(world);
     world.units = [];
 
-    placeGate(world, { x: 12, y: 12 });
+    placeNarrowGate(world, { x: 12, y: 12 });
 
-    const gate = world.buildings.find((b) => b.type === "gate");
+    const gate = world.buildings.find((b) => b.type === "gate_narrow_3");
     // Close the gate
     applyCommand(world, command({ type: "toggleGate", position: { x: 12, y: 12 } }));
     expect(gate?.gateState).toBe("closed");
@@ -330,22 +342,67 @@ describe("gate passability", () => {
 
     // Closed gate is impassable regardless of perspective
     expect(isPassable(world, { x: 12, y: 12 })).toBe(false);
-    expect(isPassable(world, { x: 12, y: 12 }, "player")).toBe(false);
+    expect(isPassable(world, { x: 13, y: 12 })).toBe(false);
+    expect(isPassable(world, { x: 14, y: 12 })).toBe(false);
+    expect(isPassable(world, { x: 13, y: 12 }, "player")).toBe(false);
   });
 
-  it("open gate is passable to all perspectives", () => {
+  it("open narrow gate: only the center cell is passable, flanking wall cells never are", () => {
     const world = createInitialWorld();
     normalizeMap(world);
     resetBuildings(world);
     world.units = [];
 
-    placeGate(world, { x: 12, y: 12 });
+    placeNarrowGate(world, { x: 12, y: 12 });
 
-    const gate = world.buildings.find((b) => b.type === "gate");
+    const gate = world.buildings.find((b) => b.type === "gate_narrow_3");
     expect(gate?.gateState).toBe("open");
 
-    expect(isPassable(world, { x: 12, y: 12 })).toBe(true);
-    expect(isPassable(world, { x: 12, y: 12 }, "player")).toBe(true);
+    // Left flanking wall — impassable even when open
+    expect(isPassable(world, { x: 12, y: 12 })).toBe(false);
+    // Center — the 1-cell opening
+    expect(isPassable(world, { x: 13, y: 12 })).toBe(true);
+    expect(isPassable(world, { x: 13, y: 12 }, "player")).toBe(true);
+    // Right flanking wall — impassable even when open
+    expect(isPassable(world, { x: 14, y: 12 })).toBe(false);
+  });
+
+  it("gate_narrow_3_ne_sw open: only the center cell is passable", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    // Place at y=30; footprint covers y=30, y=31, y=32
+    placeNarrowGateNeSw(world, { x: 30, y: 30 });
+
+    const gate = world.buildings.find((b) => b.type === "gate_narrow_3_ne_sw");
+    expect(gate?.gateState).toBe("open");
+
+    expect(isPassable(world, { x: 30, y: 30 })).toBe(false);
+    expect(isPassable(world, { x: 30, y: 31 })).toBe(true);
+    expect(isPassable(world, { x: 30, y: 32 })).toBe(false);
+  });
+
+  it("narrow gate: pathfinding routes through the center cell only", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    // Wall row at y=30 with gate_narrow_3 at x=20 (footprint x=20,21,22)
+    placeWall(world, { x: 18, y: 30 });
+    placeWall(world, { x: 19, y: 30 });
+    placeNarrowGate(world, { x: 20, y: 30 });
+    placeWall(world, { x: 23, y: 30 });
+    placeWall(world, { x: 24, y: 30 });
+
+    // Path from y=28 to y=32 must cross only through x=21 (center)
+    const path = findPath(world, { x: 21, y: 28 }, { x: 21, y: 32 });
+    expect(path.length).toBeGreaterThan(0);
+    expect(path.some((c) => c.x === 21 && c.y === 30)).toBe(true);
+    expect(path.some((c) => c.x === 20 && c.y === 30)).toBe(false);
+    expect(path.some((c) => c.x === 22 && c.y === 30)).toBe(false);
   });
 
   function placeWide3Gate(world: WorldState, position: CellCoord): void {

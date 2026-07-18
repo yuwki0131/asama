@@ -419,9 +419,12 @@ export function townBlockVariantAssetId(position: CellCoord): string {
 
 function connectedGateAssetId(world: WorldState, gate: BuildingState): string {
   const orientation = isNeSwGate(gate.type) ? "ne_sw" : "nw_se";
-  const width = gate.footprint.length;
   const state = gate.gateState ?? "closed";
-  return `building.gate.wood.${state}.${orientation}.width${width}.connected.${gateConnectionMask(world, gate)}`;
+  const sizeSegment =
+    gate.type === "gate_narrow_3" || gate.type === "gate_narrow_3_ne_sw"
+      ? "narrow3"
+      : `width${gate.footprint.length}`;
+  return `building.gate.wood.${state}.${orientation}.${sizeSegment}.connected.${gateConnectionMask(world, gate)}`;
 }
 
 function gateConnectionMask(world: WorldState, gate: BuildingState): string {

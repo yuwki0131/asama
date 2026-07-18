@@ -5,8 +5,8 @@ const MAP_WIDTH = 128;
 const MAP_HEIGHT = 128;
 
 const VALID_BUILDING_TYPES = new Set([
-  "fence", "wall", "gate", "gate_wide_2", "gate_wide_3",
-  "gate_ne_sw", "gate_wide_2_ne_sw", "gate_wide_3_ne_sw",
+  "fence", "wall", "gate_wide_2", "gate_wide_3", "gate_narrow_3",
+  "gate_wide_2_ne_sw", "gate_wide_3_ne_sw", "gate_narrow_3_ne_sw",
   "dry_moat", "water_moat", "storehouse", "market", "barracks",
   "samurai_residence", "town_block", "farm", "road",
   "earth_bridge", "wood_bridge", "honmaru", "tenshu", "yagura",

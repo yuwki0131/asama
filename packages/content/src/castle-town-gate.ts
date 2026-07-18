@@ -59,7 +59,7 @@ export const castleTownGateScenario: ContentScenarioDefinition = {
     { type: "yagura", position: { x: 52, y: 97 } },
 
     // 敵の集結地 (南の街道口)
-    { type: "gate", position: { x: 50, y: 110 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 49, y: 110 }, owner: "enemy" },
   ],
   initialUnits: [
     // 本城 — 刀は本丸マーカー上。城門裏に槍と弓。

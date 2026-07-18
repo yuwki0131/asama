@@ -311,11 +311,21 @@ def gate_box(axis: str, along0: float, along1: float, across_half: float, z0: fl
     return (min(x0, x1), min(y0, y1), z0), (max(x0, x1), max(y0, y1), z1)
 
 
-def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, doors_closed: bool = True) -> None:
+def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, doors_closed: bool = True, opening: int | None = None) -> None:
+    """Wooden gate spanning `width` cells. When `opening` is given (narrow
+    gate), only that many central cells form the doorway and the remaining
+    cells on each side are built as thick flanking wall segments — a 3-cell
+    gate that only lets units through its center cell."""
     mats = building_material_set()
     wood, door, plaster, stone = mats["dark_wood"], mats["wood"], mats["plaster"], mats["stone"]
 
     half = float(width) / 2.0
+    # Doorway half-extent along the gate axis. Full-width gates open across
+    # the entire footprint; narrow gates only across the central `opening`.
+    ohalf = half if opening is None else float(opening) / 2.0
+    ridge_axis = "x" if axis == "nw_se" else "y"
+    roof_mat = mats["roof"] if ridge_axis == "x" else mats["roof_y"]
+
     # Gate ground is trodden earth matching the terrain dirt tiles — no
     # masonry sill (user feedback: stone tiling under gates looks wrong).
     ground = make_gate_ground_material(axis)
@@ -324,23 +334,42 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, do
     else:
         add_box(scene, "Sill", *map_box((-0.5, -half, 0.0), (0.5, half, 0.02)), ground)
 
-    for label, along in (("Near", half - 0.22), ("Far", -half + 0.22)):
+    if opening is not None:
+        # Flanking wall segments — deliberately beefier than regular walls so
+        # the gate reads as "mostly wall, 1-cell doorway".
+        flank_base_half = WALL_BASE_THICKNESS / 2.0 + 0.06
+        flank_body_half = WALL_BODY_THICKNESS / 2.0 + 0.05
+        flank_cap_half = WALL_COPING_THICKNESS / 2.0 + 0.05
+        for label, along0, along1 in (("E", ohalf, half), ("W", -half, -ohalf)):
+            low, high = gate_box(axis, along0, along1, flank_base_half, 0.0, WALL_BASE_HEIGHT)
+            add_box(scene, f"Flank{label}Base", *map_box(low, high), stone)
+            low, high = gate_box(axis, along0, along1, flank_body_half, WALL_BASE_HEIGHT, WALL_BODY_TOP)
+            add_box(scene, f"Flank{label}Body", *map_box(low, high), plaster)
+            low, high = gate_box(axis, along0, along1, flank_cap_half, 0.0, 0.0)
+            wlow, whigh = map_box(low, high)
+            add_gable_roof(scene, f"Flank{label}Coping", (wlow[0], wlow[1]), (whigh[0], whigh[1]), WALL_BODY_TOP, WALL_COPING_TOP, ridge_axis, roof_mat)
+
+    # Narrow gates hug the pillars to the doorway edges so the 1-cell opening
+    # stays readable; full-width gates keep the original inset.
+    pillar_inset = 0.22 if opening is None else 0.10
+    for label, along in (("Near", ohalf - pillar_inset), ("Far", -ohalf + pillar_inset)):
         low, high = gate_box(axis, along - GATE_PILLAR_SIZE / 2.0, along + GATE_PILLAR_SIZE / 2.0, GATE_PILLAR_SIZE / 2.0, 0.0, GATE_PILLAR_HEIGHT)
         add_box(scene, f"Pillar{label}", *map_box(low, high), wood)
 
+    door_margin = 0.38 if opening is None else 0.06
     if doors_closed:
-        low, high = gate_box(axis, -half + 0.38, half - 0.38, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
+        low, high = gate_box(axis, -ohalf + door_margin, ohalf - door_margin, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
         add_box(scene, "Doors", *map_box(low, high), door)
     else:
+        leaf_offset = 0.42 if opening is None else 0.14
         for side in (-1.0, 1.0):
-            low, high = gate_box(axis, side * (half - 0.42), side * (half - 0.38), 0.36, 0.0, GATE_DOOR_HEIGHT)
+            low, high = gate_box(axis, side * (ohalf - leaf_offset), side * (ohalf - leaf_offset + 0.04), 0.36, 0.0, GATE_DOOR_HEIGHT)
             add_box(scene, f"OpenLeaf{side}", *map_box(low, high), door)
-    low, high = gate_box(axis, -half + 0.06, half - 0.06, 0.17, GATE_BEAM_BOTTOM, GATE_BEAM_TOP)
+    low, high = gate_box(axis, -ohalf - 0.06, ohalf + 0.06, 0.17, GATE_BEAM_BOTTOM, GATE_BEAM_TOP)
     add_box(scene, "Beam", *map_box(low, high), wood)
 
-    roof_low, roof_high = gate_box(axis, -half - 0.12, half + 0.12, 0.42, 0.0, 0.0)
-    ridge_axis = "x" if axis == "nw_se" else "y"
-    roof_mat = mats["roof"] if ridge_axis == "x" else mats["roof_y"]
+    roof_pad = 0.12 if opening is None else 0.24
+    roof_low, roof_high = gate_box(axis, -ohalf - roof_pad, ohalf + roof_pad, 0.42, 0.0, 0.0)
     add_kawara_roof(
         scene,
         "GateRoof",

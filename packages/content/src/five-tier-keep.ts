@@ -45,10 +45,12 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
     { type: "tenshu", position: { x: 52, y: 54 } },
     { type: "honmaru", position: { x: 61, y: 56 } },
     { type: "storehouse", position: { x: 60, y: 59 } },
-    { type: "gate", position: { x: 58, y: 62 } },
+    // 虎口狭門 — 4→5 坂の坂下 (L4 側) を塞ぐ。中央 (58,64) のみ通行可。
+    // (坂上の L5 南縁は幅1の回廊のため、3マス門は坂下に置く)
+    { type: "gate_narrow_3", position: { x: 57, y: 64 } },
 
-    // === L4 — 中段の門と隅櫓 ===
-    { type: "gate", position: { x: 53, y: 66 } },
+    // === L4 — 中段の狭門と隅櫓 ===
+    { type: "gate_narrow_3", position: { x: 52, y: 66 } },
     { type: "yagura", position: { x: 60, y: 64 } },
     { type: "yagura", position: { x: 54, y: 64 } },
 
@@ -74,7 +76,7 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 65, y: 93 } },
 
     // 敵の集結地 (南の街道口)
-    { type: "gate", position: { x: 57, y: 105 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 56, y: 105 }, owner: "enemy" },
   ],
   initialUnits: [
     // L5 — 本丸詰め。刀は本丸マーカー上。
@@ -82,9 +84,9 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
     { type: "archer", position: { x: 55, y: 61 }, owner: "player" },
     { type: "archer", position: { x: 56, y: 61 }, owner: "player" },
     { type: "archer", position: { x: 59, y: 61 }, owner: "player" },
-    // L4 — 虎口下の槍衾。(58,63..66) の補給路セルは空けておく。
-    { type: "spear_ashigaru", position: { x: 57, y: 64 }, owner: "player" },
-    { type: "archer", position: { x: 59, y: 64 }, owner: "player" },
+    // L4 — 虎口狭門 (57..59,64) の後詰め。(58,63..66) の補給路セルは空けておく。
+    { type: "spear_ashigaru", position: { x: 57, y: 65 }, owner: "player" },
+    { type: "archer", position: { x: 59, y: 65 }, owner: "player" },
     // L3 — 3→4 坂の側衛と南縁の射撃線。(53,66..68) は補給路のため空ける。
     { type: "spear_ashigaru", position: { x: 52, y: 68 }, owner: "player" },
     { type: "archer", position: { x: 56, y: 71 }, owner: "player" },

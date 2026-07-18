@@ -217,8 +217,8 @@ export const linearFortressScript: PlaythroughScript = {
  * 5波を凌ぎ、holdTicks(tick 30000)まで保持して time_held 勝利。
  *
  * 座標参照:
- *   - 北橋アプローチ門  gate @ (56, 50)
- *   - 南橋アプローチ門  gate @ (56, 66)
+ *   - 北橋アプローチ門  gate_narrow_3_ne_sw @ (56, 49)
+ *   - 南橋アプローチ門  gate_narrow_3_ne_sw @ (56, 65)
  *   - 本丸              honmaru @ (42, 57)
  *   - 敵荷車            wave2: (94,50)  wave3: (94,58)  wave4: (95,50)  wave5: (95,48),(95,66)
  */
@@ -282,7 +282,7 @@ export const riversideDefenseScript: PlaythroughScript = {
  * 座標参照:
  *   - 本丸          honmaru @ (60, 60)  L3
  *   - 大手門 (L1)   gate_wide_2 @ (56, 85)
- *   - 搦手門 (L1)   gate_ne_sw @ (73, 79)
+ *   - 搦手門 (L1)   gate_narrow_3_ne_sw @ (73, 78)
  *   - 城下守備       spear(55,106) archer(57,106)
  *   - 各波荷車       wave1: (56,119)  wave2: (56,120)  wave3: (56,121)  wave4: (55,120),(76,110)
  */
