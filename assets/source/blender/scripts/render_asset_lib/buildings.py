@@ -1119,15 +1119,40 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT) 
                 _tenshu_shachi(scene, f"Shachi{sx:+.0f}", cx + sx * (half + 0.30), cy, ridge_z + 0.10, gold)
 
 
-def build_farm_paddy(scene: bpy.types.Scene) -> None:
-    """Rice paddy filling a 4x4 surface footprint. Canvas 256x128, anchor 128,64."""
+def build_farm_paddy(scene: bpy.types.Scene, season: str = "spring") -> None:
+    """Rice paddy filling a 4x4 surface footprint. Canvas 256x128, anchor 128,64.
+
+    Seasonal variants share the exact same base/aze-ridge structure and plant
+    grid positions so the silhouette never jumps when the season switches:
+    - spring: flooded, pale reflective water + freshly planted small seedlings
+    - summer: lush tall green rice rows, water barely visible (dark, shaded)
+    - autumn: golden ripe rice with drooping ear tips and subtle color patches
+    - winter: harvested; dry bare soil with short pale stubble rows
+    """
+    import math as _math
+
     ridge = make_textured_material("AzeDirt", (0.185, 0.150, 0.105), (0.265, 0.220, 0.160), scale=9.0)
-    water = make_noise_material("PaddyWater", (0.055, 0.105, 0.115), (0.085, 0.140, 0.150), scale=5.0)
-    seedling = make_material("PaddySeedling", (0.140, 0.205, 0.080, 1.0))
-    seedling_dark = make_material("PaddySeedlingD", (0.100, 0.160, 0.062, 1.0))
 
     add_box(scene, "FieldBase", *map_box((-2.0, -2.0, 0.0), (2.0, 2.0, 0.02)), ridge)
-    add_box(scene, "Water", *map_box((-1.86, -1.86, 0.021), (1.86, 1.86, 0.045)), water)
+
+    # Paddy inner surface: what fills the basin between the aze ridges.
+    if season == "spring":
+        # Pale blue-gray water with a hint of sky reflection.
+        surface = make_noise_material("PaddyWater", (0.150, 0.225, 0.250), (0.280, 0.370, 0.400), scale=5.0)
+        add_box(scene, "Water", *map_box((-1.86, -1.86, 0.021), (1.86, 1.86, 0.045)), surface)
+    elif season == "summer":
+        # Dark green-tinted water, mostly hidden under the grown rows.
+        surface = make_noise_material("PaddyWaterSummer", (0.040, 0.080, 0.062), (0.062, 0.110, 0.082), scale=5.0)
+        add_box(scene, "Water", *map_box((-1.86, -1.86, 0.021), (1.86, 1.86, 0.040)), surface)
+    elif season == "autumn":
+        # Drained field: damp dark soil under the ripe rows.
+        surface = make_textured_material("PaddyMud", (0.110, 0.088, 0.058), (0.180, 0.148, 0.100), scale=8.0)
+        add_box(scene, "Mud", *map_box((-1.86, -1.86, 0.021), (1.86, 1.86, 0.040)), surface)
+    else:
+        # Winter: dry cracked pale earth, one tone for the whole basin.
+        surface = make_textured_material("PaddyDrySoil", (0.165, 0.135, 0.095), (0.270, 0.228, 0.168), scale=7.0)
+        add_box(scene, "DrySoil", *map_box((-1.86, -1.86, 0.021), (1.86, 1.86, 0.042)), surface)
+
     half_ridge = 0.07
     for index, (name, low, high) in enumerate((
         ("AzeN", (-2.0, -2.0), (2.0, -2.0 + 2 * half_ridge)),
@@ -1140,7 +1165,24 @@ def build_farm_paddy(scene: bpy.types.Scene) -> None:
         top = 0.078 - 0.0028 * index
         add_box(scene, name, *map_box((low[0], low[1], 0.0), (high[0], high[1], top)), ridge)
 
-    import math as _math
+    # Plant materials per season (two-tone alternation for painterly ムラ).
+    if season == "spring":
+        plant_a = make_material("PaddySeedling", (0.210, 0.330, 0.115, 1.0))
+        plant_b = make_material("PaddySeedlingD", (0.150, 0.250, 0.085, 1.0))
+    elif season == "summer":
+        plant_a = make_material("PaddyRiceGreen", (0.110, 0.260, 0.068, 1.0))
+        plant_b = make_material("PaddyRiceGreenD", (0.075, 0.190, 0.048, 1.0))
+        tuft = make_material("PaddyRiceGreenL", (0.170, 0.330, 0.095, 1.0))
+    elif season == "autumn":
+        plant_a = make_material("PaddyRiceGold", (0.470, 0.320, 0.078, 1.0))
+        plant_b = make_material("PaddyRiceGoldD", (0.360, 0.225, 0.055, 1.0))
+        ear = make_material("PaddyRiceEar", (0.560, 0.415, 0.115, 1.0))
+    else:
+        plant_a = make_material("PaddyStubble", (0.310, 0.258, 0.155, 1.0))
+        plant_b = make_material("PaddyStubbleD", (0.245, 0.198, 0.118, 1.0))
+
+    # Common grid: 4 quadrants x 5 rows x 6 columns; per-season only the
+    # clump size / height / material changes so positions stay identical.
     for qx, qy in ((-1.0, -1.0), (1.0, -1.0), (-1.0, 1.0), (1.0, 1.0)):
         for row in range(5):
             ry = qy - 0.75 + row * 0.32
@@ -1148,11 +1190,65 @@ def build_farm_paddy(scene: bpy.types.Scene) -> None:
                 rx = qx - 0.72 + col * 0.29 + (0.07 if row % 2 else 0.0)
                 if abs(rx - qx) > 0.8 or abs(ry - qy) > 0.8:
                     continue
-                mat = seedling if (row + col) % 3 else seedling_dark
+                mat = plant_a if (row + col) % 3 else plant_b
                 jitter = 0.03 * _math.sin(rx * 12.7 + ry * 7.3)
-                add_box(
-                    scene,
-                    f"Rice{qx}{qy}{row}{col}",
-                    *map_box((rx - 0.028 + jitter, ry - 0.028, 0.045), (rx + 0.028 + jitter, ry + 0.028, 0.13 + 0.02 * ((row + col) % 2))),
-                    mat,
-                )
+                name = f"Rice{qx}{qy}{row}{col}"
+                if season == "spring":
+                    add_box(
+                        scene,
+                        name,
+                        *map_box((rx - 0.028 + jitter, ry - 0.028, 0.045), (rx + 0.028 + jitter, ry + 0.028, 0.13 + 0.02 * ((row + col) % 2))),
+                        mat,
+                    )
+                elif season == "summer":
+                    # Wide lush clumps almost closing over the water, with a
+                    # smaller light-green tuft on top to break the box look.
+                    half = 0.080 + 0.012 * ((row * 7 + col * 3) % 3)
+                    top = 0.26 + 0.030 * ((row + col) % 3)
+                    add_box(
+                        scene,
+                        name,
+                        *map_box((rx - half + jitter, ry - half, 0.030), (rx + half + jitter, ry + half, top)),
+                        mat,
+                    )
+                    add_box(
+                        scene,
+                        f"{name}Tuft",
+                        *map_box(
+                            (rx - half * 0.55 + jitter, ry - half * 0.55, top - 0.01),
+                            (rx + half * 0.55 + jitter, ry + half * 0.55, top + 0.055),
+                        ),
+                        tuft,
+                    )
+                elif season == "autumn":
+                    # Ripe stalks slightly shorter than summer; a small offset
+                    # cap box in warm ear-yellow suggests the drooping heads.
+                    half = 0.080 + 0.010 * ((row * 5 + col) % 3)
+                    top = 0.24 + 0.03 * ((row + col) % 3)
+                    add_box(
+                        scene,
+                        name,
+                        *map_box((rx - half + jitter, ry - half, 0.030), (rx + half + jitter, ry + half, top)),
+                        mat,
+                    )
+                    droop = 0.05 * _math.copysign(1.0, _math.sin(rx * 9.1 + ry * 5.3))
+                    add_box(
+                        scene,
+                        f"{name}Ear",
+                        *map_box(
+                            (rx - half * 0.7 + jitter + droop, ry - half * 0.7 + droop * 0.4, top - 0.015),
+                            (rx + half * 0.7 + jitter + droop, ry + half * 0.7 + droop * 0.4, top + 0.028),
+                        ),
+                        ear,
+                    )
+                else:
+                    # Winter stubble: short dry stubs, roughly one in three cut
+                    # clean to the ground (skipped) for a sparse harvested look.
+                    if (row * 11 + col * 5) % 3 == 0:
+                        continue
+                    add_box(
+                        scene,
+                        name,
+                        *map_box((rx - 0.024 + jitter, ry - 0.024, 0.042), (rx + 0.024 + jitter, ry + 0.024, 0.085 + 0.012 * ((row + col) % 2))),
+                        mat,
+                    )

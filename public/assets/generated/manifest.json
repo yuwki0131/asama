@@ -5523,6 +5523,61 @@
         "x": 0.5,
         "y": 0.4
       }
+    },
+    {
+      "assetId": "building.tenshu.main",
+      "kind": "building",
+      "file": "generated/building-tenshu-main.png",
+      "width": 640,
+      "height": 520,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8269230769230769
+      }
+    },
+    {
+      "assetId": "building.farm.spring",
+      "kind": "building",
+      "file": "generated/building-farm-spring.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.summer",
+      "kind": "building",
+      "file": "generated/building-farm-summer.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.autumn",
+      "kind": "building",
+      "file": "generated/building-farm-autumn.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.winter",
+      "kind": "building",
+      "file": "generated/building-farm-winter.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
     }
   ],
   "animations": [

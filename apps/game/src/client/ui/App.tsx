@@ -37,6 +37,10 @@ export function App() {
   const gameCanvasRef = useRef<GameCanvasHandle | null>(null);
   const [snapshot, setSnapshot] = useState<WorldSnapshot | null>(null);
   const snapshotRef = useRef<WorldSnapshot | null>(null);
+  // DEV/QA season override (__asamaTest.setSeason): rawSnapshotRef keeps the
+  // unmodified worker snapshot so clearing the override restores it.
+  const rawSnapshotRef = useRef<WorldSnapshot | null>(null);
+  const seasonOverrideRef = useRef<Season | null>(null);
   const buildToolRef = useRef<ToolMode>(null);
   const tickWaitersRef = useRef<Map<number, Array<(s: WorldSnapshot) => void>>>(new Map());
   const [simulationError, setSimulationError] = useState<string | null>(null);
@@ -119,6 +123,13 @@ export function App() {
       setTone: (enabled) => {
         gameCanvasRef.current?.setTone(enabled);
       },
+      setSeason: (season) => {
+        seasonOverrideRef.current = season;
+        const raw = rawSnapshotRef.current;
+        if (raw !== null) {
+          setSnapshot(season === null ? raw : { ...raw, economy: { ...raw.economy, season } });
+        }
+      },
     };
     return () => {
       delete window.__asamaTest;
@@ -165,7 +176,13 @@ export function App() {
     const unsubscribe = simulation.subscribe((nextSnapshot) => {
       setSimulationStatus("ready");
       setSimulationError(null);
-      setSnapshot(nextSnapshot);
+      rawSnapshotRef.current = nextSnapshot;
+      const override = seasonOverrideRef.current;
+      setSnapshot(
+        override === null
+          ? nextSnapshot
+          : { ...nextSnapshot, economy: { ...nextSnapshot.economy, season: override } }
+      );
     });
     const unsubscribeErrors = simulation.subscribeErrors(setSimulationError);
     simulation.init(selectedScenarioId);
