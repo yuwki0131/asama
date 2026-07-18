@@ -5391,6 +5391,138 @@
         "x": 0.5,
         "y": 0.4
       }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-ne.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-ne-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-ne-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-es.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-es-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-es-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-sw.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-sw-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-sw-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-wn.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-wn-v1.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-water-transition-inner-wn-v2.png",
+      "width": 64,
+      "height": 40,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.4
+      }
     }
   ],
   "animations": [
