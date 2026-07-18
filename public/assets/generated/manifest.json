@@ -4744,17 +4744,6 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 640,
-      "height": 520,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8269230769230769
-      }
-    },
-    {
       "assetId": "terrain.water.connected.0000",
       "kind": "terrain",
       "file": "generated/terrain-water-connected-0000.png",
