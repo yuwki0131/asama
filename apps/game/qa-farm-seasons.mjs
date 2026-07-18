@@ -1,8 +1,9 @@
-// Visual QA: screenshot the free-play farms in all four seasons
-// (worktree dev server :5182). Usage: node qa-farm-seasons.mjs [outPrefix]
+// Visual QA: screenshot the free-play farms in all four seasons.
+// Usage: [ASAMA_QA_PORT=5182] node qa-farm-seasons.mjs [outPrefix]
 import { chromium } from "playwright-core";
 
 const outPrefix = process.argv[2] ?? "/tmp/farm-refine";
+const port = process.env.ASAMA_QA_PORT ?? "5182";
 
 const browser = await chromium.launch({
   executablePath: "/run/current-system/sw/bin/chromium",
@@ -13,7 +14,7 @@ const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
 page.on("console", (m) => {
   if (m.type() === "error") console.log("[console.error]", m.text());
 });
-await page.goto("http://127.0.0.1:5182/", { waitUntil: "load" });
+await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: "domcontentloaded" });
 // Scenario select screen: free-play (自由演習) starts with 4 farms in the castle town.
 await page.getByText("自由演習").first().click({ timeout: 30000 });
 await page.waitForFunction(() => window.__asamaTest && window.__asamaTest.getSnapshot() != null, null, {
