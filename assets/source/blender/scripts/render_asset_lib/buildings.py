@@ -795,100 +795,96 @@ TENSHU_VARIANTS = {
 }
 
 
-def _tenshu_boulder_ishigaki(name: str = "TenshuIshigaki") -> bpy.types.Material:
-    """Fine fitted masonry for the low keep mound, matched to the terrain
-    revetments (elevation/tiles.py _elev_ishigaki_material): same warm dark
-    palette and mortar-shadow seam treatment, but sampled in OBJECT space so
-    the stone size is a fixed fraction of a tile no matter how large the
-    mound mesh is (Generated coords normalized over the 7x7 bbox are what
-    made the old stones read as giant cracked slabs). Adds a damp/mossy foot
-    band so the base sits into the ground with some age."""
-    from . import core as _core
-    material = bpy.data.materials.new(name)
-    material.use_nodes = True
-    nodes = material.node_tree.nodes
-    links = material.node_tree.links
-    bsdf = nodes.get("Principled BSDF")
-    bsdf.inputs["Roughness"].default_value = 1.0
+def _kirikomi_mound(scene: bpy.types.Scene, cx: float, cy: float,
+                    base_half: float, height: float) -> float:
+    """Square ishigaki mound built with the SAME coursed kirikomi-hagi
+    masonry as the terrain revetments (elevation/tiles.py): 8 px courses in
+    running bond, per-stone planar quads tangent to the concave sori
+    surface, mortar-shadow joint backing, damp/mossy aging toward the foot.
+    One stone-wall vocabulary everywhere - a building mound must not read
+    as a different masonry from the terrain walls next to it
+    (art-rulebook ISHIGAKI-03). Returns the crest half-width."""
+    from .elevation import tiles as _tiles
 
-    # Object-space coordinates: meshes are built with world-space vertices on
-    # objects at the origin, so this is world units — uniform on every axis
-    # and continuous across the mound rings and quoins.
-    coords = nodes.new("ShaderNodeTexCoord")
+    amp = min(_tiles.ISHIGAKI_BATTER * height, _tiles.ISHIGAKI_SORI_MAX)
 
-    # ~3.6 stones per tile ≈ the course size of the terrain 1-step walls.
-    voronoi = nodes.new("ShaderNodeTexVoronoi")
-    voronoi.feature = "DISTANCE_TO_EDGE"
-    voronoi.inputs["Scale"].default_value = 3.6
-    links.new(coords.outputs["Object"], voronoi.inputs["Vector"])
+    def half_at(t: float) -> float:
+        return base_half - amp * (1.0 - (1.0 - t) ** 2)
 
-    seam_ramp = nodes.new("ShaderNodeValToRGB")
-    seam_ramp.color_ramp.elements[0].position = 0.0
-    seam_ramp.color_ramp.elements[0].color = (0.22, 0.20, 0.17, 1.0)
-    seam_ramp.color_ramp.elements[1].position = 0.09
-    seam_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
-    links.new(voronoi.outputs["Distance"], seam_ramp.inputs["Fac"])
+    # Joint/mortar backing: a battered frustum a hair inside the stones so
+    # only the seams between quads read as the dark bed/head joints.
+    segments = 6
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    ring_starts: list[int] = []
+    for k in range(segments + 1):
+        t = k / segments
+        h = half_at(t)
+        z = height * t
+        ring_starts.append(len(vertices))
+        for x, y in ((cx - h, cy - h), (cx + h, cy - h), (cx + h, cy + h), (cx - h, cy + h)):
+            vertices.append((*map_xy(x, y), z))
+    for k in range(segments):
+        a, b = ring_starts[k], ring_starts[k + 1]
+        for i in range(4):
+            j = (i + 1) % 4
+            faces.append((a + i, a + j, b + j, b + i))
+    add_mesh(scene, "MoundJoint", vertices, faces, _tiles._kirikomi_joint_material())
+    # Stone crest cap (terrain hides its crest under the surface tile; the
+    # mound's crest ring stays visible around the keep, so cap it in stone).
+    crest = half_at(1.0)
+    cap = [(*map_xy(x, y), height) for x, y in
+           ((cx - crest, cy - crest), (cx + crest, cy - crest), (cx + crest, cy + crest), (cx - crest, cy + crest))]
+    add_mesh(scene, "MoundCap", cap, [(0, 1, 2, 3)], _tiles._kirikomi_stone_materials()[3])
 
-    # Per-stone / weathering value variation, a touch lighter than the
-    # terrain walls so the masonry still reads next to white plaster.
-    stone_noise = nodes.new("ShaderNodeTexNoise")
-    stone_noise.inputs["Scale"].default_value = 2.8
-    links.new(coords.outputs["Object"], stone_noise.inputs["Vector"])
-    stone_ramp = nodes.new("ShaderNodeValToRGB")
-    stone_ramp.color_ramp.elements[0].position = 0.3
-    stone_ramp.color_ramp.elements[0].color = (0.168, 0.148, 0.115, 1.0)
-    stone_ramp.color_ramp.elements[1].position = 0.8
-    stone_ramp.color_ramp.elements[1].color = (0.295, 0.265, 0.212, 1.0)
-    links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
+    stones = _tiles._kirikomi_stone_materials()
+    damp, mossy = _tiles._kirikomi_weathered_materials()
+    n_courses = max(1, round(height / _tiles.KIRI_COURSE))
+    # All four faces so the masonry is orientation-proof; (nx, ny) is the
+    # outward normal, `a` runs along the face through the mound centre.
+    for seed, nx, ny in ((5.0, 0.0, -1.0), (6.0, 1.0, 0.0), (7.0, 0.0, 1.0), (8.0, -1.0, 0.0)):
+        for j in range(n_courses):
+            z1 = height - j * _tiles.KIRI_COURSE
+            z0 = max(0.0, z1 - _tiles.KIRI_COURSE + _tiles.KIRI_BED)
+            z_c = 0.5 * (z0 + z1)
+            t_c = z_c / height
+            o_c = half_at(t_c) + _tiles.KIRI_LIP
+            slope = -2.0 * (amp / height) * (1.0 - t_c)  # d(half)/dz
+            a_lim = half_at(t_c)  # clip stones at the corner arris
+            shift = 0.16 + 0.24 * _tiles._hash01(seed, j, 81.0)
+            a = -a_lim - shift
+            k = 0
+            while a < a_lim - 0.02:
+                width = 0.24 + 0.16 * _tiles._hash01(seed, j, 90.0 + 7.0 * k)
+                a0 = max(-a_lim, a)
+                a1 = min(a_lim, a + width - _tiles.KIRI_GAP)
+                if a1 - a0 > 0.03:
+                    roll = _tiles._hash01(seed, j, 60.0 + 5.0 * k)
+                    material = stones[int(roll * 5.0) % 5]
+                    # Aging gradient: damp then mossy blocks thicken toward
+                    # the foot of the wall (same thresholds as the terrain).
+                    depth = j / max(1, n_courses - 1)
+                    age = _tiles._hash01(seed, j, 70.0 + 3.0 * k)
+                    if depth > 0.75 and age < 0.12 + 0.30 * (depth - 0.75) / 0.25:
+                        material = mossy
+                    elif depth > 0.5 and age > 0.85 - 0.40 * (depth - 0.5) / 0.5:
+                        material = damp
+                    a_c = 0.5 * (a0 + a1)
+                    tilt_a = 0.055 * (_tiles._hash01(seed, j, 71.0 + k) - 0.5)
+                    tilt_z = 0.055 * (_tiles._hash01(seed, j, 72.0 + k) - 0.5)
+                    quad: list[tuple[float, float, float]] = []
+                    for aa, zz in ((a0, z0), (a1, z0), (a0, z1), (a1, z1)):
+                        o = o_c + (slope + tilt_z) * (zz - z_c) + tilt_a * (aa - a_c)
+                        if ny != 0.0:
+                            x, y = cx + aa, cy + o * ny
+                        else:
+                            x, y = cx + o * nx, cy + aa
+                        quad.append((*map_xy(x, y), zz))
+                    add_mesh(scene, f"MoundStone{int(seed)}_{j}_{k}", quad, [(0, 1, 3, 2)], material)
+                a += width
+                k += 1
+    return crest
 
-    # Weathering: slow moss/grime drift tints patches of the wall face.
-    moss_noise = nodes.new("ShaderNodeTexNoise")
-    moss_noise.inputs["Scale"].default_value = 1.3
-    moss_noise.inputs["Detail"].default_value = 2.0
-    links.new(coords.outputs["Object"], moss_noise.inputs["Vector"])
-    moss_ramp = nodes.new("ShaderNodeValToRGB")
-    moss_ramp.color_ramp.interpolation = "EASE"
-    moss_ramp.color_ramp.elements[0].position = 0.36
-    moss_ramp.color_ramp.elements[0].color = (0.86, 0.92, 0.78, 1.0)
-    moss_ramp.color_ramp.elements[1].position = 0.60
-    moss_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
-    links.new(moss_noise.outputs["Fac"], moss_ramp.inputs["Fac"])
-
-    # Damp foot: world-z ramp darkens (and slightly greens) the lowest
-    # courses where the mound meets the ground.
-    geometry = nodes.new("ShaderNodeNewGeometry")
-    separate = nodes.new("ShaderNodeSeparateXYZ")
-    links.new(geometry.outputs["Position"], separate.inputs["Vector"])
-    damp_range = nodes.new("ShaderNodeMapRange")
-    damp_range.inputs["From Min"].default_value = 0.02
-    damp_range.inputs["From Max"].default_value = 0.42
-    damp_range.clamp = True
-    links.new(separate.outputs["Z"], damp_range.inputs["Value"])
-    damp_ramp = nodes.new("ShaderNodeValToRGB")
-    damp_ramp.color_ramp.interpolation = "EASE"
-    damp_ramp.color_ramp.elements[0].position = 0.0
-    damp_ramp.color_ramp.elements[0].color = (0.55, 0.62, 0.52, 1.0)
-    damp_ramp.color_ramp.elements[1].position = 1.0
-    damp_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
-    links.new(damp_range.outputs["Result"], damp_ramp.inputs["Fac"])
-
-    def multiply(a, b):
-        node = nodes.new("ShaderNodeMix")
-        node.data_type = "RGBA"
-        node.blend_type = "MULTIPLY"
-        node.inputs["Factor"].default_value = 1.0
-        links.new(a, node.inputs["A"])
-        links.new(b, node.inputs["B"])
-        return node.outputs["Result"]
-
-    shaded = multiply(stone_ramp.outputs["Color"], seam_ramp.outputs["Color"])
-    shaded = multiply(shaded, moss_ramp.outputs["Color"])
-    shaded = multiply(shaded, damp_ramp.outputs["Color"])
-    if _core.CURRENT_STYLE == "pbr":
-        links.new(shaded, bsdf.inputs["Base Color"])
-    else:
-        _core.finish_material(material, shaded)
-    return material
 
 
 def _tenshu_material_set() -> dict[str, bpy.types.Material]:
@@ -1168,47 +1164,21 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
     plaster = mats["plaster"]
     dark = mats["dark_wood"]
     hem = mats["hem"]
-    stone = _tenshu_boulder_ishigaki()
     gold = make_material("TenshuShachi", (0.58, 0.46, 0.17, 1.0))
 
     cx, cy = -2.0, -2.0  # lot center of the [-4,0]x[-4,0] footprint
 
-    # --- Ishigaki mound: ONE terrain step tall, concave sori batter matching
-    # elevation/tiles.py (_sori_inset with ISHIGAKI_BATTER=0.30). Single mesh
-    # so the object-space stone texture is continuous across the rings.
+    # --- Ishigaki mound: ONE terrain step tall, built with the exact same
+    # coursed kirikomi masonry as the terrain revetments (ISHIGAKI-03: one
+    # stone-wall vocabulary — no patchwork between mound and terrain walls).
+    # No corner quoin blocks (user ruling 2026-07-19).
     height = TENSHU_ISHIGAKI_TOP
-    base_half = TENSHU_MOUND_BASE_HALF
-    segments = 4
-
-    def mound_half(t: float) -> float:
-        return base_half - TENSHU_ISHIGAKI_BATTER * height * (1.0 - (1.0 - t) ** 2)
-
-    vertices: list[tuple[float, float, float]] = []
-    faces: list[tuple[int, ...]] = []
-    ring_starts: list[int] = []
-    for k in range(segments + 1):
-        t = k / segments
-        h = mound_half(t)
-        z = height * t
-        ring_starts.append(len(vertices))
-        for x, y in ((cx - h, cy - h), (cx + h, cy - h), (cx + h, cy + h), (cx - h, cy + h)):
-            vertices.append((*map_xy(x, y), z))
-    for k in range(segments):
-        a, b = ring_starts[k], ring_starts[k + 1]
-        for i in range(4):
-            j = (i + 1) % 4
-            faces.append((a + i, a + j, b + j, b + i))
-    faces.append(tuple(ring_starts[-1] + i for i in range(4)))  # stone crest cap
-    add_mesh(scene, "IshigakiMound", vertices, faces, stone)
-
-    # No corner quoin blocks: user ruling 2026-07-19 — protruding sangi-zumi
-    # boxes broke the precise kirikomi-hagi (fitted masonry) read. The mound
-    # stays a clean sloped frustum; the fitted-stone texture alone carries it.
+    crest_half = _kirikomi_mound(scene, cx, cy, TENSHU_MOUND_BASE_HALF, height)
 
     # Thin gravel bed under the first story. The story wall rises within
     # ~0.14 units of the stone crest, so only a sliver of this (plus the
     # stone rim) ever reads on screen — no walkable 犬走り flat remains.
-    walk = mound_half(1.0) - 0.10
+    walk = crest_half - 0.10
     add_box(scene, "IshigakiWalk", *map_box((cx - walk, cy - walk, height), (cx + walk, cy + walk, height + 0.018)), mats["gravel"])
 
     tiers = [(w * s, body_h * s) for w, body_h in spec["tiers"]]

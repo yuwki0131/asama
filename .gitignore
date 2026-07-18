@@ -10,3 +10,4 @@ scratchpad/
 assets/intermediate/
 public/assets/placeholders/
 !public/assets/.gitkeep
+artifacts/

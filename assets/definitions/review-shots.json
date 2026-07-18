@@ -52,6 +52,25 @@
         }
       ]
     },
+    "yagura": {
+      "description": "櫓: 石垣マウンドが地形石垣と同一の切込接ぎ様式であること (ISHIGAKI-02/03, TONE-01)",
+      "shots": [
+        {
+          "name": "showcase-yagura",
+          "scenario": "takaishigaki-showcase",
+          "cell": { "x": 49, "y": 60 },
+          "zoom": 3,
+          "description": "高石垣ショーケースの櫓 (49,60)。至近の地形石垣とマウンドの石積み様式・トーン一致を確認"
+        },
+        {
+          "name": "five-tier-yagura",
+          "scenario": "five-tier-keep",
+          "cell": { "x": 60, "y": 64 },
+          "zoom": 3,
+          "description": "五重天守シナリオの櫓 (60,64)。天守・門と並んだ状態での様式統一を確認"
+        }
+      ]
+    },
     "gate": {
       "description": "門: 開=通路が見通せる/閉=暗い扉パネル、壁との接続 (GATE-01)",
       "shots": [

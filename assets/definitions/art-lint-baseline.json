@@ -459,10 +459,6 @@
       "ruleId": "GEO-01"
     },
     {
-      "assetId": "building.yagura.small.normal",
-      "ruleId": "NOISE-01"
-    },
-    {
       "assetId": "deco.bamboo.1",
       "ruleId": "NOISE-01"
     },
@@ -860,10 +856,6 @@
     },
     {
       "assetId": "building.wood_bridge.y.start",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.yagura.small.normal",
       "ruleId": "NOISE-03"
     },
     {
