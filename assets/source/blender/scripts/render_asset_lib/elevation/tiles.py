@@ -285,6 +285,14 @@ def build_cliff_corner(scene: bpy.types.Scene, h: int) -> None:
 # and the recessed joints pick up AO as thin dark mortar lines.
 
 ISHIGAKI_BATTER = 0.30  # top inset as a fraction of the wall height (sori)
+# Absolute cap on the sori amplitude (world units). The renderer pins the
+# sprite's top diamond to the HIGH cell's edge, and the surface tile only
+# covers overdraw within that one diamond (~0.5 units inward). A height-
+# proportional inset (0.30 * h * LEVEL) walks the visible lip ~1.5 cells
+# inward on h5 — off the owning cell and off the 64px canvas — so tall faces
+# detached from the plateau edge on the map. Capping keeps h1 unchanged and
+# renders h2+ nearly vertical with the same concave profile.
+ISHIGAKI_SORI_MAX = 0.40
 SORI_ROWS = 6
 
 KIRI_COURSE = LEVEL / 5.0  # one masonry course == 8 screen px
@@ -326,10 +334,14 @@ def _kirikomi_quoin_material() -> bpy.types.Material:
     return make_noise_material("KiriQuoin", (0.176, 0.166, 0.144), (0.292, 0.276, 0.240), scale=5.0)
 
 
+def _sori_amplitude(height: float) -> float:
+    return min(ISHIGAKI_BATTER * height, ISHIGAKI_SORI_MAX)
+
+
 def _sori_inset(s: float, height: float) -> float:
     """Concave ishigaki profile: vertical at the top, flaring at the base.
     s runs 0 (base, on the cell boundary) .. 1 (top)."""
-    return ISHIGAKI_BATTER * height * (1.0 - (1.0 - s) ** 2)
+    return _sori_amplitude(height) * (1.0 - (1.0 - s) ** 2)
 
 
 def _ishigaki_strip(scene, name: str, face: str, h: int, stone,
@@ -389,7 +401,7 @@ def _kirikomi_stone(scene, name: str, face: str, a0: float, a1: float,
     s_c = max(0.0, min(1.0, 1.0 + z_c / height))
     o_c = _sori_inset(s_c, height) - KIRI_LIP
     # d(inset)/dz of the sori profile at the stone centre.
-    slope_z = 2.0 * ISHIGAKI_BATTER * (1.0 - s_c)
+    slope_z = 2.0 * (_sori_amplitude(height) / height) * (1.0 - s_c)
     tilt_a = 0.055 * (_hash01(seed, j, 71.0 + k) - 0.5)  # twist about vertical
     tilt_z = 0.055 * (_hash01(seed, j, 72.0 + k) - 0.5)  # pitch about horizontal
     vertices: list[tuple[float, float, float]] = []
