@@ -306,10 +306,8 @@
       "kind": "building",
       "output": "building-farm-spring.png",
       "source": {
-        "type": "blender",
-        "model": "building-farm-paddy-spring",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-farm-spring.png"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -333,10 +331,8 @@
       "kind": "building",
       "output": "building-farm-summer.png",
       "source": {
-        "type": "blender",
-        "model": "building-farm-paddy-summer",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-farm-summer.png"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -360,10 +356,8 @@
       "kind": "building",
       "output": "building-farm-autumn.png",
       "source": {
-        "type": "blender",
-        "model": "building-farm-paddy-autumn",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-farm-autumn.png"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -387,10 +381,8 @@
       "kind": "building",
       "output": "building-farm-winter.png",
       "source": {
-        "type": "blender",
-        "model": "building-farm-paddy-winter",
-        "renderSpec": "painterly",
-        "supersample": 2
+        "type": "raster",
+        "file": "assets/source/raster/building-farm-winter.png"
       },
       "geometry": {
         "footprintWidth": 4,
