@@ -300,28 +300,6 @@
       }
     },
     {
-      "assetId": "building.earth_bridge",
-      "kind": "building",
-      "file": "generated/building-earth-bridge.png",
-      "width": 64,
-      "height": 48,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.3333333333333333
-      }
-    },
-    {
-      "assetId": "building.wood_bridge",
-      "kind": "building",
-      "file": "generated/building-wood-bridge.png",
-      "width": 64,
-      "height": 48,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.3333333333333333
-      }
-    },
-    {
       "assetId": "building.fence.wood",
       "kind": "building",
       "file": "generated/building-fence-wood.png",
@@ -2266,116 +2244,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.9230769230769231
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y",
-      "kind": "building",
-      "file": "generated/building-earth-bridge-y.png",
-      "width": 64,
-      "height": 48,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.3333333333333333
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-y.png",
-      "width": 64,
-      "height": 48,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.3333333333333333
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x3",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-x3.png",
-      "width": 192,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.625
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y3",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-y3.png",
-      "width": 192,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.625
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.x3",
-      "kind": "building",
-      "file": "generated/building-earth-bridge-x3.png",
-      "width": 192,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.625
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y3",
-      "kind": "building",
-      "file": "generated/building-earth-bridge-y3.png",
-      "width": 192,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.625
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x5",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-x5.png",
-      "width": 320,
-      "height": 192,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5833333333333334
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y5",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-y5.png",
-      "width": 320,
-      "height": 192,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5833333333333334
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.x5",
-      "kind": "building",
-      "file": "generated/building-earth-bridge-x5.png",
-      "width": 320,
-      "height": 192,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5833333333333334
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y5",
-      "kind": "building",
-      "file": "generated/building-earth-bridge-y5.png",
-      "width": 320,
-      "height": 192,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5833333333333334
       }
     },
     {
@@ -5566,6 +5434,182 @@
       "anchor": {
         "x": 0.5,
         "y": 0.6666666666666666
+      }
+    },
+    {
+      "assetId": "building.earth_bridge",
+      "kind": "building",
+      "file": "generated/building-earth-bridge.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-y.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.start",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-x-start.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.mid",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-x-mid.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.end",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-x-end.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.start",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-y-start.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.mid",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-y-mid.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.end",
+      "kind": "building",
+      "file": "generated/building-earth-bridge-y-end.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.wood_bridge",
+      "kind": "building",
+      "file": "generated/building-wood-bridge.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.start",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-x-start.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.mid",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-x-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.end",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-x-end.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.start",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y-start.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.mid",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.end",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y-end.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
       }
     }
   ],

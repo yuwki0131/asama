@@ -21,7 +21,7 @@ import {
   UNIT_GROUND_OFFSET_Y
 } from "./camera";
 import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
-import { buildingAssetCandidates } from "./gameRules";
+import { bridgeCellAssetCandidates, buildingAssetCandidates, isBridgeBuildingType } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
@@ -745,6 +745,11 @@ function addBuildingSprite(
   zoom: number,
   season: Season
 ): void {
+  if (isBridgeBuildingType(building.type)) {
+    addBridgeSprites(layer, building, assets, zoom);
+    return;
+  }
+
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building, season), assets);
   const point = buildingRenderPoint(building);
   // Buildings sit on uniform-elevation footprints (elevation-contract.md §4);
@@ -764,6 +769,31 @@ function addBuildingSprite(
       ladder.position.set(sprite.position.x, sprite.position.y);
       layer.addChild(ladder);
     }
+  }
+}
+
+/**
+ * Bridges draw one segment sprite per footprint cell (start / mid / end
+ * auto-tiling) so any span length tiles seamlessly; each segment's deck
+ * diamond center sits exactly on its cell center. Footprint order is
+ * min-to-max along the deck axis, which matches the painter's order.
+ */
+function addBridgeSprites(
+  layer: Container,
+  building: BuildingSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>,
+  zoom: number
+): void {
+  const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
+  const cells = building.footprint.length > 0 ? building.footprint : [building.position];
+  for (const cell of cells) {
+    const sprite = createSpriteFromCandidates(bridgeCellAssetCandidates(building, cell), assets);
+    const point = cellToWorld(cell);
+    sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
+    if (building.owner === "enemy") {
+      sprite.tint = 0xffaaa0;
+    }
+    layer.addChild(sprite);
   }
 }
 
