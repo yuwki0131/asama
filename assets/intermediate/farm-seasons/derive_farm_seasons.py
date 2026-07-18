@@ -9,10 +9,14 @@ so brushwork, noise character and the ridge/plot structure stay identical to
 the original in all four seasons.
 
   spring : verbatim copy of the source painting
-  summer : seedling dots grown into lush connected clumps (colors sampled
-           from the painting's own green statistics), water mostly covered
-  autumn : same clump structure hue-shifted to golden ripe rice, water
-           drained to dark wet soil (sampled from the ridge soil statistics)
+  summer : each seedling grid point becomes a standing rice hill - a 2:1 iso
+           ellipse shaded in three values (sunlit tip / leaf body / foot
+           shadow) with a cast shadow on the darkened paddy water, drawn
+           back-to-front so front rows overlap the feet of the rows behind;
+           the row (jo-ue) regularity of real transplanted paddies survives
+  autumn : the same hill renderer in ripe-gold styling - heavy drooping ears
+           bulge the hill tops, straw-brown feet, drained field floor of dark
+           wet soil sampled from the ridge statistics
   winter : harvested field - interior filled with dry soil texture derived
            from the ridge palette, faint pale stubble dots on the original
            seedling grid, slightly desaturated overall
@@ -105,86 +109,154 @@ def fill_plant_gaps(plants, inner, spacing=8):
     return out
 
 
-def draw_clumps(out, plants, field, dark_pal, bright_pal, generator):
-    """Grow each seedling into an iso-flattened clump; returns the clump mask."""
+def draw_rice_hills(out, plants, field, style, gen):
+    """Paint procedurally shaded rice hills (back-to-front) for summer/autumn.
+
+    Each hill is an ellipse elongated along the iso row axis (2,1) - real
+    transplanted rows merge into ridge-like bands at this scale - with three
+    value bands (sunlit crown / leaf body / dark foot), a 1px cast shadow on
+    the field floor and a few 1px ticks above the crown (standing leaf tips
+    in summer, nodding ear heads in autumn). Drawing back-to-front lets each
+    front row overlap the feet of the row behind it, which is what sells the
+    standing-plant look. Returns the hill mask."""
     h, w = field.shape
-    clump = np.zeros((h, w), bool)
-    for (px, py) in plants:
-        rx = 5.4 + generator.normal(0, 0.5)
-        ry = 3.1 + generator.normal(0, 0.35)
-        lift = 1  # plants read slightly "up" in iso
-        tone = generator.normal(0, 7)  # per-plant patchiness
-        for dy in range(-5, 4):
-            for dx in range(-7, 8):
-                d = (dx / rx) ** 2 + ((dy + lift) / ry) ** 2
-                if d > 1.0 + generator.normal(0, 0.10):
+    hills = np.zeros((h, w), bool)
+    hi = np.asarray(style["hi"], np.float64)
+    mid = np.asarray(style["mid"], np.float64)
+    lo = np.asarray(style["lo"], np.float64)
+    tick_c = np.asarray(style["tick"], np.float64)
+    s5 = np.sqrt(5.0)
+    for (px, py) in sorted(plants, key=lambda p: (p[1], p[0])):
+        ra = style["ra"] + gen.normal(0, 0.45)  # along-row half length
+        rb = style["rb"] + gen.normal(0, 0.20)  # across-row half width
+        # Vertical extent of the sheared ellipse (for shading / shadow).
+        yext = np.sqrt((ra / s5) ** 2 + (rb * 2.0 / s5) ** 2)
+        xext = np.sqrt((ra * 2.0 / s5) ** 2 + (rb / s5) ** 2)
+        tone = gen.normal(0, style["tone_jit"], 3)  # per-hill hue drift
+        # Cast shadow: darken the floor strip just under the hill.
+        sy = py + int(round(yext))
+        for dx in range(-int(xext), int(xext) + 1):
+            x, y = px + dx, sy + 1
+            if 0 <= x < w and 0 <= y < h and field[y, x] and abs(dx) <= xext * 0.8:
+                out[y, x, :3] = np.clip(
+                    out[y, x, :3].astype(np.float64) * style["cast"], 0, 255)
+        # Standing leaf tips / ear heads poke above the crown.
+        for _ in range(style["ticks"]):
+            x = px + int(gen.integers(-1, 2))
+            y = py - int(round(yext)) - int(gen.integers(1, style["tick_lift"] + 1))
+            if 0 <= x < w and 0 <= y < h and field[y, x]:
+                out[y, x, :3] = np.clip(tick_c + tone + gen.normal(0, 9, 3), 0, 255)
+                hills[y, x] = True
+        # Hill body: three value bands top-to-bottom.
+        for dy in range(-int(yext) - 1, int(yext) + 2):
+            for dx in range(-int(xext) - 1, int(xext) + 2):
+                pa = (2.0 * dx + dy) / s5      # along the row axis
+                pb = (-dx + 2.0 * dy) / s5     # across the rows
+                d = (pa / ra) ** 2 + (pb / rb) ** 2
+                if d > 1.0 + gen.normal(0, 0.06):
                     continue
                 x, y = px + dx, py + dy
                 if not (0 <= x < w and 0 <= y < h) or not field[y, x]:
                     continue
-                pal = bright_pal if (dy + lift) < -1 and generator.random() < 0.80 else dark_pal
-                c = pal[generator.integers(len(pal))] + tone + generator.normal(0, 5, 3)
-                # Lush mid-summer lift: brighter, juicier green than the
-                # sparse April sprigs while staying in the painting's hue.
-                c = c + np.array([2.0, 9.0, 0.0])
+                t = dy / yext  # -1 crown .. +1 foot
+                # Three-value shading with dithered band edges (crown
+                # highlight / leaf body / foot shadow) - painterly, not
+                # hard horizontal stripes.
+                u = (t + 1.0) / 2.0 + gen.normal(0, 0.09)
+                u = min(1.0, max(0.0, u))
+                if u < 0.30:
+                    c = hi
+                elif u < 0.42:
+                    k = (u - 0.30) / 0.12
+                    c = hi * (1 - k) + mid * k
+                elif u < 0.72:
+                    c = mid
+                elif u < 0.86:
+                    k = (u - 0.72) / 0.14
+                    c = mid * (1 - k) + lo * k
+                else:
+                    c = lo
+                # Rim rolls darker so each hill reads as a rounded volume.
+                c = c * (1.0 - 0.14 * max(0.0, d - 0.50))
+                c = c + tone + gen.normal(0, style["px_jit"], 3)
                 out[y, x, :3] = np.clip(c, 0, 255)
-                clump[y, x] = True
-    return clump
+                hills[y, x] = True
+    return hills
 
 
-def soften(out, mask):
+def soften(out, mask, blur_w=0.55):
     """Mild selective blur so grown pixels sit in the original brushwork."""
     rgb = out[..., :3].astype(np.float64)
     blurred = np.stack([ndimage.uniform_filter(rgb[..., i], 3) for i in range(3)], axis=-1)
     zone = ndimage.binary_dilation(mask, iterations=1)
-    out[..., :3][zone] = np.clip(rgb[zone] * 0.45 + blurred[zone] * 0.55, 0, 255)
+    out[..., :3][zone] = np.clip(rgb[zone] * (1.0 - blur_w) + blurred[zone] * blur_w, 0, 255)
 
 
-def make_summer(a, field, plants, dark_pal, bright_pal):
+def painterly_mottle(out, mask, gen, amp=0.05, warm=3.0):
+    """Low-frequency value/hue drift over the plant layer - keeps the hand-
+    painted patchiness of the base so the hills never read as a dot matrix."""
+    n = smooth_noise(mask.shape, 9, 1.0, gen)
+    rgb = out[..., :3].astype(np.float64)
+    drift = n[..., None] * np.array([warm, amp * 60.0, -warm * 0.6])
+    out[..., :3][mask] = np.clip(
+        rgb[mask] * (1.0 + n[mask, None] * amp) + drift[mask], 0, 255)
+
+
+def make_summer(a, field, plants, dark_pal, bright_pal, water_pal):
     gen = np.random.default_rng(11)
     out = a.copy()
-    # Remaining water gets lusher: pull toward green, slightly darker.
+    # Field floor: flooded paddy in deep shade under the canopy. Replace the
+    # April seedling dots with the painting's own water tone first, then pull
+    # everything darker so the green hills pop against it.
     r, g, b = (a[..., i].astype(int) for i in range(3))
-    water = field & ~(g > b + 12)
-    target = np.array([52.0, 90.0, 62.0])
-    out[..., :3][water] = np.clip(
-        a[..., :3][water].astype(np.float64) * 0.55 + target * 0.45, 0, 255
-    )
-    clump = draw_clumps(out, plants, field, dark_pal, bright_pal, gen)
-    # Second offset pass fills row gaps -> "aotа" density without losing rows.
-    offs = [(px + int(gen.integers(-2, 3)) + 4, py + int(gen.integers(-1, 2)))
-            for (px, py) in plants]
-    clump |= draw_clumps(out, offs, field, dark_pal, bright_pal, gen)
-    soften(out, clump)
-    return out, clump
+    green_px = field & (g > b + 12)
+    w_mean = water_pal.mean(axis=0)
+    out[..., :3][green_px] = np.clip(
+        a[..., :3][green_px].astype(np.float64) * 0.30 + w_mean * 0.70, 0, 255)
+    floor_target = np.array([30.0, 48.0, 44.0])  # dark shaded water
+    out[..., :3][field] = np.clip(
+        out[..., :3][field].astype(np.float64) * 0.42 + floor_target * 0.58, 0, 255)
+    # Mid-summer rice hills anchored to the painting's green statistics.
+    g_dark = dark_pal.mean(axis=0)
+    g_bright = bright_pal.mean(axis=0)
+    style = {
+        "ra": 5.9, "rb": 2.4,
+        "hi": np.clip(g_bright * 0.45 + np.array([116, 158, 62]) * 0.55, 0, 255),
+        "mid": np.clip(g_dark * 0.35 + np.array([64, 108, 50]) * 0.65, 0, 255),
+        "lo": np.array([28.0, 52.0, 33.0]),
+        "tick": np.array([122.0, 162.0, 68.0]),
+        "ticks": 2, "tick_lift": 1,
+        "cast": 0.62, "tone_jit": 5.0, "px_jit": 6.0,
+    }
+    hills = draw_rice_hills(out, plants, field, style, gen)
+    painterly_mottle(out, hills, gen, amp=0.06, warm=3.5)
+    soften(out, hills, blur_w=0.35)
+    return out, hills
 
 
-def make_autumn(a, summer, clump, field, soil_pal, plants):
+def make_autumn(a, field, plants, soil_pal):
     gen = np.random.default_rng(12)
-    out = summer.copy()
-    # Golden hue mapping keeps the clump value structure (brush detail) intact.
-    rgb = out[..., :3][clump].astype(np.float64)
-    v = rgb @ [0.299, 0.587, 0.114]
-    v = v * 1.18 + 14.0  # ripe straw is lighter than green foliage
-    gold = np.stack([v * 1.42, v * 1.12, v * 0.42], axis=-1)
-    out[..., :3][clump] = np.clip(rgb * 0.14 + gold * 0.86, 0, 255)
-    # Ripe-ear highlights: a few warm bright ticks near clump tops.
-    h, w = field.shape
-    for (px, py) in plants:
-        for _ in range(3):
-            x = px + int(gen.integers(-3, 4))
-            y = py - 2 + int(gen.integers(-1, 2))
-            if 0 <= x < w and 0 <= y < h and clump[y, x]:
-                c = out[y, x, :3].astype(np.float64) + np.array([38, 30, 6])
-                out[y, x, :3] = np.clip(c, 0, 255)
-    # Drained paddy: dark wet soil from the ridge statistics.
-    wet = field & ~clump
-    base = soil_pal.mean(axis=0) * 0.58
+    out = a.copy()
+    # Drained field floor: dark damp soil from the ridge statistics.
+    base = soil_pal.mean(axis=0) * 0.60
     noise = smooth_noise(field.shape, 6, 14.0, gen)
     jit = gen.normal(0, 4, (field.shape[0], field.shape[1], 3))
     soil_img = base[None, None, :] * (1.0 + noise[..., None] * 0.045) + jit
-    out[..., :3][wet] = np.clip(soil_img[wet], 0, 255)
-    soften(out, ndimage.binary_dilation(clump, iterations=1) & field)
+    out[..., :3][field] = np.clip(soil_img[field], 0, 255)
+    # Ripe rice hills: heavy ears bulge the crowns (slightly rounder than
+    # summer), deep gold body, straw-brown feet on dry stalks.
+    style = {
+        "ra": 5.3, "rb": 2.4,
+        "hi": np.array([234.0, 196.0, 96.0]),   # sunlit ear mass
+        "mid": np.array([196.0, 150.0, 58.0]),  # ripe straw body
+        "lo": np.array([116.0, 80.0, 38.0]),    # shaded dry stalk foot
+        "tick": np.array([214.0, 168.0, 74.0]),  # nodding ear heads
+        "ticks": 2, "tick_lift": 1,
+        "cast": 0.66, "tone_jit": 7.0, "px_jit": 6.0,
+    }
+    hills = draw_rice_hills(out, plants, field, style, gen)
+    painterly_mottle(out, hills, gen, amp=0.05, warm=4.5)
+    soften(out, hills, blur_w=0.35)
     return out
 
 
@@ -235,8 +307,8 @@ def main():
     print(f"plants={len(plants)} grown={len(grown)} field={int(field.sum())} soil={int(soil.sum())}")
 
     spring = a.copy()
-    summer, clump = make_summer(a, field, grown, dark_pal, bright_pal)
-    autumn = make_autumn(a, summer, clump, field, soil_pal, grown)
+    summer, _hills = make_summer(a, field, grown, dark_pal, bright_pal, water_pal)
+    autumn = make_autumn(a, field, grown, soil_pal)
     winter = make_winter(a, field, inner, soil, plants)
 
     for name, arr in (("spring", spring), ("summer", summer),
@@ -256,8 +328,8 @@ def main():
     for i, t in enumerate(tiles):
         tile = Image.fromarray(t).resize((tw, th), Image.NEAREST)
         sheet.paste(tile, (pad, pad + i * (th + pad)), tile)
-    sheet.save("/tmp/farm-contact.png")
-    print("wrote /tmp/farm-contact.png", labels)
+    sheet.save("/tmp/farm-rice-contact.png")
+    print("wrote /tmp/farm-rice-contact.png", labels)
 
 
 if __name__ == "__main__":
