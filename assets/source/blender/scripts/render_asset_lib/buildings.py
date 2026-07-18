@@ -9,9 +9,10 @@ from .core import (
     WALL_BODY_TOP, WALL_COPING_THICKNESS, WALL_COPING_TOP, WALL_EPSILON,
 )
 from .materials import (
-    building_material_set, make_ishigaki_material, make_namako_material,
-    make_noise_material, make_plank_material, make_showcase_plaster,
-    make_showcase_roof, make_textured_material, prop_materials,
+    building_material_set, make_gate_ground_material, make_ishigaki_material,
+    make_namako_material, make_noise_material, make_plank_material,
+    make_showcase_plaster, make_showcase_roof, make_textured_material,
+    prop_materials,
 )
 from .vegetation import (
     add_leaf_cards, add_prop_barrel, add_prop_bale, add_prop_bush,
@@ -315,10 +316,13 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, do
     wood, door, plaster, stone = mats["dark_wood"], mats["wood"], mats["plaster"], mats["stone"]
 
     half = float(width) / 2.0
+    # Gate ground is trodden earth matching the terrain dirt tiles — no
+    # masonry sill (user feedback: stone tiling under gates looks wrong).
+    ground = make_gate_ground_material(axis)
     if axis == "nw_se":
-        add_box(scene, "Sill", *map_box((-half, -0.5, 0.0), (half, 0.5, 0.035)), stone)
+        add_box(scene, "Sill", *map_box((-half, -0.5, 0.0), (half, 0.5, 0.02)), ground)
     else:
-        add_box(scene, "Sill", *map_box((-0.5, -half, 0.0), (0.5, half, 0.035)), stone)
+        add_box(scene, "Sill", *map_box((-0.5, -half, 0.0), (0.5, half, 0.02)), ground)
 
     for label, along in (("Near", half - 0.22), ("Far", -half + 0.22)):
         low, high = gate_box(axis, along - GATE_PILLAR_SIZE / 2.0, along + GATE_PILLAR_SIZE / 2.0, GATE_PILLAR_SIZE / 2.0, 0.0, GATE_PILLAR_HEIGHT)
