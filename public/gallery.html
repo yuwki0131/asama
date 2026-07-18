@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Asama Asset Gallery</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #1b1d22; color: #d8d5c9; font: 13px/1.5 "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+  header { position: sticky; top: 0; z-index: 10; background: #24262c; border-bottom: 1px solid #3a3d45; padding: 10px 16px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 15px; margin: 0 8px 0 0; color: #e8e2cf; }
+  header input[type=search] { background: #16181c; border: 1px solid #3a3d45; color: inherit; padding: 4px 8px; border-radius: 4px; width: 220px; }
+  header label { display: inline-flex; gap: 4px; align-items: center; cursor: pointer; user-select: none; }
+  header select { background: #16181c; border: 1px solid #3a3d45; color: inherit; padding: 3px 6px; border-radius: 4px; }
+  #stats { color: #8f8c80; margin-left: auto; }
+  section { padding: 8px 16px 20px; }
+  section > h2 { font-size: 14px; color: #cdb97a; border-bottom: 1px solid #3a3d45; padding-bottom: 4px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+  .card { background: #24262c; border: 1px solid #3a3d45; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .card .stage { position: relative; align-self: center;
+    background: repeating-conic-gradient(#2c2f36 0% 25%, #33363e 0% 50%) 0 0 / 16px 16px; }
+  .card img, .card canvas { display: block; image-rendering: pixelated; }
+  .card .meta { font-size: 11px; color: #a5a294; max-width: 260px; word-break: break-all; }
+  .card .meta b { color: #d8d5c9; font-size: 12px; }
+  .anchor-dot { position: absolute; width: 11px; height: 11px; margin: -5.5px; pointer-events: none; }
+  .anchor-dot::before, .anchor-dot::after { content: ""; position: absolute; background: #ff5252; }
+  .anchor-dot::before { left: 5px; top: 0; width: 1px; height: 11px; }
+  .anchor-dot::after { top: 5px; left: 0; height: 1px; width: 11px; }
+  .hidden { display: none !important; }
+  footer { padding: 12px 16px 40px; color: #6d6a60; font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Asama Asset Gallery</h1>
+  <input id="q" type="search" placeholder="assetIdで絞り込み (例: farm)" />
+  <span id="kinds"></span>
+  <label>表示倍率 <select id="scale"><option value="1">1x</option><option value="2">2x</option><option value="0.5">0.5x</option></select></label>
+  <label><input id="anchors" type="checkbox" checked />アンカー</label>
+  <span id="stats"></span>
+</header>
+<main id="main">読み込み中…</main>
+<footer>public/assets/generated/manifest.json を直接読んでいます。アセット再生成後はリロードしてください。赤十字=アンカー位置。</footer>
+<script>
+(async () => {
+  const manifest = await (await fetch("assets/generated/manifest.json")).json();
+  const main = document.getElementById("main");
+  const kindsBox = document.getElementById("kinds");
+  main.textContent = "";
+
+  const KIND_ORDER = ["building", "terrain", "unit", "overlay"];
+  const kinds = [...new Set(manifest.assets.map(a => a.kind))]
+    .sort((a, b) => KIND_ORDER.indexOf(a) - KIND_ORDER.indexOf(b));
+  const groups = [...kinds.map(k => ({
+    key: k,
+    title: `${k} (${manifest.assets.filter(a => a.kind === k).length})`,
+    items: manifest.assets.filter(a => a.kind === k).sort((x, y) => x.assetId.localeCompare(y.assetId)),
+  })), {
+    key: "animation",
+    title: `animation (${manifest.animations.length})`,
+    items: [...manifest.animations].sort((x, y) => x.assetId.localeCompare(y.assetId)),
+    animated: true,
+  }];
+
+  for (const g of [...kinds, "animation"]) {
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="checkbox" checked data-kind="${g}" />${g}`;
+    kindsBox.appendChild(label);
+  }
+
+  const players = [];
+  const allCards = [];
+
+  for (const group of groups) {
+    const section = document.createElement("section");
+    section.dataset.kind = group.key;
+    section.innerHTML = `<h2>${group.title}</h2>`;
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    section.appendChild(grid);
+    main.appendChild(section);
+
+    for (const entry of group.items) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.dataset.id = entry.assetId.toLowerCase();
+      card.dataset.kind = group.key;
+
+      const stage = document.createElement("div");
+      stage.className = "stage";
+      const w = group.animated ? entry.frame.width : entry.width;
+      const h = group.animated ? entry.frame.height : entry.height;
+
+      let el;
+      if (group.animated) {
+        el = document.createElement("canvas");
+        el.width = w; el.height = h;
+        const sheet = new Image();
+        sheet.src = "assets/" + entry.file;
+        players.push({ canvas: el, sheet, entry, dir: 0, frame: 0, last: 0 });
+      } else {
+        el = document.createElement("img");
+        el.src = "assets/" + entry.file;
+        el.loading = "lazy";
+        el.width = w; el.height = h;
+      }
+      stage.appendChild(el);
+
+      const dot = document.createElement("div");
+      dot.className = "anchor-dot";
+      stage.appendChild(dot);
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const anchorTxt = `anchor(${(entry.anchor.x).toFixed(2)}, ${(entry.anchor.y).toFixed(2)})`;
+      meta.innerHTML = `<b>${entry.assetId}</b><br>${w}×${h} ${anchorTxt}` +
+        (group.animated ? `<br>${entry.frames}f @${entry.fps}fps` : "");
+
+      card.appendChild(stage);
+      card.appendChild(meta);
+
+      if (group.animated) {
+        const sel = document.createElement("select");
+        for (let i = 0; i < entry.directions.length; i++) {
+          sel.appendChild(new Option(entry.directions[i], i));
+        }
+        sel.addEventListener("change", () => {
+          const p = players.find(p => p.canvas === el);
+          p.dir = Number(sel.value);
+        });
+        card.appendChild(sel);
+      }
+
+      card._layout = { stage, el, w, h, anchor: entry.anchor, dot };
+      allCards.push(card);
+      grid.appendChild(card);
+    }
+  }
+
+  const q = document.getElementById("q");
+  const scaleSel = document.getElementById("scale");
+  const anchorsChk = document.getElementById("anchors");
+  const stats = document.getElementById("stats");
+
+  function applyLayout() {
+    const s = Number(scaleSel.value);
+    for (const card of allCards) {
+      const { stage, el, w, h, anchor, dot } = card._layout;
+      el.style.width = w * s + "px";
+      el.style.height = h * s + "px";
+      stage.style.width = w * s + "px";
+      stage.style.height = h * s + "px";
+      dot.style.left = anchor.x * w * s + "px";
+      dot.style.top = anchor.y * h * s + "px";
+      dot.classList.toggle("hidden", !anchorsChk.checked);
+    }
+  }
+
+  function applyFilter() {
+    const term = q.value.trim().toLowerCase();
+    const enabled = new Set([...kindsBox.querySelectorAll("input:checked")].map(i => i.dataset.kind));
+    let visible = 0;
+    for (const card of allCards) {
+      const show = enabled.has(card.dataset.kind) && (!term || card.dataset.id.includes(term));
+      card.classList.toggle("hidden", !show);
+      if (show) visible++;
+    }
+    for (const section of main.querySelectorAll("section")) {
+      const any = enabled.has(section.dataset.kind) &&
+        [...section.querySelectorAll(".card")].some(c => !c.classList.contains("hidden"));
+      section.classList.toggle("hidden", !any);
+    }
+    stats.textContent = `${visible} / ${allCards.length} 表示`;
+  }
+
+  q.addEventListener("input", applyFilter);
+  kindsBox.addEventListener("change", applyFilter);
+  scaleSel.addEventListener("change", applyLayout);
+  anchorsChk.addEventListener("change", applyLayout);
+  applyLayout();
+  applyFilter();
+
+  function tick(now) {
+    for (const p of players) {
+      if (!p.sheet.complete || p.sheet.naturalWidth === 0) continue;
+      const dt = 1000 / p.entry.fps;
+      if (now - p.last >= dt) {
+        p.last = now - ((now - p.last) % dt);
+        p.frame = (p.frame + 1) % p.entry.frames;
+      }
+      const fw = p.entry.frame.width, fh = p.entry.frame.height;
+      const ctx = p.canvas.getContext("2d");
+      ctx.clearRect(0, 0, fw, fh);
+      ctx.drawImage(p.sheet, p.frame * fw, p.dir * fh, fw, fh, 0, 0, fw, fh);
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})().catch(err => {
+  document.getElementById("main").textContent = "manifest読み込み失敗: " + err;
+});
+</script>
+</body>
+</html>
