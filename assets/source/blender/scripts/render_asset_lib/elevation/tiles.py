@@ -278,9 +278,52 @@ def build_cliff_corner(scene: bpy.types.Scene, h: int) -> None:
 
 
 # --- ishigaki (castle revetment) ---------------------------------------------
+# Kirikomi-hagi: precisely dressed stones laid in level courses (nuno-zumi).
+# Horizontal bed joints run through, vertical joints break bond course to
+# course. Each stone is its own slightly tilted quad riding proud of a dark
+# joint backing, so the fixed painterly light gives every block its own tone
+# and the recessed joints pick up AO as thin dark mortar lines.
 
 ISHIGAKI_BATTER = 0.30  # top inset as a fraction of the wall height (sori)
 SORI_ROWS = 6
+
+KIRI_COURSE = LEVEL / 5.0  # one masonry course == 8 screen px
+KIRI_GAP = 0.016           # vertical head joint width (~1 screen px)
+KIRI_BED = 0.015           # horizontal bed joint width (~1 screen px)
+KIRI_LIP = 0.012           # stones sit this far proud of the joint backing
+
+
+def _kirikomi_stone_materials() -> list[bpy.types.Material]:
+    """Dressed-granite palette in five close value steps (low chroma, faintly
+    warm, after the tenshu mound). Stones pick one each so the wall carries
+    the subtle per-block colour drift of fitted masonry."""
+    specs = [
+        ("KiriStone0", (0.140, 0.128, 0.106), (0.240, 0.222, 0.186)),
+        ("KiriStone1", (0.162, 0.148, 0.122), (0.270, 0.250, 0.208)),
+        ("KiriStone2", (0.178, 0.160, 0.130), (0.294, 0.268, 0.220)),
+        ("KiriStone3", (0.194, 0.178, 0.150), (0.318, 0.296, 0.248)),
+        ("KiriStone4", (0.156, 0.150, 0.134), (0.260, 0.250, 0.222)),
+    ]
+    return [make_noise_material(name, dark, light, scale=9.0) for name, dark, light in specs]
+
+
+def _kirikomi_weathered_materials() -> tuple[bpy.types.Material, bpy.types.Material]:
+    """Aging: rain-damp blocks (cool, dark) and moss-stained blocks (green
+    cast) that replace ordinary stones toward the foot of the wall."""
+    damp = make_noise_material("KiriDamp", (0.096, 0.096, 0.088), (0.186, 0.184, 0.168), scale=9.0)
+    mossy = make_noise_material("KiriMossy", (0.094, 0.112, 0.074), (0.186, 0.202, 0.142), scale=9.0)
+    return damp, mossy
+
+
+def _kirikomi_joint_material() -> bpy.types.Material:
+    """Deep shadow tone for the mortar backing behind the stones."""
+    return make_material("KiriJoint", (0.050, 0.047, 0.041, 1.0))
+
+
+def _kirikomi_quoin_material() -> bpy.types.Material:
+    """Sangi-zumi corner blocks: dressed, a clear step lighter than the wall
+    so the alternating long/short bond reads at 64 px."""
+    return make_noise_material("KiriQuoin", (0.176, 0.166, 0.144), (0.292, 0.276, 0.240), scale=5.0)
 
 
 def _sori_inset(s: float, height: float) -> float:
@@ -290,14 +333,18 @@ def _sori_inset(s: float, height: float) -> float:
 
 
 def _ishigaki_strip(scene, name: str, face: str, h: int, stone,
-                    a_start: float, a_end_fn) -> None:
+                    a_start: float, a_end_fn, rows: int | None = None) -> None:
     """Battered wall strip along one face. a_end_fn(inset) gives the far end
-    of each row so the corner piece can taper both walls onto the arris."""
+    of each row so the corner piece can taper both walls onto the arris.
+    `rows` overrides the sori subdivision: the kirikomi joint backing must
+    hug the curve closely (chord error grows with h and would poke through
+    the stone lip on tall walls)."""
     height = h * LEVEL
+    n_rows = SORI_ROWS if rows is None else rows
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, ...]] = []
-    for k in range(SORI_ROWS + 1):
-        s = k / SORI_ROWS
+    for k in range(n_rows + 1):
+        s = k / n_rows
         inset = _sori_inset(s, height)
         z = -height + height * s
         p0 = _face_point(face, a_start, inset, z)
@@ -326,12 +373,90 @@ def _ishigaki_fringe_anchor(h: int) -> tuple[float, float]:
     return o_base, z_base
 
 
+def _kirikomi_stone(scene, name: str, face: str, a0: float, a1: float,
+                    z0: float, z1: float, height: float, material,
+                    seed: float, j: float, k: float) -> None:
+    """One dressed stone: a PLANAR quad tangent to the sori surface at the
+    stone's centre, pushed KIRI_LIP proud of the joint backing. The tangent
+    plane is tipped a touch about both axes so each block's normal differs
+    from its neighbours' — under the painterly dot(N,L) ramp that reads as
+    the individual facing of every fitted stone. Planarity matters: a quad
+    with independently jittered corners splits into two triangles whose
+    tones diverge hard near the shading terminator (black wedge artifacts
+    on the tall south faces)."""
+    a_c = 0.5 * (a0 + a1)
+    z_c = 0.5 * (z0 + z1)
+    s_c = max(0.0, min(1.0, 1.0 + z_c / height))
+    o_c = _sori_inset(s_c, height) - KIRI_LIP
+    # d(inset)/dz of the sori profile at the stone centre.
+    slope_z = 2.0 * ISHIGAKI_BATTER * (1.0 - s_c)
+    tilt_a = 0.055 * (_hash01(seed, j, 71.0 + k) - 0.5)  # twist about vertical
+    tilt_z = 0.055 * (_hash01(seed, j, 72.0 + k) - 0.5)  # pitch about horizontal
+    vertices: list[tuple[float, float, float]] = []
+    for a, z in ((a0, z0), (a1, z0), (a0, z1), (a1, z1)):
+        o = o_c + (slope_z + tilt_z) * (z - z_c) + tilt_a * (a - a_c)
+        p = _face_point(face, a, o, z)
+        vertices.append((*map_xy(p[0], p[1]), p[2]))
+    add_mesh(scene, name, vertices, [(0, 1, 3, 2)], material)
+
+
+def _kirikomi_wall(scene, face: str, h: int, a_end_fn=None, backing=None) -> None:
+    """Coursed kirikomi-hagi masonry along one battered face.
+
+    Course heights are exact (KIRI_COURSE == 8 px) and the head-joint layout
+    depends only on (face, course index), so stacked or abutting tiles of any
+    h continue the same coursing without seams. a_end_fn(inset) clips each
+    course at the corner arris for the corner piece; `backing` overrides the
+    near-black joint backing (the tall corner's taper collapses past the
+    tile edge, so its exposed backing must read as stone, not mortar)."""
+    height = h * LEVEL
+    stones = _kirikomi_stone_materials()
+    damp, mossy = _kirikomi_weathered_materials()
+    joint = backing if backing is not None else _kirikomi_joint_material()
+    seed = 5.0 if face == "s" else 6.0
+    _ishigaki_strip(scene, f"Joint{face}", face, h, joint, -0.5 - BLEED,
+                    a_end_fn if a_end_fn is not None else (lambda inset: 0.5 + BLEED))
+    n_courses = 5 * h
+    a_min = -0.5 - BLEED
+    for j in range(n_courses):
+        z1 = -j * KIRI_COURSE
+        z0 = z1 - KIRI_COURSE + KIRI_BED
+        if a_end_fn is None:
+            a_stop = 0.5 + BLEED
+        else:
+            s_mid = max(0.0, min(1.0, 1.0 + 0.5 * (z0 + z1) / height))
+            a_stop = a_end_fn(_sori_inset(s_mid, height))
+        # Running bond: the start shift alternates course to course so the
+        # vertical joints break bond instead of stacking into columns.
+        shift = 0.16 + 0.24 * _hash01(seed, j, 81.0)
+        a = a_min - shift
+        k = 0
+        while a < a_stop - 0.02:
+            width = 0.24 + 0.16 * _hash01(seed, j, 90.0 + 7.0 * k)
+            a0 = max(a_min, a)
+            a1 = min(a_stop, a + width - KIRI_GAP)
+            if a1 - a0 > 0.03:
+                roll = _hash01(seed, j, 60.0 + 5.0 * k)
+                material = stones[int(roll * 5.0) % 5]
+                # Aging gradient: damp then mossy blocks thicken toward the
+                # foot of the wall where rain and ground moisture linger.
+                depth = j / max(1, n_courses - 1)
+                age = _hash01(seed, j, 70.0 + 3.0 * k)
+                if depth > 0.75 and age < 0.12 + 0.30 * (depth - 0.75) / 0.25:
+                    material = mossy
+                elif depth > 0.5 and age > 0.85 - 0.40 * (depth - 0.5) / 0.5:
+                    material = damp
+                _kirikomi_stone(scene, f"Stone{face}{j}_{k}", face, a0, a1,
+                                z0, z1, height, material, seed, float(j), float(k))
+            a += width
+            k += 1
+
+
 def build_ishigaki_face(scene: bpy.types.Scene, face: str, h: int) -> None:
-    """Nozura-zumi ishigaki, S or E face, h steps tall; same masonry material
-    and batter language as the tenshu mound. Canvas 64x(32+40h), anchor (32,16)."""
-    stone = _elev_ishigaki_material()
-    _ishigaki_strip(scene, f"Wall{face}", face, h, stone,
-                    -0.5 - BLEED, lambda inset: 0.5 + BLEED)
+    """Kirikomi-hagi ishigaki, S or E face, h steps tall: dressed stones in
+    level courses with breaking head joints on the sori batter of the tenshu
+    mound. Canvas 64x(32+40h), anchor (32,16)."""
+    _kirikomi_wall(scene, face, h)
     _ishigaki_base_moss(scene, face, h, -0.5 - BLEED, 0.5 + BLEED)
     seed = (5.0 if face == "s" else 6.0) + 10.0 * h
     o_base, z_base = _ishigaki_fringe_anchor(h)
@@ -341,13 +466,15 @@ def build_ishigaki_face(scene: bpy.types.Scene, face: str, h: int) -> None:
 def build_ishigaki_corner(scene: bpy.types.Scene, h: int) -> None:
     """SE outer ishigaki corner with sangi-zumi quoins: complete replacement
     piece carrying BOTH faces (draw INSTEAD of face.s + face.e)."""
-    stone = _elev_ishigaki_material()
-    quoin = _quoin_material()
+    quoin = _kirikomi_quoin_material()
     height = h * LEVEL
 
-    # Both faces taper onto the shared arris (x = y = 0.5 - inset(s)).
-    _ishigaki_strip(scene, "WallS", "s", h, stone, -0.5 - BLEED, lambda inset: 0.5 - inset)
-    _ishigaki_strip(scene, "WallE", "e", h, stone, -0.5 - BLEED, lambda inset: 0.5 - inset)
+    # Both coursed walls taper onto the shared arris (x = y = 0.5 - inset(s)).
+    # Dark-stone backing: on h4/h5 the taper collapses past the tile edge and
+    # exposes bare backing near the top, which must stay stone-toned.
+    core_stone = make_noise_material("KiriCore", (0.098, 0.093, 0.082), (0.164, 0.156, 0.138), scale=4.0)
+    _kirikomi_wall(scene, "s", h, a_end_fn=lambda inset: 0.5 - inset, backing=core_stone)
+    _kirikomi_wall(scene, "e", h, a_end_fn=lambda inset: 0.5 - inset, backing=core_stone)
     _ishigaki_base_moss(scene, "s", h, -0.5 - BLEED, 0.5)
     _ishigaki_base_moss(scene, "e", h, -0.5 - BLEED, 0.5)
 
