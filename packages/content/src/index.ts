@@ -6,6 +6,7 @@ import { fiveTierKeepScenario } from "./five-tier-keep";
 import { cutPassFortScenario } from "./cut-pass-fort";
 import { castleTownGateScenario } from "./castle-town-gate";
 import { steppedFortressScenario } from "./stepped-fortress";
+import { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
 
 // --- Building and unit content definitions ---------------------------------
 //
@@ -1306,7 +1307,7 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
 /** Scenario roster in ascending difficulty order.
  *  A: 環郭式平城(入門) / B: 連郭式(標準) / C: 川城+門前町(上級) /
  *  D: 山城(2.0ショーケース・高低差) / 追加5種 (浮城/五段積/切通し/城下/段郭) /
- *  Free: 自由演習(サンドボックス) */
+ *  高石垣ショーケース (h3/h4/h5フェイス確認) / Free: 自由演習(サンドボックス) */
 export const scenarios: readonly ScenarioDefinition[] = [
   concentricCastleScenario,
   linearFortressScenario,
@@ -1317,6 +1318,7 @@ export const scenarios: readonly ScenarioDefinition[] = [
   cutPassFortScenario,
   steppedFortressScenario,
   fiveTierKeepScenario,
+  takaishigakiShowcaseScenario,
   freePlayScenario,
 ];
 
@@ -1331,3 +1333,4 @@ export { fiveTierKeepScenario } from "./five-tier-keep";
 export { cutPassFortScenario } from "./cut-pass-fort";
 export { castleTownGateScenario } from "./castle-town-gate";
 export { steppedFortressScenario } from "./stepped-fortress";
+export { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
