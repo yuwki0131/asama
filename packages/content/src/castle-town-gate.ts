@@ -18,7 +18,7 @@ export const castleTownGateScenario: ContentScenarioDefinition = {
     // === 本城 — 壁リング x40..60, y50..64 (南門 gate_wide_3 @49..51) ===
     ...ring("wall", 40, 50, 60, 64, ["49,64", "50,64", "51,64"]),
     { type: "gate_wide_3", position: { x: 49, y: 64 } },
-    { type: "tenshu", position: { x: 42, y: 53 } },
+    { type: "tenshu", position: { x: 43, y: 54 } },
     { type: "honmaru", position: { x: 55, y: 55 } },
     { type: "storehouse", position: { x: 53, y: 58 } },
     { type: "storehouse", position: { x: 56, y: 51 } },

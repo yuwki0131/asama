@@ -217,7 +217,7 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     type: "tenshu",
     category: "objective",
     maxHp: 9999,
-    footprint: { width: 7, height: 7 },
+    footprint: { width: 5, height: 5 },
     passable: false,
     assetId: "building.tenshu.main",
     gateState: null
@@ -339,7 +339,7 @@ export const mvpDefenseScenario: ScenarioDefinition = {
   id: "mvp-defense",
   name: "MVP防衛戦",
   initialBuildings: [
-  { type: "tenshu", position: { x: 54, y: 54 } },
+  { type: "tenshu", position: { x: 55, y: 55 } },
   { type: "honmaru", position: { x: 62, y: 58 } },
   { type: "yagura", position: { x: 50, y: 58 } },
   { type: "storehouse", position: { x: 47, y: 62 } },
@@ -495,8 +495,8 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 68, y: 81 } },
     { type: "wall", position: { x: 69, y: 81 } },
     { type: "wall", position: { x: 70, y: 81 } },
-    // 天守(8×8) + 本丸マーカー
-    { type: "tenshu", position: { x: 57, y: 67 } },
+    // 天守(5×5) + 本丸マーカー
+    { type: "tenshu", position: { x: 58, y: 68 } },
     { type: "honmaru", position: { x: 67, y: 78 } },
 
     // === 水堀リング x=54-72, y=26-45 ===
@@ -813,7 +813,7 @@ export const linearFortressScenario: ContentScenarioDefinition = {
   description: "連郭式の二之丸を前線に東西二方向の敵と戦う標準難易度シナリオ。騎兵による南側奇襲に要注意。",
   initialBuildings: [
     // === Honmaru compound (NW) — wall ring x=15-29, y=14-29 ===
-    { type: "tenshu", position: { x: 17, y: 56 } },
+    { type: "tenshu", position: { x: 18, y: 57 } },
     { type: "honmaru", position: { x: 26, y: 66 } },
 
     // North wall
@@ -1120,7 +1120,7 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
   description: "川を天然の水堀として活用する上級シナリオ。二本の橋を押さえる橋頭堡防衛と工兵による橋破壊が鍵。",
   initialBuildings: [
     // === Castle core (west bank) ===
-    { type: "tenshu", position: { x: 30, y: 46 } },
+    { type: "tenshu", position: { x: 31, y: 47 } },
     { type: "honmaru", position: { x: 42, y: 57 } },
 
     // Watchtower guarding the NE approach

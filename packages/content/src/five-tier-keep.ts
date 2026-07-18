@@ -42,7 +42,7 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
   },
   initialBuildings: [
     // === L5 頂上 — 天守・本丸・詰の蔵・虎口門 ===
-    { type: "tenshu", position: { x: 52, y: 54 } },
+    { type: "tenshu", position: { x: 53, y: 55 } },
     { type: "honmaru", position: { x: 61, y: 56 } },
     { type: "storehouse", position: { x: 60, y: 59 } },
     { type: "gate", position: { x: 58, y: 62 } },

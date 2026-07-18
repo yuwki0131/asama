@@ -9,9 +9,10 @@ from .core import (
     WALL_BODY_TOP, WALL_COPING_THICKNESS, WALL_COPING_TOP, WALL_EPSILON,
 )
 from .materials import (
-    building_material_set, make_ishigaki_material, make_namako_material,
-    make_noise_material, make_plank_material, make_showcase_plaster,
-    make_showcase_roof, make_textured_material, prop_materials,
+    building_material_set, make_gate_ground_material, make_ishigaki_material,
+    make_namako_material, make_noise_material, make_plank_material,
+    make_showcase_plaster, make_showcase_roof, make_textured_material,
+    prop_materials,
 )
 from .vegetation import (
     add_leaf_cards, add_prop_barrel, add_prop_bale, add_prop_bush,
@@ -315,10 +316,13 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, do
     wood, door, plaster, stone = mats["dark_wood"], mats["wood"], mats["plaster"], mats["stone"]
 
     half = float(width) / 2.0
+    # Gate ground is trodden earth matching the terrain dirt tiles — no
+    # masonry sill (user feedback: stone tiling under gates looks wrong).
+    ground = make_gate_ground_material(axis)
     if axis == "nw_se":
-        add_box(scene, "Sill", *map_box((-half, -0.5, 0.0), (half, 0.5, 0.035)), stone)
+        add_box(scene, "Sill", *map_box((-half, -0.5, 0.0), (half, 0.5, 0.02)), ground)
     else:
-        add_box(scene, "Sill", *map_box((-0.5, -half, 0.0), (0.5, half, 0.035)), stone)
+        add_box(scene, "Sill", *map_box((-0.5, -half, 0.0), (0.5, half, 0.02)), ground)
 
     for label, along in (("Near", half - 0.22), ("Far", -half + 0.22)):
         low, high = gate_box(axis, along - GATE_PILLAR_SIZE / 2.0, along + GATE_PILLAR_SIZE / 2.0, GATE_PILLAR_SIZE / 2.0, 0.0, GATE_PILLAR_HEIGHT)
@@ -704,13 +708,14 @@ def build_tenshu_graybox(scene: bpy.types.Scene) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Production tenshu (five-tier keep on an ishigaki mound, 7x7 lot)
+# Production tenshu (three-tier keep on an ishigaki mound, 5x5 lot)
 # ---------------------------------------------------------------------------
 
-# Selection-gate variants (orchestrator picks the default):
-#   A: five roofs, strong tier reduction — grounded borogata silhouette
-#   B: five roofs, gentle reduction — slimmer soto-gata column
-#   C: four roofs with oversized chidori-hafu
+# Variants keep the same design language (white plaster, kawara skirt roofs,
+# chidori-hafu, kato-mado, shachi) — only proportions differ:
+#   A (production): three roofs, strong tier reduction — grounded borogata
+#   B: three roofs, gentle reduction — slimmer column
+#   C: three roofs with oversized chidori-hafu
 TENSHU_DEFAULT_VARIANT = "A"
 
 # Mound height = exactly ONE terrain elevation step (elevation/tiles.py LEVEL,
@@ -720,31 +725,40 @@ TENSHU_DEFAULT_VARIANT = "A"
 import math as _math
 TENSHU_ISHIGAKI_TOP = 5.0 * _math.sqrt(6.0) / 12.0  # == elevation.tiles.LEVEL
 TENSHU_ISHIGAKI_BATTER = 0.30  # top inset fraction of mound height (terrain sori)
-TENSHU_MOUND_BASE_HALF = 3.45  # mound base fills the 7x7 lot minus a hair
+TENSHU_MOUND_BASE_HALF = 2.45  # mound base fills the 5x5 lot minus a hair
 
 # Global keep scale (selection gate 2026-07-18: 0.60 vs 0.75 of the PR#62
 # volume; heights AND widths shrink together so the silhouette keeps its
 # proportions while harmonizing with the kura/yagura neighbours).
 TENSHU_DEFAULT_SCALE = 0.75
 
+# Tier widths are chosen so the FIRST story rises almost flush with the stone
+# crest (user ruling 2026-07-18: no visible flat 犬走り between the ishigaki
+# edge and the plaster wall — a real keep fills its stone platform). With the
+# 0.75 global scale, tier-0 of A spans 5.15*0.75=3.86 map units against a
+# stone crest of ~2.14 half-width, leaving only a ~0.21-unit stone rim
+# (well under the 0.5-tile limit); the tier-0 skirt roof eaves then reach
+# back out over the stone edge. Story heights keep the approved height:width
+# ratio (~0.26) of the PR#62 design so the white plaster bands still read
+# clearly between the tiled skirt roofs, tier reduction ratio ~0.81 as before.
 TENSHU_VARIANTS = {
     "A": {
         # Wall:roof close to 1:1 (Himeji/Matsumoto reference) so the white
         # plaster band reads clearly between the tiled skirt roofs.
-        "tiers": ((4.55, 1.18), (3.70, 1.08), (2.95, 1.00), (2.30, 0.94), (1.75, 0.86)),
-        "rises": (0.34, 0.32, 0.30, 0.29),
+        "tiers": ((5.15, 1.34), (4.15, 1.16), (3.35, 1.00)),
+        "rises": (0.34, 0.31),
         "top_rise": 0.58,
-        "hafu": ((1, "S", 0.38), (2, "E", 0.42)),
+        "hafu": ((0, "S", 0.38), (1, "E", 0.42)),
     },
     "B": {
-        "tiers": ((4.25, 0.94), (3.75, 0.88), (3.25, 0.82), (2.75, 0.76), (2.25, 0.70)),
-        "rises": (0.34, 0.33, 0.32, 0.31),
+        "tiers": ((4.95, 1.10), (4.30, 1.00), (3.70, 0.92)),
+        "rises": (0.34, 0.33),
         "top_rise": 0.52,
-        "hafu": ((2, "S", 0.40),),
+        "hafu": ((1, "S", 0.40),),
     },
     "C": {
-        "tiers": ((4.60, 1.10), (3.55, 1.00), (2.65, 0.92), (1.90, 0.82)),
-        "rises": (0.40, 0.38, 0.36),
+        "tiers": ((5.20, 1.26), (4.00, 1.12), (3.00, 1.00)),
+        "rises": (0.40, 0.38),
         "top_rise": 0.66,
         "hafu": ((0, "S", 0.60), (1, "E", 0.55)),
     },
@@ -1105,16 +1119,19 @@ def _tenshu_shachi(scene: bpy.types.Scene, name: str, x: float, y: float, z: flo
 
 
 def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, scale: float | None = None) -> None:
-    """Production five-tier keep on a 7x7 lot. Canvas 448x400, anchor 224,368.
+    """Production three-tier keep on a 5x5 lot. Canvas 384x352, anchor 192,320.
 
     Low ishigaki mound exactly one terrain elevation step tall (the scenario
-    terrain hill supplies the height drama), then shrinking stories: dark
-    shitami-ita skirt boards + aged white plaster, koshi window rows, hipped
-    kawara skirt roofs with sumimune hips, chidori-hafu dormers, kato-mado
-    and a koran rail on the top story, gabled top roof with shachi finials.
-    `scale` shrinks the keep volume uniformly (widths and heights) while the
-    mound stays lot-sized and 1-step tall. Same shared iso camera as every
-    building, so all ridge lines land on the 2:1 tile angle by construction."""
+    terrain hill supplies the height drama); the first story rises almost
+    flush with the stone crest (no visible flat between ishigaki edge and
+    plaster wall), then shrinking stories: dark shitami-ita skirt boards +
+    aged white plaster, koshi window rows, hipped kawara skirt roofs with
+    sumimune hips, chidori-hafu dormers, kato-mado and a koran rail on the
+    top story, gabled top roof with shachi finials.
+    `scale` shrinks the keep heights/roofs uniformly (tier widths in the
+    variant spec are pre-divided by it so the footprint stays flush) while
+    the mound stays lot-sized and 1-step tall. Same shared iso camera as
+    every building, so all ridge lines land on the 2:1 tile angle."""
     spec = TENSHU_VARIANTS[variant]
     s = TENSHU_DEFAULT_SCALE if scale is None else scale
     mats = _tenshu_material_set()
@@ -1126,7 +1143,7 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
         "TenshuQuoin", (0.190, 0.172, 0.140), (0.300, 0.278, 0.235), scale=3.0)
     gold = make_material("TenshuShachi", (0.58, 0.46, 0.17, 1.0))
 
-    cx, cy = -3.5, -3.5  # lot center of the [-7,0]x[-7,0] footprint
+    cx, cy = -2.5, -2.5  # lot center of the [-5,0]x[-5,0] footprint
 
     # --- Ishigaki mound: ONE terrain step tall, concave sori batter matching
     # elevation/tiles.py (_sori_inset with ISHIGAKI_BATTER=0.30). Single mesh
@@ -1171,7 +1188,9 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
                 add_box(scene, f"Quoin{sx:+.0f}{sy:+.0f}{k}", *map_box(
                     (px - ax, py - ay, z0), (px + ax, py + ay, z1)), quoin)
 
-    # Gravel walk inset from the crest so a stone rim stays visible.
+    # Thin gravel bed under the first story. The story wall rises within
+    # ~0.14 units of the stone crest, so only a sliver of this (plus the
+    # stone rim) ever reads on screen — no walkable 犬走り flat remains.
     walk = mound_half(1.0) - 0.10
     add_box(scene, "IshigakiWalk", *map_box((cx - walk, cy - walk, height), (cx + walk, cy + walk, height + 0.018)), mats["gravel"])
 
