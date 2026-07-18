@@ -6,6 +6,7 @@ import { fiveTierKeepScenario } from "./five-tier-keep";
 import { cutPassFortScenario } from "./cut-pass-fort";
 import { castleTownGateScenario } from "./castle-town-gate";
 import { steppedFortressScenario } from "./stepped-fortress";
+import { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
 
 // --- Building and unit content definitions ---------------------------------
 //
@@ -44,15 +45,6 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.wall.plaster",
     gateState: null
   },
-  gate: {
-    type: "gate",
-    category: "castle",
-    maxHp: 220,
-    footprint: { width: 1, height: 1 },
-    passable: false,
-    assetId: "building.gate.wood.closed",
-    gateState: "closed"
-  },
   gate_wide_2: {
     type: "gate_wide_2",
     category: "castle",
@@ -71,13 +63,15 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.gate.wood.closed.width3",
     gateState: "closed"
   },
-  gate_ne_sw: {
-    type: "gate_ne_sw",
+  // 狭門: 3マス占有だが通行できるのは中央1マスのみ。両袖は厚い袖壁で、
+  // 1マス幅の通用口を表す (旧1マス門 gate / gate_ne_sw の後継)。
+  gate_narrow_3: {
+    type: "gate_narrow_3",
     category: "castle",
-    maxHp: 220,
-    footprint: { width: 1, height: 1 },
+    maxHp: 380,
+    footprint: { width: 3, height: 1 },
     passable: false,
-    assetId: "building.gate.wood.closed.ne_sw",
+    assetId: "building.gate.wood.closed.narrow3",
     gateState: "closed"
   },
   gate_wide_2_ne_sw: {
@@ -96,6 +90,15 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     footprint: { width: 1, height: 3 },
     passable: false,
     assetId: "building.gate.wood.closed.ne_sw.width3",
+    gateState: "closed"
+  },
+  gate_narrow_3_ne_sw: {
+    type: "gate_narrow_3_ne_sw",
+    category: "castle",
+    maxHp: 380,
+    footprint: { width: 1, height: 3 },
+    passable: false,
+    assetId: "building.gate.wood.closed.ne_sw.narrow3",
     gateState: "closed"
   },
   dry_moat: {
@@ -216,7 +219,7 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     type: "tenshu",
     category: "objective",
     maxHp: 9999,
-    footprint: { width: 7, height: 7 },
+    footprint: { width: 5, height: 5 },
     passable: false,
     assetId: "building.tenshu.main",
     gateState: null
@@ -338,7 +341,7 @@ export const mvpDefenseScenario: ScenarioDefinition = {
   id: "mvp-defense",
   name: "MVP防衛戦",
   initialBuildings: [
-  { type: "tenshu", position: { x: 54, y: 54 } },
+  { type: "tenshu", position: { x: 55, y: 55 } },
   { type: "honmaru", position: { x: 62, y: 58 } },
   { type: "yagura", position: { x: 50, y: 58 } },
   { type: "storehouse", position: { x: 47, y: 62 } },
@@ -494,8 +497,8 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 68, y: 81 } },
     { type: "wall", position: { x: 69, y: 81 } },
     { type: "wall", position: { x: 70, y: 81 } },
-    // 天守(8×8) + 本丸マーカー
-    { type: "tenshu", position: { x: 57, y: 67 } },
+    // 天守(5×5) + 本丸マーカー
+    { type: "tenshu", position: { x: 58, y: 68 } },
     { type: "honmaru", position: { x: 67, y: 78 } },
 
     // === 水堀リング x=54-72, y=26-45 ===
@@ -812,7 +815,7 @@ export const linearFortressScenario: ContentScenarioDefinition = {
   description: "連郭式の二之丸を前線に東西二方向の敵と戦う標準難易度シナリオ。騎兵による南側奇襲に要注意。",
   initialBuildings: [
     // === Honmaru compound (NW) — wall ring x=15-29, y=14-29 ===
-    { type: "tenshu", position: { x: 17, y: 56 } },
+    { type: "tenshu", position: { x: 18, y: 57 } },
     { type: "honmaru", position: { x: 26, y: 66 } },
 
     // North wall
@@ -1024,9 +1027,10 @@ export const linearFortressScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 42, y: 87 } },
     { type: "farm", position: { x: 48, y: 89 } },
 
-    // Enemy staging areas (east and south)
-    { type: "gate", position: { x: 100, y: 62 }, owner: "enemy" },
-    { type: "gate", position: { x: 63, y: 100 }, owner: "enemy" },
+    // Enemy staging areas (east and south) — 狭門 (中央1マス開口) centered on
+    // the old 1-cell gate positions.
+    { type: "gate_narrow_3_ne_sw", position: { x: 100, y: 61 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 62, y: 100 }, owner: "enemy" },
   ],
   initialUnits: [
     // Player garrison in honmaru
@@ -1119,7 +1123,7 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
   description: "川を天然の水堀として活用する上級シナリオ。二本の橋を押さえる橋頭堡防衛と工兵による橋破壊が鍵。",
   initialBuildings: [
     // === Castle core (west bank) ===
-    { type: "tenshu", position: { x: 30, y: 46 } },
+    { type: "tenshu", position: { x: 31, y: 47 } },
     { type: "honmaru", position: { x: 42, y: 57 } },
 
     // Watchtower guarding the NE approach
@@ -1177,8 +1181,8 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 52, y: 70 } },
 
     // === Bridge approach gates (west shore — choke the exits) ===
-    { type: "gate", position: { x: 56, y: 50 } },
-    { type: "gate", position: { x: 56, y: 66 } },
+    { type: "gate_narrow_3_ne_sw", position: { x: 56, y: 49 } },
+    { type: "gate_narrow_3_ne_sw", position: { x: 56, y: 65 } },
 
     // Roads connecting castle gate to bridge approach gates
     { type: "road", position: { x: 54, y: 57 } },
@@ -1214,7 +1218,7 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
     { type: "road", position: { x: 62, y: 66 } },
 
     // Enemy staging area
-    { type: "gate", position: { x: 80, y: 58 }, owner: "enemy" },
+    { type: "gate_narrow_3_ne_sw", position: { x: 80, y: 57 }, owner: "enemy" },
   ],
   initialUnits: [
     // Player garrison at honmaru
@@ -1306,7 +1310,7 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
 /** Scenario roster in ascending difficulty order.
  *  A: 環郭式平城(入門) / B: 連郭式(標準) / C: 川城+門前町(上級) /
  *  D: 山城(2.0ショーケース・高低差) / 追加5種 (浮城/五段積/切通し/城下/段郭) /
- *  Free: 自由演習(サンドボックス) */
+ *  高石垣ショーケース (h3/h4/h5フェイス確認) / Free: 自由演習(サンドボックス) */
 export const scenarios: readonly ScenarioDefinition[] = [
   concentricCastleScenario,
   linearFortressScenario,
@@ -1317,6 +1321,7 @@ export const scenarios: readonly ScenarioDefinition[] = [
   cutPassFortScenario,
   steppedFortressScenario,
   fiveTierKeepScenario,
+  takaishigakiShowcaseScenario,
   freePlayScenario,
 ];
 
@@ -1331,3 +1336,4 @@ export { fiveTierKeepScenario } from "./five-tier-keep";
 export { cutPassFortScenario } from "./cut-pass-fort";
 export { castleTownGateScenario } from "./castle-town-gate";
 export { steppedFortressScenario } from "./stepped-fortress";
+export { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";

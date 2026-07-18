@@ -23,7 +23,7 @@ export const waterCastleScenario: ContentScenarioDefinition = {
     // === 本丸 — 壁リング x34..46, y58..70 (南門 gate_wide_3 @39..41) ===
     ...ring("wall", 34, 58, 46, 70, ["39,70", "40,70", "41,70"]),
     { type: "gate_wide_3", position: { x: 39, y: 70 } },
-    { type: "tenshu", position: { x: 35, y: 59 } },
+    { type: "tenshu", position: { x: 36, y: 60 } },
     { type: "honmaru", position: { x: 44, y: 60 } },
     { type: "storehouse", position: { x: 43, y: 63 } },
     { type: "storehouse", position: { x: 35, y: 66 } },
@@ -57,7 +57,7 @@ export const waterCastleScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 44, y: 93 } },
 
     // 敵の集結地 (南の街道口)
-    { type: "gate", position: { x: 40, y: 104 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 39, y: 104 }, owner: "enemy" },
   ],
   initialUnits: [
     // 本丸 — 刀足軽は本丸マーカー上 (在城中は敵の占拠が成立しない)

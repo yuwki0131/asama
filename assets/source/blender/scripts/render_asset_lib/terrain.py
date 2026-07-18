@@ -377,83 +377,24 @@ def build_water_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
     build_trench_moat(scene, mask, water=True)
 
 
-def build_wood_bridge_span(scene: bpy.types.Scene, axis: str = "x", span_len: int = 3) -> None:
-    """1x3 wooden bridge spanning a sunken river: earthen approach ramps on
-    the two bank cells, arched plank span over the middle water cell, trestle
-    posts in the water, railings full length. Built in along=[-3,0],
-    across=[-1,0] (south-corner lot convention). Canvas 160x112, anchor 80,64."""
-    from .materials import make_plank_material, make_ishigaki_material
-    pt = _bridge_axes(axis)
-    plank = make_plank_material("SpanPlank", (0.110, 0.078, 0.046), (0.185, 0.140, 0.088), boards_per_unit=12.0)
-    beam = make_material("SpanBeam", (0.070, 0.050, 0.030, 1.0))
-    rail = make_material("SpanRail", (0.085, 0.062, 0.038, 1.0))
-    stone = make_ishigaki_material("SpanAbutment")
-    dirt = make_mud_material("SpanRamp")
+# --- Bridges: segment-based auto-tiling -----------------------------------
+# One asset per footprint cell, selected by the renderer:
+#   segment "single" -> isolated one-tile bridge (abutments on both ends)
+#           "start"  -> approach cell at the MIN-coordinate end (on land)
+#           "mid"    -> water-crossing cell, seamless along the axis
+#           "end"    -> approach cell at the MAX-coordinate end (on land)
+# Contract:
+#   * every tile is built with its own cell center at map origin, so the
+#     deck diamond center projects exactly onto the anchor pixel;
+#   * every long-running element (deck, revetment, kamachi, rails) keeps a
+#     constant cross-section and crosses segment-internal tile edges with a
+#     TERRAIN_BLEED extension, so adjacent segments meet flush with no
+#     repeated edges and no visible steps;
+#   * the earth-bridge deck reuses the road kit's material, top height and
+#     half-width, so road -> dobashi -> road reads as one straight line.
 
-    L = float(span_len)
-
-    def box(name, a0, a1, c0, c1, z0, z1, mat):
-        lo = pt(min(a0, a1), min(c0, c1))
-        hi = pt(max(a0, a1), max(c0, c1))
-        add_box(scene, name, *map_box((lo[0], lo[1], z0), (hi[0], hi[1], z1)), mat)
-
-    # Bank cells (first and last): packed-earth approach ramps rising to
-    # the deck level, with stone cheek walls facing the water.
-    for name, a0, a1, cheek_a in (("RampW", -L, -L + 1.0, -L + 1.0), ("RampE", -1.0, 0.0, -1.0)):
-        box(name + "Fill", a0, a1, -0.42, 0.42, 0.0, 0.10, dirt)
-        box(name + "Cheek", cheek_a - 0.10, cheek_a + 0.10, -0.46, 0.46, -0.20, 0.11, stone)
-    # Trestle posts standing in the sunken water (one pair per water cell).
-    for wi in range(span_len - 2):
-        for da in (-0.22, 0.22):
-            a = -L + 1.0 + wi + 0.5 + da
-            for c in (-0.24, 0.24):
-                p = pt(a, c)
-                add_box(scene, f"Post{wi}{da}{c}", *map_box((p[0] - 0.04, p[1] - 0.04, -0.20), (p[0] + 0.04, p[1] + 0.04, 0.10)), beam)
-    # Stringers under the water span.
-    for c in (-0.24, 0.0, 0.24):
-        box(f"Stringer{c}", -L + 0.9, -0.9, c - 0.04, c + 0.04, 0.075, 0.115, beam)
-    # Deck: bank sections flat, water span slightly arched.
-    box("DeckW", -L, -L + 1.0, -0.34, 0.34, 0.10, 0.14, plank)
-    box("DeckMid", -L + 0.95, -0.95, -0.34, 0.34, 0.115, 0.155, plank)
-    box("DeckE", -1.0, 0.0, -0.34, 0.34, 0.10, 0.14, plank)
-    # Kamachi edge beams + railings full length.
-    for side in (-1.0, 1.0):
-        c = side * 0.36
-        box(f"Kamachi{side}", -L, 0.0, c - 0.02, c + 0.02, 0.14, 0.165, beam)
-        n_posts = 2 * span_len
-        for pi in range(n_posts + 1):
-            a = -L + 0.1 + (L - 0.2) * pi / n_posts
-            zb = 0.155 if (-L + 0.95) < a < -0.95 else 0.14
-            p = pt(a, c)
-            add_box(scene, f"RailPost{side}{pi}", *map_box((p[0] - 0.03, p[1] - 0.03, zb), (p[0] + 0.03, p[1] + 0.03, zb + 0.30)), rail)
-        for rz in (0.30, 0.40):
-            box(f"Rail{side}{rz}", -L + 0.05, -0.05, c - 0.022, c + 0.022, rz, rz + 0.035, rail)
-
-
-def build_earth_bridge_span(scene: bpy.types.Scene, axis: str = "x", span_len: int = 3) -> None:
-    """1x3 dobashi: continuous earthen causeway over the middle water cell,
-    stone revetment along the water span, grass lips on the shoulders."""
-    from .materials import make_ishigaki_material
-    pt = _bridge_axes(axis)
-    dirt = make_mud_material("DobashiDirt")
-    stone = make_ishigaki_material("DobashiStone")
-    grass_lip = make_material("DobashiGrass", (0.105, 0.150, 0.070, 1.0))
-
-    def box(name, a0, a1, c0, c1, z0, z1, mat):
-        lo = pt(min(a0, a1), min(c0, c1))
-        hi = pt(max(a0, a1), max(c0, c1))
-        add_box(scene, name, *map_box((lo[0], lo[1], z0), (hi[0], hi[1], z1)), mat)
-
-    L = float(span_len)
-    # Stone revetment carrying the causeway across the sunken water cells.
-    box("Revet", -L + 0.9, -0.9, -0.40, 0.40, -0.20, 0.05, stone)
-    # Earthen causeway full length, gently cambered over the water.
-    box("CausewayW", -L, -L + 1.0, -0.36, 0.36, 0.0, 0.075, dirt)
-    box("CausewayMid", -L + 0.95, -0.95, -0.36, 0.36, 0.0, 0.10, dirt)
-    box("CausewayE", -1.0, 0.0, -0.36, 0.36, 0.0, 0.075, dirt)
-    # Grass lips on both shoulders, full length.
-    for side in (-1.0, 1.0):
-        box(f"Lip{side}", -L, 0.0, side * 0.36, side * 0.42, 0.0, 0.055, grass_lip)
+ROAD_FLOOR_TOP = 0.014   # build_road_mask floor_top
+ROAD_ARM_HALF = 0.27     # build_road_mask arm_half
 
 
 def _bridge_axes(axis: str):
@@ -463,73 +404,140 @@ def _bridge_axes(axis: str):
     return lambda a, c: (c, a)
 
 
-def build_earth_bridge(scene: bpy.types.Scene, axis: str = "x") -> None:
-    """Dobashi (earthen causeway): packed-earth ramp with stone revetment
-    sides and grass-tufted shoulders, crossing sunken water. Canvas 64x48,
-    anchor 32,16."""
+def _bridge_box(scene: bpy.types.Scene, pt, name, a0, a1, c0, c1, z0, z1, material) -> None:
+    lo = pt(min(a0, a1), min(c0, c1))
+    hi = pt(max(a0, a1), max(c0, c1))
+    add_box(scene, name, *map_box((lo[0], lo[1], z0), (hi[0], hi[1], z1)), material)
+
+
+def _bridge_along_extents(segment: str) -> tuple[float, float]:
+    """Along-axis extents of the running elements for one segment tile.
+
+    Land-side ends stop exactly at the tile edge (the neighbouring road tile
+    provides the continuation); segment-internal edges extend by the bleed.
+    """
+    b = TERRAIN_BLEED
+    a0 = -0.5 - (0.0 if segment in ("start", "single") else b)
+    a1 = 0.5 + (0.0 if segment in ("end", "single") else b)
+    return a0, a1
+
+
+def build_earth_bridge(scene: bpy.types.Scene, axis: str = "x", segment: str = "single") -> None:
+    """Dobashi (earthen causeway) segment tile. The deck is a dead-flat
+    continuation of the road (same mud material, same top height, same
+    half-width); the only vertical relief is the stone revetment face that
+    carries the causeway across the sunken water. Canvas 64x48, anchor 32,24."""
     from .materials import make_ishigaki_material
     pt = _bridge_axes(axis)
     dirt = make_mud_material("CausewayDirt")
     stone = make_ishigaki_material("CausewayStone")
-    grass_lip = make_material("CausewayGrass", (0.105, 0.150, 0.070, 1.0))
-    # Stone revetment descending into the water.
+    a0, a1 = _bridge_along_extents(segment)
+
+    # Deck: flat road surface across the whole tile, constant cross-section.
+    _bridge_box(scene, pt, "Deck", a0, a1, -ROAD_ARM_HALF, ROAD_ARM_HALF, 0.0, ROAD_FLOOR_TOP, dirt)
+
+    # Stone revetment flanks descending into the water. Water cells carry it
+    # full length; approach cells only continue it on the water-facing half
+    # so it reads as the abutment wing built into the bank.
+    if segment in ("mid", "single"):
+        r0, r1 = a0, a1
+    elif segment == "start":
+        r0, r1 = 0.12, a1
+    else:  # end
+        r0, r1 = a0, -0.12
     for side in (-1.0, 1.0):
-        c0, c1 = side * 0.24, side * 0.34
-        lo = pt(-0.56, min(c0, c1))
-        hi = pt(0.56, max(c0, c1))
-        add_box(scene, f"Revet{side}", *map_box((lo[0], lo[1], -0.20), (hi[0], hi[1], 0.05)), stone)
-        glo = pt(-0.56, min(c0, c1))
-        ghi = pt(0.56, max(side * 0.24, side * 0.27))
-        add_box(scene, f"Lip{side}", *map_box((glo[0], glo[1], 0.05), (ghi[0], ghi[1], 0.075)), grass_lip)
-    # Packed earth deck.
-    lo = pt(-0.56, -0.26)
-    hi = pt(0.56, 0.26)
-    add_box(scene, "Causeway", *map_box((lo[0], lo[1], 0.0), (hi[0], hi[1], 0.07)), dirt)
+        _bridge_box(
+            scene, pt, f"Revet{side}",
+            r0, r1, side * ROAD_ARM_HALF, side * (ROAD_ARM_HALF + 0.07),
+            -0.20, ROAD_FLOOR_TOP - 0.004, stone
+        )
 
 
-def build_wood_bridge(scene: bpy.types.Scene, axis: str = "x") -> None:
-    """Wooden bridge: planked deck on log stringers, trestle posts standing
-    in the sunken water, railings with posts, stone abutments. Canvas 64x48,
-    anchor 32,16."""
+def _bridge_wedge(scene: bpy.types.Scene, pt, name, aA, aB, c0, c1, zA, zB, base_z, material) -> None:
+    """Prism whose top slopes from zA (at along=aA) to zB (at along=aB)."""
+    corners_map = [
+        (aA, c0, base_z), (aB, c0, base_z), (aB, c1, base_z), (aA, c1, base_z),
+        (aA, c0, zA), (aB, c0, zB), (aB, c1, zB), (aA, c1, zA),
+    ]
+    vertices = []
+    for a, c, z in corners_map:
+        x, y = pt(a, c)
+        wx, wy = map_xy(x, y)
+        vertices.append((wx, wy, z))
+    faces = [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    add_mesh(scene, name, vertices, faces, material)
+
+
+WOOD_DECK_Z0 = 0.085
+WOOD_DECK_Z1 = 0.125
+WOOD_DECK_HALF = 0.28
+
+
+def build_wood_bridge(scene: bpy.types.Scene, axis: str = "x", segment: str = "single") -> None:
+    """Wooden bridge segment tile: planked deck on log stringers, kamachi
+    edge beams, continuous railings (posts on a 0.25 grid so the rhythm
+    carries across tile edges), trestle posts in the water on mid cells and
+    stone abutments with an earthen approach ramp on the end cells.
+    Canvas 64x72, anchor 32,40."""
     from .materials import make_plank_material, make_ishigaki_material
     pt = _bridge_axes(axis)
     plank = make_plank_material("BridgePlank", (0.110, 0.078, 0.046), (0.185, 0.140, 0.088), boards_per_unit=12.0)
     beam = make_material("BridgeBeam", (0.070, 0.050, 0.030, 1.0))
     rail = make_material("BridgeRail", (0.085, 0.062, 0.038, 1.0))
     stone = make_ishigaki_material("BridgeAbutment")
+    dirt = make_mud_material("BridgeRamp")
+    a0, a1 = _bridge_along_extents(segment)
 
-    # Stone abutments at both banks.
-    for end in (-1.0, 1.0):
-        a0, a1 = end * 0.56, end * 0.42
-        lo = pt(min(a0, a1), -0.30)
-        hi = pt(max(a0, a1), 0.30)
-        add_box(scene, f"Abutment{end}", *map_box((lo[0], lo[1], -0.12), (hi[0], hi[1], 0.045)), stone)
-    # Trestle posts standing in the water (visible over the sunken river).
-    for a in (-0.18, 0.18):
-        for c in (-0.20, 0.20):
-            p = pt(a, c)
-            add_box(scene, f"Trestle{a}{c}", *map_box((p[0] - 0.035, p[1] - 0.035, -0.20), (p[0] + 0.035, p[1] + 0.035, 0.06)), beam)
-    # Log stringers under the deck.
+    # Log stringers under the deck, full length.
     for c in (-0.20, 0.0, 0.20):
-        lo = pt(-0.52, c - 0.035)
-        hi = pt(0.52, c + 0.035)
-        add_box(scene, f"Stringer{c}", *map_box((lo[0], lo[1], 0.045), (hi[0], hi[1], 0.085)), beam)
-    # Planked deck (plank grain runs across the walking direction).
-    lo = pt(-0.56, -0.28)
-    hi = pt(0.56, 0.28)
-    add_box(scene, "Deck", *map_box((lo[0], lo[1], 0.085), (hi[0], hi[1], 0.125)), plank)
-    # Kamachi edge beams along the deck sides.
+        _bridge_box(scene, pt, f"Stringer{c}", a0, a1, c - 0.035, c + 0.035, 0.045, WOOD_DECK_Z0, beam)
+    # Planked deck, constant cross-section full length.
+    _bridge_box(scene, pt, "Deck", a0, a1, -WOOD_DECK_HALF, WOOD_DECK_HALF, WOOD_DECK_Z0, WOOD_DECK_Z1, plank)
+    # Kamachi edge beams along both deck sides.
     for side in (-1.0, 1.0):
-        lo = pt(-0.56, side * 0.28 - 0.02)
-        hi = pt(0.56, side * 0.28 + 0.02)
-        add_box(scene, f"Kamachi{side}", *map_box((lo[0], min(lo[1], hi[1]), 0.125), (hi[0], max(lo[1], hi[1]), 0.15)), beam)
-    # Railings: posts + two horizontal rails.
+        _bridge_box(scene, pt, f"Kamachi{side}", a0, a1, side * (WOOD_DECK_HALF - 0.02), side * (WOOD_DECK_HALF + 0.02), WOOD_DECK_Z1, 0.15, beam)
+
+    # Railings: two horizontal rails + posts. Interior posts sit on the
+    # +-0.125 / +-0.375 grid (period 0.25 across tile edges); terminal ends
+    # get a heavier end post and the rails stop inside the tile.
+    rail_a0 = -0.44 if segment in ("start", "single") else a0
+    rail_a1 = 0.44 if segment in ("end", "single") else a1
     for side in (-1.0, 1.0):
         c = side * 0.30
-        for a in (-0.46, -0.15, 0.15, 0.46):
+        posts = [-0.125, 0.125]
+        if segment in ("mid",):
+            posts += [-0.375, 0.375]
+        if segment in ("start", "single"):
+            posts += [-0.44]
+        else:
+            posts += [-0.375]
+        if segment in ("end", "single"):
+            posts += [0.44]
+        else:
+            posts += [0.375]
+        for a in sorted(set(posts)):
             p = pt(a, c)
-            add_box(scene, f"RailPost{side}{a}", *map_box((p[0] - 0.028, p[1] - 0.028, 0.125), (p[0] + 0.028, p[1] + 0.028, 0.42)), rail)
+            add_box(scene, f"RailPost{side}{a}", *map_box((p[0] - 0.028, p[1] - 0.028, WOOD_DECK_Z1), (p[0] + 0.028, p[1] + 0.028, 0.42)), rail)
         for rz in (0.26, 0.38):
-            lo = pt(-0.48, c - 0.02)
-            hi = pt(0.48, c + 0.02)
-            add_box(scene, f"Rail{side}{rz}", *map_box((lo[0], min(lo[1], hi[1]), rz), (hi[0], max(lo[1], hi[1]), rz + 0.035)), rail)
+            _bridge_box(scene, pt, f"Rail{side}{rz}", rail_a0, rail_a1, c - 0.02, c + 0.02, rz, rz + 0.035, rail)
+
+    # Trestle posts standing in the sunken water (mid / isolated crossings).
+    if segment in ("mid", "single"):
+        for c in (-0.20, 0.20):
+            p = pt(0.0, c)
+            add_box(scene, f"Trestle{c}", *map_box((p[0] - 0.04, p[1] - 0.04, -0.20), (p[0] + 0.04, p[1] + 0.04, WOOD_DECK_Z0)), beam)
+
+    # Approach cells: stone abutment under the deck end + earth ramp from
+    # ground level up to the deck, so the bridge visibly lands on the bank.
+    ends = []
+    if segment in ("start", "single"):
+        ends.append(-1.0)
+    if segment in ("end", "single"):
+        ends.append(1.0)
+    for sign in ends:
+        ab0, ab1 = sign * 0.50, sign * 0.26
+        _bridge_box(scene, pt, f"Abutment{sign}", ab0, ab1, -0.30, 0.30, -0.12, WOOD_DECK_Z0 - 0.005, stone)
+        if sign < 0:
+            _bridge_wedge(scene, pt, "RampNeg", -0.50, -0.28, -0.26, 0.26, 0.015, WOOD_DECK_Z1 - 0.004, 0.0, dirt)
+        else:
+            _bridge_wedge(scene, pt, "RampPos", 0.28, 0.50, -0.26, 0.26, WOOD_DECK_Z1 - 0.004, 0.015, 0.0, dirt)

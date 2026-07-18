@@ -35,13 +35,13 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
   },
   initialBuildings: [
     // === 本曲輪 (L2) ===
-    { type: "tenshu", position: { x: 38, y: 87 } },
+    { type: "tenshu", position: { x: 39, y: 88 } },
     { type: "honmaru", position: { x: 48, y: 88 } },
     { type: "storehouse", position: { x: 48, y: 90 } },
     // 大手虎口 — 1→2 坂の出口 (43,96)(44,96) を塞ぐ幅2の門。
     { type: "gate_wide_2", position: { x: 43, y: 96 } },
-    // 搦手虎口 — 1→2 坂の出口 (52,91) を塞ぐ門。
-    { type: "gate", position: { x: 52, y: 91 } },
+    // 搦手虎口 — 1→2 坂の出口 (52,91) を塞ぐ狭門 (中央 (52,91) のみ通行可)。
+    { type: "gate_narrow_3_ne_sw", position: { x: 52, y: 90 } },
     { type: "yagura", position: { x: 36, y: 86 } },
     { type: "yagura", position: { x: 50, y: 94 } },
 
@@ -61,7 +61,7 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 54, y: 105 } },
 
     // 敵の集結地 (南の街道口)
-    { type: "gate", position: { x: 44, y: 116 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 43, y: 116 }, owner: "enemy" },
   ],
   decorations: [
     // 切通しの岩肌を印象付ける岩と松。

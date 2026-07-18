@@ -18,7 +18,7 @@ export const castleTownGateScenario: ContentScenarioDefinition = {
     // === 本城 — 壁リング x40..60, y50..64 (南門 gate_wide_3 @49..51) ===
     ...ring("wall", 40, 50, 60, 64, ["49,64", "50,64", "51,64"]),
     { type: "gate_wide_3", position: { x: 49, y: 64 } },
-    { type: "tenshu", position: { x: 42, y: 53 } },
+    { type: "tenshu", position: { x: 43, y: 54 } },
     { type: "honmaru", position: { x: 55, y: 55 } },
     { type: "storehouse", position: { x: 53, y: 58 } },
     { type: "storehouse", position: { x: 56, y: 51 } },
@@ -59,7 +59,7 @@ export const castleTownGateScenario: ContentScenarioDefinition = {
     { type: "yagura", position: { x: 52, y: 97 } },
 
     // 敵の集結地 (南の街道口)
-    { type: "gate", position: { x: 50, y: 110 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 49, y: 110 }, owner: "enemy" },
   ],
   initialUnits: [
     // 本城 — 刀は本丸マーカー上。城門裏に槍と弓。

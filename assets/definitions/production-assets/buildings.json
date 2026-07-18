@@ -444,7 +444,196 @@
         "canvasWidth": 64,
         "canvasHeight": 48,
         "anchorX": 32,
-        "anchorY": 16
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y",
+      "kind": "building",
+      "output": "building-earth-bridge-y.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.start",
+      "kind": "building",
+      "output": "building-earth-bridge-x-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-x-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.mid",
+      "kind": "building",
+      "output": "building-earth-bridge-x-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-x-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.end",
+      "kind": "building",
+      "output": "building-earth-bridge-x-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-x-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.start",
+      "kind": "building",
+      "output": "building-earth-bridge-y-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.mid",
+      "kind": "building",
+      "output": "building-earth-bridge-y-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.end",
+      "kind": "building",
+      "output": "building-earth-bridge-y-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
       },
       "category": "building",
       "postprocess": {
@@ -469,9 +658,198 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 48,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 16
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y",
+      "kind": "building",
+      "output": "building-wood-bridge-y.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.start",
+      "kind": "building",
+      "output": "building-wood-bridge-x-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-x-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.mid",
+      "kind": "building",
+      "output": "building-wood-bridge-x-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-x-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.end",
+      "kind": "building",
+      "output": "building-wood-bridge-x-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-x-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.start",
+      "kind": "building",
+      "output": "building-wood-bridge-y-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.mid",
+      "kind": "building",
+      "output": "building-wood-bridge-y-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.end",
+      "kind": "building",
+      "output": "building-wood-bridge-y-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
       },
       "category": "building",
       "postprocess": {
@@ -537,33 +915,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.closed",
-      "kind": "building",
-      "output": "building-gate-wood-closed.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.closed.width2",
       "kind": "building",
       "output": "building-gate-wood-closed-width2.png",
@@ -597,6 +948,33 @@
       "source": {
         "type": "blender",
         "model": "gate-wood-closed-nw_se-w3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.narrow3",
+      "kind": "building",
+      "output": "building-gate-wood-closed-narrow3.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0000",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -2832,114 +3210,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0100",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0100.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0100",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0001",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0001.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0001",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.nw_se.width1.connected.0101",
-      "kind": "building",
-      "output": "building-gate-wood-closed-nw-se-width1-connected-0101.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-nw_se-w1-0101",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.closed.nw_se.width2.connected.0000",
       "kind": "building",
       "output": "building-gate-wood-closed-nw-se-width2-connected-0000.png",
@@ -3145,114 +3415,6 @@
         "canvasHeight": 160,
         "anchorX": 112,
         "anchorY": 120
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.1000",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-1000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-1000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.0010",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-0010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-0010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.closed.ne_sw.width1.connected.1010",
-      "kind": "building",
-      "output": "building-gate-wood-closed-ne-sw-width1-connected-1010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-closed-ne_sw-w1-1010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
       },
       "category": "building",
       "postprocess": {
@@ -3480,114 +3642,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0100",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0100.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0100",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0001",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0001.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0001",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.nw_se.width1.connected.0101",
-      "kind": "building",
-      "output": "building-gate-wood-open-nw-se-width1-connected-0101.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-nw_se-w1-0101",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.open.nw_se.width2.connected.0000",
       "kind": "building",
       "output": "building-gate-wood-open-nw-se-width2-connected-0000.png",
@@ -3804,114 +3858,6 @@
       }
     },
     {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.0000",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-0000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-0000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.1000",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-1000.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-1000",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.0010",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-0010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-0010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
-      "assetId": "building.gate.wood.open.ne_sw.width1.connected.1010",
-      "kind": "building",
-      "output": "building-gate-wood-open-ne-sw-width1-connected-1010.png",
-      "source": {
-        "type": "blender",
-        "model": "gate-wood-open-ne_sw-w1-1010",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 96,
-        "canvasHeight": 128,
-        "anchorX": 48,
-        "anchorY": 104
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact",
-        "sharpen": {
-          "sigma": 0.35
-        }
-      }
-    },
-    {
       "assetId": "building.gate.wood.open.ne_sw.width2.connected.0000",
       "kind": "building",
       "output": "building-gate-wood-open-ne-sw-width2-connected-0000.png",
@@ -4107,6 +4053,438 @@
       "source": {
         "type": "blender",
         "model": "gate-wood-open-ne_sw-w3-1010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0100.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0100",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0001.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0001",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "output": "building-gate-wood-closed-nw-se-narrow3-connected-0101.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-nw_se-n3-0101",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-1000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-1000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-0010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-0010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "output": "building-gate-wood-closed-ne-sw-narrow3-connected-1010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-closed-ne_sw-n3-1010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0100.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0100",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0001.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0001",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "output": "building-gate-wood-open-nw-se-narrow3-connected-0101.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-nw_se-n3-0101",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-1000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-1000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-0010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-0010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 160,
+        "anchorX": 112,
+        "anchorY": 120
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.wood.open.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "output": "building-gate-wood-open-ne-sw-narrow3-connected-1010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-wood-open-ne_sw-n3-1010",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -5125,252 +5503,12 @@
         "supersample": 2
       },
       "geometry": {
-        "footprintWidth": 7,
-        "footprintHeight": 7,
-        "canvasWidth": 512,
-        "canvasHeight": 416,
-        "anchorX": 256,
-        "anchorY": 384
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y",
-      "kind": "building",
-      "output": "building-earth-bridge-y.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-y",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 64,
-        "canvasHeight": 48,
-        "anchorX": 32,
-        "anchorY": 16
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y",
-      "kind": "building",
-      "output": "building-wood-bridge-y.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-y",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 64,
-        "canvasHeight": 48,
-        "anchorX": 32,
-        "anchorY": 16
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x3",
-      "kind": "building",
-      "output": "building-wood-bridge-x3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-x3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 3,
-        "footprintHeight": 1,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y3",
-      "kind": "building",
-      "output": "building-wood-bridge-y3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-y3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 3,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.x3",
-      "kind": "building",
-      "output": "building-earth-bridge-x3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-x3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 3,
-        "footprintHeight": 1,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y3",
-      "kind": "building",
-      "output": "building-earth-bridge-y3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-y3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 3,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x5",
-      "kind": "building",
-      "output": "building-wood-bridge-x5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-x5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
         "footprintWidth": 5,
-        "footprintHeight": 1,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y5",
-      "kind": "building",
-      "output": "building-wood-bridge-y5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-y5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
         "footprintHeight": 5,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.x5",
-      "kind": "building",
-      "output": "building-earth-bridge-x5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-x5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 5,
-        "footprintHeight": 1,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y5",
-      "kind": "building",
-      "output": "building-earth-bridge-y5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-y5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 5,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
+        "canvasWidth": 384,
+        "canvasHeight": 352,
+        "anchorX": 192,
+        "anchorY": 320
       },
       "category": "building",
       "postprocess": {

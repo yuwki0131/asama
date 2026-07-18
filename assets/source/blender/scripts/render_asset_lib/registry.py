@@ -10,7 +10,6 @@ from .terrain import (
     build_terrain_mask, build_terrain_base,
     build_road_mask, build_dry_moat_mask, build_water_moat_mask, build_trench_moat,
     build_earth_bridge, build_wood_bridge,
-    build_earth_bridge_span, build_wood_bridge_span,
 )
 from .buildings import (
     build_storehouse_graybox, build_storehouse_showcase,
@@ -54,18 +53,12 @@ MODEL_REGISTRY = {
     # 2026-07-18 resize selection gate: keep volume at 0.60 / 0.75 of PR#62.
     "building-tenshu-scale-060": lambda scene: build_tenshu(scene, scale=0.60),
     "building-tenshu-scale-075": lambda scene: build_tenshu(scene, scale=0.75),
+    # Bridges: isolated single tiles + per-cell span segments (start/mid/end
+    # along each axis); the renderer picks the segment per footprint cell.
     "building-earth-bridge": build_earth_bridge,
     "building-earth-bridge-y": lambda scene: build_earth_bridge(scene, axis="y"),
     "building-wood-bridge": build_wood_bridge,
     "building-wood-bridge-y": lambda scene: build_wood_bridge(scene, axis="y"),
-    "building-wood-bridge-x3": build_wood_bridge_span,
-    "building-wood-bridge-y3": lambda scene: build_wood_bridge_span(scene, axis="y"),
-    "building-earth-bridge-x3": build_earth_bridge_span,
-    "building-earth-bridge-y3": lambda scene: build_earth_bridge_span(scene, axis="y"),
-    "building-wood-bridge-x5": lambda scene: build_wood_bridge_span(scene, span_len=5),
-    "building-wood-bridge-y5": lambda scene: build_wood_bridge_span(scene, axis="y", span_len=5),
-    "building-earth-bridge-x5": lambda scene: build_earth_bridge_span(scene, span_len=5),
-    "building-earth-bridge-y5": lambda scene: build_earth_bridge_span(scene, axis="y", span_len=5),
     "unit-engineer": build_unit_engineer,
     "wall-ladder": build_wall_ladder,
     "tree-pine": build_tree_pine,
@@ -78,6 +71,13 @@ MODEL_REGISTRY = {
     "deco-bush": build_deco_bush,
     "deco-weeds": build_deco_weeds,
 }
+
+for _kind, _builder in (("earth", build_earth_bridge), ("wood", build_wood_bridge)):
+    for _axis in ("x", "y"):
+        for _segment in ("start", "mid", "end"):
+            MODEL_REGISTRY[f"building-{_kind}-bridge-{_axis}-{_segment}"] = (
+                lambda scene, b=_builder, a=_axis, s=_segment: b(scene, axis=a, segment=s)
+            )
 
 
 def resolve_model(name: str):
@@ -104,9 +104,13 @@ def resolve_model(name: str):
             phase = (p, 0.0) if mask == "0101" else (0.0, p)
             return lambda scene: build_trench_moat(scene, mask, is_water, phase=phase)
         return lambda scene: build_trench_moat(scene, mask, is_water, seed=1.0)
-    gate = re.fullmatch(r"gate-wood-(closed|open)-(nw_se|ne_sw)-w([123])-([01]{4})", name)
+    gate = re.fullmatch(r"gate-wood-(closed|open)-(nw_se|ne_sw)-(w[123]|n3)-([01]{4})", name)
     if gate is not None:
-        state, axis, width, mask = gate.group(1), gate.group(2), int(gate.group(3)), gate.group(4)
+        state, axis, size, mask = gate.group(1), gate.group(2), gate.group(3), gate.group(4)
+        if size == "n3":
+            # Narrow 3-cell gate: 1-cell doorway flanked by thick wall segments.
+            return lambda scene: build_gate_wood(scene, axis, 3, mask, doors_closed=state == "closed", opening=1)
+        width = int(size[1:])
         return lambda scene: build_gate_wood(scene, axis, width, mask, doors_closed=state == "closed")
     shore_v = re.fullmatch(r"terrain-water-connected-([01]{4})-v([12])", name)
     if shore_v is not None:

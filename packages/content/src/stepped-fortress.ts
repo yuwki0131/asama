@@ -34,10 +34,10 @@ export const steppedFortressScenario: ContentScenarioDefinition = {
   },
   initialBuildings: [
     // === 本丸 (L3) ===
-    { type: "tenshu", position: { x: 25, y: 57 } },
+    { type: "tenshu", position: { x: 26, y: 58 } },
     { type: "honmaru", position: { x: 35, y: 58 } },
     { type: "storehouse", position: { x: 33, y: 62 } },
-    { type: "gate_ne_sw", position: { x: 38, y: 61 } },
+    { type: "gate_narrow_3_ne_sw", position: { x: 38, y: 60 } },
     { type: "yagura", position: { x: 36, y: 64 } },
 
     // === 二の丸 (L2) ===
@@ -63,7 +63,7 @@ export const steppedFortressScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 64, y: 82 } },
 
     // 敵の集結地 (南東の街道口)
-    { type: "gate", position: { x: 75, y: 95 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 74, y: 95 }, owner: "enemy" },
   ],
   initialUnits: [
     // 本丸 (L3) — 刀は本丸マーカー上。虎口裏 (37..39,61) は補給路のため空ける。

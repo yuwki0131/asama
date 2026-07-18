@@ -193,16 +193,16 @@
       "anchor": { "x": 0.5, "y": 0.7777777778 }
     },
     {
-      "assetId": "building.gate.wood.closed",
+      "assetId": "building.gate.wood.closed.narrow3",
       "kind": "building",
-      "output": "building-gate-wood-closed.png",
-      "width": 80,
+      "output": "building-gate-wood-closed-narrow3.png",
+      "width": 192,
       "height": 80,
       "fill": "#8a5a34",
       "stroke": "#2f2116",
       "accent": "#3c4650",
-      "pattern": "gate",
-      "anchor": { "x": 0.5, "y": 0.7625 }
+      "pattern": "wide-gate",
+      "anchor": { "x": 0.5, "y": 0.9125 }
     },
     {
       "assetId": "building.gate.wood.closed.width2",
