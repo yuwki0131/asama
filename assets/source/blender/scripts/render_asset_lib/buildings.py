@@ -737,7 +737,7 @@ def build_tenshu_graybox(scene: bpy.types.Scene) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Production tenshu (three-tier keep on an ishigaki mound, 5x5 lot)
+# Production tenshu (three-tier keep on an ishigaki mound, 4x4 lot)
 # ---------------------------------------------------------------------------
 
 # Variants keep the same design language (white plaster, kawara skirt roofs,
@@ -754,7 +754,7 @@ TENSHU_DEFAULT_VARIANT = "A"
 import math as _math
 TENSHU_ISHIGAKI_TOP = 5.0 * _math.sqrt(6.0) / 12.0  # == elevation.tiles.LEVEL
 TENSHU_ISHIGAKI_BATTER = 0.30  # top inset fraction of mound height (terrain sori)
-TENSHU_MOUND_BASE_HALF = 2.45  # mound base fills the 5x5 lot minus a hair
+TENSHU_MOUND_BASE_HALF = 1.95  # mound base fills the 4x4 lot minus a hair
 
 # Global keep scale (selection gate 2026-07-18: 0.60 vs 0.75 of the PR#62
 # volume; heights AND widths shrink together so the silhouette keeps its
@@ -764,29 +764,30 @@ TENSHU_DEFAULT_SCALE = 0.75
 # Tier widths are chosen so the FIRST story rises almost flush with the stone
 # crest (user ruling 2026-07-18: no visible flat 犬走り between the ishigaki
 # edge and the plaster wall — a real keep fills its stone platform). With the
-# 0.75 global scale, tier-0 of A spans 5.15*0.75=3.86 map units against a
-# stone crest of ~2.14 half-width, leaving only a ~0.21-unit stone rim
-# (well under the 0.5-tile limit); the tier-0 skirt roof eaves then reach
-# back out over the stone edge. Story heights keep the approved height:width
-# ratio (~0.26) of the PR#62 design so the white plaster bands still read
-# clearly between the tiled skirt roofs, tier reduction ratio ~0.81 as before.
+# 0.75 global scale, tier-0 of A spans 3.93*0.75=2.95 map units against a
+# stone crest of ~1.64 half-width, leaving only a ~0.17-unit stone rim;
+# the tier-0 skirt roof eaves then reach back out over the stone edge.
+# Slim rework (user ruling 2026-07-19: "全体的に太い、シュッと"): tier
+# reduction strengthened to ~0.69/0.64 (was ~0.81) so the top story reads
+# clearly small, and story walls are taller so the whole silhouette leans
+# toward the yagura's tower-like height:width (~1.0-1.2:1 on screen).
 TENSHU_VARIANTS = {
     "A": {
         # Wall:roof close to 1:1 (Himeji/Matsumoto reference) so the white
         # plaster band reads clearly between the tiled skirt roofs.
-        "tiers": ((5.15, 1.34), (4.15, 1.16), (3.35, 1.00)),
+        "tiers": ((3.93, 1.62), (2.71, 1.38), (1.72, 1.15)),
         "rises": (0.34, 0.31),
-        "top_rise": 0.58,
+        "top_rise": 0.60,
         "hafu": ((0, "S", 0.38), (1, "E", 0.42)),
     },
     "B": {
-        "tiers": ((4.95, 1.10), (4.30, 1.00), (3.70, 0.92)),
+        "tiers": ((3.78, 1.32), (3.10, 1.20), (2.50, 1.06)),
         "rises": (0.34, 0.33),
         "top_rise": 0.52,
         "hafu": ((1, "S", 0.40),),
     },
     "C": {
-        "tiers": ((5.20, 1.26), (4.00, 1.12), (3.00, 1.00)),
+        "tiers": ((3.97, 1.50), (2.85, 1.34), (1.95, 1.15)),
         "rises": (0.40, 0.38),
         "top_rise": 0.66,
         "hafu": ((0, "S", 0.60), (1, "E", 0.55)),
@@ -1148,7 +1149,7 @@ def _tenshu_shachi(scene: bpy.types.Scene, name: str, x: float, y: float, z: flo
 
 
 def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, scale: float | None = None) -> None:
-    """Production three-tier keep on a 5x5 lot. Canvas 384x352, anchor 192,320.
+    """Production three-tier keep on a 4x4 lot. Canvas 320x320, anchor 160,288.
 
     Low ishigaki mound exactly one terrain elevation step tall (the scenario
     terrain hill supplies the height drama); the first story rises almost
@@ -1168,11 +1169,9 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
     dark = mats["dark_wood"]
     hem = mats["hem"]
     stone = _tenshu_boulder_ishigaki()
-    quoin = make_noise_material(
-        "TenshuQuoin", (0.190, 0.172, 0.140), (0.300, 0.278, 0.235), scale=3.0)
     gold = make_material("TenshuShachi", (0.58, 0.46, 0.17, 1.0))
 
-    cx, cy = -2.5, -2.5  # lot center of the [-5,0]x[-5,0] footprint
+    cx, cy = -2.0, -2.0  # lot center of the [-4,0]x[-4,0] footprint
 
     # --- Ishigaki mound: ONE terrain step tall, concave sori batter matching
     # elevation/tiles.py (_sori_inset with ISHIGAKI_BATTER=0.30). Single mesh
@@ -1202,20 +1201,9 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
     faces.append(tuple(ring_starts[-1] + i for i in range(4)))  # stone crest cap
     add_mesh(scene, "IshigakiMound", vertices, faces, stone)
 
-    # Sangi-zumi corner quoins: alternating long/short dressed stones climbing
-    # each vertical corner, breaking the clean frustum silhouette.
-    courses = 4
-    for sx in (-1.0, 1.0):
-        for sy in (-1.0, 1.0):
-            for k in range(courses):
-                t_mid = (k + 0.5) / courses
-                h = mound_half(t_mid) - 0.05  # hug the face, don't float off it
-                px, py = cx + sx * h, cy + sy * h
-                z0 = height * k / courses + 0.012
-                z1 = height * (k + 1) / courses - 0.014
-                ax, ay = (0.26, 0.155) if k % 2 == 0 else (0.155, 0.26)
-                add_box(scene, f"Quoin{sx:+.0f}{sy:+.0f}{k}", *map_box(
-                    (px - ax, py - ay, z0), (px + ax, py + ay, z1)), quoin)
+    # No corner quoin blocks: user ruling 2026-07-19 — protruding sangi-zumi
+    # boxes broke the precise kirikomi-hagi (fitted masonry) read. The mound
+    # stays a clean sloped frustum; the fitted-stone texture alone carries it.
 
     # Thin gravel bed under the first story. The story wall rises within
     # ~0.14 units of the stone crest, so only a sliver of this (plus the
@@ -1257,8 +1245,11 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
             _tenshu_katomado(scene, "Kato", cx, cy, half, z + skirt_h + (body_h - skirt_h) * 0.52, mats, scale=s)
             z_eave = z + body_h
             ridge_z = z_eave + spec["top_rise"] * s
-            roof_low = (cx - half - 0.46 * s, cy - half - 0.40 * s)
-            roof_high = (cx + half + 0.46 * s, cy + half + 0.40 * s)
+            # Tighter top-roof overhang than before (0.46/0.40): keeps the
+            # top roof clearly the smallest — target <=55% of the tier-0
+            # skirt roof width on screen so the keep reads slim, not squat.
+            roof_low = (cx - half - 0.33 * s, cy - half - 0.29 * s)
+            roof_high = (cx + half + 0.33 * s, cy + half + 0.29 * s)
             add_kawara_roof(scene, "TopRoof", roof_low, roof_high, z_eave, ridge_z, "x", mats["roof"], mats["ridge"], verge_material=plaster)
             for sx in (-1.0, 1.0):
                 _tenshu_shachi(scene, f"Shachi{sx:+.0f}", cx + sx * (half + 0.30 * s), cy, ridge_z + 0.10 * s, gold, scale=s)
