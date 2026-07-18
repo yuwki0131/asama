@@ -114,7 +114,7 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
     ...vLine("road", 58, 51, 54),
 
     // 敵の集結地 (北東の街道口)
-    { type: "gate", position: { x: 75, y: 48 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 74, y: 48 }, owner: "enemy" },
   ],
   initialUnits: [
     // 本丸 (L5) — 刀は本丸マーカー上、弓は南縁。
