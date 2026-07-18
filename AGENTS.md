@@ -58,6 +58,26 @@ Pull requests should include:
 
 Respect the document priority in `docs/README.md`. If a specification is unresolved, parameterize the implementation and update `docs/10_development/unresolved-issues.md` rather than making a hidden permanent decision.
 
+## Visual QA Gate
+
+Any change that affects rendered art (generated PNGs, manifest, Blender or
+raster pipelines, renderer visuals) must pass the visual QA gate BEFORE the
+result is shown to the user or a PR is opened:
+
+- L1 machine lint: `pnpm assets:lint:art` with zero new violations.
+  Known violations live in `assets/definitions/art-lint-baseline.json`;
+  never hide a violation you just introduced by adding it to the baseline.
+- L2 self review: fixed-viewpoint screenshots via
+  `node apps/game/qa/shot.mjs --preset <name>` (presets in
+  `assets/definitions/review-shots.json`), judged by a SEPARATE-context
+  agent against the rule IDs in `docs/05_map-and-art/art-rulebook.md`.
+
+When the user rejects a visual, closing the fix cycle REQUIRES adding a
+rule: a checker in `packages/asset-tools/src/artLint/checks.ts` if machine
+checkable, otherwise one line in `art-rulebook.md` (PROC-01).
+
+Full procedure: `.claude/skills/art-review/SKILL.md`.
+
 
 ## AGENTS.md追記本文
 
