@@ -5514,17 +5514,6 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 640,
-      "height": 520,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8269230769230769
-      }
-    },
-    {
       "assetId": "building.farm.spring",
       "kind": "building",
       "file": "generated/building-farm-spring.png",
@@ -5566,6 +5555,17 @@
       "anchor": {
         "x": 0.5,
         "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.tenshu.main",
+      "kind": "building",
+      "file": "generated/building-tenshu-main.png",
+      "width": 512,
+      "height": 416,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9230769230769231
       }
     }
   ],
