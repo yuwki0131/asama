@@ -1,4 +1,4 @@
-import type { PlayerCommand, WorldSnapshot } from "@asama/shared";
+import type { PlayerCommand, Season, WorldSnapshot } from "@asama/shared";
 
 export interface AsamaTestBridge {
   /** Returns the most recent WorldSnapshot, or null before first tick. */
@@ -24,6 +24,11 @@ export interface AsamaTestBridge {
    * expected colors via src/client/renderer/toneGrade.ts.
    */
   setTone(enabled: boolean): void;
+  /**
+   * DEV/QA: override the season presented to the renderer/UI (farm sprites
+   * swap texture per season). Pass null to follow the simulation again.
+   */
+  setSeason(season: Season | null): void;
 }
 
 declare global {

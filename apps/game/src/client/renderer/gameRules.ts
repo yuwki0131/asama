@@ -1,5 +1,5 @@
 import { buildingSpecs } from "@asama/content";
-import type { BuildingSnapshot, BuildingType, CellCoord, TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
+import type { BuildingSnapshot, BuildingType, CellCoord, Season, TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
 
 const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = Object.fromEntries(
   Object.values(buildingSpecs).map((spec) => [spec.type, rectangleFootprint(spec.footprint.width, spec.footprint.height)])
@@ -60,7 +60,19 @@ export function buildingPreviewFootprint(buildingType: BuildingType, position: C
   }));
 }
 
-export function buildingAssetCandidates(building: BuildingSnapshot): readonly string[] {
+export function buildingAssetCandidates(building: BuildingSnapshot, season?: Season): readonly string[] {
+  // Farms swap texture with the season (spring=flooded, summer=green,
+  // autumn=golden, winter=bare soil). The seasonal id leads the candidate
+  // list so a missing manifest entry still falls back to the season-less
+  // building.farm asset.
+  if (building.type === "farm" && season !== undefined) {
+    return [
+      `building.farm.${season}`,
+      building.assetId,
+      baseBuildingAssetId(building),
+      finalBuildingFallbackAssetId(building)
+    ];
+  }
   return [building.assetId, baseBuildingAssetId(building), finalBuildingFallbackAssetId(building)];
 }
 
