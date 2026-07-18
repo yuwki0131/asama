@@ -57,7 +57,7 @@ export const waterCastleScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 44, y: 93 } },
 
     // 敵の集結地 (南の街道口)
-    { type: "gate", position: { x: 40, y: 104 }, owner: "enemy" },
+    { type: "gate_narrow_3", position: { x: 39, y: 104 }, owner: "enemy" },
   ],
   initialUnits: [
     // 本丸 — 刀足軽は本丸マーカー上 (在城中は敵の占拠が成立しない)

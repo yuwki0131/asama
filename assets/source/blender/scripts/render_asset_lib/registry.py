@@ -104,9 +104,13 @@ def resolve_model(name: str):
             phase = (p, 0.0) if mask == "0101" else (0.0, p)
             return lambda scene: build_trench_moat(scene, mask, is_water, phase=phase)
         return lambda scene: build_trench_moat(scene, mask, is_water, seed=1.0)
-    gate = re.fullmatch(r"gate-wood-(closed|open)-(nw_se|ne_sw)-w([123])-([01]{4})", name)
+    gate = re.fullmatch(r"gate-wood-(closed|open)-(nw_se|ne_sw)-(w[123]|n3)-([01]{4})", name)
     if gate is not None:
-        state, axis, width, mask = gate.group(1), gate.group(2), int(gate.group(3)), gate.group(4)
+        state, axis, size, mask = gate.group(1), gate.group(2), gate.group(3), gate.group(4)
+        if size == "n3":
+            # Narrow 3-cell gate: 1-cell doorway flanked by thick wall segments.
+            return lambda scene: build_gate_wood(scene, axis, 3, mask, doors_closed=state == "closed", opening=1)
+        width = int(size[1:])
         return lambda scene: build_gate_wood(scene, axis, width, mask, doors_closed=state == "closed")
     shore_v = re.fullmatch(r"terrain-water-connected-([01]{4})-v([12])", name)
     if shore_v is not None:

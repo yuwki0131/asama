@@ -89,12 +89,12 @@ describe("connected building asset masks", () => {
   it("connects fence and wall to gate footprints without mixing fence and wall directly", () => {
     const world = createInitialWorld();
     resetBuildings(world);
-    place(world, "gate", { x: 40, y: 40 });
+    place(world, "gate_narrow_3", { x: 40, y: 40 });
     place(world, "fence", { x: 39, y: 40 });
-    place(world, "wall", { x: 41, y: 40 });
+    place(world, "wall", { x: 43, y: 40 });
 
     expect(buildingAt(world, { x: 39, y: 40 }).assetId).toBe("building.fence.wood.connected.0100");
-    expect(buildingAt(world, { x: 41, y: 40 }).assetId).toBe("building.wall.plaster.connected.0001");
+    expect(buildingAt(world, { x: 43, y: 40 }).assetId).toBe("building.wall.plaster.connected.0001");
   });
 
   it("connects to wide gate footprint endpoints", () => {

@@ -259,12 +259,12 @@ export const SIEGE_BALANCE = {
 export const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
   "wall",
   "fence",
-  "gate",
   "gate_wide_2",
   "gate_wide_3",
-  "gate_ne_sw",
+  "gate_narrow_3",
   "gate_wide_2_ne_sw",
-  "gate_wide_3_ne_sw"
+  "gate_wide_3_ne_sw",
+  "gate_narrow_3_ne_sw"
 ];
 
 /** Compatibility export: the default scenario's waves (tests, tooling). */
@@ -326,17 +326,17 @@ export const cardinalDirections: readonly CellCoord[] = [
 
 export function isGate(type: BuildingType): boolean {
   return (
-    type === "gate" ||
     type === "gate_wide_2" ||
     type === "gate_wide_3" ||
-    type === "gate_ne_sw" ||
+    type === "gate_narrow_3" ||
     type === "gate_wide_2_ne_sw" ||
-    type === "gate_wide_3_ne_sw"
+    type === "gate_wide_3_ne_sw" ||
+    type === "gate_narrow_3_ne_sw"
   );
 }
 
 export function isNeSwGate(type: BuildingType): boolean {
-  return type === "gate_ne_sw" || type === "gate_wide_2_ne_sw" || type === "gate_wide_3_ne_sw";
+  return type === "gate_wide_2_ne_sw" || type === "gate_wide_3_ne_sw" || type === "gate_narrow_3_ne_sw";
 }
 
 export function isBridge(type: BuildingType): boolean {

@@ -34,7 +34,7 @@ const targets: readonly AlignmentTarget[] = [
   { assetId: "building.town_block", footprintWidth: 6, footprintHeight: 6, placement: "south", baseMatch: "blender yard-pad foundation" },
   // Gates anchor at the footprint south corner (not the tile center), so
   // socket-marker overlays computed from the anchor do not apply.
-  { assetId: "building.gate.wood.closed", footprintWidth: 1, footprintHeight: 1, placement: "south", baseMatch: "blender gate kit" },
+  { assetId: "building.gate.wood.closed.narrow3", footprintWidth: 3, footprintHeight: 1, placement: "south", baseMatch: "blender gate kit" },
   {
     assetId: "building.yagura.small.normal",
     footprintWidth: 2,

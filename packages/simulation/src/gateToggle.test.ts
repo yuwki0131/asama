@@ -91,20 +91,14 @@ describe("gate toggling", () => {
     world.buildings.splice(0, world.buildings.length);
     world.units = [unit("u1", "player", "spear_ashigaru", { x: 10, y: 12 })];
 
+    // Narrow 3-cell gate on the west face: footprint (12,11)(12,12)(12,13),
+    // center (12,12) is the only opening.
     applyCommand(world, {
-      type: "placeBuilding", buildingType: "wall", position: { x: 12, y: 11 },
+      type: "placeBuilding", buildingType: "gate_narrow_3_ne_sw", position: { x: 12, y: 11 },
       issuedAtTick: 0, clientSequence: 10
     });
-    applyCommand(world, {
-      type: "placeBuilding", buildingType: "gate", position: { x: 12, y: 12 },
-      issuedAtTick: 0, clientSequence: 11
-    });
-    applyCommand(world, {
-      type: "placeBuilding", buildingType: "wall", position: { x: 12, y: 13 },
-      issuedAtTick: 0, clientSequence: 12
-    });
 
-    const gate = world.buildings.find((b) => b.type === "gate");
+    const gate = world.buildings.find((b) => b.type === "gate_narrow_3_ne_sw");
     // Close the gate
     applyCommand(world, toggleCommand({ x: 12, y: 12 }));
     expect(gate?.gateState).toBe("closed");
@@ -122,19 +116,11 @@ describe("gate toggling", () => {
     world.units = [unit("u1", "player", "spear_ashigaru", { x: 10, y: 12 })];
 
     applyCommand(world, {
-      type: "placeBuilding", buildingType: "wall", position: { x: 12, y: 11 },
+      type: "placeBuilding", buildingType: "gate_narrow_3_ne_sw", position: { x: 12, y: 11 },
       issuedAtTick: 0, clientSequence: 20
     });
-    applyCommand(world, {
-      type: "placeBuilding", buildingType: "gate", position: { x: 12, y: 12 },
-      issuedAtTick: 0, clientSequence: 21
-    });
-    applyCommand(world, {
-      type: "placeBuilding", buildingType: "wall", position: { x: 12, y: 13 },
-      issuedAtTick: 0, clientSequence: 22
-    });
 
-    const gate = world.buildings.find((b) => b.type === "gate");
+    const gate = world.buildings.find((b) => b.type === "gate_narrow_3_ne_sw");
     expect(gate?.gateState).toBe("open");
 
     const path = findPath(world, { x: 10, y: 12 }, { x: 14, y: 12 }, "player");
@@ -148,18 +134,11 @@ describe("gate toggling", () => {
     world.buildings.splice(0, world.buildings.length);
     world.units = [];
 
-    // Honmaru on the left, wall + gate between, storehouse on the right
+    // Honmaru on the left, narrow gate between (footprint (20,19)..(20,21),
+    // opening at (20,20)), storehouse on the right
     applyCommand(world, {
-      type: "placeBuilding", buildingType: "wall", position: { x: 20, y: 19 },
+      type: "placeBuilding", buildingType: "gate_narrow_3_ne_sw", position: { x: 20, y: 19 },
       issuedAtTick: 0, clientSequence: 30
-    });
-    applyCommand(world, {
-      type: "placeBuilding", buildingType: "gate", position: { x: 20, y: 20 },
-      issuedAtTick: 0, clientSequence: 31
-    });
-    applyCommand(world, {
-      type: "placeBuilding", buildingType: "wall", position: { x: 20, y: 21 },
-      issuedAtTick: 0, clientSequence: 32
     });
     applyCommand(world, {
       type: "placeBuilding", buildingType: "honmaru", position: { x: 15, y: 20 },
@@ -172,7 +151,7 @@ describe("gate toggling", () => {
 
     // Close the gate — food connectivity should still work
     applyCommand(world, toggleCommand({ x: 20, y: 20 }));
-    const gate = world.buildings.find((b) => b.type === "gate");
+    const gate = world.buildings.find((b) => b.type === "gate_narrow_3_ne_sw");
     expect(gate?.gateState).toBe("closed");
 
     updateWorld(world);
