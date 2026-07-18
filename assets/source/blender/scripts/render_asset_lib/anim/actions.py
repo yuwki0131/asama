@@ -199,6 +199,35 @@ def apply_attack(scene: bpy.types.Scene, rig: bpy.types.Object, frame_count: int
     _apply_curve_table(scene, rig, frame_count, _ATTACK, loop=True)
 
 
+# --- sword ashigaru attack: high guard into diagonal kesagiri -------------
+
+_SWORD_ATTACK = {
+    # Draw the blade up and across the right shoulder, cut diagonally through
+    # the target, then recover to the one-handed ready pose.
+    ("spear",     "rx"): [(0.0, 0.18), (0.25, -1.30), (0.375, -1.55), (0.625, 1.12), (0.75, 0.62), (1.0, 0.18)],
+    ("spear",     "ry"): [(0.0, 0.00), (0.25, -0.42), (0.375, -0.58), (0.625, 0.50), (0.75, 0.24), (1.0, 0.00)],
+    ("spear",     "rz"): [(0.0, 0.08), (0.25, -0.72), (0.375, -0.92), (0.625, 0.78), (0.75, 0.42), (1.0, 0.08)],
+    ("arm.r",     "rx"): [(0.0, -0.28), (0.25, -1.05), (0.375, -1.22), (0.625, -0.18), (0.75, -0.12), (1.0, -0.28)],
+    ("arm.r",     "ry"): [(0.0, 0.00), (0.375, -0.38), (0.625, 0.34), (1.0, 0.00)],
+    ("forearm.r", "rx"): [(0.0, -0.16), (0.375, -0.55), (0.625, -0.08), (1.0, -0.16)],
+    ("arm.l",     "rx"): [(0.0, -0.16), (0.375, -0.42), (0.625, -0.58), (1.0, -0.16)],
+    ("forearm.l", "rx"): [(0.0, -0.12), (0.375, -0.28), (0.625, -0.34), (1.0, -0.12)],
+    ("spine",     "rx"): [(0.0, 0.06), (0.375, -0.14), (0.625, 0.28), (0.75, 0.18), (1.0, 0.06)],
+    ("spine",     "ry"): [(0.0, -0.08), (0.375, -0.42), (0.625, 0.48), (0.75, 0.24), (1.0, -0.08)],
+    ("head",      "ry"): [(0.0, 0.04), (0.375, 0.18), (0.625, -0.20), (1.0, 0.04)],
+    ("thigh.l",   "rx"): [(0.0, -0.12), (0.375, -0.28), (0.625, -0.42), (1.0, -0.12)],
+    ("shin.l",    "rx"): [(0.0, 0.18), (0.625, 0.38), (1.0, 0.18)],
+    ("thigh.r",   "rx"): [(0.0, 0.10), (0.375, 0.24), (0.625, 0.34), (1.0, 0.10)],
+    ("hips",      "ly"): [(0.0, 0.00), (0.625, -0.035), (1.0, 0.00)],
+    ("hips",      "lz"): [(0.0, 0.00), (0.375, -0.025), (0.625, 0.055), (1.0, 0.00)],
+}
+
+
+def apply_sword_attack(scene: bpy.types.Scene, rig: bpy.types.Object, frame_count: int) -> None:
+    _begin(scene, rig, frame_count)
+    _apply_curve_table(scene, rig, frame_count, _SWORD_ATTACK, loop=True)
+
+
 # --- death -----------------------------------------------------------------
 
 _DEATH = {
@@ -498,6 +527,9 @@ ACTIONS: dict[str, object] = {
 
     # --- archer (model-specific attack override) ---
     "unit-archer-rigged:attack":    apply_archer_attack,
+
+    # --- sword ashigaru (diagonal cut) ---
+    "unit-sword-ashigaru-rigged:attack": apply_sword_attack,
 
     # --- musketeer ---
     "unit-musketeer-rigged:attack": apply_musketeer_attack,
