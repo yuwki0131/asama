@@ -245,157 +245,47 @@
       }
     },
     {
-      "assetId": "unit.spear_ashigaru.idle.south",
-      "kind": "unit",
-      "file": "generated/unit-spear-ashigaru-idle-south.png",
-      "width": 48,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.82
-      }
-    },
-    {
-      "assetId": "unit.sword_ashigaru.idle.south",
-      "kind": "unit",
-      "file": "generated/unit-sword-ashigaru-idle-south.png",
-      "width": 48,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.82
-      }
-    },
-    {
-      "assetId": "unit.archer.idle.south",
-      "kind": "unit",
-      "file": "generated/unit-archer-idle-south.png",
-      "width": 48,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.82
-      }
-    },
-    {
-      "assetId": "unit.musketeer.idle.south",
-      "kind": "unit",
-      "file": "generated/unit-musketeer-idle-south.png",
-      "width": 48,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.82
-      }
-    },
-    {
-      "assetId": "unit.cavalry.idle.south",
-      "kind": "unit",
-      "file": "generated/unit-cavalry-idle-south.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.875
-      }
-    },
-    {
-      "assetId": "unit.supply_cart.idle.south",
-      "kind": "unit",
-      "file": "generated/unit-supply-cart-idle-south.png",
-      "width": 64,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.875
-      }
-    },
-    {
-      "assetId": "deco.tree.pine.1",
+      "assetId": "building.farm.spring",
       "kind": "building",
-      "file": "generated/deco-tree-pine-1.png",
-      "width": 64,
-      "height": 112,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8571428571428571
-      }
-    },
-    {
-      "assetId": "deco.tree.pine.2",
-      "kind": "building",
-      "file": "generated/deco-tree-pine-2.png",
-      "width": 64,
-      "height": 112,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8571428571428571
-      }
-    },
-    {
-      "assetId": "deco.tree.cedar.1",
-      "kind": "building",
-      "file": "generated/deco-tree-cedar-1.png",
-      "width": 64,
+      "file": "generated/building-farm-spring.png",
+      "width": 256,
       "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.875
+        "y": 0.5
       }
     },
     {
-      "assetId": "deco.tree.broadleaf.1",
+      "assetId": "building.farm.summer",
       "kind": "building",
-      "file": "generated/deco-tree-broadleaf-1.png",
-      "width": 64,
-      "height": 112,
+      "file": "generated/building-farm-summer.png",
+      "width": 256,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.8571428571428571
+        "y": 0.5
       }
     },
     {
-      "assetId": "deco.rock.1",
+      "assetId": "building.farm.autumn",
       "kind": "building",
-      "file": "generated/deco-rock-1.png",
-      "width": 64,
-      "height": 56,
+      "file": "generated/building-farm-autumn.png",
+      "width": 256,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
+        "y": 0.5
       }
     },
     {
-      "assetId": "deco.reeds.1",
+      "assetId": "building.farm.winter",
       "kind": "building",
-      "file": "generated/deco-reeds-1.png",
-      "width": 64,
-      "height": 56,
+      "file": "generated/building-farm-winter.png",
+      "width": 256,
+      "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.7142857142857143
-      }
-    },
-    {
-      "assetId": "deco.bush.1",
-      "kind": "building",
-      "file": "generated/deco-bush-1.png",
-      "width": 64,
-      "height": 56,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7142857142857143
-      }
-    },
-    {
-      "assetId": "deco.weeds.1",
-      "kind": "building",
-      "file": "generated/deco-weeds-1.png",
-      "width": 64,
-      "height": 48,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.6666666666666666
+        "y": 0.5
       }
     },
     {
@@ -2365,6 +2255,17 @@
       "anchor": {
         "x": 0.5,
         "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.tenshu.main",
+      "kind": "building",
+      "file": "generated/building-tenshu-main.png",
+      "width": 640,
+      "height": 520,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8269230769230769
       }
     },
     {
@@ -4744,17 +4645,6 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 640,
-      "height": 520,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8269230769230769
-      }
-    },
-    {
       "assetId": "terrain.water.connected.0000",
       "kind": "terrain",
       "file": "generated/terrain-water-connected-0000.png",
@@ -5525,58 +5415,157 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 640,
-      "height": 520,
+      "assetId": "unit.spear_ashigaru.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-spear-ashigaru-idle-south.png",
+      "width": 48,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.8269230769230769
+        "y": 0.82
       }
     },
     {
-      "assetId": "building.farm.spring",
-      "kind": "building",
-      "file": "generated/building-farm-spring.png",
-      "width": 256,
-      "height": 128,
+      "assetId": "unit.sword_ashigaru.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-sword-ashigaru-idle-south.png",
+      "width": 48,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.82
       }
     },
     {
-      "assetId": "building.farm.summer",
-      "kind": "building",
-      "file": "generated/building-farm-summer.png",
-      "width": 256,
-      "height": 128,
+      "assetId": "unit.archer.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-archer-idle-south.png",
+      "width": 48,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.82
       }
     },
     {
-      "assetId": "building.farm.autumn",
-      "kind": "building",
-      "file": "generated/building-farm-autumn.png",
-      "width": 256,
-      "height": 128,
+      "assetId": "unit.musketeer.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-musketeer-idle-south.png",
+      "width": 48,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.82
       }
     },
     {
-      "assetId": "building.farm.winter",
+      "assetId": "unit.cavalry.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-cavalry-idle-south.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
+      }
+    },
+    {
+      "assetId": "unit.supply_cart.idle.south",
+      "kind": "unit",
+      "file": "generated/unit-supply-cart-idle-south.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
+      }
+    },
+    {
+      "assetId": "deco.tree.pine.1",
       "kind": "building",
-      "file": "generated/building-farm-winter.png",
-      "width": 256,
+      "file": "generated/deco-tree-pine-1.png",
+      "width": 64,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "deco.tree.pine.2",
+      "kind": "building",
+      "file": "generated/deco-tree-pine-2.png",
+      "width": 64,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "deco.tree.cedar.1",
+      "kind": "building",
+      "file": "generated/deco-tree-cedar-1.png",
+      "width": 64,
       "height": 128,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.875
+      }
+    },
+    {
+      "assetId": "deco.tree.broadleaf.1",
+      "kind": "building",
+      "file": "generated/deco-tree-broadleaf-1.png",
+      "width": 64,
+      "height": 112,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "deco.rock.1",
+      "kind": "building",
+      "file": "generated/deco-rock-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.reeds.1",
+      "kind": "building",
+      "file": "generated/deco-reeds-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.bush.1",
+      "kind": "building",
+      "file": "generated/deco-bush-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.weeds.1",
+      "kind": "building",
+      "file": "generated/deco-weeds-1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6666666666666666
       }
     }
   ],
