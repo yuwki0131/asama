@@ -4645,17 +4645,6 @@
       }
     },
     {
-      "assetId": "building.tenshu.main",
-      "kind": "building",
-      "file": "generated/building-tenshu-main.png",
-      "width": 640,
-      "height": 520,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.8269230769230769
-      }
-    },
-    {
       "assetId": "terrain.water.connected.0000",
       "kind": "terrain",
       "file": "generated/terrain-water-connected-0000.png",
@@ -5459,17 +5448,6 @@
       }
     },
     {
-      "assetId": "unit.engineer.idle.south",
-      "kind": "unit",
-      "file": "generated/unit-engineer-idle-south.png",
-      "width": 48,
-      "height": 64,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.82
-      }
-    },
-    {
       "assetId": "unit.musketeer.idle.south",
       "kind": "unit",
       "file": "generated/unit-musketeer-idle-south.png",
@@ -5544,17 +5522,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.8571428571428571
-      }
-    },
-    {
-      "assetId": "deco.bamboo.1",
-      "kind": "building",
-      "file": "generated/deco-bamboo-1.png",
-      "width": 64,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.875
       }
     },
     {
