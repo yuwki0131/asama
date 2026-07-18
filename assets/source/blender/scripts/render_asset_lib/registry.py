@@ -18,7 +18,7 @@ from .buildings import (
     build_samurai_residence_graybox, build_town_block_graybox,
     build_yagura_small_graybox, build_farm_paddy,
     build_gate_wood, build_wall_plaster_mask, build_fence_wood_mask,
-    build_wall_ladder, build_tenshu_graybox,
+    build_wall_ladder, build_tenshu_graybox, build_tenshu,
 )
 from .vegetation import (
     build_tree_pine, build_tree_cedar, build_tree_broadleaf,
@@ -43,6 +43,10 @@ MODEL_REGISTRY = {
     "building-yagura-small-graybox": build_yagura_small_graybox,
     "building-farm-paddy": build_farm_paddy,
     "building-tenshu-graybox": build_tenshu_graybox,
+    "building-tenshu": build_tenshu,
+    "building-tenshu-var-a": lambda scene: build_tenshu(scene, variant="A"),
+    "building-tenshu-var-b": lambda scene: build_tenshu(scene, variant="B"),
+    "building-tenshu-var-c": lambda scene: build_tenshu(scene, variant="C"),
     "building-earth-bridge": build_earth_bridge,
     "building-earth-bridge-y": lambda scene: build_earth_bridge(scene, axis="y"),
     "building-wood-bridge": build_wood_bridge,
