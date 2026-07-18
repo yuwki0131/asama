@@ -5127,10 +5127,10 @@
       "geometry": {
         "footprintWidth": 7,
         "footprintHeight": 7,
-        "canvasWidth": 640,
-        "canvasHeight": 520,
-        "anchorX": 320,
-        "anchorY": 430
+        "canvasWidth": 512,
+        "canvasHeight": 416,
+        "anchorX": 256,
+        "anchorY": 384
       },
       "category": "building",
       "postprocess": {

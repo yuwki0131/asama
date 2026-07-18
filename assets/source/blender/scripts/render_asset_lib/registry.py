@@ -51,6 +51,9 @@ MODEL_REGISTRY = {
     "building-tenshu-var-a": lambda scene: build_tenshu(scene, variant="A"),
     "building-tenshu-var-b": lambda scene: build_tenshu(scene, variant="B"),
     "building-tenshu-var-c": lambda scene: build_tenshu(scene, variant="C"),
+    # 2026-07-18 resize selection gate: keep volume at 0.60 / 0.75 of PR#62.
+    "building-tenshu-scale-060": lambda scene: build_tenshu(scene, scale=0.60),
+    "building-tenshu-scale-075": lambda scene: build_tenshu(scene, scale=0.75),
     "building-earth-bridge": build_earth_bridge,
     "building-earth-bridge-y": lambda scene: build_earth_bridge(scene, axis="y"),
     "building-wood-bridge": build_wood_bridge,
