@@ -444,7 +444,196 @@
         "canvasWidth": 64,
         "canvasHeight": 48,
         "anchorX": 32,
-        "anchorY": 16
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y",
+      "kind": "building",
+      "output": "building-earth-bridge-y.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.start",
+      "kind": "building",
+      "output": "building-earth-bridge-x-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-x-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.mid",
+      "kind": "building",
+      "output": "building-earth-bridge-x-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-x-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.x.end",
+      "kind": "building",
+      "output": "building-earth-bridge-x-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-x-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.start",
+      "kind": "building",
+      "output": "building-earth-bridge-y-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.mid",
+      "kind": "building",
+      "output": "building-earth-bridge-y-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.earth_bridge.y.end",
+      "kind": "building",
+      "output": "building-earth-bridge-y-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-earth-bridge-y-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 48,
+        "anchorX": 32,
+        "anchorY": 24
       },
       "category": "building",
       "postprocess": {
@@ -469,9 +658,198 @@
         "footprintWidth": 1,
         "footprintHeight": 1,
         "canvasWidth": 64,
-        "canvasHeight": 48,
+        "canvasHeight": 72,
         "anchorX": 32,
-        "anchorY": 16
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y",
+      "kind": "building",
+      "output": "building-wood-bridge-y.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.start",
+      "kind": "building",
+      "output": "building-wood-bridge-x-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-x-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.mid",
+      "kind": "building",
+      "output": "building-wood-bridge-x-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-x-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.end",
+      "kind": "building",
+      "output": "building-wood-bridge-x-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-x-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.start",
+      "kind": "building",
+      "output": "building-wood-bridge-y-start.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y-start",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.mid",
+      "kind": "building",
+      "output": "building-wood-bridge-y-mid.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y-mid",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.end",
+      "kind": "building",
+      "output": "building-wood-bridge-y-end.png",
+      "source": {
+        "type": "blender",
+        "model": "building-wood-bridge-y-end",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 40
       },
       "category": "building",
       "postprocess": {
@@ -5131,246 +5509,6 @@
         "canvasHeight": 352,
         "anchorX": 192,
         "anchorY": 320
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y",
-      "kind": "building",
-      "output": "building-earth-bridge-y.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-y",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 64,
-        "canvasHeight": 48,
-        "anchorX": 32,
-        "anchorY": 16
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y",
-      "kind": "building",
-      "output": "building-wood-bridge-y.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-y",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 1,
-        "canvasWidth": 64,
-        "canvasHeight": 48,
-        "anchorX": 32,
-        "anchorY": 16
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x3",
-      "kind": "building",
-      "output": "building-wood-bridge-x3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-x3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 3,
-        "footprintHeight": 1,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y3",
-      "kind": "building",
-      "output": "building-wood-bridge-y3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-y3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 3,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.x3",
-      "kind": "building",
-      "output": "building-earth-bridge-x3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-x3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 3,
-        "footprintHeight": 1,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y3",
-      "kind": "building",
-      "output": "building-earth-bridge-y3.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-y3",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 3,
-        "canvasWidth": 192,
-        "canvasHeight": 128,
-        "anchorX": 96,
-        "anchorY": 80
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x5",
-      "kind": "building",
-      "output": "building-wood-bridge-x5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-x5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 5,
-        "footprintHeight": 1,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y5",
-      "kind": "building",
-      "output": "building-wood-bridge-y5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-wood-bridge-y5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 5,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.x5",
-      "kind": "building",
-      "output": "building-earth-bridge-x5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-x5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 5,
-        "footprintHeight": 1,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
-      },
-      "category": "building",
-      "postprocess": {
-        "trim": false,
-        "resizeMode": "exact"
-      }
-    },
-    {
-      "assetId": "building.earth_bridge.y5",
-      "kind": "building",
-      "output": "building-earth-bridge-y5.png",
-      "source": {
-        "type": "blender",
-        "model": "building-earth-bridge-y5",
-        "renderSpec": "painterly",
-        "supersample": 2
-      },
-      "geometry": {
-        "footprintWidth": 1,
-        "footprintHeight": 5,
-        "canvasWidth": 320,
-        "canvasHeight": 192,
-        "anchorX": 160,
-        "anchorY": 112
       },
       "category": "building",
       "postprocess": {

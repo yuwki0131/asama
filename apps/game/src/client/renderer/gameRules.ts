@@ -195,6 +195,58 @@ function isBridgeBuildTool(buildTool: BuildingType): boolean {
   return buildTool === "earth_bridge" || buildTool === "wood_bridge";
 }
 
+export function isBridgeBuildingType(buildingType: BuildingType): boolean {
+  return buildingType === "earth_bridge" || buildingType === "wood_bridge";
+}
+
+export type BridgeAxis = "x" | "y";
+
+/**
+ * Deck axis of a bridge. The simulation encodes it in the oriented snapshot
+ * asset id ("building.earth_bridge.y5"); the footprint shape is the fallback
+ * so the renderer stays correct even for plain base ids.
+ */
+export function bridgeAxis(building: BuildingSnapshot): BridgeAxis {
+  const oriented = /\.([xy])\d+$/.exec(building.assetId);
+  if (oriented !== null) {
+    return oriented[1] as BridgeAxis;
+  }
+  const footprint = building.footprint;
+  if (footprint.length >= 2) {
+    return footprint[0]!.x === footprint[1]!.x ? "y" : "x";
+  }
+  return "x";
+}
+
+/**
+ * Per-cell asset candidates for a bridge footprint cell (segment-based
+ * auto-tiling): the min-coordinate cell along the deck axis is the "start"
+ * approach, the max-coordinate cell the "end" approach, everything between
+ * a seamless "mid" water crossing. Single-cell bridges use the isolated
+ * one-tile asset with abutments on both ends.
+ */
+export function bridgeCellAssetCandidates(building: BuildingSnapshot, cell: CellCoord): readonly string[] {
+  const base = building.type === "earth_bridge" ? "building.earth_bridge" : "building.wood_bridge";
+  const axis = bridgeAxis(building);
+  const single = axis === "y" ? `${base}.y` : base;
+  const footprint = building.footprint;
+  if (footprint.length <= 1) {
+    return [single, finalBuildingFallbackAssetId(building)];
+  }
+
+  const along = (coord: CellCoord): number => (axis === "x" ? coord.x : coord.y);
+  let min = along(footprint[0]!);
+  let max = min;
+  for (const footprintCell of footprint) {
+    const value = along(footprintCell);
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+  }
+  const value = along(cell);
+  const segment = value === min ? "start" : value === max ? "end" : "mid";
+  return [`${base}.${axis}.${segment}`, single, finalBuildingFallbackAssetId(building)];
+}
+
 function isNeSwGateType(buildingType: BuildingType): boolean {
   return (
     buildingType === "gate_wide_2_ne_sw" ||
