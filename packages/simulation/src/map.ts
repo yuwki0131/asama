@@ -116,6 +116,7 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
   // but carry a dedicated diagonal-split tile asset so the staircase corners
   // of the rasterised river read as smooth 45° bends.
   const corner = riverTransitionCorner(coord);
+  const innerCorner = corner === null ? riverInnerTransitionCorner(coord) : null;
   const terrain = corner !== null ? "water" : terrainAt(coord);
   const passable = terrain !== "water" && terrain !== "stone";
   const movementCost = terrain === "dirt" ? 3 : 1;
@@ -125,7 +126,12 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
     terrain,
     movementCost,
     passable,
-    assetId: corner !== null ? riverTransitionAssetId(corner, coord) : terrainAssetId(terrain, coord),
+    assetId:
+      corner !== null
+        ? riverTransitionAssetId(corner, coord)
+        : innerCorner !== null
+          ? riverInnerTransitionAssetId(innerCorner, coord)
+          : terrainAssetId(terrain, coord),
     // Procedural base map is flat; scenarios raise cells afterwards via
     // applyScenarioElevation (elevation-contract.md).
     elevation: 0,
@@ -134,9 +140,6 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
   };
 }
 
-const RIVER_WEST_LIMIT = 12;
-const RIVER_EAST_LIMIT = MAP_WIDTH - 10;
-
 /**
  * Southernmost allowed water reach (center + halfWidth) per column, as a
  * piecewise-linear "levee" line. Scenario content pins buildings to fixed
@@ -144,18 +147,20 @@ const RIVER_EAST_LIMIT = MAP_WIDTH - 10;
  * x=28-44, walls at x=52 y>=44, water moats at x=58 y>=44), so the river --
  * including its impassable transition corners one row beyond the water --
  * must never reach them. Gentle ramp slopes keep bank steps <= 1 cell per
- * column so corners stay single transitions.
+ * column so corners stay single transitions. The cap now spans the full map
+ * width (x=0..127): the river runs edge to edge, sea-bound, instead of
+ * petering out mid-map.
  */
 function riverSouthCap(x: number): number {
   const points: ReadonlyArray<readonly [number, number]> = [
-    [13, 44.9],
+    [0, 44.9],
     [21, 44.9],
     [26, 41.9],
     [48, 41.9],
     [50, 42.9],
     [58, 42.9],
     [65, 44.9],
-    [117, 44.9]
+    [127, 44.9]
   ];
   for (let index = 0; index < points.length - 1; index += 1) {
     const [x0, v0] = points[index]!;
@@ -191,9 +196,9 @@ function riverCourse(x: number): { center: number; halfWidth: number } {
 }
 
 function isRiverWater(x: number, y: number): boolean {
-  if (x <= RIVER_WEST_LIMIT || x >= RIVER_EAST_LIMIT) {
-    return false;
-  }
+  // No west/east cut-off: the river spans the full map width and its course
+  // function extends smoothly past the borders, so edge columns see an
+  // off-map water continuation (no spurious bank corners at x=0 / x=127).
   const { center, halfWidth } = riverCourse(x);
   return Math.abs(y - center) <= halfWidth;
 }
@@ -227,6 +232,61 @@ export function riverTransitionAssetId(corner: RiverTransitionCorner, coord: Cel
   h = (h ^ (h >>> 13)) >>> 0;
   const pick = h % 3;
   const base = `terrain.water.transition.${corner}`;
+  return pick === 0 ? base : `${base}.v${pick}`;
+}
+
+/**
+ * A river-water cell whose orthogonal neighbours include exactly one
+ * perpendicular pair of non-water cells is an inner (concave) corner of the
+ * river staircase: without a dedicated tile, its bank turns a hard 90°
+ * against the neighbouring outer transition's diagonal (or against two
+ * straight connected banks). It gets a wedge tile instead -- mostly water,
+ * with a small grass/bank wedge chamfering the land corner at 45° so the
+ * bank contour reads as a continuous 45° line together with the adjacent
+ * outer transition diagonals.
+ *
+ * The corner suffix names the two LAND sides (mirroring the outer tiles,
+ * which name their two WATER sides).
+ *
+ * When the land neighbour on the HORIZONTAL side of the pair (N/S) is
+ * itself an outer transition corner, the cell is excluded: on the 45°
+ * stretches of the course, consecutive outer diagonals already meet
+ * end-to-end exactly at this cell's corner point and form a continuous
+ * line, so a wedge here would protrude into open water and scallop it. The
+ * check stays base-function-only (riverTransitionCorner itself derives from
+ * the base course), so classification cannot chain outward. The vertical
+ * (E/W) pair neighbour is regularly an outer transition -- the wedge is
+ * shaped to continue that tile's diagonal (see build_water_transition_
+ * inner_tile in the Blender library).
+ */
+export function riverInnerTransitionCorner(coord: CellCoord): RiverTransitionCorner | null {
+  if (!isRiverWater(coord.x, coord.y)) {
+    return null;
+  }
+  const n = !isRiverWater(coord.x, coord.y - 1);
+  const e = !isRiverWater(coord.x + 1, coord.y);
+  const s = !isRiverWater(coord.x, coord.y + 1);
+  const w = !isRiverWater(coord.x - 1, coord.y);
+  let corner: RiverTransitionCorner | null = null;
+  if (n && e && !s && !w) corner = "ne";
+  else if (e && s && !w && !n) corner = "es";
+  else if (s && w && !n && !e) corner = "sw";
+  else if (w && n && !e && !s) corner = "wn";
+  if (corner === null) {
+    return null;
+  }
+  const horizontalDy = corner === "ne" || corner === "wn" ? -1 : 1;
+  if (riverTransitionCorner({ x: coord.x, y: coord.y + horizontalDy }) !== null) {
+    return null;
+  }
+  return corner;
+}
+
+export function riverInnerTransitionAssetId(corner: RiverTransitionCorner, coord: CellCoord): string {
+  let h = (coord.x * 374761393 + coord.y * 668265263 + 60103) >>> 0;
+  h = (h ^ (h >>> 13)) >>> 0;
+  const pick = h % 3;
+  const base = `terrain.water.transition.inner.${corner}`;
   return pick === 0 ? base : `${base}.v${pick}`;
 }
 
