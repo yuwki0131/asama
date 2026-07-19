@@ -1,6 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import sharp from "sharp";
+import { despeckleRgba } from "./despeckle";
 import type { RasterImportSpec } from "./types";
 
 const categoryDefaults: Record<RasterImportSpec["category"], { readonly trimThreshold: number; readonly sharpenSigma?: number }> = {
@@ -56,10 +57,25 @@ export async function importRasterAsset(spec: RasterImportSpec): Promise<void> {
     // Art direction asks for a reduced-palette pseudo-pixel look; per-asset
     // quantization keeps the game-wide palette rich while giving each sprite
     // retro grain.
-    await image.png({ palette: true, colors: spec.palette.colors, dither: spec.palette.dither }).toFile(spec.outputFile);
-  } else {
-    await image.png().toFile(spec.outputFile);
+    const quantized = await image
+      .png({ palette: true, colors: spec.palette.colors, dither: spec.palette.dither })
+      .toBuffer();
+    image = sharp(quantized).ensureAlpha();
   }
+
+  // Deterministic NOISE cleanup as the very last pixel operation: palette
+  // dithering re-creates speckles/holes/dark fringe, so despeckling any
+  // earlier would not guarantee the lint passes on the written file.
+  const { data: finalPixels, info: finalInfo } = await image.raw().toBuffer({ resolveWithObject: true });
+  despeckleRgba(
+    { data: finalPixels, width: finalInfo.width, height: finalInfo.height },
+    { liftDarkFringe: spec.category === "building" }
+  );
+  await sharp(finalPixels, {
+    raw: { width: finalInfo.width, height: finalInfo.height, channels: 4 }
+  })
+    .png()
+    .toFile(spec.outputFile);
   await validateOutputPng(spec.outputFile, spec.canvasWidth, spec.canvasHeight);
 }
 

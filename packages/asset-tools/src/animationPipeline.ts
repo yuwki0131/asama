@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import {
@@ -15,6 +15,7 @@ import {
   writeAnimationCacheIndex
 } from "./animationCache";
 import { mergeAnimationManifest, toAnimationManifestEntries } from "./animationManifest";
+import { despecklePngFile } from "./despeckle";
 import { composeSpriteSheet } from "./spriteSheet";
 import { resolveBlenderBinary } from "./blenderRender";
 import {
@@ -71,7 +72,9 @@ export async function renderAnimationAssets(): Promise<AnimationRenderBatchResul
       const cachedPng = await resolveAnimationCacheHit(animationRenderCacheDir, cacheKey.sha256);
 
       if (cachedPng !== null) {
-        await copyFile(cachedPng, outputPath);
+        // Cached sheets predate the despeckle post-process; apply it on the
+        // way out (idempotent, so already-clean sheets copy through unchanged).
+        await despecklePngFile(cachedPng, outputPath, { fillInteriorHoles: false });
         cachedHit += 1;
         if (cacheIndex[cacheKey.sha256] === undefined) {
           cacheIndex[cacheKey.sha256] = cacheKey.metadata;
