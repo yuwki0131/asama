@@ -16,7 +16,7 @@ from .buildings import (
     build_market_graybox, build_barracks_graybox,
     build_samurai_residence_graybox, build_town_block_graybox,
     build_yagura_small_graybox, build_farm_paddy,
-    build_gate_wood, build_wall_plaster_mask, build_fence_wood_mask,
+    build_gate_wood, build_wall_plaster_mask, build_wall_hazama_mask, build_fence_wood_mask,
     build_wall_ladder, build_tenshu_graybox, build_tenshu,
 )
 from .vegetation import (
@@ -95,6 +95,10 @@ def resolve_model(name: str):
             mask = name[len(prefix):]
             if len(mask) == 4 and set(mask) <= {"0", "1"}:
                 return lambda scene, kit=kit, mask=mask: kit(scene, mask)
+    hazama = re.fullmatch(r"wall-hazama-connected-([01]{4})-s([012])", name)
+    if hazama is not None:
+        mask, shape = hazama.group(1), int(hazama.group(2))
+        return lambda scene: build_wall_hazama_mask(scene, mask, shape)
     moat_variant = re.fullmatch(r"(dry|water)-moat-connected-([01]{4})-(p([123])|v1)", name)
     if moat_variant is not None:
         kind, mask, suffix = moat_variant.group(1), moat_variant.group(2), moat_variant.group(3)

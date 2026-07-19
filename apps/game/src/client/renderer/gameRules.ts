@@ -80,6 +80,7 @@ export function isCenterAnchoredBuilding(buildingType: BuildingType): boolean {
   return (
     buildingType === "fence" ||
     buildingType === "wall" ||
+    buildingType === "hazama_wall" ||
     isGateType(buildingType) ||
     buildingType === "dry_moat" ||
     buildingType === "water_moat" ||
@@ -96,7 +97,7 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.fence.wood";
   }
 
-  if (building.type === "wall") {
+  if (building.type === "wall" || building.type === "hazama_wall") {
     return "building.wall.plaster";
   }
 

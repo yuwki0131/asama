@@ -26,7 +26,7 @@ interface DragState {
 }
 
 /** Building types that support drag-to-place (1×1 connection-kit pieces). */
-const DRAG_BUILD_TYPES = new Set<ToolMode>(["fence", "wall", "road", "dry_moat", "water_moat"]);
+const DRAG_BUILD_TYPES = new Set<ToolMode>(["fence", "wall", "hazama_wall", "road", "dry_moat", "water_moat"]);
 
 function isDragBuildTool(tool: ToolMode): tool is BuildingType {
   return DRAG_BUILD_TYPES.has(tool);

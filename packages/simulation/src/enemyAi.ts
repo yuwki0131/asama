@@ -77,7 +77,7 @@ export function updateEnemyAi(world: WorldState): void {
     // Route blocked: breach the nearest defender fortification. Engineers
     // ladder walls and fill moats; combat units hack at the obstacle.
     if (unit.type === "engineer" && unit.task === null) {
-      const wall = nearestBuildingOfTypes(world, unit, ["wall"]);
+      const wall = nearestBuildingOfTypes(world, unit, ["wall", "hazama_wall"]);
       if (wall !== null && wall.ladderHp === null) {
         unit.task = { kind: "ladder", target: wall.position, progress: 0 };
         continue;

@@ -905,6 +905,72 @@
       }
     },
     {
+      "assetId": "building.wall.hazama.connected.0101.s0",
+      "kind": "building",
+      "file": "generated/building-wall-hazama-connected-0101-s0.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.0101.s1",
+      "kind": "building",
+      "file": "generated/building-wall-hazama-connected-0101-s1.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.0101.s2",
+      "kind": "building",
+      "file": "generated/building-wall-hazama-connected-0101-s2.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.1010.s0",
+      "kind": "building",
+      "file": "generated/building-wall-hazama-connected-1010-s0.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.1010.s1",
+      "kind": "building",
+      "file": "generated/building-wall-hazama-connected-1010-s1.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.1010.s2",
+      "kind": "building",
+      "file": "generated/building-wall-hazama-connected-1010-s2.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
       "assetId": "building.dry_moat.connected.0000",
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0000.png",

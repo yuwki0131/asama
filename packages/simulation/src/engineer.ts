@@ -1,7 +1,7 @@
 import type { CellCoord, EngineerTaskKind, UnitId } from "@asama/shared";
 import { attachLadder, getBuildingAt } from "./buildings";
 import { PATH_RETRY_COOLDOWN_TICKS, findPathToAttackRange } from "./pathfinding";
-import { SIEGE_BALANCE, manhattan, sameCell } from "./types";
+import { SIEGE_BALANCE, isWall, manhattan, sameCell } from "./types";
 import type { BuildingState, WorldState } from "./types";
 
 export function applyEngineerTaskCommand(
@@ -40,7 +40,7 @@ function engineerTaskTarget(world: WorldState, kind: EngineerTaskKind, position:
     return null;
   }
   if (kind === "ladder") {
-    return building.type === "wall" && building.ladderHp === null ? building : null;
+    return isWall(building.type) && building.ladderHp === null ? building : null;
   }
   return building.type === "dry_moat" || building.type === "water_moat" ? building : null;
 }
@@ -111,7 +111,7 @@ function engineerWorkTarget(world: WorldState, kind: EngineerTaskKind, position:
     return null;
   }
   if (kind === "ladder") {
-    return building.type === "wall" && building.ladderHp === null ? building : null;
+    return isWall(building.type) && building.ladderHp === null ? building : null;
   }
   return building.type === "dry_moat" || building.type === "water_moat" ? building : null;
 }

@@ -33,6 +33,7 @@ export function buildingTypeLabel(type: BuildingType): string {
     tenshu: "天守",
     yagura: "矢倉",
     wall: "石塀",
+    hazama_wall: "狭間塀",
     fence: "木塀",
     gate_wide_2: "門(広2)",
     gate_wide_3: "門(広3 NW-SE)",

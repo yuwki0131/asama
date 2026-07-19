@@ -259,6 +259,42 @@ def build_wall_plaster_mask(scene: bpy.types.Scene, mask: str) -> None:
         )
 
 
+def build_wall_hazama_mask(scene: bpy.types.Scene, mask: str, shape: int) -> None:
+    """Plaster wall with a sama (loophole) opening through a straight run.
+
+    Only straight masks carry loopholes (0101 = E-W run, 1010 = N-S run);
+    shape 0=maru(circle) 1=sankaku(triangle) 2=shikaku(square), cycled per
+    cell by the simulation so a run reads as an alternating loophole row.
+    """
+    import math
+
+    build_wall_plaster_mask(scene, mask)
+    dark = make_material("HazamaOpening", (0.055, 0.045, 0.04, 1.0))
+    axis = "x" if mask == "0101" else "y"
+    # Poke a hair past both plaster faces to break coplanarity without a
+    # visible ledge on the silhouette (1px is about 0.022 units).
+    half_depth = WALL_BODY_THICKNESS / 2.0 + 0.004
+    if shape == 0:
+        pts = [(math.cos(a) * 0.105, 0.62 + math.sin(a) * 0.105) for a in (i * math.tau / 10 for i in range(10))]
+    elif shape == 1:
+        pts = [(-0.12, 0.51), (0.12, 0.51), (0.0, 0.75)]
+    else:
+        pts = [(-0.10, 0.52), (0.10, 0.52), (0.10, 0.72), (-0.10, 0.72)]
+
+    vertices: list[tuple[float, float, float]] = []
+    for side in (-1.0, 1.0):
+        for u, z in pts:
+            mx, my = (u, side * half_depth) if axis == "x" else (side * half_depth, u)
+            wx, wy = map_xy(mx, my)
+            vertices.append((wx, wy, z))
+    count = len(pts)
+    faces: list[tuple[int, ...]] = [tuple(range(count - 1, -1, -1)), tuple(range(count, 2 * count))]
+    for i in range(count):
+        j = (i + 1) % count
+        faces.append((i, j, count + j, count + i))
+    add_mesh(scene, f"HazamaOpening{shape}", vertices, faces, dark)
+
+
 def build_wall_ladder(scene: bpy.types.Scene) -> None:
     """Siege ladder leaning over a wall cell. Canvas 64x96, anchor 32,80."""
     wood = make_material("LadderWood", (0.52, 0.40, 0.24, 1.0))

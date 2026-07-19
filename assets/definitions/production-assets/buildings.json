@@ -1914,6 +1914,168 @@
       }
     },
     {
+      "assetId": "building.wall.hazama.connected.0101.s0",
+      "kind": "building",
+      "output": "building-wall-hazama-connected-0101-s0.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-hazama-connected-0101-s0",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.0101.s1",
+      "kind": "building",
+      "output": "building-wall-hazama-connected-0101-s1.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-hazama-connected-0101-s1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.0101.s2",
+      "kind": "building",
+      "output": "building-wall-hazama-connected-0101-s2.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-hazama-connected-0101-s2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.1010.s0",
+      "kind": "building",
+      "output": "building-wall-hazama-connected-1010-s0.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-hazama-connected-1010-s0",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.1010.s1",
+      "kind": "building",
+      "output": "building-wall-hazama-connected-1010-s1.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-hazama-connected-1010-s1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.hazama.connected.1010.s2",
+      "kind": "building",
+      "output": "building-wall-hazama-connected-1010-s2.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-hazama-connected-1010-s2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
       "assetId": "building.dry_moat.connected.0000",
       "kind": "building",
       "output": "building-dry-moat-connected-0000.png",
