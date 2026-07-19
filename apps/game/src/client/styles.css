@@ -474,6 +474,60 @@ button {
   color: #f4efe6;
 }
 
+/* ── Focus-cell debug panel (hover/selected tile render info) ── */
+
+.debug-focus-panel {
+  position: absolute;
+  left: 12px;
+  bottom: 44px;
+  z-index: 20;
+  width: min(360px, calc(100% - 24px));
+  max-height: 45%;
+  overflow: auto;
+  padding: 8px 10px;
+  border: 1px solid rgba(155, 172, 190, 0.45);
+  border-radius: 6px;
+  background: rgba(18, 22, 27, 0.88);
+  color: #f4efe6;
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.debug-focus-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(155, 172, 190, 0.24);
+  font-weight: 700;
+}
+
+.debug-focus-grid {
+  margin: 0;
+}
+
+.debug-focus-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 0 10px;
+}
+
+.debug-focus-row dt {
+  color: #b7c1cc;
+}
+
+.debug-focus-row dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #f4efe6;
+}
+
 /* ── Loading screen ──────────────────────────────────────── */
 
 @keyframes loadingFadeIn {

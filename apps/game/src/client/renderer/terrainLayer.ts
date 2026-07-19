@@ -704,7 +704,7 @@ function drawFallbackFace(
   }
 }
 
-function terrainFallbackAssetId(cell: TerrainCellSnapshot): string {
+export function terrainFallbackAssetId(cell: TerrainCellSnapshot): string {
   if (cell.terrain === "grass" && (cell.coord.x * 17 + cell.coord.y * 31) % 7 === 0) {
     return "terrain.grass.variant.1";
   }

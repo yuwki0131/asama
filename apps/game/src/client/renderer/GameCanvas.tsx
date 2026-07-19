@@ -16,6 +16,7 @@ import { tileOffsetYAt } from "./elevation";
 import { registerKeyboardInput, registerPointerInput } from "./input";
 import { elapsedSimTicks } from "./interpolation";
 import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type MinimapTerrainCache } from "./minimap";
+import { focusCellDebugRows } from "./focusCellDebug";
 import { EffectsLayer } from "./effectsLayer";
 import { renderScene } from "./renderScene";
 import { RetainedScene } from "./sceneLayer";
@@ -562,6 +563,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
     scheduleCameraRender();
   };
 
+  // Focus-cell debug panel: hover wins over selection; shows the asset ids
+  // the renderer actually resolved for the focused tile (focusCellDebug.ts).
+  const focusCell = hoverCell ?? selectedCell;
+  const focusRows =
+    debugOverlayVisible && snapshot !== null && assets.size > 0 && focusCell !== null
+      ? focusCellDebugRows(snapshot, assets, focusCell)
+      : null;
+
   return (
     <div ref={hostRef} className="game-canvas">
       <canvas
@@ -572,6 +581,22 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         onPointerDown={handleMinimapPointer}
         onPointerMove={handleMinimapPointer}
       />
+      {focusRows === null ? null : (
+        <aside className="debug-focus-panel" aria-label="Focus cell debug" data-testid="debug-focus-panel">
+          <div className="debug-focus-header">
+            <span>Focus Tile</span>
+            <span className="debug-status-flag">{hoverCell !== null ? "hover" : "selected"}</span>
+          </div>
+          <dl className="debug-focus-grid">
+            {focusRows.map((row, index) => (
+              <div className="debug-focus-row" key={`${index}:${row.label}`}>
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </aside>
+      )}
       {selectionBox === null ? null : (
         <div
           className="selection-box"
