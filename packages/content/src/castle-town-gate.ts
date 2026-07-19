@@ -19,7 +19,7 @@ export const castleTownGateScenario: ContentScenarioDefinition = {
     ...ring("wall", 40, 50, 60, 64, ["49,64", "50,64", "51,64"]),
     { type: "gate_wide_3", position: { x: 49, y: 64 } },
     { type: "tenshu", position: { x: 43, y: 54 } },
-    { type: "honmaru", position: { x: 55, y: 55 } },
+    { type: "honmaru", position: { x: 54, y: 54 } },
     { type: "storehouse", position: { x: 53, y: 58 } },
     { type: "storehouse", position: { x: 56, y: 51 } },
     { type: "barracks", position: { x: 42, y: 60 } },

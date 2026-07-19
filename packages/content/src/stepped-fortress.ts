@@ -35,7 +35,7 @@ export const steppedFortressScenario: ContentScenarioDefinition = {
   initialBuildings: [
     // === 本丸 (L3) ===
     { type: "tenshu", position: { x: 26, y: 58 } },
-    { type: "honmaru", position: { x: 35, y: 58 } },
+    { type: "honmaru", position: { x: 34, y: 57 } },
     { type: "storehouse", position: { x: 33, y: 62 } },
     { type: "gate_narrow_3_ne_sw", position: { x: 38, y: 60 } },
     { type: "yagura", position: { x: 36, y: 64 } },

@@ -3,6 +3,7 @@ import {
   DEFAULT_SCENARIO,
   concentricCastleScenario,
   linearFortressScenario,
+  mvpDefenseScenario,
   riversideDefenseScenario,
 } from "@asama/content";
 import { createInitialWorld, updateWorld } from "./index";
@@ -68,6 +69,49 @@ describe("bug regression: enemy AI honmaru approach without pause", () => {
       ticks++;
     }
     expect(world.outcome?.winner).toBe("enemy");
+  });
+});
+
+describe("honmaru footprint sizing", () => {
+  it("defaults to the 3x3 spec footprint when no size override is given", () => {
+    const world = createInitialWorld(mvpDefenseScenario);
+    const honmaru = world.buildings.find((b) => b.type === "honmaru");
+    expect(honmaru?.footprint).toHaveLength(9);
+  });
+
+  it("honors the scenario size override (concentricCastle uses size: 4)", () => {
+    const world = createInitialWorld(concentricCastleScenario);
+    const honmaru = world.buildings.find((b) => b.type === "honmaru");
+    expect(honmaru?.footprint).toHaveLength(16);
+    const xs = honmaru!.footprint.map((c) => c.x);
+    const ys = honmaru!.footprint.map((c) => c.y);
+    expect(Math.min(...xs)).toBe(65);
+    expect(Math.max(...xs)).toBe(68);
+    expect(Math.min(...ys)).toBe(76);
+    expect(Math.max(...ys)).toBe(79);
+  });
+
+  it("rejects a size override on a non-honmaru placement", () => {
+    const scenario: ScenarioDefinition = {
+      ...DEFAULT_SCENARIO,
+      initialBuildings: [
+        ...DEFAULT_SCENARIO.initialBuildings,
+        { type: "storehouse", position: { x: 20, y: 20 }, size: 2 }
+      ]
+    };
+    expect(() => createInitialWorld(scenario)).toThrow(/only supported for honmaru/);
+  });
+
+  it("rejects a non-integer or sub-1 size override", () => {
+    for (const size of [0, -1, 2.5]) {
+      const scenario: ScenarioDefinition = {
+        ...DEFAULT_SCENARIO,
+        initialBuildings: DEFAULT_SCENARIO.initialBuildings.map((p) =>
+          p.type === "honmaru" ? { ...p, size } : p
+        )
+      };
+      expect(() => createInitialWorld(scenario)).toThrow(/Invalid honmaru size/);
+    }
   });
 });
 

@@ -43,7 +43,7 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
   initialBuildings: [
     // === L5 頂上 — 天守・本丸・詰の蔵・虎口門 ===
     { type: "tenshu", position: { x: 53, y: 55 } },
-    { type: "honmaru", position: { x: 61, y: 56 } },
+    { type: "honmaru", position: { x: 60, y: 55 } },
     { type: "storehouse", position: { x: 60, y: 59 } },
     // 虎口狭門 — 4→5 坂の坂下 (L4 側) を塞ぐ。中央 (58,64) のみ通行可。
     // (坂上の L5 南縁は幅1の回廊のため、3マス門は坂下に置く)

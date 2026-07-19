@@ -152,6 +152,9 @@ export interface ScenarioBuildingPlacement {
   readonly type: BuildingType;
   readonly position: CellCoord;
   readonly owner?: OwnerId;
+  /** Map-authoring-time square footprint override in cells (honmaru only).
+   *  Overrides the default spec footprint with size x size. Integer >= 1. */
+  readonly size?: number;
 }
 
 export interface ScenarioUnitSpawn {

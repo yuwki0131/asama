@@ -45,7 +45,7 @@ export const freePlayScenario: ContentScenarioDefinition = {
     // 天守 (5×5): x=53..57, y=55..59
     { type: "tenshu", position: { x: 53, y: 55 } },
     // 本丸マーカー
-    { type: "honmaru", position: { x: 62, y: 59 } },
+    { type: "honmaru", position: { x: 62, y: 58 } },
     // 兵糧蔵 (3×3) × 2: 天守の東側
     { type: "storehouse", position: { x: 59, y: 53 } },
     { type: "storehouse", position: { x: 59, y: 56 } },

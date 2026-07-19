@@ -1,5 +1,5 @@
 import { buildingSpecs } from "@asama/content";
-import type { BuildingSnapshot, BuildingType, CellCoord, OwnerId, ScenarioDefinition, TerrainCellSnapshot } from "@asama/shared";
+import type { BuildingSnapshot, BuildingType, CellCoord, OwnerId, ScenarioBuildingPlacement, ScenarioDefinition, TerrainCellSnapshot } from "@asama/shared";
 import {
   BLOCKED_MOVEMENT_COST,
   FOOD_BALANCE,
@@ -128,6 +128,26 @@ function canPlaceBridgeAt(world: WorldState, position: CellCoord): boolean {
   return true;
 }
 
+/** Resolve the effective building definition for a scenario placement.
+ *  Honmaru accepts a map-authoring-time square `size` override (integer >= 1)
+ *  which replaces the default spec footprint with size x size cells. */
+function resolvePlacementDefinition(placement: ScenarioBuildingPlacement): BuildingDefinition | undefined {
+  const definition = buildingDefinitions[placement.type];
+  if (definition === undefined || placement.size === undefined) {
+    return definition;
+  }
+  if (placement.type !== "honmaru") {
+    throw new Error(`Scenario placement size override is only supported for honmaru (got ${placement.type})`);
+  }
+  if (!Number.isInteger(placement.size) || placement.size < 1) {
+    throw new Error(`Invalid honmaru size override: ${placement.size}`);
+  }
+  return {
+    ...definition,
+    footprint: rectangularFootprint(placement.size, placement.size)
+  };
+}
+
 export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefinition): void {
   // Pre-collect all bridge positions so auto-span does not extend into a cell
   // that is reserved for an adjacent bridge (e.g. two-wide moat crossings).
@@ -138,7 +158,7 @@ export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefini
   );
 
   for (const placement of scenario.initialBuildings) {
-    const definition = buildingDefinitions[placement.type];
+    const definition = resolvePlacementDefinition(placement);
     if (definition === undefined) {
       throw new Error(`Unknown initial building type: ${placement.type}`);
     }
