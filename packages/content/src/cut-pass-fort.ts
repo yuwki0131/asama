@@ -36,7 +36,7 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
   initialBuildings: [
     // === 本曲輪 (L2) ===
     { type: "tenshu", position: { x: 39, y: 88 } },
-    { type: "honmaru", position: { x: 48, y: 88 } },
+    { type: "honmaru", position: { x: 47, y: 87 } },
     { type: "storehouse", position: { x: 48, y: 90 } },
     // 大手虎口 — 1→2 坂の出口 (43,96)(44,96) を塞ぐ幅2の門。
     { type: "gate_wide_2", position: { x: 43, y: 96 } },

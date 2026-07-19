@@ -23,7 +23,7 @@ import {
 import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
 import { bridgeCellAssetCandidates, buildingAssetCandidates, isBridgeBuildingType } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
-import { buildingRenderPoint, isoBehind } from "./renderGeometry";
+import { buildingRenderPoint, honmaruMarkerScale, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
 import {
   addCliffCellSprites,
@@ -756,6 +756,11 @@ function addBuildingSprite(
   // the anchor cell's elevation lifts the whole sprite.
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
+  if (building.type === "honmaru") {
+    // The marker asset is a single-cell ground diamond; scale it to cover the
+    // whole (map-authored) footprint without needing a regenerated asset.
+    sprite.scale.set(honmaruMarkerScale(building));
+  }
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
   }

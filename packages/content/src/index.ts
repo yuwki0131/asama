@@ -209,7 +209,7 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     type: "honmaru",
     category: "objective",
     maxHp: 9999,
-    footprint: { width: 1, height: 1 },
+    footprint: { width: 3, height: 3 },
     passable: true,
     movementCostModifier: 1,
     assetId: "building.honmaru.marker",
@@ -342,7 +342,7 @@ export const mvpDefenseScenario: ScenarioDefinition = {
   name: "MVP防衛戦",
   initialBuildings: [
   { type: "tenshu", position: { x: 55, y: 55 } },
-  { type: "honmaru", position: { x: 62, y: 58 } },
+  { type: "honmaru", position: { x: 61, y: 57 } },
   { type: "yagura", position: { x: 50, y: 58 } },
   { type: "storehouse", position: { x: 47, y: 62 } },
   { type: "market", position: { x: 52, y: 66 } },
@@ -514,7 +514,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 70, y: 81 } },
     // 天守(5×5) + 本丸マーカー
     { type: "tenshu", position: { x: 58, y: 68 } },
-    { type: "honmaru", position: { x: 67, y: 78 } },
+    { type: "honmaru", position: { x: 65, y: 76 }, size: 4 },
 
     // === 水堀リング x=54-72, y=26-45 ===
     // 北堀
@@ -844,7 +844,7 @@ export const linearFortressScenario: ContentScenarioDefinition = {
   initialBuildings: [
     // === Honmaru compound (NW) — wall ring x=15-29, y=14-29 ===
     { type: "tenshu", position: { x: 18, y: 57 } },
-    { type: "honmaru", position: { x: 26, y: 66 } },
+    { type: "honmaru", position: { x: 25, y: 65 } },
 
     // North wall
     { type: "wall", position: { x: 15, y: 54 } },
@@ -1173,7 +1173,7 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
   initialBuildings: [
     // === Castle core (west bank) ===
     { type: "tenshu", position: { x: 31, y: 47 } },
-    { type: "honmaru", position: { x: 42, y: 57 } },
+    { type: "honmaru", position: { x: 41, y: 56 } },
 
     // Watchtower guarding the NE approach
     { type: "yagura", position: { x: 46, y: 43 } },

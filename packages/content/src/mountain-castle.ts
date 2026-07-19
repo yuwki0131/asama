@@ -56,7 +56,7 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
   initialBuildings: [
     // === 本丸 (L3, x51..62 y57..64) ===
     { type: "tenshu", position: { x: 52, y: 58 } },
-    { type: "honmaru", position: { x: 60, y: 60 } },
+    { type: "honmaru", position: { x: 59, y: 60 } },
     // 虎口門 — 2→3 坂の出口を塞ぐ狭門 (中央 (60,64) のみ通行可)。破らない限り本丸に入れない。
     { type: "gate_narrow_3", position: { x: 59, y: 64 } },
     // 本丸の兵糧蔵 — マーカー隣接なので包囲されても補給が切れない (籠城の蓄え)。

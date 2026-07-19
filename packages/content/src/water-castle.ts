@@ -24,7 +24,7 @@ export const waterCastleScenario: ContentScenarioDefinition = {
     ...ring("wall", 34, 58, 46, 70, ["39,70", "40,70", "41,70"]),
     { type: "gate_wide_3", position: { x: 39, y: 70 } },
     { type: "tenshu", position: { x: 36, y: 60 } },
-    { type: "honmaru", position: { x: 44, y: 60 } },
+    { type: "honmaru", position: { x: 43, y: 59 } },
     { type: "storehouse", position: { x: 43, y: 63 } },
     { type: "storehouse", position: { x: 35, y: 66 } },
 

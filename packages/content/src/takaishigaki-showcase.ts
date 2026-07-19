@@ -59,7 +59,7 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
   initialBuildings: [
     // === 本丸 (L5) — 天守・詰の蔵・虎口門・櫓台の隅櫓 ===
     { type: "tenshu", position: { x: 18, y: 52 } },
-    { type: "honmaru", position: { x: 31, y: 58 } },
+    { type: "honmaru", position: { x: 30, y: 57 } },
     { type: "storehouse", position: { x: 27, y: 52 } },
     { type: "gate_wide_2", position: { x: 32, y: 65 } },
     { type: "yagura", position: { x: 16, y: 66 } },
