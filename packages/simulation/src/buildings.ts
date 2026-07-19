@@ -250,7 +250,7 @@ function bridgeSpanForSeed(
   if (posIdx >= dimSize) return null;
 
   const length = posIdx - negIdx + 1;
-  if (length < 3 || length > 5) return null;
+  if (length < 3) return null;
 
   const negCell: CellCoord = isX ? { x: negIdx, y: position.y } : { x: position.x, y: negIdx };
   const posCell: CellCoord = isX ? { x: posIdx, y: position.y } : { x: position.x, y: posIdx };
@@ -562,7 +562,8 @@ function bridgeOrientation(world: WorldState, position: CellCoord): "x" | "y" {
 
 // Expand from the clicked water cell in both directions along the bridge axis
 // until landing on non-water (passable land). Returns the full footprint
-// (land + water + land) or null if the span is < 3 or > 5 cells.
+// (land + water + land) or null if the span is < 3 cells; no upper bound so
+// bridges always fit the actual river/moat width.
 function bridgeSpan(world: WorldState, position: CellCoord, orientation: "x" | "y"): CellCoord[] | null {
   const isX = orientation === "x";
   const dimSize = isX ? world.map.width : world.map.height;
@@ -584,7 +585,7 @@ function bridgeSpan(world: WorldState, position: CellCoord, orientation: "x" | "
   if (posIdx >= dimSize) return null;
 
   const length = posIdx - negIdx + 1;
-  if (length < 3 || length > 5) return null;
+  if (length < 3) return null;
 
   const negCell: CellCoord = isX ? { x: negIdx, y: position.y } : { x: position.x, y: negIdx };
   const posCell: CellCoord = isX ? { x: posIdx, y: position.y } : { x: position.x, y: posIdx };
@@ -599,7 +600,7 @@ function bridgeSpan(world: WorldState, position: CellCoord, orientation: "x" | "
 
 function bridgeOrientedAssetId(world: WorldState, building: BuildingState): string {
   // For legacy single-cell scenario bridges, fall back to "3" so the asset ID
-  // remains well-formed; player-placed bridges use actual footprint length (3–5).
+  // remains well-formed; player-placed bridges use actual footprint length.
   const n = Math.max(3, building.footprint.length);
   return `${building.assetId}.${bridgeOrientation(world, building.position)}${n}`;
 }

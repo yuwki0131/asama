@@ -89,6 +89,25 @@
           "description": "五重天守シナリオの gate_narrow_3 (原点 57,64)。狭門の開閉視覚差を確認"
         }
       ]
+    },
+    "bridge": {
+      "description": "橋: 木橋の太鼓反り・可変長タイリング・土橋の平坦さ (BRIDGE-01/02, TONE-02)",
+      "shots": [
+        {
+          "name": "water-castle-wood",
+          "scenario": "water-castle",
+          "cell": { "x": 28, "y": 64 },
+          "zoom": 3,
+          "description": "水城の1セル木橋 (28,64)。単セル太鼓アーチと堀水面との接合を確認"
+        },
+        {
+          "name": "mvp-earth",
+          "scenario": "mvp-defense",
+          "cell": { "x": 61, "y": 44 },
+          "zoom": 3,
+          "description": "mvp-defense の土橋 (61,44) と木橋 (62,45)。土橋は平坦のまま・木橋は反りありの対比 (既知: 2026-07-19時点で本シナリオの橋が非表示になる不具合あり)"
+        }
+      ]
     }
   }
 }

@@ -12,6 +12,8 @@ from .materials import (
     TERRAIN_STYLES, TERRAIN_EDGE_QUADS, make_macro_terrain_material,
 )
 
+import math
+
 import bpy
 
 TERRAIN_BLEED = 0.03
@@ -553,13 +555,61 @@ def _bridge_wedge(scene: bpy.types.Scene, pt, name, aA, aB, c0, c1, zA, zB, base
 WOOD_DECK_Z0 = 0.085
 WOOD_DECK_Z1 = 0.125
 WOOD_DECK_HALF = 0.28
+#: Crown lift of the taiko-bashi arch above the flat deck height.
+WOOD_SORI_RISE = 0.10
+#: Along-extent where the deck leaves the abutment and the arch may rise.
+WOOD_ABUTMENT_EDGE = 0.26
+
+
+def _wood_deck_lift(segment: str, a: float) -> float:
+    """Taiko-bashi deck lift at along-position `a` (tile-local, -0.5..0.5).
+
+    start rises bank-to-crown with a quarter sine (slope reaches 0 at the
+    tile edge so repeated level-crown mid tiles continue seamlessly), end
+    mirrors it, mid runs level at the crown, and single holds a full
+    half-sine arch between its two abutments.
+    """
+    if segment == "mid":
+        return WOOD_SORI_RISE
+    e = WOOD_ABUTMENT_EDGE
+    if segment == "start":
+        t = min(max((a + e) / (0.5 + e), 0.0), 1.0)
+        return WOOD_SORI_RISE * math.sin(math.pi / 2.0 * t)
+    if segment == "end":
+        t = min(max((e - a) / (0.5 + e), 0.0), 1.0)
+        return WOOD_SORI_RISE * math.sin(math.pi / 2.0 * t)
+    t = min(max((a + e) / (2.0 * e), 0.0), 1.0)
+    return WOOD_SORI_RISE * math.sin(math.pi * t)
+
+
+def _bridge_arc_box(scene: bpy.types.Scene, pt, name, a0, a1, c0, c1, z0, z1, lift, material, slices: int = 8) -> None:
+    """Box running along the deck whose whole cross-section is raised by
+    `lift(a)`, built as piecewise-linear slices so the arch reads smoothly."""
+    faces = [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    for i in range(slices):
+        aA = a0 + (a1 - a0) * i / slices
+        aB = a0 + (a1 - a0) * (i + 1) / slices
+        lA, lB = lift(aA), lift(aB)
+        corners = [
+            (aA, c0, z0 + lA), (aB, c0, z0 + lB), (aB, c1, z0 + lB), (aA, c1, z0 + lA),
+            (aA, c0, z1 + lA), (aB, c0, z1 + lB), (aB, c1, z1 + lB), (aA, c1, z1 + lA),
+        ]
+        vertices = []
+        for a, c, z in corners:
+            x, y = pt(a, c)
+            wx, wy = map_xy(x, y)
+            vertices.append((wx, wy, z))
+        add_mesh(scene, f"{name}.s{i}", vertices, faces, material)
 
 
 def build_wood_bridge(scene: bpy.types.Scene, axis: str = "x", segment: str = "single") -> None:
-    """Wooden bridge segment tile: planked deck on log stringers, kamachi
-    edge beams, continuous railings (posts on a 0.25 grid so the rhythm
-    carries across tile edges), trestle posts in the water on mid cells and
-    stone abutments with an earthen approach ramp on the end cells.
+    """Wooden taiko-bashi segment tile: arched planked deck on log
+    stringers, kamachi edge beams, continuous railings (posts on a 0.25
+    grid so the rhythm carries across tile edges), trestle posts in the
+    water on mid cells and stone abutments with an earthen approach ramp
+    on the end cells. The sori arch rises on start/end cells and runs
+    level at the crown across mid cells so any span length tiles cleanly;
+    single-cell bridges arch fully within the tile.
     Canvas 64x72, anchor 32,40."""
     from .materials import make_plank_material, make_ishigaki_material
     pt = _bridge_axes(axis)
@@ -569,15 +619,16 @@ def build_wood_bridge(scene: bpy.types.Scene, axis: str = "x", segment: str = "s
     stone = make_ishigaki_material("BridgeAbutment")
     dirt = make_mud_material("BridgeRamp")
     a0, a1 = _bridge_along_extents(segment)
+    lift = lambda a: _wood_deck_lift(segment, a)
 
-    # Log stringers under the deck, full length.
+    # Log stringers under the deck, full length, following the arch.
     for c in (-0.20, 0.0, 0.20):
-        _bridge_box(scene, pt, f"Stringer{c}", a0, a1, c - 0.035, c + 0.035, 0.045, WOOD_DECK_Z0, beam)
-    # Planked deck, constant cross-section full length.
-    _bridge_box(scene, pt, "Deck", a0, a1, -WOOD_DECK_HALF, WOOD_DECK_HALF, WOOD_DECK_Z0, WOOD_DECK_Z1, plank)
+        _bridge_arc_box(scene, pt, f"Stringer{c}", a0, a1, c - 0.035, c + 0.035, 0.045, WOOD_DECK_Z0, lift, beam)
+    # Planked deck, constant cross-section full length, arched (taiko-bashi).
+    _bridge_arc_box(scene, pt, "Deck", a0, a1, -WOOD_DECK_HALF, WOOD_DECK_HALF, WOOD_DECK_Z0, WOOD_DECK_Z1, lift, plank)
     # Kamachi edge beams along both deck sides.
     for side in (-1.0, 1.0):
-        _bridge_box(scene, pt, f"Kamachi{side}", a0, a1, side * (WOOD_DECK_HALF - 0.02), side * (WOOD_DECK_HALF + 0.02), WOOD_DECK_Z1, 0.15, beam)
+        _bridge_arc_box(scene, pt, f"Kamachi{side}", a0, a1, side * (WOOD_DECK_HALF - 0.02), side * (WOOD_DECK_HALF + 0.02), WOOD_DECK_Z1, 0.15, lift, beam)
 
     # Railings: two horizontal rails + posts. Interior posts sit on the
     # +-0.125 / +-0.375 grid (period 0.25 across tile edges); terminal ends
@@ -599,15 +650,17 @@ def build_wood_bridge(scene: bpy.types.Scene, axis: str = "x", segment: str = "s
             posts += [0.375]
         for a in sorted(set(posts)):
             p = pt(a, c)
-            add_box(scene, f"RailPost{side}{a}", *map_box((p[0] - 0.028, p[1] - 0.028, WOOD_DECK_Z1), (p[0] + 0.028, p[1] + 0.028, 0.42)), rail)
+            la = lift(a)
+            add_box(scene, f"RailPost{side}{a}", *map_box((p[0] - 0.028, p[1] - 0.028, WOOD_DECK_Z1 + la), (p[0] + 0.028, p[1] + 0.028, 0.42 + la)), rail)
         for rz in (0.26, 0.38):
-            _bridge_box(scene, pt, f"Rail{side}{rz}", rail_a0, rail_a1, c - 0.02, c + 0.02, rz, rz + 0.035, rail)
+            _bridge_arc_box(scene, pt, f"Rail{side}{rz}", rail_a0, rail_a1, c - 0.02, c + 0.02, rz, rz + 0.035, lift, rail)
 
-    # Trestle posts standing in the sunken water (mid / isolated crossings).
+    # Trestle posts standing in the sunken water (mid / isolated crossings);
+    # tops reach the arched stringers.
     if segment in ("mid", "single"):
         for c in (-0.20, 0.20):
             p = pt(0.0, c)
-            add_box(scene, f"Trestle{c}", *map_box((p[0] - 0.04, p[1] - 0.04, -0.20), (p[0] + 0.04, p[1] + 0.04, WOOD_DECK_Z0)), beam)
+            add_box(scene, f"Trestle{c}", *map_box((p[0] - 0.04, p[1] - 0.04, -0.20), (p[0] + 0.04, p[1] + 0.04, WOOD_DECK_Z0 + lift(0.0))), beam)
 
     # Approach cells: stone abutment under the deck end + earth ramp from
     # ground level up to the deck, so the bridge visibly lands on the bank.

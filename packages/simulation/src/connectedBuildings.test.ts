@@ -237,6 +237,23 @@ describe("bridge orientation", () => {
     ]);
   });
 
+  it("spans wide water without an upper length cap (y9 over a 7-cell moat)", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    for (let y = 18; y <= 24; y++) {
+      setWaterCell(world, { x: 20, y });
+      setWaterCell(world, { x: 21, y });
+    }
+
+    place(world, "wood_bridge", { x: 20, y: 21 });
+    const b = buildingAt(world, { x: 20, y: 21 });
+    expect(b.assetId).toBe("building.wood_bridge.y9");
+    expect(b.footprint).toHaveLength(9);
+    expect(b.footprint[0]).toEqual({ x: 20, y: 17 });
+    expect(b.footprint[8]).toEqual({ x: 20, y: 25 });
+  });
+
   it("uses y3 when east neighbor has a moat building adjacent to water center", () => {
     const world = createInitialWorld();
     resetBuildings(world);
@@ -263,11 +280,11 @@ describe("bridge orientation", () => {
     expect(error).toBe("Cannot place building there");
   });
 
-  it("rejects bridge placement when the river is too wide to span (> 5 cells)", () => {
+  it("accepts bridge placement across a river wider than the old 5-cell cap", () => {
     const world = createInitialWorld();
     resetBuildings(world);
     normalizeMap(world);
-    // 4-cell-wide river at y=17-20 requires a 6-cell bridge: exceeds max of 5
+    // 4-cell-wide river at y=17-20 requires a 6-cell bridge
     setWaterCell(world, { x: 20, y: 17 });
     setWaterCell(world, { x: 20, y: 18 });
     setWaterCell(world, { x: 20, y: 19 });
@@ -281,6 +298,9 @@ describe("bridge orientation", () => {
       issuedAtTick: 0,
       clientSequence: 100
     });
-    expect(error).toBe("Cannot place building there");
+    expect(error).toBeNull();
+    const b = buildingAt(world, { x: 20, y: 20 });
+    expect(b.assetId).toBe("building.earth_bridge.y6");
+    expect(b.footprint).toHaveLength(6);
   });
 });
