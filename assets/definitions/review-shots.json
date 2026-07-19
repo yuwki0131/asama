@@ -101,11 +101,11 @@
           "description": "水城の1セル木橋 (28,64)。単セル太鼓アーチと堀水面との接合を確認"
         },
         {
-          "name": "mvp-earth",
-          "scenario": "mvp-defense",
-          "cell": { "x": 61, "y": 44 },
+          "name": "concentric-earth",
+          "scenario": "concentric-castle",
+          "cell": { "x": 63, "y": 83 },
           "zoom": 3,
-          "description": "mvp-defense の土橋 (61,44) と木橋 (62,45)。土橋は平坦のまま・木橋は反りありの対比 (既知: 2026-07-19時点で本シナリオの橋が非表示になる不具合あり)"
+          "description": "環郭の城の南堀土橋 (63,83, y3)。土橋は平坦な土手道のまま(反りなし)であることを木橋と対比で確認"
         }
       ]
     },
