@@ -323,7 +323,7 @@ export const freePlayScenario: ContentScenarioDefinition = {
   ],
 
   initialUnits: [
-    // プレイヤー全兵種 × 1 (中郭内・本丸から離して配置)
+    // プレイヤー全兵種 × 2 (中郭内・本丸から離して配置)
     // 注意: 本丸に隣接するセルを塞ぐと兵糧接続BFSが止まるため、
     // ユニットは本丸周辺を避けて中郭南寄りに配置する。
     { type: "spear_ashigaru",  position: { x: 55, y: 68 }, owner: "player" },
@@ -331,7 +331,13 @@ export const freePlayScenario: ContentScenarioDefinition = {
     { type: "archer",          position: { x: 57, y: 68 }, owner: "player" },
     { type: "engineer",        position: { x: 58, y: 68 }, owner: "player" },
     { type: "musketeer",       position: { x: 59, y: 68 }, owner: "player" },
-    { type: "cavalry",         position: { x: 60, y: 68 }, owner: "player" }
+    { type: "cavalry",         position: { x: 60, y: 68 }, owner: "player" },
+    { type: "spear_ashigaru",  position: { x: 55, y: 69 }, owner: "player" },
+    { type: "sword_ashigaru",  position: { x: 56, y: 69 }, owner: "player" },
+    { type: "archer",          position: { x: 57, y: 69 }, owner: "player" },
+    { type: "engineer",        position: { x: 58, y: 69 }, owner: "player" },
+    { type: "musketeer",       position: { x: 59, y: 69 }, owner: "player" },
+    { type: "cavalry",         position: { x: 60, y: 69 }, owner: "player" }
   ],
 
   // センチネルウェーブ: nextWaveIndex を waves.length 未満に保ち、

@@ -62,20 +62,28 @@ export const waterCastleScenario: ContentScenarioDefinition = {
   initialUnits: [
     // 本丸 — 刀足軽は本丸マーカー上 (在城中は敵の占拠が成立しない)
     { type: "sword_ashigaru", position: { x: 44, y: 60 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 44, y: 61 }, owner: "player" },
     // 東列 x42 は西蔵への補給路のため空け、射手は南東隅に置く。
     { type: "archer", position: { x: 45, y: 66 }, owner: "player" },
     { type: "archer", position: { x: 45, y: 68 }, owner: "player" },
+    { type: "archer", position: { x: 44, y: 66 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 40, y: 68 }, owner: "player" },
     // 内堀南橋の橋頭守備 (堀間の帯曲輪)
     { type: "archer", position: { x: 39, y: 74 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 41, y: 74 }, owner: "player" },
+    { type: "archer", position: { x: 38, y: 74 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 42, y: 74 }, owner: "player" },
     // 外堀東橋の橋頭守備
     { type: "archer", position: { x: 50, y: 63 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 50, y: 65 }, owner: "player" },
+    { type: "archer", position: { x: 50, y: 62 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 50, y: 66 }, owner: "player" },
 
     // 敵の物見 (東岸)
     { type: "spear_ashigaru", position: { x: 58, y: 64 }, owner: "enemy" },
     { type: "archer", position: { x: 60, y: 68 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 58, y: 68 }, owner: "enemy" },
+    { type: "archer", position: { x: 60, y: 64 }, owner: "enemy" },
   ],
   waves: [
     {
@@ -84,6 +92,8 @@ export const waterCastleScenario: ContentScenarioDefinition = {
       spawns: [
         { type: "spear_ashigaru", position: { x: 38, y: 102 } },
         { type: "spear_ashigaru", position: { x: 42, y: 102 } },
+        { type: "spear_ashigaru", position: { x: 40, y: 102 } },
+        { type: "spear_ashigaru", position: { x: 36, y: 102 } },
         { type: "supply_cart", position: { x: 40, y: 106 } },
       ],
     },
@@ -95,6 +105,9 @@ export const waterCastleScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 43, y: 102 } },
         { type: "archer", position: { x: 38, y: 105 } },
         { type: "archer", position: { x: 42, y: 105 } },
+        { type: "spear_ashigaru", position: { x: 39, y: 102 } },
+        { type: "sword_ashigaru", position: { x: 41, y: 102 } },
+        { type: "archer", position: { x: 40, y: 105 } },
         { type: "supply_cart", position: { x: 40, y: 108 } },
       ],
     },
@@ -105,9 +118,12 @@ export const waterCastleScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 60, y: 62 } },
         { type: "sword_ashigaru", position: { x: 60, y: 66 } },
         { type: "archer", position: { x: 62, y: 64 } },
+        { type: "archer", position: { x: 62, y: 62 } },
         { type: "supply_cart", position: { x: 64, y: 64 } },
         { type: "sword_ashigaru", position: { x: 40, y: 102 } },
         { type: "engineer", position: { x: 38, y: 104 } },
+        { type: "spear_ashigaru", position: { x: 42, y: 103 } },
+        { type: "sword_ashigaru", position: { x: 38, y: 103 } },
         { type: "supply_cart", position: { x: 40, y: 107 } },
       ],
     },
@@ -120,9 +136,13 @@ export const waterCastleScenario: ContentScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 40, y: 103 } },
         { type: "musketeer", position: { x: 40, y: 105 } },
         { type: "engineer", position: { x: 42, y: 104 } },
+        { type: "spear_ashigaru", position: { x: 39, y: 103 } },
+        { type: "sword_ashigaru", position: { x: 41, y: 103 } },
+        { type: "archer", position: { x: 38, y: 105 } },
         { type: "supply_cart", position: { x: 39, y: 108 } },
         { type: "cavalry", position: { x: 60, y: 64 } },
         { type: "spear_ashigaru", position: { x: 61, y: 66 } },
+        { type: "cavalry", position: { x: 62, y: 65 } },
         { type: "supply_cart", position: { x: 64, y: 66 } },
       ],
     },

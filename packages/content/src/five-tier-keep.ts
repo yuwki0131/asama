@@ -84,28 +84,37 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
     { type: "archer", position: { x: 55, y: 61 }, owner: "player" },
     { type: "archer", position: { x: 56, y: 61 }, owner: "player" },
     { type: "archer", position: { x: 59, y: 61 }, owner: "player" },
+    { type: "archer", position: { x: 57, y: 61 }, owner: "player" },
     // L4 — 虎口狭門 (57..59,64) の後詰め。(58,63..66) の補給路セルは空けておく。
     { type: "spear_ashigaru", position: { x: 57, y: 65 }, owner: "player" },
     { type: "archer", position: { x: 59, y: 65 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 56, y: 65 }, owner: "player" },
     // L3 — 3→4 坂の側衛と南縁の射撃線。(53,66..68) は補給路のため空ける。
     { type: "spear_ashigaru", position: { x: 52, y: 68 }, owner: "player" },
     { type: "archer", position: { x: 56, y: 71 }, owner: "player" },
     { type: "archer", position: { x: 58, y: 71 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 63, y: 71 }, owner: "player" },
+    { type: "archer", position: { x: 57, y: 71 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 62, y: 71 }, owner: "player" },
     // L2 — 2→3 坂下の受けと鉄砲。
     { type: "musketeer", position: { x: 52, y: 74 }, owner: "player" },
     { type: "archer", position: { x: 48, y: 74 }, owner: "player" },
+    { type: "archer", position: { x: 50, y: 74 }, owner: "player" },
     // L1 — 大手坂上と 1→2 坂の守り。(49..50,77..78) の坂口は片側を空ける。
     { type: "spear_ashigaru", position: { x: 51, y: 78 }, owner: "player" },
     { type: "archer", position: { x: 52, y: 79 }, owner: "player" },
     { type: "archer", position: { x: 59, y: 82 }, owner: "player" },
+    { type: "archer", position: { x: 58, y: 82 }, owner: "player" },
     // 城下 (L0) — 遅滞戦闘要員。
     { type: "spear_ashigaru", position: { x: 56, y: 97 }, owner: "player" },
     { type: "archer", position: { x: 58, y: 97 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 55, y: 97 }, owner: "player" },
 
     // 敵の物見。
     { type: "spear_ashigaru", position: { x: 55, y: 100 }, owner: "enemy" },
     { type: "archer", position: { x: 59, y: 101 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 53, y: 101 }, owner: "enemy" },
+    { type: "archer", position: { x: 57, y: 101 }, owner: "enemy" },
   ],
   waves: [
     {
@@ -114,6 +123,8 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
       spawns: [
         { type: "spear_ashigaru", position: { x: 54, y: 103 } },
         { type: "spear_ashigaru", position: { x: 60, y: 103 } },
+        { type: "spear_ashigaru", position: { x: 56, y: 103 } },
+        { type: "spear_ashigaru", position: { x: 58, y: 103 } },
         { type: "supply_cart", position: { x: 57, y: 107 } },
       ],
     },
@@ -126,6 +137,9 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 57, y: 103 } },
         { type: "archer", position: { x: 55, y: 105 } },
         { type: "archer", position: { x: 59, y: 105 } },
+        { type: "spear_ashigaru", position: { x: 55, y: 103 } },
+        { type: "sword_ashigaru", position: { x: 59, y: 103 } },
+        { type: "archer", position: { x: 57, y: 105 } },
         { type: "supply_cart", position: { x: 57, y: 108 } },
       ],
     },
@@ -139,6 +153,9 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
         { type: "engineer", position: { x: 55, y: 106 } },
         { type: "archer", position: { x: 57, y: 106 } },
         { type: "cavalry", position: { x: 52, y: 104 } },
+        { type: "sword_ashigaru", position: { x: 56, y: 103 } },
+        { type: "spear_ashigaru", position: { x: 58, y: 103 } },
+        { type: "archer", position: { x: 59, y: 106 } },
         { type: "supply_cart", position: { x: 57, y: 109 } },
       ],
     },
@@ -155,6 +172,10 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
         { type: "musketeer", position: { x: 57, y: 107 } },
         { type: "engineer", position: { x: 59, y: 106 } },
         { type: "cavalry", position: { x: 62, y: 104 } },
+        { type: "sword_ashigaru", position: { x: 57, y: 103 } },
+        { type: "spear_ashigaru", position: { x: 52, y: 103 } },
+        { type: "archer", position: { x: 55, y: 104 } },
+        { type: "archer", position: { x: 59, y: 104 } },
         { type: "supply_cart", position: { x: 56, y: 110 } },
         { type: "supply_cart", position: { x: 58, y: 110 } },
       ],

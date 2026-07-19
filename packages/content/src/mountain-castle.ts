@@ -152,12 +152,16 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     { type: "archer", position: { x: 57, y: 64 }, owner: "player" },
     { type: "archer", position: { x: 62, y: 64 }, owner: "player" },
     { type: "archer", position: { x: 58, y: 64 }, owner: "player" },
+    { type: "archer", position: { x: 56, y: 64 }, owner: "player" },
     // 虎口門の後詰め。(60,63) は本丸への唯一の補給路セルなので空けておく。
     { type: "spear_ashigaru", position: { x: 59, y: 63 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 58, y: 63 }, owner: "player" },
     // 二の丸 (L2) — 大手 1→2 坂上の槍衾と南縁の射撃線。
     { type: "spear_ashigaru", position: { x: 52, y: 70 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 53, y: 70 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 54, y: 70 }, owner: "player" },
     { type: "archer", position: { x: 55, y: 71 }, owner: "player" },
+    { type: "archer", position: { x: 56, y: 71 }, owner: "player" },
     { type: "archer", position: { x: 61, y: 66 }, owner: "player" },
     // 注意: (60,66) の虎口直下セルには置かない — 唯一の補給路セルを味方が
     // 塞ぐと兵糧接続BFSが切れて兵糧切れ判定になる。
@@ -170,16 +174,22 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     { type: "archer", position: { x: 55, y: 84 }, owner: "player" },
     { type: "archer", position: { x: 58, y: 84 }, owner: "player" },
     { type: "archer", position: { x: 54, y: 84 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 53, y: 84 }, owner: "player" },
+    { type: "archer", position: { x: 59, y: 84 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 73, y: 78 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 72, y: 79 }, owner: "player" },
     { type: "archer", position: { x: 72, y: 80 }, owner: "player" },
+    { type: "archer", position: { x: 70, y: 80 }, owner: "player" },
     // 城下 (L0) — 惣構門前の遅滞戦闘要員。
     { type: "spear_ashigaru", position: { x: 55, y: 106 }, owner: "player" },
     { type: "archer", position: { x: 57, y: 106 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 54, y: 106 }, owner: "player" },
 
     // 敵の物見 (南の街道)。
     { type: "spear_ashigaru", position: { x: 54, y: 112 }, owner: "enemy" },
     { type: "archer", position: { x: 58, y: 113 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 52, y: 113 }, owner: "enemy" },
+    { type: "archer", position: { x: 60, y: 112 }, owner: "enemy" },
   ],
   waves: [
     {
@@ -190,6 +200,8 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 52, y: 114 } },
         { type: "spear_ashigaru", position: { x: 56, y: 115 } },
         { type: "spear_ashigaru", position: { x: 60, y: 114 } },
+        { type: "spear_ashigaru", position: { x: 54, y: 115 } },
+        { type: "spear_ashigaru", position: { x: 58, y: 115 } },
         { type: "supply_cart", position: { x: 56, y: 119 } },
       ],
     },
@@ -202,6 +214,9 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 56, y: 114 } },
         { type: "archer", position: { x: 53, y: 116 } },
         { type: "archer", position: { x: 59, y: 116 } },
+        { type: "spear_ashigaru", position: { x: 54, y: 115 } },
+        { type: "sword_ashigaru", position: { x: 58, y: 115 } },
+        { type: "archer", position: { x: 56, y: 116 } },
         { type: "supply_cart", position: { x: 56, y: 120 } },
       ],
     },
@@ -215,10 +230,13 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 59, y: 114 } },
         { type: "archer", position: { x: 52, y: 116 } },
         { type: "engineer", position: { x: 56, y: 117 } },
+        { type: "spear_ashigaru", position: { x: 58, y: 115 } },
+        { type: "archer", position: { x: 54, y: 116 } },
         { type: "supply_cart", position: { x: 56, y: 121 } },
         // 搦手側面隊 (山と東の岩尾根の間の廊下を北上する)
         { type: "cavalry", position: { x: 76, y: 104 } },
         { type: "spear_ashigaru", position: { x: 75, y: 102 } },
+        { type: "sword_ashigaru", position: { x: 76, y: 103 } },
       ],
     },
     {
@@ -234,12 +252,16 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
         { type: "archer", position: { x: 59, y: 115 } },
         { type: "musketeer", position: { x: 56, y: 115 } },
         { type: "engineer", position: { x: 54, y: 117 } },
+        { type: "spear_ashigaru", position: { x: 52, y: 114 } },
+        { type: "sword_ashigaru", position: { x: 60, y: 114 } },
+        { type: "archer", position: { x: 58, y: 116 } },
         { type: "supply_cart", position: { x: 55, y: 120 } },
         // 搦手総攻撃隊
         { type: "sword_ashigaru", position: { x: 75, y: 103 } },
         { type: "spear_ashigaru", position: { x: 76, y: 105 } },
         { type: "archer", position: { x: 77, y: 107 } },
         { type: "cavalry", position: { x: 74, y: 101 } },
+        { type: "spear_ashigaru", position: { x: 75, y: 104 } },
         { type: "supply_cart", position: { x: 76, y: 110 } },
       ],
     },
