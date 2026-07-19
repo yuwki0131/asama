@@ -48,25 +48,139 @@ export function terrainFaceSide(assetId: string): "e" | "s" | null {
 }
 
 /**
- * GEO-01: building canvases follow the H-32 rule — anchor.x = 0.5 and the
- * anchor row sits 32 px above the canvas bottom (anchor.y*height = height-32).
+ * GEO-01: building anchor geometry, split by family. The renderer consumes
+ * anchors in family-specific ways (apps/game/src/client/renderer/
+ * renderGeometry.ts buildingRenderPoint + sceneLayer.ts addBridgeSprites +
+ * gameRules.ts isCenterAnchoredBuilding), so a single H-32 rule over-applies;
+ * each family gets the contract its render path actually requires:
+ *
+ * - standard lots: anchor pinned to the footprint SOUTH corner
+ *   (footprintSouthWorld) with a 32px base apron → anchorRow = height-32;
+ *   the canvas centers on the footprint diamond, whose center sits
+ *   (fw-fh)*16px left of the south corner → anchorX = width/2 + (fw-fh)*16.
+ * - ground tile kits (road/fence/wall/honmaru marker + deco.*): anchor pinned
+ *   to the cell diamond center (cellToWorld) and the diamond bottom vertex
+ *   sits on the canvas bottom edge → anchorRow = height-16.
+ * - recessed moat kits: anchor at the ground-surface diamond center 16px from
+ *   the canvas TOP; extra rows extend downward into the sunken pit →
+ *   anchorRow = 16.
+ * - gates: anchor at the footprint bbox center (cellToWorld); art keeps an
+ *   8px pad below the n-cell block diamond (half-height (n+1)*8) →
+ *   anchorRow = height - 8 - (n+1)*8, n from the width{n}/narrow{n} token.
+ * - bridges: one sprite per cell, deck diamond center pinned on the cell
+ *   center; deck height above the canvas bottom is a per-material art
+ *   constant — earth 24px (low causeway), wood 32px (raised plank deck).
+ * - flat lots (farm): the canvas IS the footprint diamond → anchor at the
+ *   canvas center and width = 2*height.
  */
+
+interface Geo01Contract {
+  readonly family: string;
+  readonly expectedAnchorXPx: number;
+  readonly expectedAnchorRowPx: number;
+}
+
+function isInAssetFamily(assetId: string, base: string): boolean {
+  return assetId === base || assetId.startsWith(`${base}.`);
+}
+
+/**
+ * Standard-lot footprints (w×h cells), mirrored from
+ * packages/content/src/index.ts buildingSpecs — asset-tools intentionally has
+ * no dependency on @asama/content, so keep this table in sync. Unlisted
+ * standard lots are assumed square (no half-tile X offset).
+ */
+const STANDARD_LOT_FOOTPRINTS: readonly (readonly [string, number, number])[] = [
+  ["building.storehouse", 3, 3],
+  ["building.market", 4, 3],
+  ["building.barracks", 4, 3],
+  ["building.samurai_residence", 4, 4],
+  ["building.town_block", 6, 6],
+  ["building.tenshu", 4, 4],
+  ["building.yagura", 2, 2]
+];
+
+function geo01Contract(asset: ManifestAssetMeta): Geo01Contract | null {
+  const { assetId, width, height } = asset;
+  const centerX = width / 2;
+
+  if (
+    assetId.startsWith("deco.") ||
+    isInAssetFamily(assetId, "building.road") ||
+    isInAssetFamily(assetId, "building.fence") ||
+    isInAssetFamily(assetId, "building.wall") ||
+    isInAssetFamily(assetId, "building.honmaru")
+  ) {
+    return { family: "ground-tile", expectedAnchorXPx: centerX, expectedAnchorRowPx: height - 16 };
+  }
+
+  if (isInAssetFamily(assetId, "building.dry_moat") || isInAssetFamily(assetId, "building.water_moat")) {
+    return { family: "moat", expectedAnchorXPx: centerX, expectedAnchorRowPx: 16 };
+  }
+
+  if (isInAssetFamily(assetId, "building.earth_bridge")) {
+    return { family: "bridge(earth)", expectedAnchorXPx: centerX, expectedAnchorRowPx: height - 24 };
+  }
+  if (isInAssetFamily(assetId, "building.wood_bridge")) {
+    return { family: "bridge(wood)", expectedAnchorXPx: centerX, expectedAnchorRowPx: height - 32 };
+  }
+
+  if (isInAssetFamily(assetId, "building.gate")) {
+    const span = /(?:width|narrow)(\d+)/.exec(assetId);
+    if (span === null) {
+      // Cell span is not recoverable from the id, so the anchor-row formula
+      // cannot be evaluated — explicitly out of machine-check scope.
+      return null;
+    }
+    const n = Number(span[1]);
+    return { family: `gate(${n}-cell)`, expectedAnchorXPx: centerX, expectedAnchorRowPx: height - 8 - (n + 1) * 8 };
+  }
+
+  if (isInAssetFamily(assetId, "building.farm")) {
+    return { family: "flat-lot", expectedAnchorXPx: centerX, expectedAnchorRowPx: height / 2 };
+  }
+
+  let southCornerOffsetX = 0;
+  for (const [base, fw, fh] of STANDARD_LOT_FOOTPRINTS) {
+    if (isInAssetFamily(assetId, base)) {
+      southCornerOffsetX = (fw - fh) * 16;
+      break;
+    }
+  }
+  return {
+    family: "standard-lot(H-32)",
+    expectedAnchorXPx: centerX + southCornerOffsetX,
+    expectedAnchorRowPx: height - 32
+  };
+}
+
 export function checkBuildingGeometry(asset: ManifestAssetMeta, tolerancePx = 1): ArtLintViolation | null {
   if (asset.kind !== "building") {
     return null;
   }
-  const anchorXPxOff = Math.abs(asset.anchor.x - 0.5) * asset.width;
+  const contract = geo01Contract(asset);
+  if (contract === null) {
+    return null;
+  }
+  const anchorXPx = asset.anchor.x * asset.width;
   const anchorRowPx = asset.anchor.y * asset.height;
-  const anchorYPxOff = Math.abs(anchorRowPx - (asset.height - 32));
-  if (anchorXPxOff <= tolerancePx && anchorYPxOff <= tolerancePx) {
+  // Flat lots must also keep the iso diamond aspect (canvas == footprint diamond).
+  const flatLotAspectBroken = contract.family === "flat-lot" && asset.width !== asset.height * 2;
+  if (
+    !flatLotAspectBroken &&
+    Math.abs(anchorXPx - contract.expectedAnchorXPx) <= tolerancePx &&
+    Math.abs(anchorRowPx - contract.expectedAnchorRowPx) <= tolerancePx
+  ) {
     return null;
   }
   return {
     assetId: asset.assetId,
     ruleId: "GEO-01",
-    measured: `anchor=(${asset.anchor.x.toFixed(4)},${asset.anchor.y.toFixed(4)}) → anchorRow=${anchorRowPx.toFixed(1)}px of ${asset.height}px`,
-    threshold: `anchor.x=0.5±${tolerancePx}px, anchorRow=height-32±${tolerancePx}px`,
-    message: "H-32ルール違反: アンカーはフットプリント菱形中心(下端から32px上)に置くこと"
+    measured: `${asset.width}x${asset.height} anchor=(${asset.anchor.x.toFixed(4)},${asset.anchor.y.toFixed(4)}) → anchorPx=(${anchorXPx.toFixed(1)},${anchorRowPx.toFixed(1)})`,
+    threshold:
+      `${contract.family}: anchorPx=(${contract.expectedAnchorXPx.toFixed(1)},${contract.expectedAnchorRowPx.toFixed(1)})±${tolerancePx}px` +
+      (contract.family === "flat-lot" ? ", width=2*height" : ""),
+    message: `族別アンカー幾何契約違反 (${contract.family}): レンダラーのピン位置とアンカー行が一致していない`
   };
 }
 
