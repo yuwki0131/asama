@@ -18,7 +18,9 @@ export function formationSlots(world: WorldState, destination: CellCoord, count:
       break;
     }
     explored += 1;
-    if (isPassable(world, current, perspective)) {
+    // Units do not block movement (temporary overlap is allowed), but final
+    // destinations avoid occupied cells so groups do not end up stacked.
+    if (isPassable(world, current, perspective) && getUnitAt(world, current) === null) {
       slots.push(current);
     }
     for (const direction of ORTHOGONAL_DIRECTIONS) {
@@ -35,14 +37,15 @@ export function formationSlots(world: WorldState, destination: CellCoord, count:
 }
 
 export function findSpawnCell(world: WorldState, preferred: CellCoord, perspective?: "player"): CellCoord | null {
-  if (isPassable(world, preferred, perspective)) {
+  const free = (coord: CellCoord): boolean => isPassable(world, coord, perspective) && getUnitAt(world, coord) === null;
+  if (free(preferred)) {
     return preferred;
   }
   for (let radius = 1; radius <= 4; radius += 1) {
     for (let dy = -radius; dy <= radius; dy += 1) {
       for (let dx = -radius; dx <= radius; dx += 1) {
         const candidate = { x: preferred.x + dx, y: preferred.y + dy };
-        if (isPassable(world, candidate, perspective)) {
+        if (free(candidate)) {
           return candidate;
         }
       }
@@ -173,12 +176,13 @@ function reconstructPath(goalKey: string, nodes: Map<string, PathNode>): CellCoo
   return path.reverse();
 }
 
+/**
+ * Terrain/building passability only — other units never block. Units may
+ * overlap in transit; lasting stacks are avoided at the destination layer
+ * (formationSlots / findSpawnCell check occupancy explicitly).
+ */
 export function isPassable(world: WorldState, coord: CellCoord, perspective?: "player" | "supply"): boolean {
   if (!isInsideMap(coord)) {
-    return false;
-  }
-
-  if (getUnitAt(world, coord) !== null) {
     return false;
   }
 

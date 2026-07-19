@@ -164,6 +164,60 @@ describe("pathfinding", () => {
     expect(path).not.toContainEqual({ x: 12, y: 13 });
   });
 
+  it("paths straight through cells occupied by other units (一時重複可)", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [
+      unit("unit:player:1", "player", "spear_ashigaru", { x: 10, y: 10 }),
+      unit("unit:player:2", "player", "spear_ashigaru", { x: 11, y: 10 }),
+      unit("unit:enemy:1", "enemy", "spear_ashigaru", { x: 12, y: 10 })
+    ];
+
+    const error = applyCommand(
+      world,
+      command({
+        type: "moveUnits",
+        unitIds: ["unit:player:1"],
+        destination: { x: 14, y: 10 }
+      })
+    );
+
+    expect(error).toBeNull();
+    expect(pathFor(world, "unit:player:1")).toEqual([
+      { x: 11, y: 10 },
+      { x: 12, y: 10 },
+      { x: 13, y: 10 },
+      { x: 14, y: 10 }
+    ]);
+  });
+
+  it("assigns a free neighbouring slot when the ordered destination cell is occupied", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [
+      unit("unit:player:1", "player", "spear_ashigaru", { x: 10, y: 10 }),
+      unit("unit:player:2", "player", "spear_ashigaru", { x: 14, y: 10 })
+    ];
+
+    const error = applyCommand(
+      world,
+      command({
+        type: "moveUnits",
+        unitIds: ["unit:player:1"],
+        destination: { x: 14, y: 10 }
+      })
+    );
+
+    expect(error).toBeNull();
+    const path = pathFor(world, "unit:player:1");
+    const slot = path.at(-1);
+    expect(slot).toBeDefined();
+    expect(slot).not.toEqual({ x: 14, y: 10 });
+    expect(manhattan(slot as CellCoord, { x: 14, y: 10 })).toBe(1);
+  });
+
   it("rejects movement when the destination is unreachable", () => {
     const world = createInitialWorld();
     normalizeMap(world);
