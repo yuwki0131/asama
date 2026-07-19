@@ -95,19 +95,23 @@ export async function collectArtLintViolations(): Promise<{
         violations.push(geo03);
       }
     }
-    const noise01 = checkSpeckles(asset.assetId, image);
-    if (noise01 !== null) {
-      violations.push(noise01);
+    // UI overlays (kind "overlay") are exempt from NOISE-01/03: dashed ticks
+    // and hollow ring centres are intentional design, not render noise.
+    if (asset.kind !== "overlay") {
+      const noise01 = checkSpeckles(asset.assetId, image);
+      if (noise01 !== null) {
+        violations.push(noise01);
+      }
+      const noise03 = checkInteriorHoles(asset.assetId, image);
+      if (noise03 !== null) {
+        violations.push(noise03);
+      }
     }
     if (asset.kind === "building") {
       const noise02 = checkMatteFringe(asset.assetId, image);
       if (noise02 !== null) {
         violations.push(noise02);
       }
-    }
-    const noise03 = checkInteriorHoles(asset.assetId, image);
-    if (noise03 !== null) {
-      violations.push(noise03);
     }
   }
 

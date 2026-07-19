@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { despeckleRgba } from "./despeckle";
 
 export interface SpriteSheetComposeSpec {
   /** Frame PNG paths as a grid: rows = directions, columns = frames. */
@@ -61,7 +62,7 @@ export async function composeSpriteSheet(spec: SpriteSheetComposeSpec): Promise<
     }
   }
 
-  return sharp({
+  const { data: sheetPixels, info: sheetInfo } = await sharp({
     create: {
       width: dimensions.width,
       height: dimensions.height,
@@ -70,6 +71,19 @@ export async function composeSpriteSheet(spec: SpriteSheetComposeSpec): Promise<
     }
   })
     .composite(composites)
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  // Sheet-scope NOISE cleanup mirrors the lint scope for animations:
+  // speckles only (NOISE-02/03 lint does not apply to sheets).
+  despeckleRgba(
+    { data: sheetPixels, width: sheetInfo.width, height: sheetInfo.height },
+    { fillInteriorHoles: false }
+  );
+
+  return sharp(sheetPixels, {
+    raw: { width: sheetInfo.width, height: sheetInfo.height, channels: 4 }
+  })
     .png()
     .toBuffer();
 }

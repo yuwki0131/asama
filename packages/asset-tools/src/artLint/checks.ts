@@ -280,7 +280,7 @@ export function checkFaceDrift(
   };
 }
 
-interface ComponentScan {
+export interface ComponentScan {
   /** Component sizes, indexed by component id. */
   readonly sizes: number[];
   /** Component id per pixel, -1 where the mask is false. */
@@ -290,7 +290,7 @@ interface ComponentScan {
 }
 
 /** 4-connected component labeling over an arbitrary pixel mask. */
-function labelComponents(width: number, height: number, mask: (index: number) => boolean): ComponentScan {
+export function labelComponents(width: number, height: number, mask: (index: number) => boolean): ComponentScan {
   const labels = new Int32Array(width * height).fill(-1);
   const sizes: number[] = [];
   const touchesBorder: boolean[] = [];
