@@ -1151,6 +1151,55 @@ def _tenshu_shachi(scene: bpy.types.Scene, name: str, x: float, y: float, z: flo
     add_beam(scene, f"{name}Tail", (x, y, z + 0.16 * s), (x + 0.0, y + 0.0, z + 0.30 * s), 0.075 * s, gold, tip_thickness=0.035 * s)
 
 
+def _tenshu_entrance(scene: bpy.types.Scene, cx: float, cy: float,
+                     mound_base_half: float, height: float, wall_half: float,
+                     mats: dict, s: float) -> None:
+    """Visible keep entrance: a gangi stone stair climbing the mound's south
+    face sideways to a dark doorway in the first story wall. The stair reuses
+    the terrain kirikomi stone materials (ISHIGAKI-03: one masonry vocabulary)
+    and sits centered on the face, clear of the corners (TENSHU-03)."""
+    from .elevation import tiles as _tiles
+
+    amp = min(_tiles.ISHIGAKI_BATTER * height, _tiles.ISHIGAKI_SORI_MAX)
+
+    def half_at(t: float) -> float:
+        return mound_base_half - amp * (1.0 - (1.0 - t) ** 2)
+
+    stones = _tiles._kirikomi_stone_materials()
+    n = 7
+    run = 1.30
+    x_top = cx + 0.30
+    # Constant front face proud of the mound BASE: the batter recedes with
+    # height, so anchoring each step to the face at its own top would bury
+    # the flight inside the stone (only slivers rendered). One flat flight
+    # face keeps every riser visible.
+    face = cy + mound_base_half + 0.04  # -0.01: stays inside the [-4,0] lot
+    for i in range(n):
+        t1 = (i + 1) / n
+        xa = x_top - run * (1.0 - i / n)
+        xb = x_top - run * (1.0 - (i + 1) / n)
+        add_box(scene, f"Gangi{i}", *map_box((xa, face - 0.60, 0.0), (xb, face, height * t1)),
+                stones[(2 * i + 1) % 5])
+
+    door_w = 0.56 * s
+    door_h = 0.66 * s
+    y_wall = cy + wall_half
+    doorway = make_material("TenshuDoorway", (0.030, 0.024, 0.018, 1.0))
+    add_box(scene, "EntranceFrame",
+            *map_box((cx - door_w / 2 - 0.06 * s, y_wall - 0.06, height),
+                     (cx + door_w / 2 + 0.06 * s, y_wall + 0.06, height + door_h + 0.06 * s)),
+            mats["dark_wood"])
+    add_box(scene, "EntranceDoor",
+            *map_box((cx - door_w / 2, y_wall - 0.05, height),
+                     (cx + door_w / 2, y_wall + 0.045, height + door_h)),
+            doorway)
+    # Small kawara awning (hisashi) so the doorway reads at map zoom.
+    add_box(scene, "EntranceAwning",
+            *map_box((cx - door_w / 2 - 0.14 * s, y_wall - 0.02, height + door_h + 0.06 * s),
+                     (cx + door_w / 2 + 0.14 * s, y_wall + 0.16, height + door_h + 0.105 * s)),
+            mats["ridge"])
+
+
 def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, scale: float | None = None) -> None:
     """Production three-tier keep on a 4x4 lot. Canvas 320x320, anchor 160,288.
 
@@ -1190,6 +1239,7 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
 
     tiers = [(w * s, body_h * s) for w, body_h in spec["tiers"]]
     rises = [r * s for r in spec["rises"]]
+    _tenshu_entrance(scene, cx, cy, TENSHU_MOUND_BASE_HALF, height, tiers[0][0] / 2.0, mats, s)
     hafu_spec = {(t, f): w for t, f, w in spec["hafu"]}
     skirt_h = 0.14 * s
     hem_top = 0.23 * s
