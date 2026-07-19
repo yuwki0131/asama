@@ -16,6 +16,10 @@ function scenarioForId(scenarioId: string | undefined): ScenarioDefinition {
   if (scenarioId !== undefined) {
     const found = scenarios.find(s => s.id === scenarioId);
     if (found) return found;
+    console.warn(
+      `Unknown scenario id "${scenarioId}" — falling back to "${DEFAULT_SCENARIO.id}". ` +
+        `Available: ${scenarios.map(s => s.id).join(", ")}`
+    );
   }
   return DEFAULT_SCENARIO;
 }
