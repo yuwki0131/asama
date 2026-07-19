@@ -17,6 +17,13 @@ import bpy
 TERRAIN_BLEED = 0.03
 WATER_DEPTH = 0.17
 MOAT_DEPTH = 0.30
+# Dry moats read deeper than water moats (no waterline to imply volume), so
+# they get their own excavation depth. Canvas budget: depth*30px must stay
+# inside the 48px canvas (32px diamond + 16px below), 0.44 -> ~13px, ok.
+DRY_MOAT_DEPTH = 0.44
+# Horizontal run of the excavated bank slope (法面) from its top lip toward
+# the trench floor - vertical walls read as masonry, not dug earth.
+MOAT_SLOPE = 0.26
 
 # --- Shared bank "edge-crossing standard" for every water tile builder ----
 # Any land/water boundary in any water tile (connected shores, outer diagonal
@@ -317,7 +324,7 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool, phase: tup
     lip = make_material("MoatGrassLip", (0.105, 0.150, 0.070, 1.0))
 
     surface = make_trench_surface_material(water, phase, seed)
-    surface_z = (-MOAT_DEPTH + 0.08) if water else -MOAT_DEPTH
+    surface_z = (-MOAT_DEPTH + 0.08) if water else -DRY_MOAT_DEPTH
 
     b = TERRAIN_BLEED
     fx0 = -0.5 - (0.45 if same["W"] else b)
@@ -343,8 +350,11 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool, phase: tup
         add_mesh(scene, f"Rim{name}",
             [(*map_xy(*r0), 0.0), (*map_xy(*r1), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p0), 0.0)],
             [(0, 1, 2, 3)], rim)
+        ix, iy = {"N": (0.0, 1.0), "S": (0.0, -1.0), "W": (1.0, 0.0), "E": (-1.0, 0.0)}[name]
+        q0 = (p0[0] + ix * MOAT_SLOPE, p0[1] + iy * MOAT_SLOPE)
+        q1 = (p1[0] + ix * MOAT_SLOPE, p1[1] + iy * MOAT_SLOPE)
         add_mesh(scene, f"BankFace{name}",
-            [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), surface_z), (*map_xy(*p0), surface_z)],
+            [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*q1), surface_z), (*map_xy(*q0), surface_z)],
             [(0, 1, 2, 3)], earth)
         add_mesh(scene, f"Lip{name}",
             [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), -0.035), (*map_xy(*p0), -0.035)],
