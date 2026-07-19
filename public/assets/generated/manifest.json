@@ -6513,6 +6513,50 @@
         "x": 0.5,
         "y": 0.5
       }
+    },
+    {
+      "assetId": "building.garden.v0",
+      "kind": "building",
+      "file": "generated/building-garden-v0.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.garden.v1",
+      "kind": "building",
+      "file": "generated/building-garden-v1.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.garden.v2",
+      "kind": "building",
+      "file": "generated/building-garden-v2.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.garden.v3",
+      "kind": "building",
+      "file": "generated/building-garden-v3.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
     }
   ],
   "animations": [
