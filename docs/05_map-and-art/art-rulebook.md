@@ -35,7 +35,7 @@ L1(機械lint: `assets:lint:art`)または L2(VLMセルフレビュー)のどち
 
 | ID | ルール | 検証 |
 |---|---|---|
-| TONE-01 | 種別ごとのトーン窓(天守実測基準の meanLuma/meanSat)から逸脱しない。「白すぎ・新品」は不合格 | L1: aiIntakeのToneStats流用 |
+| TONE-01 | 建物はロット建物実測トーン窓(art-direction.md「建物トーン窓」: luma3バンドのmean rgb/warm/sat)から逸脱しない。無彩色〜青寄り(warm<+5)の漆喰・瓦は不合格(石材帯はISHIGAKI-03で例外)。「白すぎ・新品」も不合格 | L1: aiIntakeのToneStats流用 |
 | TONE-02 | 経年感必須: 雨だれ縦筋・壁裾の跳ね汚れ・壁足元の湿り/苔グラデーション等、風化記号を最低1系統 | L2 |
 | TONE-03 | ペインタリーランプ(暖光×青紫影、光源=画面左上固定)。清潔なCG的グラデ禁止 | L2 |
 

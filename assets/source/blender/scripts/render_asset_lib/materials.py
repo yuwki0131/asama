@@ -411,8 +411,8 @@ def make_namako_material() -> bpy.types.Material:
 def make_showcase_plaster(
     name: str = "ShowcasePlaster",
     *,
-    dark: tuple[float, float, float] = (0.485, 0.445, 0.365),
-    light: tuple[float, float, float] = (0.615, 0.575, 0.485),
+    dark: tuple[float, float, float] = (0.700, 0.555, 0.330),
+    light: tuple[float, float, float] = (0.870, 0.690, 0.395),
 ) -> bpy.types.Material:
     """Aged plaster: subdued warm base, painterly blotches, and vertical
     rain-streak grime (noise stretched along z)."""
@@ -462,12 +462,12 @@ def make_showcase_roof(
     ridge_axis: str = "x",
     *,
     name: str = "ShowcaseRoof",
-    base_dark: tuple[float, float, float] = (0.052, 0.048, 0.046),
-    base_light: tuple[float, float, float] = (0.125, 0.120, 0.115),
+    base_dark: tuple[float, float, float] = (0.068, 0.057, 0.042),
+    base_light: tuple[float, float, float] = (0.129, 0.102, 0.068),
     mud: tuple[float, float, float] = (0.075, 0.058, 0.038),
     columns: float = 9.0,
     courses: float = 15.0,
-    seam: tuple[float, float, float] = (0.42, 0.40, 0.40),
+    seam: tuple[float, float, float] = (0.40, 0.33, 0.23),
     grime_strength: float = 0.55,
 ) -> bpy.types.Material:
     """Kawara roof calibrated to the tenshu reference: warm dark tiles, tile
@@ -672,7 +672,7 @@ def building_material_set() -> dict[str, bpy.types.Material]:
         "stone": make_ishigaki_material(),
         "roof": make_showcase_roof(),
         "roof_y": make_showcase_roof(ridge_axis="y"),
-        "trim": make_material("RoofTrim", (0.045, 0.042, 0.045, 1.0)),
+        "trim": make_material("RoofTrim", (0.062, 0.056, 0.052, 1.0)),
         "thatch": make_textured_material("Thatch", (0.150, 0.118, 0.062), (0.235, 0.190, 0.105), scale=(3.0, 3.0, 22.0)),
         "gravel": make_textured_material("YardGravel", (0.235, 0.210, 0.165), (0.320, 0.290, 0.235), scale=14.0),
         "dirt": make_textured_material("YardDirt", (0.195, 0.160, 0.115), (0.265, 0.225, 0.165), scale=9.0),

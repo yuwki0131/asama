@@ -889,26 +889,33 @@ def _kirikomi_mound(scene: bpy.types.Scene, cx: float, cy: float,
 
 def _tenshu_material_set() -> dict[str, bpy.types.Material]:
     """Building materials lifted to the tone of the painterly raster
-    neighbours (showcase kura): bright blue-gray kawara with per-tile value
-    jitter, warm aged-white plaster, and light ridge caps. The keep's deep
-    eaves + AO would otherwise sink the whole sprite toward black."""
+    neighbours (showcase kura): bright kawara with per-tile value jitter,
+    warm aged-white plaster, and light ridge caps. The keep's deep eaves +
+    AO would otherwise sink the whole sprite toward black. Tone target is
+    the lot-building tone window (art-direction.md) — warm ordering R>G>B
+    everywhere except stone (ISHIGAKI-03 exception)."""
     mats = building_material_set()
+    # AgX view transform desaturates highlights hard, so the plaster base
+    # carries an exaggerated warm spread to land inside the lot-building
+    # tone window after the transform.
     mats["plaster"] = make_showcase_plaster(
-        "TenshuPlaster", dark=(0.660, 0.630, 0.560), light=(0.820, 0.790, 0.720))
+        "TenshuPlaster", dark=(0.800, 0.650, 0.390), light=(0.960, 0.780, 0.470))
+    # Kawara stays a gray with only a warm hint — pushing the roof into the
+    # wood-band warmth reads as thatch/straw, not tile.
     roof_kwargs = dict(
-        base_dark=(0.150, 0.160, 0.180),
-        base_light=(0.295, 0.310, 0.335),
+        base_dark=(0.145, 0.128, 0.100),
+        base_light=(0.290, 0.238, 0.175),
         mud=(0.150, 0.135, 0.115),
         columns=7.0,
         courses=11.0,
-        seam=(0.47, 0.47, 0.50),
+        seam=(0.42, 0.36, 0.27),
         grime_strength=0.42,
     )
     mats["roof"] = make_showcase_roof("x", name="TenshuRoof", **roof_kwargs)
     mats["roof_y"] = make_showcase_roof("y", name="TenshuRoofY", **roof_kwargs)
-    # Ridge caps / fascia read as pale ibushi-silver against the tiles.
+    # Ridge caps / fascia read as pale aged-clay against the tiles.
     mats["ridge"] = make_noise_material(
-        "TenshuRidge", (0.255, 0.265, 0.292), (0.355, 0.365, 0.392), scale=7.0)
+        "TenshuRidge", (0.280, 0.250, 0.205), (0.380, 0.340, 0.280), scale=7.0)
     mats["dark_wood"] = make_plank_material(
         "TenshuDarkWood", (0.065, 0.048, 0.030), (0.130, 0.100, 0.062))
     # Hem grime: thin warm gray-brown wash where plaster meets the skirt.
