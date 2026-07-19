@@ -130,6 +130,10 @@ def resolve_model(name: str):
     if macro is not None:
         t, v, tx, ty = macro.group(1), int(macro.group(2)), int(macro.group(3)), int(macro.group(4))
         return lambda scene: build_terrain_macro_tile(scene, t, v, tx, ty)
+    land_v = re.fullmatch(r"terrain-(grass|dirt)-connected-([01]{4})-v([12])", name)
+    if land_v is not None:
+        kind, mask, v = land_v.group(1), land_v.group(2), int(land_v.group(3))
+        return lambda scene: build_terrain_mask(scene, kind, mask, variant=v)
     terrain = re.fullmatch(r"terrain-(grass|dirt|stone|water)-connected-([01]{4})", name)
     if terrain is not None:
         kind, mask = terrain.group(1), terrain.group(2)

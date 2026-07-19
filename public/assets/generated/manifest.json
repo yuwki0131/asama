@@ -2203,358 +2203,6 @@
       }
     },
     {
-      "assetId": "terrain.grass.connected.0000",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.0001",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.0010",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.0011",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.0100",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.0101",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.0110",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.0111",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-0111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1000",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1001",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1010",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1011",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1100",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1101",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1110",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.grass.connected.1111",
-      "kind": "terrain",
-      "file": "generated/terrain-grass-connected-1111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0000",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0001",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0010",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0011",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0100",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0101",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0110",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.0111",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-0111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1000",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1001",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1010",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1011",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1100",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1101",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1110",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "terrain.dirt.connected.1111",
-      "kind": "terrain",
-      "file": "generated/terrain-dirt-connected-1111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
       "assetId": "terrain.water.connected.0000",
       "kind": "terrain",
       "file": "generated/terrain-water-connected-0000.png",
@@ -5434,6 +5082,1018 @@
       "anchor": {
         "x": 0.5,
         "y": 0.9
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0000",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0001",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0010",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0011",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0100",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0101",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0110",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0111",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1000",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1001",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1010",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1011",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1100",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1101",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1110",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1111",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0000",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0001",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0010",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0011",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0100",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0101",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0110",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0111",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1000",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1001",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1010",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1011",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1100",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1101",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1110",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1111",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0000.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0000-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0000.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0000-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0001.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0001-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0001.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0001-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0010.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0010-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0010.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0010-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0011.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0011-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0011.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0011-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0100.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0100-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0100.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0100-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0101.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0101-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0101.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0101-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0110.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0110-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0110.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0110-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0111.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0111-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.0111.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-0111-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1000.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1000-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1000.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1000-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1001.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1001-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1001.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1001-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1010.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1010-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1010.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1010-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1011.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1011-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1011.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1011-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1100.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1100-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1100.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1100-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1101.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1101-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1101.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1101-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1110.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1110-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.grass.connected.1110.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-grass-connected-1110-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0000.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0000-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0000.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0000-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0001.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0001-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0001.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0001-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0010.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0010-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0010.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0010-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0011.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0011-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0011.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0011-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0100.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0100-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0100.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0100-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0101.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0101-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0101.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0101-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0110.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0110-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0110.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0110-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0111.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0111-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.0111.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-0111-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1000.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1000-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1000.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1000-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1001.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1001-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1001.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1001-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1010.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1010-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1010.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1010-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1011.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1011-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1011.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1011-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1100.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1100-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1100.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1100-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1101.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1101-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1101.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1101-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1110.v1",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1110-v1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.dirt.connected.1110.v2",
+      "kind": "terrain",
+      "file": "generated/terrain-dirt-connected-1110-v2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
       }
     },
     {

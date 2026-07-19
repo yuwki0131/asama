@@ -250,7 +250,56 @@ def build_water_transition_inner_tile(scene: bpy.types.Scene, corner: str, varia
     )
 
 
-def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
+# Land boundary fringe "edge-crossing standard" (mirrors the water banks):
+# the fringe strip is FRINGE_BASE wide at every tile corner (jitter envelope
+# pinned to zero), so adjoining boundary tiles always meet flush no matter
+# which mask/variant they carry.
+FRINGE_BASE = 0.10
+FRINGE_JITTER_A = 0.05
+FRINGE_JITTER_B = 0.03
+
+
+def _add_fringe_run(
+    scene: bpy.types.Scene,
+    prefix: str,
+    start: tuple[float, float],
+    end: tuple[float, float],
+    normal: tuple[float, float],
+    segments: int,
+    seed: float,
+    material: bpy.types.Material,
+    z: float,
+) -> None:
+    """Flat wavy fringe strip along one open tile edge (land/land boundary),
+    from the tile boundary to a jittered inner width, endpoints pinned to
+    FRINGE_BASE and extended into the bleed zone."""
+    import math as _math
+
+    def jitter(i: int) -> float:
+        raw = FRINGE_JITTER_A * _math.sin(seed * 2.13 + i * 2.9) + FRINGE_JITTER_B * _math.sin(seed * 5.7 + i * 6.1)
+        envelope = _math.sin(_math.pi * i / segments)
+        return raw * envelope
+
+    dx, dy = end[0] - start[0], end[1] - start[1]
+    for i in range(segments):
+        t0 = i / segments
+        t1 = (i + 1) / segments
+        if i == 0:
+            t0 = -TERRAIN_BLEED
+        if i == segments - 1:
+            t1 = 1.0 + TERRAIN_BLEED
+        w0 = FRINGE_BASE + jitter(i)
+        w1 = FRINGE_BASE + jitter(i + 1)
+        p0 = (start[0] + dx * t0, start[1] + dy * t0)
+        p1 = (start[0] + dx * t1, start[1] + dy * t1)
+        q0 = (p0[0] + normal[0] * w0, p0[1] + normal[1] * w0)
+        q1 = (p1[0] + normal[0] * w1, p1[1] + normal[1] * w1)
+        add_mesh(scene, f"{prefix}{i}",
+            [(*map_xy(*p0), z), (*map_xy(*p1), z), (*map_xy(*q1), z), (*map_xy(*q0), z)],
+            [(0, 1, 2, 3)], material)
+
+
+def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str, variant: int = 0) -> None:
     if terrain == "water":
         build_water_shore_tile(scene, mask, variant=0)
         return
@@ -260,13 +309,36 @@ def build_terrain_mask(scene: bpy.types.Scene, terrain: str, mask: str) -> None:
     x1 = 0.5 + (TERRAIN_BLEED if same["E"] else 0.0)
     y1 = 0.5 + (TERRAIN_BLEED if same["S"] else 0.0)
     x0 = -0.5 - (TERRAIN_BLEED if same["W"] else 0.0)
-    add_flat_quad(scene, "Surface", (x0, y0), (x1, y1), 0.0, style["surface"]())
+    if terrain == "stone":
+        add_flat_quad(scene, "Surface", (x0, y0), (x1, y1), 0.0, style["surface"]())
+        edge_material = make_material("TerrainEdge", (*style["edge"], 1.0))
+        for index, name in enumerate(("N", "E", "S", "W")):
+            if same[name]:
+                continue
+            low, high = TERRAIN_EDGE_QUADS[name]
+            add_flat_quad(scene, f"Edge{name}", low, high, 0.002 + 0.0005 * index, edge_material)
+        return
+
+    # Grass/dirt boundary tile: surface sampled from the same macro noise
+    # family as the interior tiles (kills the tonal band along region edges),
+    # fringe as a wavy corner-pinned strip instead of a straight frame band.
+    surface = make_macro_terrain_material(terrain, variant % 2, 6 + 3 * variant, 9 + 2 * variant)
+    add_flat_quad(scene, "Surface", (x0, y0), (x1, y1), 0.0, surface)
     edge_material = make_material("TerrainEdge", (*style["edge"], 1.0))
+    # Open edges with the fringe normal pointing INTO the tile.
+    runs = {
+        "N": ((-0.5, -0.5), (0.5, -0.5), (0.0, 1.0)),
+        "E": ((0.5, -0.5), (0.5, 0.5), (-1.0, 0.0)),
+        "S": ((-0.5, 0.5), (0.5, 0.5), (0.0, -1.0)),
+        "W": ((-0.5, -0.5), (-0.5, 0.5), (1.0, 0.0)),
+    }
     for index, name in enumerate(("N", "E", "S", "W")):
         if same[name]:
             continue
-        low, high = TERRAIN_EDGE_QUADS[name]
-        add_flat_quad(scene, f"Edge{name}", low, high, 0.002 + 0.0005 * index, edge_material)
+        start, end, normal = runs[name]
+        seed = ord(name) * 3.7 + variant * 97.0 + (int(mask, 2) % 13) * 0.53
+        _add_fringe_run(scene, f"F{name}{variant}", start, end, normal, 6, seed,
+                        edge_material, 0.002 + 0.0005 * index)
 
 
 def build_terrain_base(scene: bpy.types.Scene, terrain: str, variant: bool = False) -> None:
