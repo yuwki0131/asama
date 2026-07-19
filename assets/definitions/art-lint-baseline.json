@@ -1,10 +1,5 @@
 {
   "version": 1,
   "note": "既知のアートルール違反 (docs/05_map-and-art/art-rulebook.md)。段階導入用: ここに載っている assetId×ruleId は assets:lint:art で fail しない。修正したらエントリを削除すること。再生成: assets:lint:art --write-baseline",
-  "entries": [
-    {
-      "assetId": "building.tenshu.test",
-      "ruleId": "GEO-01"
-    }
-  ]
+  "entries": []
 }

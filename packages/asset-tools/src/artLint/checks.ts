@@ -13,7 +13,7 @@ export interface RawImage {
   readonly height: number;
 }
 
-export type ArtLintRuleId = "GEO-01" | "GEO-02" | "GEO-03" | "NOISE-01" | "NOISE-02" | "NOISE-03";
+export type ArtLintRuleId = "GEO-01" | "GEO-02" | "GEO-03" | "NOISE-01" | "NOISE-02" | "NOISE-03" | "NOISE-04";
 
 export interface ArtLintViolation {
   readonly assetId: string;
@@ -431,5 +431,43 @@ export function checkInteriorHoles(assetId: string, image: RawImage): ArtLintVio
     measured: `${holes.length} enclosed hole(s), largest=${Math.max(...holes)}px`,
     threshold: "0 enclosed transparent components",
     message: "不透過本体内部の透明穴禁止"
+  };
+}
+
+/**
+ * NOISE-04 (machine-checkable subset): no pure marker colours. A visible
+ * pixel whose channels are all exactly 0 or 255 (excluding pure black/white)
+ * is one of the six saturated primaries/secondaries (#F00 #FF0 #0F0 #0FF
+ * #00F #F0F) — debug/cleanup remnants that never occur in painterly art.
+ */
+export function checkMarkerColors(assetId: string, image: RawImage): ArtLintViolation | null {
+  const { data, width, height } = image;
+  let count = 0;
+  const samples: string[] = [];
+  for (let p = 0; p < width * height; p += 1) {
+    const i = p * 4;
+    if ((data[i + 3] ?? 0) < OPAQUE_ALPHA) {
+      continue;
+    }
+    const r = data[i] ?? 0;
+    const g = data[i + 1] ?? 0;
+    const b = data[i + 2] ?? 0;
+    const pure = (v: number): boolean => v === 0 || v === 255;
+    if (pure(r) && pure(g) && pure(b) && !(r === g && g === b)) {
+      count += 1;
+      if (samples.length < 3) {
+        samples.push(`(${p % width},${Math.floor(p / width)})=rgb(${r},${g},${b})`);
+      }
+    }
+  }
+  if (count === 0) {
+    return null;
+  }
+  return {
+    assetId,
+    ruleId: "NOISE-04",
+    measured: `${count} pure marker pixel(s): ${samples.join(" ")}`,
+    threshold: "0 visible pure-primary/secondary pixels",
+    message: "純色マーカー画素(デバッグ/クリーンアップ残滓)禁止"
   };
 }

@@ -7,6 +7,7 @@ import {
   checkBuildingGeometry,
   checkFaceDrift,
   checkInteriorHoles,
+  checkMarkerColors,
   checkMatteFringe,
   checkSpeckles,
   checkTerrainFaceGeometry,
@@ -106,6 +107,10 @@ export async function collectArtLintViolations(): Promise<{
       if (noise03 !== null) {
         violations.push(noise03);
       }
+      const noise04 = checkMarkerColors(asset.assetId, image);
+      if (noise04 !== null) {
+        violations.push(noise04);
+      }
     }
     if (asset.kind === "building") {
       const noise02 = checkMatteFringe(asset.assetId, image);
@@ -121,6 +126,10 @@ export async function collectArtLintViolations(): Promise<{
     const noise01 = checkSpeckles(animation.assetId, image);
     if (noise01 !== null) {
       violations.push(noise01);
+    }
+    const noise04 = checkMarkerColors(animation.assetId, image);
+    if (noise04 !== null) {
+      violations.push(noise04);
     }
   }
 
