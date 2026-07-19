@@ -177,3 +177,97 @@ describe("combat", () => {
     expect(attacker?.targetId).toBe("unit:enemy:1");
   });
 });
+
+function setWaterCell(world: WorldState, coord: CellCoord): void {
+  const index = coord.y * world.map.width + coord.x;
+  const cell = world.map.cells[index];
+  if (cell === undefined) {
+    throw new Error(`Missing terrain cell at ${coord.x},${coord.y}`);
+  }
+  world.map.cells[index] = {
+    ...cell,
+    terrain: "water",
+    movementCost: 9999,
+    passable: false,
+    assetId: "terrain.water.test"
+  };
+}
+
+describe("melee auto-engagement", () => {
+  it("idle melee unit auto-acquires an enemy within range 6, closes in and attacks", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.nextWaveIndex = world.scenario.waves.length;
+    world.units = [
+      unit("unit:player:1", "player", "spear_ashigaru", { x: 10, y: 10 }),
+      unit("unit:enemy:cart", "enemy", "supply_cart", { x: 15, y: 10 })
+    ];
+
+    for (let tick = 0; tick < 300; tick += 1) {
+      updateWorld(world);
+    }
+
+    expect(snapshotUnit(world, "unit:enemy:cart")).toBeUndefined();
+    expect(snapshotUnit(world, "unit:player:1")?.position).toEqual({ x: 14, y: 10 });
+  });
+
+  it("does not engage enemies beyond range 6", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.nextWaveIndex = world.scenario.waves.length;
+    world.units = [
+      unit("unit:player:1", "player", "spear_ashigaru", { x: 10, y: 10 }),
+      unit("unit:enemy:cart", "enemy", "supply_cart", { x: 17, y: 10 })
+    ];
+
+    for (let tick = 0; tick < 100; tick += 1) {
+      updateWorld(world);
+    }
+
+    expect(snapshotUnit(world, "unit:player:1")?.position).toEqual({ x: 10, y: 10 });
+    expect(snapshotUnit(world, "unit:enemy:cart")?.hp).toBe(80);
+    expect(world.units.find((u) => u.id === "unit:player:1")?.attackTargetId).toBeNull();
+  });
+
+  it("stays put when the nearby enemy is unreachable", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.nextWaveIndex = world.scenario.waves.length;
+    world.units = [
+      unit("unit:player:1", "player", "spear_ashigaru", { x: 10, y: 10 }),
+      unit("unit:enemy:cart", "enemy", "supply_cart", { x: 15, y: 10 })
+    ];
+    setWaterCell(world, { x: 14, y: 10 });
+    setWaterCell(world, { x: 16, y: 10 });
+    setWaterCell(world, { x: 15, y: 9 });
+    setWaterCell(world, { x: 15, y: 11 });
+
+    for (let tick = 0; tick < 100; tick += 1) {
+      updateWorld(world);
+    }
+
+    expect(snapshotUnit(world, "unit:player:1")?.position).toEqual({ x: 10, y: 10 });
+    expect(snapshotUnit(world, "unit:enemy:cart")?.hp).toBe(80);
+  });
+
+  it("ranged units hold position and shoot instead of approaching", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.nextWaveIndex = world.scenario.waves.length;
+    world.units = [
+      unit("unit:archer:1", "player", "archer", { x: 10, y: 10 }),
+      unit("unit:enemy:cart", "enemy", "supply_cart", { x: 15, y: 10 })
+    ];
+
+    for (let tick = 0; tick < 300; tick += 1) {
+      updateWorld(world);
+    }
+
+    expect(snapshotUnit(world, "unit:archer:1")?.position).toEqual({ x: 10, y: 10 });
+    expect(world.units.find((u) => u.id === "unit:enemy:cart")).toBeUndefined();
+  });
+});

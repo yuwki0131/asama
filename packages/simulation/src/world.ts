@@ -333,8 +333,8 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     const movers = world.units.filter((unit) => command.unitIds.includes(unit.id));
     movers.sort((a, b) => manhattan(a.position, destination) - manhattan(b.position, destination));
 
-    // Exclude the moving units themselves from passability checks so that
-    // units packed together do not block each other's computed paths.
+    // Exclude the moving units themselves from slot occupancy checks so a
+    // mover's current cell can be assigned as another mover's slot.
     const moverIds = new Set(command.unitIds);
     const worldForPaths: WorldState = { ...world, units: world.units.filter((u) => !moverIds.has(u.id)) };
     const slots = formationSlots(worldForPaths, destination, movers.length, "player");

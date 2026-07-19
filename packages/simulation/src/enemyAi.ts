@@ -52,9 +52,8 @@ export function updateEnemyAi(world: WorldState): void {
       continue;
     }
 
-    // March on the honmaru. The keep cell itself may be blocked by its
-    // garrison (occupied cells are impassable), so falling short by one
-    // cell still counts as a successful approach.
+    // March on the honmaru. If terrain or fortifications block the keep cell
+    // itself, falling short by one cell still counts as a successful approach.
     const direct = findPath(world, unit.position, honmaru.position);
     const path = direct.length > 0 ? direct : findPathToAttackRange(world, unit.position, honmaru.position, 1);
     if (path.length > 0) {

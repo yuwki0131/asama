@@ -38,6 +38,47 @@ function inAttackRange(world: WorldState, attacker: UnitState, target: AttackTar
   return manhattan(attacker.position, target.position) <= effectiveRange;
 }
 
+// Idle melee defenders pick up nearby enemies on their own instead of waiting
+// to be adjacent. Deliberately shorter than the enemy aggroRange (12) so
+// defenders are not baited far off their posts.
+export const MELEE_AUTO_ENGAGE_RANGE = 6;
+
+function updateMeleeAutoEngage(world: WorldState): void {
+  for (const unit of world.units) {
+    if (
+      unit.owner !== "player" ||
+      unit.hp <= 0 ||
+      unit.attackRange !== 1 ||
+      unit.attackDamage <= 0 ||
+      unit.type === "engineer" ||
+      unit.attackTargetId !== null ||
+      unit.path.length > 0 ||
+      unit.attackMoveDestination !== null ||
+      unit.task !== null
+    ) {
+      continue;
+    }
+
+    let nearest: UnitState | null = null;
+    let nearestDistance = MELEE_AUTO_ENGAGE_RANGE + 1;
+    for (const candidate of world.units) {
+      if (candidate.hp <= 0 || !areEnemies(unit.owner, candidate.owner)) {
+        continue;
+      }
+      const distance = manhattan(unit.position, candidate.position);
+      if (distance < nearestDistance) {
+        nearest = candidate;
+        nearestDistance = distance;
+      }
+    }
+    if (nearest !== null) {
+      // Approach happens through updateAttackMovement; when the target is
+      // unreachable its path search fails and the unit stays put (no drift).
+      unit.attackTargetId = nearest.id;
+    }
+  }
+}
+
 export function updateCombat(world: WorldState): void {
   for (const unit of world.units) {
     unit.targetId = null;
@@ -46,6 +87,7 @@ export function updateCombat(world: WorldState): void {
     }
   }
 
+  updateMeleeAutoEngage(world);
   updateAttackMovement(world);
 
   for (const unit of world.units) {
