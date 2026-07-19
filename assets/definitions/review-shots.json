@@ -109,6 +109,25 @@
         }
       ]
     },
+    "honmaru": {
+      "description": "本丸: セル毎の敷地タイル(内部=砂敷き/境界=縁石)の連続性と、幟(のぼり)の設置・所有者識別 (GEO-04/05, TONE-01)",
+      "shots": [
+        {
+          "name": "five-tier-honmaru",
+          "scenario": "five-tier-keep",
+          "cell": { "x": 61, "y": 56 },
+          "zoom": 3,
+          "description": "五重天守シナリオの本丸 (原点 60,55, 3x3)。敷地タイルの内部継ぎ目・外周縁石・中央の幟を確認"
+        },
+        {
+          "name": "freeplay-honmaru-flags",
+          "scenario": "free-play",
+          "cell": { "x": 61, "y": 57 },
+          "zoom": 3,
+          "description": "自由開始の本丸 (61,57) と周辺の櫓・天守の幟。屋根頂部への幟のポール接地を確認"
+        }
+      ]
+    },
     "cart": {
       "description": "荷車: 停車中でも旗指物(pennant)が揺れて生きて見えること、牽引棒/スポークが途切れずスペックル化しないこと (NOISE-01, TONE-01)",
       "shots": [

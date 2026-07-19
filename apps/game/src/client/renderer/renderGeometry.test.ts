@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildingDrawY, decorationDrawY, honmaruMarkerScale, isoBehind } from "./renderGeometry";
+import { buildingDrawY, decorationDrawY, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
 import { cellToWorld, TILE_HEIGHT } from "./camera";
 import type { BuildingSnapshot, MapDecoration } from "@asama/shared";
@@ -94,25 +94,6 @@ describe("Y-sort: decoration vs building", () => {
 
   it("tile height constant is positive (sanity check)", () => {
     expect(TILE_HEIGHT).toBeGreaterThan(0);
-  });
-});
-
-describe("honmaruMarkerScale", () => {
-  it("returns 1 for a single-cell footprint", () => {
-    const b = mockBuilding({ type: "honmaru", footprint: [{ x: 5, y: 5 }] });
-    expect(honmaruMarkerScale(b)).toBe(1);
-  });
-
-  it("returns the span for a 3x3 footprint", () => {
-    const fp: Array<{ x: number; y: number }> = [];
-    for (let y = 4; y <= 6; y++) for (let x = 4; x <= 6; x++) fp.push({ x, y });
-    const b = mockBuilding({ type: "honmaru", position: { x: 4, y: 4 }, footprint: fp });
-    expect(honmaruMarkerScale(b)).toBe(3);
-  });
-
-  it("falls back to 1 for an empty footprint", () => {
-    const b = mockBuilding({ type: "honmaru", footprint: [] });
-    expect(honmaruMarkerScale(b)).toBe(1);
   });
 });
 

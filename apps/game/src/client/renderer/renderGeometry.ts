@@ -53,17 +53,6 @@ export function footprintBounds(footprint: readonly CellCoord[]): FootprintRect 
   );
 }
 
-/** Scale factor for the honmaru ground-marker sprite: the marker asset covers
- *  exactly one cell diamond, so an N x N footprint scales the sprite by N
- *  (center-anchored at the footprint center, it then covers the whole lot). */
-export function honmaruMarkerScale(building: BuildingSnapshot): number {
-  if (building.footprint.length === 0) {
-    return 1;
-  }
-  const bounds = footprintBounds(building.footprint);
-  return Math.max(bounds.maxX - bounds.minX + 1, bounds.maxY - bounds.minY + 1, 1);
-}
-
 function footprintCenterWorld(footprint: readonly CellCoord[]): CellCoord {
   const bounds = footprintBounds(footprint);
   return cellToWorld({

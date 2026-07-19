@@ -6271,6 +6271,182 @@
         "x": 0.5,
         "y": 0.6666666666666666
       }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0000",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0001",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0010",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0011",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0100",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0101",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0110",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0111",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1000",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1001",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1010",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1011",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1100",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1101",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1110",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1111",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
     }
   ],
   "animations": [

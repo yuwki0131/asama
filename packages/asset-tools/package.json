@@ -22,6 +22,7 @@
     "assets:generate:directional-wall-gates": "tsx src/generateDirectionalWallGates.ts",
     "assets:generate:building-scale-up": "tsx src/generateBuildingScaleUp.ts",
     "assets:generate:wide-surfaces": "tsx src/generateWideSurfaceBatch.ts",
+    "assets:generate:honmaru-tiles": "tsx src/generateHonmaruTiles.ts",
     "assets:alignment:correct": "tsx src/correctIsometricAlignmentAssets.ts",
     "assets:alignment:correct-large-buildings": "tsx src/correctLargeBuildingFootprints.ts",
     "assets:alignment:contact-sheet": "tsx src/generateAlignmentContactSheet.ts",
