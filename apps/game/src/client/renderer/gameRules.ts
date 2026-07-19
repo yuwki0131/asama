@@ -248,6 +248,35 @@ export function bridgeCellAssetCandidates(building: BuildingSnapshot, cell: Cell
 }
 
 /**
+ * Screen-px lift of the bridge deck surface above the cell's ground plane,
+ * used to draw units standing on the deck instead of sunk into it. Derived
+ * from the Blender deck geometry: wood taiko-bashi deck top = WOOD_DECK_Z1 +
+ * sori lift at the cell centre (crown 0.225 / ramp 0.176 world z), converted
+ * at 40px per elevation LEVEL (5√6/12 world z) ≈ 39.2 px/z. The dobashi deck
+ * is a flat causeway at road height (~1px).
+ */
+export function bridgeDeckLiftAt(building: BuildingSnapshot, cell: CellCoord): number {
+  if (building.type === "earth_bridge") {
+    return 1;
+  }
+  const footprint = building.footprint;
+  if (footprint.length <= 1) {
+    return 9;
+  }
+  const axis = bridgeAxis(building);
+  const along = (coord: CellCoord): number => (axis === "x" ? coord.x : coord.y);
+  let min = along(footprint[0]!);
+  let max = min;
+  for (const footprintCell of footprint) {
+    const value = along(footprintCell);
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+  }
+  const value = along(cell);
+  return value === min || value === max ? 7 : 9;
+}
+
+/**
  * Per-cell asset candidates for a honmaru footprint cell. The honmaru lot is
  * rendered as ordinary ground tiles (one sprite per cell) instead of one
  * scaled marker; the connected mask (N,E,S,W bit = neighbour cell is inside
