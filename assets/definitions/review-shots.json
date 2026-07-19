@@ -89,6 +89,19 @@
           "description": "五重天守シナリオの gate_narrow_3 (原点 57,64)。狭門の開閉視覚差を確認"
         }
       ]
+    },
+    "cart": {
+      "description": "荷車: 停車中でも旗指物(pennant)が揺れて生きて見えること、牽引棒/スポークが途切れずスペックル化しないこと (NOISE-01, TONE-01)",
+      "shots": [
+        {
+          "name": "cut-pass-cart",
+          "scenario": "cut-pass-fort",
+          "cell": { "x": 44, "y": 117 },
+          "zoom": 3,
+          "tick": 3010,
+          "description": "第1波で (44,117) に湧く敵補給荷車。荷車は湧きセルから動かない(enemyAi)ので tick 3010 まで早送りして撮る"
+        }
+      ]
     }
   }
 }

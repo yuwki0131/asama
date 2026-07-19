@@ -35,6 +35,7 @@ function parseArgs(argv) {
     out: null,
     cell: null,
     zoom: 0,
+    tick: null,
     settleMs: 15000,
     viewport: { width: 1600, height: 1000 }
   };
@@ -56,6 +57,7 @@ function parseArgs(argv) {
       if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Error("--cell expects x,y");
       options.cell = { x, y };
     } else if (arg === "--zoom") options.zoom = Number(next());
+    else if (arg === "--tick") options.tick = Number(next());
     else if (arg === "--settle") options.settleMs = Number(next());
     else if (arg === "--help" || arg === "-h") {
       console.log(
@@ -89,6 +91,7 @@ async function resolveShots(options) {
       out: join(options.outDir, `${options.preset}-${shot.name}.png`),
       cell: shot.cell,
       zoom: shot.zoom ?? 0,
+      tick: shot.tick ?? null,
       label: `${options.preset}/${shot.name} — ${shot.description ?? ""}`
     }));
   }
@@ -101,6 +104,7 @@ async function resolveShots(options) {
       out: options.out,
       cell: options.cell,
       zoom: options.zoom,
+      tick: options.tick,
       label: "ad-hoc"
     }
   ];
@@ -129,6 +133,15 @@ async function takeShot(page, shot, settleMs) {
   });
   // Let textures/animation sheets finish decoding before framing the shot.
   await page.waitForTimeout(settleMs);
+
+  if (shot.tick != null) {
+    // Fast-forward for subjects that only exist mid-scenario (e.g. wave spawns).
+    await page.evaluate(async (tick) => {
+      window.__asamaTest.setSpeed(4);
+      await window.__asamaTest.waitForTick(tick);
+      window.__asamaTest.setSpeed(1);
+    }, shot.tick);
+  }
 
   if (shot.cell != null) {
     await page.evaluate((cell) => window.__asamaTest.jumpCameraToCell(cell), shot.cell);
