@@ -1,9 +1,12 @@
 """Rigged supply cart unit at production quality.
 
-A 2-wheel ox-cart silhouette with three bones:
+A 2-wheel ox-cart silhouette with four bones:
     cart_body  — root; controls the entire cart and cargo
     wheel.l    — left wheel (world +X side); animated with ry spin
     wheel.r    — right wheel (world -X side); animated with ry spin
+    flag       — small konidatai pennant at the rear pole; flutters so the
+                 cart reads as animated even while parked (carts never walk
+                 in-game: the enemy AI keeps them at their spawn cell)
 
 Facing map SOUTH (world -Y). Canvas 56x48, anchorX=28, anchorY=38.
 """
@@ -16,7 +19,7 @@ from ..materials import make_noise_material, make_plank_material
 from .rig import make_armature, rig_beam, rig_box, rig_limb
 
 #: All bones that supply_cart actions keyframe.
-CART_BONES = ["cart_body", "wheel.l", "wheel.r"]
+CART_BONES = ["cart_body", "wheel.l", "wheel.r", "flag"]
 
 
 def build_supply_cart(scene: bpy.types.Scene) -> bpy.types.Object:
@@ -26,6 +29,7 @@ def build_supply_cart(scene: bpy.types.Scene) -> bpy.types.Object:
     rope_mat = make_noise_material("CartRope",    (0.130, 0.108, 0.072), (0.200, 0.168, 0.118), scale=6.0)
     cargo    = make_noise_material("CartCargo",   (0.075, 0.062, 0.042), (0.145, 0.122, 0.085), scale=5.0)
     axle_mat = make_material("CartAxle",         (0.32, 0.28, 0.22, 1.0))
+    cloth    = make_noise_material("CartFlag",    (0.295, 0.085, 0.062), (0.420, 0.135, 0.098), scale=5.0)
 
     # --- armature -----------------------------------------------------------
     rig = make_armature(scene, "SupplyCartRig", [
@@ -34,6 +38,8 @@ def build_supply_cart(scene: bpy.types.Scene) -> bpy.types.Object:
         # Wheel stub bones at axle height, left and right
         ("wheel.l",   ( 0.26,  0.0,   0.20), ( 0.26,  0.0,   0.22), "cart_body"),
         ("wheel.r",   (-0.26,  0.0,   0.20), (-0.26,  0.0,   0.22), "cart_body"),
+        # Pennant bone at the top of the rear flag pole
+        ("flag",      (-0.185, 0.180, 0.60), (-0.185, 0.180, 0.64), "cart_body"),
     ])
 
     # --- cart body ----------------------------------------------------------
@@ -59,11 +65,19 @@ def build_supply_cart(scene: bpy.types.Scene) -> bpy.types.Object:
     rig_limb(scene, rig, "Axle",
         (-0.28, 0.0, 0.20), (0.28, 0.0, 0.20),
         0.013, 0.013, axle_mat, "cart_body", segments=8, rings=2, bulge=0.0, cap="flat")
-    # Tow-poles (round shafts extending forward from cart)
+    # Tow-poles (round shafts extending forward from cart). Kept chunky:
+    # thinner tips detach into 1px NOISE-01 speckles at the 56px canvas.
     for name, px in (("TowPole", -0.040), ("TowPoleR", 0.040)):
         rig_limb(scene, rig, name,
             (px, -0.14, 0.18), (px, -0.42, 0.16),
-            0.012, 0.010, plank, "cart_body", segments=8, rings=2, bulge=0.0, cap="round")
+            0.020, 0.018, plank, "cart_body", segments=8, rings=2, bulge=0.0, cap="round")
+    # Rear flag pole (rigid, on the cart body) and the pennant cloth (on the
+    # flag bone so idle/walk can flutter it). Kept chunky: sub-pixel geometry
+    # at the 56x48 canvas breaks up into NOISE-01 speckles.
+    rig_beam(scene, rig, "FlagPole",
+        (-0.185, 0.180, 0.34), (-0.185, 0.180, 0.78), 0.028, plank, "cart_body")
+    rig_box(scene, rig, "FlagCloth",
+        (-0.178, 0.169, 0.615), (-0.082, 0.191, 0.765), cloth, "flag", bevel=None)
 
     # --- wheels (each parented to its own bone so ry makes it spin) ---------
     # Proper round disc wheel (14-segment cylinder along the axle) with
