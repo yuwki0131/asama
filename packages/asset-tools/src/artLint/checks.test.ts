@@ -3,6 +3,7 @@ import {
   checkBuildingGeometry,
   checkFaceDrift,
   checkInteriorHoles,
+  checkMarkerColors,
   checkMatteFringe,
   checkSpeckles,
   checkTerrainFaceGeometry,
@@ -340,5 +341,33 @@ describe("NOISE-03 checkInteriorHoles", () => {
     fillRect(image, 4, 4, 28, 28, WOOD);
     fillRect(image, 0, 14, 16, 15, CLEAR); // notch open to the border
     expect(checkInteriorHoles("building.test", image)).toBeNull();
+  });
+});
+
+describe("NOISE-04 checkMarkerColors", () => {
+  it("passes painterly colours including near-saturated ones", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 4, 4, 28, 28, WOOD);
+    setPixel(image, 8, 8, [254, 0, 0, 255]); // saturated but not the pure marker value
+    setPixel(image, 9, 8, [0, 0, 0, 255]); // pure black outline is allowed
+    setPixel(image, 10, 8, [255, 255, 255, 255]); // pure white highlight is allowed
+    expect(checkMarkerColors("building.test", image)).toBeNull();
+  });
+
+  it("flags visible pure marker pixels (storehouse cleanup remnant case)", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 4, 4, 28, 28, WOOD);
+    setPixel(image, 6, 6, [255, 0, 0, 238]);
+    setPixel(image, 7, 6, [255, 255, 0, 255]);
+    const violation = checkMarkerColors("building.storehouse", image);
+    expect(violation?.ruleId).toBe("NOISE-04");
+    expect(violation?.measured).toContain("2 pure marker pixel(s)");
+  });
+
+  it("ignores marker colours below visible alpha", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 4, 4, 28, 28, WOOD);
+    setPixel(image, 6, 6, [255, 0, 0, 100]); // below OPAQUE_ALPHA
+    expect(checkMarkerColors("building.test", image)).toBeNull();
   });
 });
