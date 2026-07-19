@@ -21,9 +21,9 @@ import {
   UNIT_GROUND_OFFSET_Y
 } from "./camera";
 import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
-import { bridgeCellAssetCandidates, buildingAssetCandidates, isBridgeBuildingType } from "./gameRules";
+import { bridgeCellAssetCandidates, buildingAssetCandidates, honmaruCellAssetCandidates, isBridgeBuildingType } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
-import { buildingRenderPoint, honmaruMarkerScale, isoBehind } from "./renderGeometry";
+import { buildingRenderPoint, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
 import {
   addCliffCellSprites,
@@ -217,9 +217,10 @@ export class RetainedScene {
       }
     }
 
-    // Flag flutter: small pennant Graphics on castle buildings rotate ±0.15 rad.
+    // Flag flutter: nobori banners sway ±0.045 rad around the pole base.
+    // (Amplitude is small because the pivot sits at the base of a ~58px pole.)
     for (const flag of this.flagVisuals) {
-      flag.graphics.rotation = Math.sin(timeSec * 3 + flag.phaseOffset * 6.28) * 0.15;
+      flag.graphics.rotation = Math.sin(timeSec * 2 + flag.phaseOffset * 6.28) * 0.045;
     }
   }
 
@@ -346,7 +347,11 @@ export class RetainedScene {
           building.lifecycleState === "intact" &&
           (building.type === "yagura" || building.type === "tenshu" || building.type === "honmaru")
         ) {
-          const flagGraphics = createFlagGraphics(building, zoom);
+          const flagGraphics = createFlagGraphics(
+            building,
+            zoom,
+            flagBaseOffsetY(building, assets, snapshot.economy.season)
+          );
           this.staticLayer.addChild(flagGraphics);
           this.flagVisuals.push({
             graphics: flagGraphics,
@@ -545,22 +550,62 @@ function cellPhaseOffset(pos: CellCoord): number {
 }
 
 /**
- * Draws a small pennant triangle for a castle building.
- * The Graphics origin sits at the flag's attachment point (pole top) so that
- * `graphics.rotation` creates a natural flutter around that anchor.
- * The pennant points to the right: (0,0)→(8,3)→(0,6).
+ * World-Y of the nobori pole base relative to the building's render anchor:
+ * planted on the roof ridge for tower buildings (top of the resolved sprite,
+ * pushed a few px in so the pole reads attached), on the ground at the lot
+ * center for the tiled honmaru.
  */
-function createFlagGraphics(building: BuildingSnapshot, zoom: number): Graphics {
+function flagBaseOffsetY(
+  building: BuildingSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>,
+  season: Season
+): number {
+  if (building.type === "honmaru") {
+    return 0;
+  }
+  for (const candidate of buildingAssetCandidates(building, season)) {
+    const asset = assets.get(candidate);
+    if (asset !== undefined) {
+      // +24 sinks the pole base past the thin ridge-ornament pixels at the
+      // texture top into the solid roof mass, so the pole reads as planted
+      // (yagura/tenshu solid roof starts ~18-21px below the opaque top).
+      return -asset.texture.height * asset.anchor.y + 24;
+    }
+  }
+  return -75;
+}
+
+/**
+ * Draws a Japanese nobori banner (vertical rectangle hung from a top
+ * crossbar on a pole) marking building ownership. The Graphics origin sits at
+ * the pole base so `graphics.rotation` sways the whole banner in the wind.
+ */
+function createFlagGraphics(building: BuildingSnapshot, zoom: number, baseOffsetY: number): Graphics {
   const point = buildingRenderPoint(building);
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
-  const flagX = roundWorldPixel(point.x, zoom);
-  // 75 px above the building's render anchor — works for all three building types.
-  const flagY = roundWorldPixel(point.y + offsetY, zoom) - 75;
+  const baseX = roundWorldPixel(point.x, zoom);
+  const baseY = roundWorldPixel(point.y + offsetY + baseOffsetY, zoom);
 
-  const flagColor = building.owner === "enemy" ? 0xaa2222 : 0x2244aa;
+  const enemy = building.owner === "enemy";
+  const cloth = enemy ? 0xb02a26 : 0x24418f;
+  const clothShade = enemy ? 0x87201d : 0x1a3070;
+  const scale = building.type === "honmaru" ? 1.3 : 1;
+  const poleHeight = Math.round(58 * scale);
+  const bannerWidth = Math.round(13 * scale);
+  const bannerHeight = Math.round(40 * scale);
+  const bannerTop = -poleHeight + 4;
+
   const graphics = new Graphics();
-  graphics.poly([0, 0, 8, 3, 0, 6]).fill({ color: flagColor, alpha: 0.92 });
-  graphics.position.set(flagX, flagY);
+  graphics.rect(-1, -poleHeight, 2, poleHeight).fill({ color: 0x5a4a33 });
+  graphics.rect(0, -poleHeight + 2, bannerWidth + 4, 2).fill({ color: 0x5a4a33 });
+  graphics.rect(2, bannerTop, bannerWidth, bannerHeight).fill({ color: cloth, alpha: 0.96 });
+  graphics.rect(2 + bannerWidth - 3, bannerTop, 3, bannerHeight).fill({ color: clothShade, alpha: 0.92 });
+  graphics.rect(2, bannerTop + 4, bannerWidth, 3).fill({ color: 0xf0e8d4, alpha: 0.95 });
+  graphics
+    .circle(2 + bannerWidth / 2, bannerTop + Math.round(bannerHeight * 0.42), Math.max(3, Math.round(4 * scale)))
+    .fill({ color: 0xf0e8d4, alpha: 0.95 });
+  graphics.circle(0, -poleHeight, 2).fill({ color: 0x2e2618 });
+  graphics.position.set(baseX, baseY);
   return graphics;
 }
 
@@ -750,17 +795,17 @@ function addBuildingSprite(
     return;
   }
 
+  if (building.type === "honmaru") {
+    addHonmaruTileSprites(layer, building, assets, zoom);
+    return;
+  }
+
   const sprite = createSpriteFromCandidates(buildingAssetCandidates(building, season), assets);
   const point = buildingRenderPoint(building);
   // Buildings sit on uniform-elevation footprints (elevation-contract.md §4);
   // the anchor cell's elevation lifts the whole sprite.
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
-  if (building.type === "honmaru") {
-    // The marker asset is a single-cell ground diamond; scale it to cover the
-    // whole (map-authored) footprint without needing a regenerated asset.
-    sprite.scale.set(honmaruMarkerScale(building));
-  }
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
   }
@@ -774,6 +819,51 @@ function addBuildingSprite(
       ladder.position.set(sprite.position.x, sprite.position.y);
       layer.addChild(ladder);
     }
+  }
+}
+
+/**
+ * The honmaru lot renders as flat courtyard ground tiles, one sprite per
+ * footprint cell, with dedicated boundary tiles (stone curb) on cells whose
+ * connected mask has an outside neighbour — no scaled-up single marker.
+ */
+function addHonmaruTileSprites(
+  layer: Container,
+  building: BuildingSnapshot,
+  assets: ReadonlyMap<string, LoadedAsset>,
+  zoom: number
+): void {
+  const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
+  const cells = building.footprint.length > 0 ? building.footprint : [building.position];
+  // Linear texture sampling leaves the diamond edge texels partially
+  // transparent when zoomed, so the dark terrain under the lot shows through
+  // as a grid between adjacent tile sprites. An opaque sand-colored backing
+  // polygon under the whole lot absorbs that bleed at every zoom step.
+  const backing = new Graphics();
+  for (const cell of cells) {
+    const point = cellToWorld(cell);
+    const x = roundWorldPixel(point.x, zoom);
+    const y = roundWorldPixel(point.y + offsetY, zoom);
+    backing.poly([x, y - 16, x + 32, y, x, y + 16, x - 32, y]).fill({ color: 0xc2a46e });
+  }
+  if (building.owner === "enemy") {
+    backing.tint = 0xffaaa0;
+  }
+  layer.addChild(backing);
+  for (const cell of cells) {
+    const candidates = honmaruCellAssetCandidates(building, cell);
+    const sprite = createSpriteFromCandidates(candidates, assets);
+    const point = cellToWorld(cell);
+    sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
+    // Interior tiles alternate a horizontal mirror so the hand-painted patch
+    // pattern doesn't read as a mechanical per-cell repeat.
+    if (candidates[0]?.endsWith(".1111") === true && (cell.x + cell.y) % 2 !== 0) {
+      sprite.scale.x *= -1;
+    }
+    if (building.owner === "enemy") {
+      sprite.tint = 0xffaaa0;
+    }
+    layer.addChild(sprite);
   }
 }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates } from "./gameRules";
+import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates, honmaruCellAssetCandidates } from "./gameRules";
 import type { BuildingSnapshot, CellCoord, Season } from "@asama/shared";
 
 function mockBuilding(overrides: Partial<BuildingSnapshot> = {}): BuildingSnapshot {
@@ -135,6 +135,49 @@ describe("bridgeCellAssetCandidates segment auto-tiling", () => {
       "building.wood_bridge.x.mid",
       "building.wood_bridge",
       "overlay.cell.blocked"
+    ]);
+  });
+});
+
+describe("honmaruCellAssetCandidates per-cell tiling", () => {
+  function honmaru(size: number): BuildingSnapshot {
+    const footprint: CellCoord[] = [];
+    for (let y = 10; y < 10 + size; y += 1) {
+      for (let x = 10; x < 10 + size; x += 1) {
+        footprint.push({ x, y });
+      }
+    }
+    return mockBuilding({
+      type: "honmaru",
+      position: { x: 10, y: 10 },
+      footprint,
+      assetId: "building.honmaru.marker"
+    });
+  }
+
+  it("selects the full-interior tile for a center cell (all neighbours inside)", () => {
+    expect(honmaruCellAssetCandidates(honmaru(3), { x: 11, y: 11 })[0]).toBe(
+      "building.honmaru.tile.connected.1111"
+    );
+  });
+
+  it("selects boundary tiles on edges and corners (mask bits are N,E,S,W inside-neighbours)", () => {
+    const lot = honmaru(3);
+    // north-west corner cell: only E (x+1) and S (y+1) neighbours are inside.
+    expect(honmaruCellAssetCandidates(lot, { x: 10, y: 10 })[0]).toBe("building.honmaru.tile.connected.0110");
+    // south-east corner cell: only N (y-1) and W (x-1) inside.
+    expect(honmaruCellAssetCandidates(lot, { x: 12, y: 12 })[0]).toBe("building.honmaru.tile.connected.1001");
+    // middle of the north edge: E, S, W inside.
+    expect(honmaruCellAssetCandidates(lot, { x: 11, y: 10 })[0]).toBe("building.honmaru.tile.connected.0111");
+    // middle of the west edge: N, E, S inside.
+    expect(honmaruCellAssetCandidates(lot, { x: 10, y: 11 })[0]).toBe("building.honmaru.tile.connected.1110");
+  });
+
+  it("keeps the single-cell marker and overlay as fallbacks", () => {
+    expect(honmaruCellAssetCandidates(honmaru(1), { x: 10, y: 10 })).toEqual([
+      "building.honmaru.tile.connected.0000",
+      "building.honmaru.marker",
+      "overlay.cell.selected"
     ]);
   });
 });

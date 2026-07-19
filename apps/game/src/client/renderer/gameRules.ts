@@ -247,6 +247,28 @@ export function bridgeCellAssetCandidates(building: BuildingSnapshot, cell: Cell
   return [`${base}.${axis}.${segment}`, single, finalBuildingFallbackAssetId(building)];
 }
 
+/**
+ * Per-cell asset candidates for a honmaru footprint cell. The honmaru lot is
+ * rendered as ordinary ground tiles (one sprite per cell) instead of one
+ * scaled marker; the connected mask (N,E,S,W bit = neighbour cell is inside
+ * the footprint) selects boundary tiles with a stone curb on the outer edges.
+ * The single-cell marker asset stays as the fallback (it covers exactly one
+ * cell diamond).
+ */
+export function honmaruCellAssetCandidates(building: BuildingSnapshot, cell: CellCoord): readonly string[] {
+  const inside = (x: number, y: number): boolean =>
+    building.footprint.some((footprintCell) => footprintCell.x === x && footprintCell.y === y);
+  const mask = [
+    inside(cell.x, cell.y - 1),
+    inside(cell.x + 1, cell.y),
+    inside(cell.x, cell.y + 1),
+    inside(cell.x - 1, cell.y)
+  ]
+    .map((bit) => (bit ? "1" : "0"))
+    .join("");
+  return [`building.honmaru.tile.connected.${mask}`, "building.honmaru.marker", finalBuildingFallbackAssetId(building)];
+}
+
 function isNeSwGateType(buildingType: BuildingType): boolean {
   return (
     buildingType === "gate_wide_2_ne_sw" ||
