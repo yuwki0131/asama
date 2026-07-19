@@ -406,21 +406,29 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool, phase: tup
     add_flat_quad(scene, "TrenchFloor", (fx0, fy0), (0.5 + b, 0.5 + b), surface_z, surface)
 
     rim_w = 0.09
+    # This tile's floor overdraws the already-painted W/N neighbor by 0.45
+    # (painter order: lower x+y first), so every run-parallel bank/rim/lip
+    # must extend the same distance or the neighbor's bank shows a water
+    # tooth where the floor covered it (task: 土手の途切れ).
+    ext_x0 = -0.45 if same["W"] else 0.0
+    ext_x1 = b if same["E"] else 0.0
+    ext_y0 = -0.45 if same["N"] else 0.0
+    ext_y1 = b if same["S"] else 0.0
     for name in ("N", "E", "S", "W"):
         if same[name]:
             continue
         if name == "N":
-            p0, p1 = (-0.5, -0.5 + rim_w), (0.5, -0.5 + rim_w)
-            r0, r1 = (-0.5, -0.5), (0.5, -0.5)
+            p0, p1 = (-0.5 + ext_x0, -0.5 + rim_w), (0.5 + ext_x1, -0.5 + rim_w)
+            r0, r1 = (-0.5 + ext_x0, -0.5), (0.5 + ext_x1, -0.5)
         elif name == "S":
-            p0, p1 = (-0.5, 0.5 - rim_w), (0.5, 0.5 - rim_w)
-            r0, r1 = (-0.5, 0.5), (0.5, 0.5)
+            p0, p1 = (-0.5 + ext_x0, 0.5 - rim_w), (0.5 + ext_x1, 0.5 - rim_w)
+            r0, r1 = (-0.5 + ext_x0, 0.5), (0.5 + ext_x1, 0.5)
         elif name == "W":
-            p0, p1 = (-0.5 + rim_w, -0.5), (-0.5 + rim_w, 0.5)
-            r0, r1 = (-0.5, -0.5), (-0.5, 0.5)
+            p0, p1 = (-0.5 + rim_w, -0.5 + ext_y0), (-0.5 + rim_w, 0.5 + ext_y1)
+            r0, r1 = (-0.5, -0.5 + ext_y0), (-0.5, 0.5 + ext_y1)
         else:
-            p0, p1 = (0.5 - rim_w, -0.5), (0.5 - rim_w, 0.5)
-            r0, r1 = (0.5, -0.5), (0.5, 0.5)
+            p0, p1 = (0.5 - rim_w, -0.5 + ext_y0), (0.5 - rim_w, 0.5 + ext_y1)
+            r0, r1 = (0.5, -0.5 + ext_y0), (0.5, 0.5 + ext_y1)
         add_mesh(scene, f"Rim{name}",
             [(*map_xy(*r0), 0.0), (*map_xy(*r1), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p0), 0.0)],
             [(0, 1, 2, 3)], rim)

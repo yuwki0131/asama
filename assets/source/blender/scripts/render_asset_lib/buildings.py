@@ -150,6 +150,12 @@ def add_yosemune_roof(
     faces = [(0, 1, 5, 4), (3, 2, 5, 4), (0, 4, 3), (1, 2, 5)]
     add_mesh(scene, f"{name}Surface", vertices, faces, roof_material)
 
+    # Soffit slab closing the roof underside: the hip surface is single-sided,
+    # so rays grazing under the eave otherwise punch through to background
+    # (barracks NW corner transparency).
+    soffit_low, soffit_high = map_box((x0, y0, 0.0), (x1, y1, 0.0))
+    add_box(scene, f"{name}Soffit", (soffit_low[0], soffit_low[1], base_z - 0.055), (soffit_high[0], soffit_high[1], base_z + 0.005), trim_material)
+
     cap_low, cap_high = map_box((r0[0] - 0.06, ym - 0.06, 0.0), (r1[0] + 0.06, ym + 0.06, 0.0))
     add_box(scene, f"{name}Cap", (cap_low[0], cap_low[1], ridge_z - 0.02), (cap_high[0], cap_high[1], ridge_z + 0.06), trim_material)
     for ox in (r0[0] - 0.10, r1[0] - 0.02):
