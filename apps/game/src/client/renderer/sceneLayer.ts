@@ -13,6 +13,7 @@ import { clearLayer, createSprite, createSpriteFromCandidates, type AnimationShe
 import {
   cellToWorld,
   clamp,
+  gridCornerToWorld,
   isVisibleCell,
   roundWorldPixel,
   type CameraState,
@@ -23,7 +24,7 @@ import {
 import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
 import { bridgeCellAssetCandidates, buildingAssetCandidates, honmaruCellAssetCandidates, isBridgeBuildingType } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
-import { buildingRenderPoint, isoBehind } from "./renderGeometry";
+import { buildingRenderPoint, footprintBounds, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
 import {
   addCliffCellSprites,
@@ -347,11 +348,7 @@ export class RetainedScene {
           building.lifecycleState === "intact" &&
           (building.type === "yagura" || building.type === "tenshu" || building.type === "honmaru")
         ) {
-          const flagGraphics = createFlagGraphics(
-            building,
-            zoom,
-            flagBaseOffsetY(building, assets, snapshot.economy.season)
-          );
+          const flagGraphics = createFlagGraphics(building, zoom);
           this.staticLayer.addChild(flagGraphics);
           this.flagVisuals.push({
             graphics: flagGraphics,
@@ -550,29 +547,21 @@ function cellPhaseOffset(pos: CellCoord): number {
 }
 
 /**
- * World-Y of the nobori pole base relative to the building's render anchor:
- * planted on the roof ridge for tower buildings (top of the resolved sprite,
- * pushed a few px in so the pole reads attached), on the ground at the lot
- * center for the tiled honmaru.
+ * Ground point where the nobori pole is planted. Historically nobori were
+ * always ground-planted (period screens like 大坂夏の陣図屏風 show them in
+ * rows at gates and camp perimeters, never flying from rooftops), so tower
+ * buildings get the pole planted beside their south (viewer-facing) corner
+ * rather than on the roof ridge. The honmaru keeps its lot-center placement,
+ * echoing the 馬印 that marked a commander's 本陣.
  */
-function flagBaseOffsetY(
-  building: BuildingSnapshot,
-  assets: ReadonlyMap<string, LoadedAsset>,
-  season: Season
-): number {
-  if (building.type === "honmaru") {
-    return 0;
+function flagGroundWorldPoint(building: BuildingSnapshot): CellCoord {
+  if (building.type === "honmaru" || building.footprint.length === 0) {
+    return buildingRenderPoint(building);
   }
-  for (const candidate of buildingAssetCandidates(building, season)) {
-    const asset = assets.get(candidate);
-    if (asset !== undefined) {
-      // +24 sinks the pole base past the thin ridge-ornament pixels at the
-      // texture top into the solid roof mass, so the pole reads as planted
-      // (yagura/tenshu solid roof starts ~18-21px below the opaque top).
-      return -asset.texture.height * asset.anchor.y + 24;
-    }
-  }
-  return -75;
+  const bounds = footprintBounds(building.footprint);
+  // 0.7 nudges the pole off the exact corner vertex onto the east front edge
+  // so it does not overlap the facade's corner pixels.
+  return gridCornerToWorld({ x: bounds.maxX + 1, y: bounds.maxY + 0.7 });
 }
 
 /**
@@ -580,11 +569,11 @@ function flagBaseOffsetY(
  * crossbar on a pole) marking building ownership. The Graphics origin sits at
  * the pole base so `graphics.rotation` sways the whole banner in the wind.
  */
-function createFlagGraphics(building: BuildingSnapshot, zoom: number, baseOffsetY: number): Graphics {
-  const point = buildingRenderPoint(building);
+function createFlagGraphics(building: BuildingSnapshot, zoom: number): Graphics {
+  const point = flagGroundWorldPoint(building);
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   const baseX = roundWorldPixel(point.x, zoom);
-  const baseY = roundWorldPixel(point.y + offsetY + baseOffsetY, zoom);
+  const baseY = roundWorldPixel(point.y + offsetY, zoom);
 
   const enemy = building.owner === "enemy";
   const cloth = enemy ? 0xb02a26 : 0x24418f;
