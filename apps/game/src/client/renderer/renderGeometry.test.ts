@@ -116,20 +116,28 @@ describe("honmaruMarkerScale", () => {
   });
 });
 
-// Helper: runs the same two-step isoSort algorithm (mirrors sceneLayer.ts)
-// on abstract {id, rect} items so we can test it without importing pixi.
+// Helper: runs the same two-step isoSort algorithm (mirrors sceneLayer.ts,
+// buildings only — all items rank 2) on abstract {id, rect} items so we can
+// test it without importing pixi.
 function isoSortRects(items: Array<{ id: string; rect: FootprintRect }>): string[] {
+  const area = (r: FootprintRect) => (r.maxX - r.minX + 1) * (r.maxY - r.minY + 1);
   const arr = [...items];
   arr.sort((a, b) => {
     const diff = (a.rect.maxX + a.rect.maxY) - (b.rect.maxX + b.rect.maxY);
     if (diff !== 0) return diff;
+    const areaDiff = area(a.rect) - area(b.rect);
+    if (areaDiff !== 0) return areaDiff;
     return a.id.localeCompare(b.id);
   });
   const PASSES = 3;
   for (let pass = 0; pass < PASSES; pass++) {
     let swapped = false;
     for (let i = 0; i < arr.length - 1; i++) {
-      if (isoBehind(arr[i + 1]!.rect, arr[i]!.rect) && !isoBehind(arr[i]!.rect, arr[i + 1]!.rect)) {
+      const ra = arr[i]!.rect;
+      const rb = arr[i + 1]!.rect;
+      // Equal-depth pairs never occlude each other; keep comparator order.
+      if (ra.maxX + ra.maxY === rb.maxX + rb.maxY) continue;
+      if (isoBehind(rb, ra) && !isoBehind(ra, rb)) {
         const tmp = arr[i]!;
         arr[i] = arr[i + 1]!;
         arr[i + 1] = tmp;
@@ -221,6 +229,27 @@ describe("isoSort: footprint-based painter's order", () => {
     // No swap: wall(12) stays before building(16)
     expect(isoSortRects([wall, building])).toEqual(["wall", "bldg"]);
     expect(isoSortRects([building, wall])).toEqual(["wall", "bldg"]);
+  });
+
+  it("equal-depth wall diagonal to a 2x2 yagura paints before it (eaves stay visible)", () => {
+    // free-play regression: yagura(65-66,60-61) depth 127, wall(67,60) depth 127.
+    // Equal depth ⇒ neither occludes the other physically; the wall must not
+    // paint over the yagura's roof eaves, so the larger footprint goes last.
+    const yagura = { id: "yagura", rect: { minX: 65, maxX: 66, minY: 60, maxY: 61 } };
+    const wallEast = { id: "wallE", rect: { minX: 67, maxX: 67, minY: 60, maxY: 60 } };
+    const wallSouthWest = { id: "wallSW", rect: { minX: 65, maxX: 65, minY: 62, maxY: 62 } };
+    expect(isoSortRects([yagura, wallEast])).toEqual(["wallE", "yagura"]);
+    expect(isoSortRects([wallEast, yagura])).toEqual(["wallE", "yagura"]);
+    expect(isoSortRects([yagura, wallSouthWest])).toEqual(["wallSW", "yagura"]);
+    expect(isoSortRects([wallSouthWest, yagura])).toEqual(["wallSW", "yagura"]);
+  });
+
+  it("wall directly south of a yagura footprint cell (greater depth) still paints after it", () => {
+    // wall(66,62) depth 128 > yagura depth 127 — a true occluder keeps painting last.
+    const yagura = { id: "yagura", rect: { minX: 65, maxX: 66, minY: 60, maxY: 61 } };
+    const wallFront = { id: "wallF", rect: { minX: 66, maxX: 66, minY: 62, maxY: 62 } };
+    expect(isoSortRects([wallFront, yagura])).toEqual(["yagura", "wallF"]);
+    expect(isoSortRects([yagura, wallFront])).toEqual(["yagura", "wallF"]);
   });
 
   it("three items: chain resolved correctly via multiple bubble passes", () => {
