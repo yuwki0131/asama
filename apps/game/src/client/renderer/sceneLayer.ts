@@ -870,6 +870,12 @@ function sceneItemRect(entry: SceneItemForSort): FootprintRect {
   return { minX: x, maxX: x, minY: y, maxY: y };
 }
 
+function overhangWeight(entry: SceneItemForSort): number {
+  if (entry.kind === "decoration") return 1000;
+  const r = sceneItemRect(entry);
+  return (r.maxX - r.minX + 1) * (r.maxY - r.minY + 1);
+}
+
 // Isometric painter's sort for scene items (buildings + decorations).
 // Step 1: primary sort by south-corner depth (maxX+maxY) — a good approximation
 //   but non-transitive for separated footprints (e.g. 1x1 wall to the NE of a
@@ -892,6 +898,16 @@ function isoSort(items: SceneItemForSort[]): void {
     const rankA = sceneItemRank(a);
     const rankB = sceneItemRank(b);
     if (rankA !== rankB) return rankA - rankB;
+    // Equal-depth buildings/decorations can never occlude each other (the view
+    // ray runs along (+1,+1), so a true occluder always has strictly greater
+    // maxX+maxY) — only sprite overhangs overlap. Paint overhang-heavy items
+    // later so eaves/canopies stay visible: decorations after buildings, and
+    // among buildings the larger footprint (wider roof) last.
+    if (rankA === 2) {
+      const wa = overhangWeight(a);
+      const wb = overhangWeight(b);
+      if (wa !== wb) return wa - wb;
+    }
     return sceneItemId(a).localeCompare(sceneItemId(b));
   });
 
@@ -904,6 +920,17 @@ function isoSort(items: SceneItemForSort[]): void {
     for (let i = 0; i < items.length - 1; i++) {
       const ra = sceneItemRect(items[i]!);
       const rb = sceneItemRect(items[i + 1]!);
+      // Equal-depth rank-2 pairs stay in comparator order: swapping them only
+      // trades which sprite's overhang wins, and the comparator already picked
+      // the order that keeps roofs/canopies intact (e.g. a wall diagonal to a
+      // yagura must not paint over its eaves).
+      if (
+        ra.maxX + ra.maxY === rb.maxX + rb.maxY &&
+        sceneItemRank(items[i]!) === 2 &&
+        sceneItemRank(items[i + 1]!) === 2
+      ) {
+        continue;
+      }
       // items[i+1] is provably behind items[i] AND not in a mutual/diagonal relationship
       // (both separated in opposing axes → depth fallback keeps primary-sort order).
       if (isoBehind(rb, ra) && !isoBehind(ra, rb)) {
