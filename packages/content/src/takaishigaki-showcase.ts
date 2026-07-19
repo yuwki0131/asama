@@ -121,11 +121,14 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
     { type: "sword_ashigaru", position: { x: 31, y: 58 }, owner: "player" },
     { type: "archer", position: { x: 21, y: 64 }, owner: "player" },
     { type: "archer", position: { x: 26, y: 64 }, owner: "player" },
+    { type: "archer", position: { x: 23, y: 64 }, owner: "player" },
     // 二の丸 (L4) — 本丸虎口下の受け。坂セル (32..33,66) は空ける。
     { type: "spear_ashigaru", position: { x: 32, y: 68 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 33, y: 68 }, owner: "player" },
     { type: "archer", position: { x: 35, y: 69 }, owner: "player" },
     { type: "archer", position: { x: 38, y: 70 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 34, y: 68 }, owner: "player" },
+    { type: "archer", position: { x: 36, y: 70 }, owner: "player" },
     // 三の丸 (L3) — 二の丸門下の槍衾と南縁の射撃線。
     { type: "spear_ashigaru", position: { x: 45, y: 80 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 48, y: 80 }, owner: "player" },
@@ -133,6 +136,8 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
     { type: "archer", position: { x: 50, y: 93 }, owner: "player" },
     { type: "archer", position: { x: 53, y: 93 }, owner: "player" },
     { type: "musketeer", position: { x: 63, y: 93 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 47, y: 80 }, owner: "player" },
+    { type: "archer", position: { x: 51, y: 93 }, owner: "player" },
     // 大手裏階段の門裏 (L3/L2/L1)。門セルと坂セルは空ける。
     { type: "spear_ashigaru", position: { x: 58, y: 73 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 59, y: 73 }, owner: "player" },
@@ -140,13 +145,18 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
     { type: "archer", position: { x: 61, y: 69 }, owner: "player" },
     { type: "archer", position: { x: 56, y: 60 }, owner: "player" },
     { type: "archer", position: { x: 61, y: 60 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 57, y: 73 }, owner: "player" },
+    { type: "archer", position: { x: 57, y: 60 }, owner: "player" },
     // 城下 (L0) — 大手口の遅滞戦闘要員。
     { type: "spear_ashigaru", position: { x: 60, y: 52 }, owner: "player" },
     { type: "archer", position: { x: 62, y: 52 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 61, y: 52 }, owner: "player" },
 
     // 敵の物見 (北東街道)。
     { type: "spear_ashigaru", position: { x: 70, y: 48 }, owner: "enemy" },
     { type: "archer", position: { x: 73, y: 49 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 71, y: 49 }, owner: "enemy" },
+    { type: "archer", position: { x: 69, y: 49 }, owner: "enemy" },
   ],
   waves: [
     {
@@ -155,6 +165,8 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
       spawns: [
         { type: "spear_ashigaru", position: { x: 72, y: 48 } },
         { type: "spear_ashigaru", position: { x: 74, y: 50 } },
+        { type: "spear_ashigaru", position: { x: 73, y: 47 } },
+        { type: "spear_ashigaru", position: { x: 75, y: 49 } },
         { type: "supply_cart", position: { x: 76, y: 49 } },
       ],
     },
@@ -167,6 +179,9 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 73, y: 48 } },
         { type: "archer", position: { x: 72, y: 51 } },
         { type: "archer", position: { x: 76, y: 51 } },
+        { type: "spear_ashigaru", position: { x: 70, y: 48 } },
+        { type: "sword_ashigaru", position: { x: 74, y: 49 } },
+        { type: "archer", position: { x: 77, y: 51 } },
         { type: "supply_cart", position: { x: 77, y: 49 } },
       ],
     },
@@ -180,6 +195,9 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
         { type: "engineer", position: { x: 75, y: 51 } },
         { type: "archer", position: { x: 71, y: 50 } },
         { type: "cavalry", position: { x: 69, y: 47 } },
+        { type: "spear_ashigaru", position: { x: 70, y: 49 } },
+        { type: "sword_ashigaru", position: { x: 76, y: 49 } },
+        { type: "archer", position: { x: 72, y: 52 } },
         { type: "supply_cart", position: { x: 77, y: 50 } },
       ],
     },
@@ -197,6 +215,10 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
         { type: "engineer", position: { x: 74, y: 52 } },
         { type: "cavalry", position: { x: 68, y: 47 } },
         { type: "cavalry", position: { x: 70, y: 52 } },
+        { type: "spear_ashigaru", position: { x: 70, y: 48 } },
+        { type: "sword_ashigaru", position: { x: 73, y: 49 } },
+        { type: "archer", position: { x: 76, y: 51 } },
+        { type: "spear_ashigaru", position: { x: 71, y: 52 } },
         { type: "supply_cart", position: { x: 76, y: 52 } },
         { type: "supply_cart", position: { x: 77, y: 52 } },
       ],

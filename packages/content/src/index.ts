@@ -385,15 +385,23 @@ export const mvpDefenseScenario: ScenarioDefinition = {
     { type: "spear_ashigaru", position: { x: 63, y: 57 }, owner: "player" },
     { type: "archer", position: { x: 63, y: 58 }, owner: "player" },
     { type: "archer", position: { x: 64, y: 59 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 64, y: 57 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 65, y: 58 }, owner: "player" },
+    { type: "archer", position: { x: 64, y: 58 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 65, y: 59 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 86, y: 66 }, owner: "enemy" },
-    { type: "archer", position: { x: 87, y: 66 }, owner: "enemy" }
+    { type: "archer", position: { x: 87, y: 66 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 85, y: 67 }, owner: "enemy" },
+    { type: "archer", position: { x: 88, y: 66 }, owner: "enemy" }
   ],
   waves: [
   {
     tick: 2400,
     spawns: [
       { type: "spear_ashigaru", position: { x: 86, y: 63 } },
-      { type: "spear_ashigaru", position: { x: 87, y: 68 } }
+      { type: "spear_ashigaru", position: { x: 87, y: 68 } },
+      { type: "spear_ashigaru", position: { x: 85, y: 64 } },
+      { type: "archer", position: { x: 88, y: 64 } }
     ]
   },
   {
@@ -402,7 +410,10 @@ export const mvpDefenseScenario: ScenarioDefinition = {
       { type: "spear_ashigaru", position: { x: 86, y: 63 } },
       { type: "sword_ashigaru", position: { x: 86, y: 66 } },
       { type: "engineer", position: { x: 88, y: 65 } },
-      { type: "archer", position: { x: 87, y: 68 } }
+      { type: "archer", position: { x: 87, y: 68 } },
+      { type: "spear_ashigaru", position: { x: 85, y: 63 } },
+      { type: "sword_ashigaru", position: { x: 85, y: 67 } },
+      { type: "archer", position: { x: 88, y: 68 } }
     ]
   },
   {
@@ -413,7 +424,11 @@ export const mvpDefenseScenario: ScenarioDefinition = {
       { type: "sword_ashigaru", position: { x: 87, y: 64 } },
       { type: "engineer", position: { x: 88, y: 65 } },
       { type: "engineer", position: { x: 88, y: 67 } },
-      { type: "archer", position: { x: 87, y: 68 } }
+      { type: "archer", position: { x: 87, y: 68 } },
+      { type: "spear_ashigaru", position: { x: 85, y: 63 } },
+      { type: "sword_ashigaru", position: { x: 85, y: 66 } },
+      { type: "archer", position: { x: 88, y: 63 } },
+      { type: "spear_ashigaru", position: { x: 85, y: 68 } }
     ]
   }
   ],
@@ -760,9 +775,13 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "spear_ashigaru", position: { x: 65, y: 78 }, owner: "player" },
     { type: "sword_ashigaru", position: { x: 66, y: 76 }, owner: "player" },
     { type: "archer", position: { x: 65, y: 75 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 66, y: 78 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 64, y: 77 }, owner: "player" },
+    { type: "archer", position: { x: 64, y: 75 }, owner: "player" },
     // 二之丸南門付近 (大手道守備)
     { type: "archer", position: { x: 63, y: 90 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 61, y: 90 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 62, y: 90 }, owner: "player" },
   ],
   waves: [
     {
@@ -771,6 +790,8 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
       spawns: [
         { type: "spear_ashigaru", position: { x: 60, y: 118 } },
         { type: "spear_ashigaru", position: { x: 66, y: 118 } },
+        { type: "spear_ashigaru", position: { x: 58, y: 118 } },
+        { type: "spear_ashigaru", position: { x: 68, y: 118 } },
         { type: "supply_cart", position: { x: 63, y: 121 } },
       ],
     },
@@ -781,6 +802,9 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 59, y: 118 } },
         { type: "spear_ashigaru", position: { x: 67, y: 118 } },
         { type: "archer", position: { x: 63, y: 120 } },
+        { type: "spear_ashigaru", position: { x: 61, y: 118 } },
+        { type: "spear_ashigaru", position: { x: 65, y: 118 } },
+        { type: "archer", position: { x: 60, y: 120 } },
         { type: "supply_cart", position: { x: 63, y: 124 } },
       ],
     },
@@ -793,6 +817,10 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 69, y: 118 } },
         { type: "sword_ashigaru", position: { x: 60, y: 120 } },
         { type: "cavalry", position: { x: 67, y: 120 } },
+        { type: "spear_ashigaru", position: { x: 55, y: 118 } },
+        { type: "sword_ashigaru", position: { x: 64, y: 120 } },
+        { type: "archer", position: { x: 61, y: 120 } },
+        { type: "spear_ashigaru", position: { x: 71, y: 118 } },
         { type: "supply_cart", position: { x: 63, y: 123 } },
       ],
     },
@@ -1036,16 +1064,24 @@ export const linearFortressScenario: ContentScenarioDefinition = {
     // Player garrison in honmaru
     { type: "spear_ashigaru", position: { x: 26, y: 66 }, owner: "player" },
     { type: "sword_ashigaru", position: { x: 27, y: 67 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 25, y: 67 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 27, y: 65 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 25, y: 65 }, owner: "player" },
     // Archer guarding ninomaru east gate
     { type: "archer", position: { x: 53, y: 62 }, owner: "player" },
+    { type: "archer", position: { x: 52, y: 63 }, owner: "player" },
     // Spear at ninomaru east gate
     { type: "spear_ashigaru", position: { x: 51, y: 62 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 52, y: 61 }, owner: "player" },
     // Archer covering southern road
     { type: "archer", position: { x: 62, y: 88 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 61, y: 88 }, owner: "player" },
 
     // Enemy advance scouts (east bank)
     { type: "spear_ashigaru", position: { x: 85, y: 61 }, owner: "enemy" },
     { type: "archer", position: { x: 86, y: 65 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 84, y: 63 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 84, y: 62 }, owner: "enemy" },
   ],
   waves: [
     {
@@ -1054,6 +1090,8 @@ export const linearFortressScenario: ContentScenarioDefinition = {
       spawns: [
         { type: "spear_ashigaru", position: { x: 100, y: 59 } },
         { type: "spear_ashigaru", position: { x: 100, y: 64 } },
+        { type: "spear_ashigaru", position: { x: 101, y: 58 } },
+        { type: "archer", position: { x: 101, y: 65 } },
         { type: "supply_cart", position: { x: 103, y: 61 } },
       ],
     },
@@ -1064,10 +1102,13 @@ export const linearFortressScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 100, y: 58 } },
         { type: "spear_ashigaru", position: { x: 100, y: 62 } },
         { type: "archer", position: { x: 100, y: 66 } },
+        { type: "spear_ashigaru", position: { x: 101, y: 60 } },
+        { type: "archer", position: { x: 101, y: 64 } },
         { type: "supply_cart", position: { x: 103, y: 61 } },
         // South probe — tests the undefended flank
         { type: "spear_ashigaru", position: { x: 61, y: 100 } },
         { type: "archer", position: { x: 64, y: 102 } },
+        { type: "spear_ashigaru", position: { x: 63, y: 101 } },
       ],
     },
     {
@@ -1078,10 +1119,13 @@ export const linearFortressScenario: ContentScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 100, y: 62 } },
         { type: "engineer", position: { x: 102, y: 60 } },
         { type: "cavalry", position: { x: 100, y: 67 } },
+        { type: "sword_ashigaru", position: { x: 101, y: 59 } },
+        { type: "archer", position: { x: 101, y: 66 } },
         { type: "supply_cart", position: { x: 104, y: 61 } },
         // South cavalry flanking — fast and hard to intercept
         { type: "cavalry", position: { x: 60, y: 100 } },
         { type: "spear_ashigaru", position: { x: 64, y: 100 } },
+        { type: "cavalry", position: { x: 62, y: 101 } },
       ],
     },
     {
@@ -1096,11 +1140,16 @@ export const linearFortressScenario: ContentScenarioDefinition = {
         { type: "engineer", position: { x: 102, y: 61 } },
         { type: "cavalry", position: { x: 100, y: 72 } },
         { type: "musketeer", position: { x: 102, y: 65 } },
+        { type: "spear_ashigaru", position: { x: 101, y: 58 } },
+        { type: "sword_ashigaru", position: { x: 101, y: 63 } },
+        { type: "archer", position: { x: 101, y: 70 } },
         { type: "supply_cart", position: { x: 104, y: 61 } },
         // South assault column
         { type: "spear_ashigaru", position: { x: 59, y: 100 } },
         { type: "sword_ashigaru", position: { x: 62, y: 100 } },
         { type: "cavalry", position: { x: 66, y: 100 } },
+        { type: "spear_ashigaru", position: { x: 60, y: 101 } },
+        { type: "sword_ashigaru", position: { x: 64, y: 101 } },
         { type: "supply_cart", position: { x: 62, y: 104 } },
       ],
     },
@@ -1224,15 +1273,22 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
     // Player garrison at honmaru
     { type: "spear_ashigaru", position: { x: 42, y: 57 }, owner: "player" },
     { type: "sword_ashigaru", position: { x: 43, y: 57 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 41, y: 57 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 44, y: 57 }, owner: "player" },
     // Player archers covering bridge exits
     { type: "archer", position: { x: 55, y: 50 }, owner: "player" },
     { type: "archer", position: { x: 55, y: 66 }, owner: "player" },
+    { type: "archer", position: { x: 55, y: 51 }, owner: "player" },
+    { type: "archer", position: { x: 55, y: 65 }, owner: "player" },
     // Player spear guard in front of castle gate
     { type: "spear_ashigaru", position: { x: 50, y: 57 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 50, y: 58 }, owner: "player" },
 
     // Enemy advance scouts on east bank
     { type: "spear_ashigaru", position: { x: 78, y: 56 }, owner: "enemy" },
     { type: "archer", position: { x: 78, y: 60 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 78, y: 58 }, owner: "enemy" },
+    { type: "archer", position: { x: 79, y: 61 }, owner: "enemy" },
   ],
   waves: [
     {
@@ -1241,6 +1297,8 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
       spawns: [
         { type: "spear_ashigaru", position: { x: 90, y: 50 } },
         { type: "spear_ashigaru", position: { x: 90, y: 52 } },
+        { type: "spear_ashigaru", position: { x: 91, y: 50 } },
+        { type: "spear_ashigaru", position: { x: 91, y: 52 } },
       ],
     },
     {
@@ -1250,6 +1308,9 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 90, y: 48 } },
         { type: "spear_ashigaru", position: { x: 90, y: 52 } },
         { type: "archer", position: { x: 92, y: 50 } },
+        { type: "spear_ashigaru", position: { x: 91, y: 48 } },
+        { type: "sword_ashigaru", position: { x: 91, y: 50 } },
+        { type: "archer", position: { x: 92, y: 52 } },
         { type: "supply_cart", position: { x: 94, y: 50 } },
       ],
     },
@@ -1262,6 +1323,9 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
         { type: "engineer", position: { x: 92, y: 52 } },
         { type: "spear_ashigaru", position: { x: 90, y: 66 } },
         { type: "archer", position: { x: 92, y: 68 } },
+        { type: "spear_ashigaru", position: { x: 91, y: 50 } },
+        { type: "sword_ashigaru", position: { x: 91, y: 66 } },
+        { type: "archer", position: { x: 92, y: 54 } },
         { type: "supply_cart", position: { x: 94, y: 58 } },
       ],
     },
@@ -1278,6 +1342,10 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
         { type: "engineer", position: { x: 92, y: 66 } },
         { type: "archer", position: { x: 90, y: 68 } },
         { type: "musketeer", position: { x: 93, y: 52 } },
+        { type: "spear_ashigaru", position: { x: 91, y: 48 } },
+        { type: "sword_ashigaru", position: { x: 91, y: 64 } },
+        { type: "archer", position: { x: 91, y: 54 } },
+        { type: "musketeer", position: { x: 93, y: 66 } },
         { type: "supply_cart", position: { x: 95, y: 50 } },
       ],
     },
@@ -1297,6 +1365,11 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
         { type: "archer", position: { x: 90, y: 70 } },
         { type: "cavalry", position: { x: 90, y: 58 } },
         { type: "musketeer", position: { x: 93, y: 56 } },
+        { type: "sword_ashigaru", position: { x: 91, y: 46 } },
+        { type: "spear_ashigaru", position: { x: 91, y: 68 } },
+        { type: "archer", position: { x: 91, y: 56 } },
+        { type: "cavalry", position: { x: 91, y: 60 } },
+        { type: "engineer", position: { x: 92, y: 54 } },
         { type: "supply_cart", position: { x: 95, y: 48 } },
         { type: "supply_cart", position: { x: 95, y: 66 } },
       ],

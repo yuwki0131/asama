@@ -74,25 +74,33 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
   initialUnits: [
     // 本曲輪 (L2) — 刀は本丸マーカー上。門裏の (43..44,95) は補給路のため空ける。
     { type: "sword_ashigaru", position: { x: 48, y: 88 }, owner: "player" },
+    { type: "sword_ashigaru", position: { x: 47, y: 88 }, owner: "player" },
     { type: "archer", position: { x: 45, y: 94 }, owner: "player" },
     { type: "archer", position: { x: 46, y: 95 }, owner: "player" },
+    { type: "archer", position: { x: 44, y: 94 }, owner: "player" },
     { type: "musketeer", position: { x: 47, y: 95 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 42, y: 95 }, owner: "player" },
     // 帯曲輪 (L1) — 大手坂の上とその左右。
     { type: "spear_ashigaru", position: { x: 43, y: 101 }, owner: "player" },
     { type: "spear_ashigaru", position: { x: 44, y: 101 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 45, y: 101 }, owner: "player" },
     { type: "archer", position: { x: 42, y: 102 }, owner: "player" },
     { type: "archer", position: { x: 45, y: 102 }, owner: "player" },
+    { type: "archer", position: { x: 41, y: 102 }, owner: "player" },
     // 搦手 (L1 東縁) — 細道の受け。(58,90) の坂口セルは空けておく。
     { type: "spear_ashigaru", position: { x: 57, y: 90 }, owner: "player" },
     { type: "archer", position: { x: 56, y: 91 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 57, y: 91 }, owner: "player" },
     // 城下 (L0) — 遅滞戦闘要員。
     { type: "spear_ashigaru", position: { x: 44, y: 106 }, owner: "player" },
     { type: "archer", position: { x: 43, y: 106 }, owner: "player" },
+    { type: "spear_ashigaru", position: { x: 45, y: 106 }, owner: "player" },
 
     // 敵の物見 (南の街道)。
     { type: "spear_ashigaru", position: { x: 46, y: 113 }, owner: "enemy" },
     { type: "archer", position: { x: 42, y: 114 }, owner: "enemy" },
+    { type: "spear_ashigaru", position: { x: 44, y: 114 }, owner: "enemy" },
+    { type: "archer", position: { x: 40, y: 113 }, owner: "enemy" },
   ],
   waves: [
     {
@@ -101,6 +109,8 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
       spawns: [
         { type: "spear_ashigaru", position: { x: 42, y: 113 } },
         { type: "spear_ashigaru", position: { x: 46, y: 113 } },
+        { type: "spear_ashigaru", position: { x: 44, y: 113 } },
+        { type: "spear_ashigaru", position: { x: 40, y: 114 } },
         { type: "supply_cart", position: { x: 44, y: 117 } },
       ],
     },
@@ -111,6 +121,9 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
         { type: "spear_ashigaru", position: { x: 41, y: 113 } },
         { type: "spear_ashigaru", position: { x: 47, y: 113 } },
         { type: "archer", position: { x: 44, y: 115 } },
+        { type: "spear_ashigaru", position: { x: 43, y: 113 } },
+        { type: "sword_ashigaru", position: { x: 45, y: 113 } },
+        { type: "archer", position: { x: 42, y: 115 } },
         { type: "supply_cart", position: { x: 44, y: 118 } },
         { type: "spear_ashigaru", position: { x: 66, y: 90 } },
         { type: "archer", position: { x: 68, y: 92 } },
@@ -124,6 +137,9 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
         { type: "sword_ashigaru", position: { x: 45, y: 113 } },
         { type: "engineer", position: { x: 43, y: 116 } },
         { type: "archer", position: { x: 42, y: 115 } },
+        { type: "spear_ashigaru", position: { x: 41, y: 113 } },
+        { type: "sword_ashigaru", position: { x: 47, y: 113 } },
+        { type: "archer", position: { x: 46, y: 115 } },
         { type: "supply_cart", position: { x: 44, y: 119 } },
         { type: "cavalry", position: { x: 66, y: 89 } },
         { type: "spear_ashigaru", position: { x: 67, y: 92 } },
@@ -140,9 +156,13 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
         { type: "musketeer", position: { x: 45, y: 116 } },
         { type: "archer", position: { x: 41, y: 115 } },
         { type: "archer", position: { x: 47, y: 115 } },
+        { type: "spear_ashigaru", position: { x: 40, y: 113 } },
+        { type: "sword_ashigaru", position: { x: 48, y: 113 } },
+        { type: "archer", position: { x: 43, y: 115 } },
         { type: "supply_cart", position: { x: 44, y: 120 } },
         { type: "sword_ashigaru", position: { x: 66, y: 90 } },
         { type: "cavalry", position: { x: 67, y: 88 } },
+        { type: "spear_ashigaru", position: { x: 68, y: 90 } },
         { type: "supply_cart", position: { x: 69, y: 92 } },
       ],
     },
