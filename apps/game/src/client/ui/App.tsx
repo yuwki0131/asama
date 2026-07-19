@@ -1015,6 +1015,7 @@ function buildingTypeCounts(snapshot: WorldSnapshot | null): string {
 const CASTLE_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [
   { type: "fence", label: "柵" },
   { type: "wall", label: "壁" },
+  { type: "hazama_wall", label: "狭間壁" },
   { type: "gate_wide_3", label: "門NW" },
   { type: "gate_wide_3_ne_sw", label: "門NE" },
   { type: "gate_narrow_3", label: "狭門NW" },

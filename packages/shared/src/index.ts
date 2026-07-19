@@ -33,6 +33,7 @@ export type ElevationSkin = "cliff" | "ishigaki";
 export type BuildingType =
   | "fence"
   | "wall"
+  | "hazama_wall"
   | "gate_wide_2"
   | "gate_wide_3"
   | "gate_narrow_3"

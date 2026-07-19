@@ -304,3 +304,42 @@ describe("bridge orientation", () => {
     expect(b.footprint).toHaveLength(6);
   });
 });
+
+describe("hazama wall loophole assets", () => {
+  it("uses loophole variants only on straight runs, cycling shapes along the axis", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    for (let x = 20; x <= 24; x += 1) {
+      place(world, "hazama_wall", { x, y: 20 });
+    }
+
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.wall.plaster.connected.0100");
+    expect(buildingAt(world, { x: 21, y: 20 }).assetId).toBe("building.wall.hazama.connected.0101.s0");
+    expect(buildingAt(world, { x: 22, y: 20 }).assetId).toBe("building.wall.hazama.connected.0101.s1");
+    expect(buildingAt(world, { x: 23, y: 20 }).assetId).toBe("building.wall.hazama.connected.0101.s2");
+    expect(buildingAt(world, { x: 24, y: 20 }).assetId).toBe("building.wall.plaster.connected.0001");
+  });
+
+  it("uses the N-S loophole family on vertical runs and plaster corners at turns", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "hazama_wall", { x: 30, y: 30 });
+    place(world, "hazama_wall", { x: 30, y: 31 });
+    place(world, "hazama_wall", { x: 30, y: 32 });
+    place(world, "hazama_wall", { x: 31, y: 32 });
+
+    expect(buildingAt(world, { x: 30, y: 31 }).assetId).toBe("building.wall.hazama.connected.1010.s1");
+    expect(buildingAt(world, { x: 30, y: 32 }).assetId).toBe("building.wall.plaster.connected.1100");
+  });
+
+  it("connects hazama walls with plain walls into one visual run", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "wall", { x: 40, y: 40 });
+    place(world, "hazama_wall", { x: 41, y: 40 });
+    place(world, "wall", { x: 42, y: 40 });
+
+    expect(buildingAt(world, { x: 41, y: 40 }).assetId).toBe("building.wall.hazama.connected.0101.s2");
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe("building.wall.plaster.connected.0100");
+  });
+});

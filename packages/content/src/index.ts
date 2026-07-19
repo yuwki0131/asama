@@ -45,6 +45,15 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.wall.plaster",
     gateState: null
   },
+  hazama_wall: {
+    type: "hazama_wall",
+    category: "castle",
+    maxHp: 260,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.wall.plaster",
+    gateState: null
+  },
   gate_wide_2: {
     type: "gate_wide_2",
     category: "castle",

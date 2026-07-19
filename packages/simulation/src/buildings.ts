@@ -9,6 +9,7 @@ import {
   isGate,
   isInsideMap,
   isNeSwGate,
+  isWall,
   sameCell
 } from "./types";
 import type { BuildingDefinition, BuildingState, TerrainCellState, WorldState } from "./types";
@@ -394,6 +395,10 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
     return townBlockVariantAssetId(building.position);
   }
 
+  if (building.type === "hazama_wall") {
+    return hazamaWallAssetId(world, building);
+  }
+
   const family = connectedAssetFamily(building.type);
   if (family === null) {
     return building.assetId;
@@ -437,6 +442,23 @@ export function townBlockVariantAssetId(position: CellCoord): string {
   return variant === 0 ? "building.town_block" : `building.town_block.v${variant + 1}`;
 }
 
+/**
+ * Hazama (loophole) walls read as plain plaster walls except on straight
+ * runs: a straight mask already implies at least three wall cells in a row,
+ * which is exactly the "loopholes only in long runs" placement rule —
+ * corners, ends and junctions fall back to the plaster kit. The
+ * maru/sankaku/shikaku opening cycles deterministically along the run axis.
+ */
+function hazamaWallAssetId(world: WorldState, building: BuildingState): string {
+  const mask = connectionMask(world, building);
+  if (mask === "0101" || mask === "1010") {
+    const along = mask === "0101" ? building.position.x : building.position.y;
+    const shape = ((along % 3) + 3) % 3;
+    return `building.wall.hazama.connected.${mask}.s${shape}`;
+  }
+  return `building.wall.plaster.connected.${mask}`;
+}
+
 function connectedGateAssetId(world: WorldState, gate: BuildingState): string {
   const orientation = isNeSwGate(gate.type) ? "ne_sw" : "nw_se";
   const state = gate.gateState ?? "closed";
@@ -452,7 +474,8 @@ function gateConnectionMask(world: WorldState, gate: BuildingState): string {
   return cardinalDirections
     .map((_, index) => {
       const endpoint = endpointCells[index];
-      return endpoint != null && getBuildingAt(world, endpoint)?.type === "wall" ? "1" : "0";
+      const neighborType = endpoint != null ? getBuildingAt(world, endpoint)?.type : undefined;
+      return neighborType !== undefined && isWall(neighborType) ? "1" : "0";
     })
     .join("");
 }
@@ -494,7 +517,7 @@ function connectionMask(world: WorldState, building: BuildingState): string {
 }
 
 function connectsToAdjacentGateFootprint(world: WorldState, building: BuildingState, direction: CellCoord): boolean {
-  if (building.type !== "fence" && building.type !== "wall") {
+  if (building.type !== "fence" && !isWall(building.type)) {
     return false;
   }
 
@@ -544,8 +567,8 @@ function connectsTo(building: BuildingState, neighbor: BuildingState | null): bo
     return neighbor.type === "fence";
   }
 
-  if (building.type === "wall") {
-    return neighbor.type === "wall";
+  if (isWall(building.type)) {
+    return isWall(neighbor.type);
   }
 
   return (

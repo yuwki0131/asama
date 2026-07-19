@@ -307,7 +307,7 @@ describe("elevation: interaction on high ground", () => {
 
   it("places a wall on the level-2 terrace via a click at the lifted cell", async () => {
     await centerOnHill();
-    await page.getByRole("button", { name: "壁" }).click();
+    await page.getByRole("button", { name: "壁", exact: true }).click();
     const point = await cellToScreen(page, TERRACE_BUILD_CELL);
     expect(point).not.toBeNull();
     await page.mouse.click(point!.x, point!.y);

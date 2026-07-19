@@ -258,6 +258,7 @@ export const SIEGE_BALANCE = {
  * must never be targeted. */
 export const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
   "wall",
+  "hazama_wall",
   "fence",
   "gate_wide_2",
   "gate_wide_3",
@@ -333,6 +334,10 @@ export function isGate(type: BuildingType): boolean {
     type === "gate_wide_3_ne_sw" ||
     type === "gate_narrow_3_ne_sw"
   );
+}
+
+export function isWall(type: BuildingType): boolean {
+  return type === "wall" || type === "hazama_wall";
 }
 
 export function isNeSwGate(type: BuildingType): boolean {
