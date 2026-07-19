@@ -119,7 +119,7 @@ describe("functional: drag-build walls", () => {
 
   it("dragging wall tool across 5 cells places 5 wall buildings", async () => {
     // Click the "壁" (wall) button in the build toolbar
-    await page.getByRole("button", { name: "壁" }).click();
+    await page.getByRole("button", { name: "壁", exact: true }).click();
 
     // Cells to drag across: {46,65}→{46,69} — open terrain south of the outer ring.
     // Using x=46 constant, y increments from 65 to 69 = 5 cells.
@@ -182,7 +182,7 @@ describe("functional: right-click cancels build tool", () => {
 
   it("right-clicking during build mode resets tool to Select (null)", async () => {
     // Select the wall build tool via the button
-    await page.getByRole("button", { name: "壁" }).click();
+    await page.getByRole("button", { name: "壁", exact: true }).click();
 
     // Verify wall tool is now active
     const toolBefore = await page.evaluate(() => window.__asamaTest?.getBuildTool());
