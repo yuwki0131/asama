@@ -42,22 +42,144 @@ const BLACK: readonly [number, number, number, number] = [5, 5, 5, 255];
 const CLEAR: readonly [number, number, number, number] = [0, 0, 0, 0];
 
 describe("GEO-01 checkBuildingGeometry", () => {
-  it("passes a compliant H-32 building", () => {
+  it("passes a compliant H-32 standard lot", () => {
     expect(
       checkBuildingGeometry({ assetId: "building.storehouse", kind: "building", width: 224, height: 176, anchor: { x: 0.5, y: 144 / 176 } })
     ).toBeNull();
   });
 
-  it("flags an anchor off the H-32 row", () => {
+  it("flags a standard lot off the H-32 row", () => {
     const violation = checkBuildingGeometry({
-      assetId: "building.farm",
+      assetId: "building.storehouse",
       kind: "building",
-      width: 256,
-      height: 128,
+      width: 224,
+      height: 176,
       anchor: { x: 0.5, y: 0.5 }
     });
     expect(violation?.ruleId).toBe("GEO-01");
     expect(violation?.message).toContain("H-32");
+  });
+
+  it("allows the half-tile X offset of non-square standard lots (4x3 barracks/market)", () => {
+    // South-corner anchor sits (fw-fh)*16 = 16px right of canvas center.
+    expect(
+      checkBuildingGeometry({ assetId: "building.barracks", kind: "building", width: 256, height: 192, anchor: { x: 0.5625, y: 160 / 192 } })
+    ).toBeNull();
+    expect(
+      checkBuildingGeometry({ assetId: "building.market", kind: "building", width: 256, height: 192, anchor: { x: 0.5625, y: 160 / 192 } })
+    ).toBeNull();
+  });
+
+  it("flags a non-square standard lot whose anchor ignores the half-tile offset", () => {
+    const violation = checkBuildingGeometry({
+      assetId: "building.barracks",
+      kind: "building",
+      width: 256,
+      height: 192,
+      anchor: { x: 0.5, y: 160 / 192 }
+    });
+    expect(violation?.ruleId).toBe("GEO-01");
+    expect(violation?.threshold).toContain("144.0");
+  });
+
+  it("flags the legacy benchmark tenshu.test canvas (90px apron)", () => {
+    const violation = checkBuildingGeometry({
+      assetId: "building.tenshu.test",
+      kind: "building",
+      width: 640,
+      height: 520,
+      anchor: { x: 0.5, y: 430 / 520 }
+    });
+    expect(violation?.ruleId).toBe("GEO-01");
+  });
+
+  it("passes ground tile kits with the diamond bottom on the canvas edge (height-16)", () => {
+    expect(
+      checkBuildingGeometry({ assetId: "building.fence.wood.connected.0101", kind: "building", width: 64, height: 64, anchor: { x: 0.5, y: 0.75 } })
+    ).toBeNull();
+    expect(
+      checkBuildingGeometry({ assetId: "building.wall.plaster", kind: "building", width: 64, height: 96, anchor: { x: 0.5, y: 80 / 96 } })
+    ).toBeNull();
+    expect(
+      checkBuildingGeometry({ assetId: "building.road.connected.1111", kind: "building", width: 64, height: 32, anchor: { x: 0.5, y: 0.5 } })
+    ).toBeNull();
+    expect(
+      checkBuildingGeometry({ assetId: "deco.tree.pine.1", kind: "building", width: 64, height: 112, anchor: { x: 0.5, y: 96 / 112 } })
+    ).toBeNull();
+  });
+
+  it("flags a ground tile whose anchor drifts off the diamond center", () => {
+    const violation = checkBuildingGeometry({
+      assetId: "building.fence.wood",
+      kind: "building",
+      width: 64,
+      height: 64,
+      anchor: { x: 0.5, y: 0.5 }
+    });
+    expect(violation?.ruleId).toBe("GEO-01");
+    expect(violation?.message).toContain("ground-tile");
+  });
+
+  it("passes recessed moat kits anchored 16px from the canvas top", () => {
+    expect(
+      checkBuildingGeometry({ assetId: "building.dry_moat.connected.0101", kind: "building", width: 64, height: 48, anchor: { x: 0.5, y: 16 / 48 } })
+    ).toBeNull();
+    expect(
+      checkBuildingGeometry({ assetId: "building.water_moat", kind: "building", width: 64, height: 32, anchor: { x: 0.5, y: 0.5 } })
+    ).toBeNull();
+  });
+
+  it("passes gates on the 8px-pad block diamond formula (height-8-(n+1)*8)", () => {
+    // 2-cell gate: 144 - 8 - 24 = row 112
+    expect(
+      checkBuildingGeometry({ assetId: "building.gate.wood.closed.width2", kind: "building", width: 160, height: 144, anchor: { x: 0.5, y: 112 / 144 } })
+    ).toBeNull();
+    // 3-cell gates: 160 - 8 - 32 = row 120
+    expect(
+      checkBuildingGeometry({ assetId: "building.gate.wood.closed.width3", kind: "building", width: 224, height: 160, anchor: { x: 0.5, y: 120 / 160 } })
+    ).toBeNull();
+    expect(
+      checkBuildingGeometry({ assetId: "building.gate.wood.open.ne_sw.narrow3.connected.1010", kind: "building", width: 224, height: 160, anchor: { x: 0.5, y: 120 / 160 } })
+    ).toBeNull();
+  });
+
+  it("flags a 3-cell gate anchored on the 2-cell row", () => {
+    const violation = checkBuildingGeometry({
+      assetId: "building.gate.wood.closed.width3",
+      kind: "building",
+      width: 224,
+      height: 160,
+      anchor: { x: 0.5, y: 128 / 160 }
+    });
+    expect(violation?.ruleId).toBe("GEO-01");
+    expect(violation?.message).toContain("gate(3-cell)");
+  });
+
+  it("passes bridge decks at their per-material height (earth 24 / wood 32)", () => {
+    expect(
+      checkBuildingGeometry({ assetId: "building.earth_bridge.x.mid", kind: "building", width: 64, height: 48, anchor: { x: 0.5, y: 0.5 } })
+    ).toBeNull();
+    expect(
+      checkBuildingGeometry({ assetId: "building.wood_bridge.y.start", kind: "building", width: 64, height: 72, anchor: { x: 0.5, y: 40 / 72 } })
+    ).toBeNull();
+  });
+
+  it("passes a flat lot (farm) centered on its footprint diamond", () => {
+    expect(
+      checkBuildingGeometry({ assetId: "building.farm.autumn", kind: "building", width: 256, height: 128, anchor: { x: 0.5, y: 0.5 } })
+    ).toBeNull();
+  });
+
+  it("flags a flat lot whose canvas breaks the diamond aspect", () => {
+    const violation = checkBuildingGeometry({
+      assetId: "building.farm",
+      kind: "building",
+      width: 256,
+      height: 160,
+      anchor: { x: 0.5, y: 0.5 }
+    });
+    expect(violation?.ruleId).toBe("GEO-01");
+    expect(violation?.threshold).toContain("width=2*height");
   });
 
   it("ignores non-building assets", () => {
