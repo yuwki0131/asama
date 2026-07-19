@@ -311,17 +311,6 @@
       }
     },
     {
-      "assetId": "building.wood_bridge",
-      "kind": "building",
-      "file": "generated/building-wood-bridge.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
-      }
-    },
-    {
       "assetId": "building.fence.wood",
       "kind": "building",
       "file": "generated/building-fence-wood.png",
@@ -1705,17 +1694,6 @@
       "anchor": {
         "x": 0.5,
         "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-y.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
       }
     },
     {
@@ -4821,72 +4799,6 @@
       }
     },
     {
-      "assetId": "building.wood_bridge.x.start",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-x-start.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x.mid",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-x-mid.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.x.end",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-x-end.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y.start",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-y-start.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y.mid",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-y-mid.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
-      }
-    },
-    {
-      "assetId": "building.wood_bridge.y.end",
-      "kind": "building",
-      "file": "generated/building-wood-bridge-y-end.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5555555555555556
-      }
-    },
-    {
       "assetId": "building.gate.wood.closed.narrow3",
       "kind": "building",
       "file": "generated/building-gate-wood-closed-narrow3.png",
@@ -6270,6 +6182,94 @@
       "anchor": {
         "x": 0.5,
         "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "building.wood_bridge",
+      "kind": "building",
+      "file": "generated/building-wood-bridge.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.start",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-x-start.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.mid",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-x-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.x.end",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-x-end.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.start",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y-start.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.mid",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
+      }
+    },
+    {
+      "assetId": "building.wood_bridge.y.end",
+      "kind": "building",
+      "file": "generated/building-wood-bridge-y-end.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5555555555555556
       }
     }
   ],
