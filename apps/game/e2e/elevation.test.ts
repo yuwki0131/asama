@@ -61,7 +61,7 @@ beforeAll(async () => {
 /** Asset loading + first terrain build can take several seconds on a cold
  *  dev server; poll until most of the canvas differs from the empty clear
  *  color (#1c2227; terrain is much brighter even through the tone grade). */
-async function waitForSceneRender(timeoutMs = 30_000): Promise<void> {
+async function waitForSceneRender(timeoutMs = 90_000): Promise<void> {
   const canvas = page.locator(".game-view canvas:not(.minimap)");
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {

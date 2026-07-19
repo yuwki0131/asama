@@ -30,7 +30,7 @@ import bpy
 from .. import core
 from ..core import add_beam, add_box, add_mesh, finish_material, make_material, map_box, map_xy
 from ..materials import (
-    make_grass_material,
+    make_macro_terrain_material,
     make_noise_material,
 )
 
@@ -669,7 +669,8 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str, half: str | None = Non
     rib = make_material("SlopeRib", (0.088, 0.066, 0.042, 1.0))
     stone = make_noise_material("SlopeStone", (0.108, 0.100, 0.090), (0.172, 0.162, 0.146), scale=6.0)
     flank = make_noise_material("SlopeFlank", (0.105, 0.085, 0.060), (0.205, 0.172, 0.126), scale=7.0)
-    grass = make_grass_material()
+    # Macro-family grass so slope caps/tongues tonally match the map tiles.
+    grass = make_macro_terrain_material("grass", 0, 0, 0)
     grass_dark, grass_light = _grass_lip_materials()
 
     _slope_relief_surface(scene, "Surface", pt, seed, dirt, z_of=z_of)
