@@ -491,6 +491,27 @@ def apply_cart_walk(scene: bpy.types.Scene, rig: bpy.types.Object, frame_count: 
         # Slight vertical bob as the cart rolls over uneven ground.
         bones["cart_body"].location = (0.0, 0.0, -0.008 * math.sin(phase) ** 2)
 
+        # Pennant streams and snaps in the travel wind (double frequency).
+        bones["flag"].rotation_euler = (
+            0.10 * math.sin(2.0 * phase + 0.8),
+            0.40 * math.sin(2.0 * phase),
+            0.0,
+        )
+
+        _key_pose_for_list(rig, f, CART_BONES)
+
+
+def apply_cart_idle(scene: bpy.types.Scene, rig: bpy.types.Object, frame_count: int) -> None:
+    """Parked cart: body and wheels rest; only the pennant sways in the breeze."""
+    _begin(scene, rig, frame_count)
+    bones = rig.pose.bones
+    for f in range(1, frame_count + 1):
+        phase = 2.0 * math.pi * (f - 1) / frame_count
+        bones["flag"].rotation_euler = (
+            0.08 * math.sin(2.0 * phase + 0.7),
+            0.30 * math.sin(phase),
+            0.0,
+        )
         _key_pose_for_list(rig, f, CART_BONES)
 
 
@@ -545,5 +566,6 @@ ACTIONS: dict[str, object] = {
 
     # --- supply cart ---
     "unit-supply-cart-rigged:walk":  apply_cart_walk,
+    "unit-supply-cart-rigged:idle":  apply_cart_idle,
     "unit-supply-cart-rigged:death": apply_cart_death,
 }

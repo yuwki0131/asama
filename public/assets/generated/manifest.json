@@ -7031,6 +7031,42 @@
       }
     },
     {
+      "assetId": "unit.supply_cart.anim.idle",
+      "unitAssetId": "unit.supply_cart",
+      "action": "idle",
+      "kind": "unit",
+      "file": "generated/unit-supply-cart-idle-sheet.png",
+      "sheet": {
+        "width": 336,
+        "height": 384
+      },
+      "frame": {
+        "width": 56,
+        "height": 48
+      },
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "directions": [
+        "s",
+        "se",
+        "e",
+        "ne",
+        "n",
+        "nw",
+        "w",
+        "sw"
+      ],
+      "layout": {
+        "columns": "frames",
+        "rows": "directions"
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7916666666666666
+      }
+    },
+    {
       "assetId": "unit.supply_cart.anim.walk",
       "unitAssetId": "unit.supply_cart",
       "action": "walk",

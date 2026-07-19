@@ -439,14 +439,6 @@
       "ruleId": "NOISE-03"
     },
     {
-      "assetId": "unit.supply_cart.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.supply_cart.anim.walk",
-      "ruleId": "NOISE-01"
-    },
-    {
       "assetId": "unit.supply_cart.idle.south",
       "ruleId": "NOISE-03"
     },
