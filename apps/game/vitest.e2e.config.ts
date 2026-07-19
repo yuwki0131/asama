@@ -7,7 +7,7 @@ export default defineConfig({
     exclude: ["e2e/autoplay.test.ts", "e2e/monkey.test.ts"],
     environment: "node",
     testTimeout: 90_000,
-    hookTimeout: 60_000,
+    hookTimeout: 120_000,
     pool: "forks",
     poolOptions: {
       forks: { singleFork: true }

@@ -2049,94 +2049,6 @@
       }
     },
     {
-      "assetId": "terrain.slope.dirt.n",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-n.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope.dirt.e",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-e.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope.dirt.s",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-s.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope.dirt.w",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-w.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope.dirt.n.side.e",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-n-side-e.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope.dirt.s.side.e",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-s-side-e.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope.dirt.e.side.s",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-e-side-s.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope.dirt.w.side.s",
-      "kind": "terrain",
-      "file": "generated/terrain-slope-dirt-w-side-s.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
       "assetId": "terrain.slope.ishigaki.n",
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-n.png",
@@ -2217,94 +2129,6 @@
       "assetId": "terrain.slope.ishigaki.w.side.s",
       "kind": "terrain",
       "file": "generated/terrain-slope-ishigaki-w-side-s.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.n.lower",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-n-lower.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.n.upper",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-n-upper.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.e.lower",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-e-lower.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.e.upper",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-e-upper.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.s.lower",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-s-lower.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.s.upper",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-s-upper.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.w.lower",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-w-lower.png",
-      "width": 64,
-      "height": 72,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7777777777777778
-      }
-    },
-    {
-      "assetId": "terrain.slope2.dirt.w.upper",
-      "kind": "terrain",
-      "file": "generated/terrain-slope2-dirt-w-upper.png",
       "width": 64,
       "height": 72,
       "anchor": {
@@ -6270,6 +6094,182 @@
       "anchor": {
         "x": 0.5,
         "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.n",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-n.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.e",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-e.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.s",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-s.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.w",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-w.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.n.side.e",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-n-side-e.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.s.side.e",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-s-side-e.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.e.side.s",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-e-side-s.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.dirt.w.side.s",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-dirt-w-side-s.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.n.lower",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-n-lower.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.n.upper",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-n-upper.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.e.lower",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-e-lower.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.e.upper",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-e-upper.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.s.lower",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-s-lower.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.s.upper",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-s-upper.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.w.lower",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-w-lower.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.w.upper",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-w-upper.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
       }
     }
   ],

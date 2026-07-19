@@ -33,33 +33,6 @@ def make_noise_material(name: str, dark: tuple[float, float, float], light: tupl
     return material
 
 
-def make_grass_material() -> bpy.types.Material:
-    """Low-saturation grass with subtle large-scale noise variation."""
-    material = bpy.data.materials.new("Grass")
-    material.use_nodes = True
-    nodes = material.node_tree.nodes
-    links = material.node_tree.links
-    bsdf = nodes.get("Principled BSDF")
-    bsdf.inputs["Roughness"].default_value = 1.0
-
-    noise = nodes.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 6.0
-    noise.inputs["Detail"].default_value = 4.0
-
-    ramp = nodes.new("ShaderNodeValToRGB")
-    ramp.color_ramp.elements[0].position = 0.35
-    ramp.color_ramp.elements[0].color = (0.208, 0.294, 0.157, 1.0)
-    ramp.color_ramp.elements[1].position = 0.75
-    ramp.color_ramp.elements[1].color = (0.322, 0.412, 0.204, 1.0)
-
-    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
-    if core.CURRENT_STYLE == "pbr":
-        links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
-    else:
-        finish_material(material, ramp.outputs["Color"])
-    return material
-
-
 # Terrain kit ----------------------------------------------------------------
 TERRAIN_EDGE_WIDTH = 0.14
 
