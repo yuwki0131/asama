@@ -17,7 +17,7 @@ import { connectedTerrainAssetId, getCell } from "./map";
 
 const LOT_BUILDING_TYPES = new Set<BuildingType>([
   "tenshu", "storehouse", "market", "barracks",
-  "samurai_residence", "town_block", "farm", "yagura", "honmaru"
+  "samurai_residence", "town_block", "garden", "farm", "yagura", "honmaru"
 ]);
 
 export function isLotBuilding(type: BuildingType): boolean {
@@ -395,6 +395,10 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
     return townBlockVariantAssetId(building.position);
   }
 
+  if (building.type === "garden") {
+    return gardenVariantAssetId(building.position);
+  }
+
   if (building.type === "hazama_wall") {
     return hazamaWallAssetId(world, building);
   }
@@ -433,6 +437,22 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
  * Variant 0 keeps the original assetId so old snapshots and missing variant
  * art fall back to the existing sprite.
  */
+/**
+ * Garden lots cycle four visual variants by 2x2 lot coordinate so tiled
+ * compositions read as one landscaped garden. The form (u + 3v mod 4) on
+ * lot coords cycles through all four variants along both rows and columns,
+ * so grid-aligned orthogonal neighbors never repeat; only diagonal
+ * neighbors (offset 4) may.
+ */
+export const GARDEN_VARIANT_COUNT = 4;
+
+export function gardenVariantAssetId(position: CellCoord): string {
+  const lotX = Math.floor(position.x / 2);
+  const lotY = Math.floor(position.y / 2);
+  const variant = (((lotX + lotY * 3) % GARDEN_VARIANT_COUNT) + GARDEN_VARIANT_COUNT) % GARDEN_VARIANT_COUNT;
+  return `building.garden.v${variant}`;
+}
+
 export const TOWN_BLOCK_VARIANT_COUNT = 5;
 
 export function townBlockVariantAssetId(position: CellCoord): string {

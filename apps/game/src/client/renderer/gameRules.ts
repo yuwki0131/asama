@@ -153,6 +153,10 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.town_block";
   }
 
+  if (building.type === "garden") {
+    return "building.garden.v0";
+  }
+
   if (building.type === "farm") {
     return "building.farm";
   }
