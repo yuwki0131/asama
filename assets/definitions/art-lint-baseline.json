@@ -3,148 +3,16 @@
   "note": "既知のアートルール違反 (docs/05_map-and-art/art-rulebook.md)。段階導入用: ここに載っている assetId×ruleId は assets:lint:art で fail しない。修正したらエントリを削除すること。再生成: assets:lint:art --write-baseline",
   "entries": [
     {
-      "assetId": "building.tenshu.test",
-      "ruleId": "GEO-01"
-    },
-    {
-      "assetId": "deco.bamboo.1",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "deco.reeds.1",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "deco.tree.pine.2",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "deco.weeds.1",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "overlay.cell.selected",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "terrain.slope.dirt.e",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "terrain.slope.dirt.s",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.archer.anim.attack",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.archer.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.archer.anim.idle",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.archer.anim.walk",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.archer.idle.south",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.cavalry.anim.attack",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.cavalry.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.cavalry.anim.idle",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.cavalry.anim.walk",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.cavalry.idle.south",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.engineer.anim.attack",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.engineer.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.musketeer.anim.attack",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.musketeer.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.musketeer.anim.idle",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.musketeer.anim.walk",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.spear_ashigaru.anim.attack",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.spear_ashigaru.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.spear_ashigaru.anim.idle",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.spear_ashigaru.anim.walk",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.spear_ashigaru.idle.south",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.supply_cart.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.supply_cart.anim.walk",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.sword_ashigaru.anim.attack",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.sword_ashigaru.anim.death",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.sword_ashigaru.anim.idle",
-      "ruleId": "NOISE-01"
-    },
-    {
-      "assetId": "unit.sword_ashigaru.anim.walk",
-      "ruleId": "NOISE-01"
+      "assetId": "building.barracks",
+      "ruleId": "NOISE-03"
     },
     {
       "assetId": "building.fence.wood",
       "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.fence.wood",
+      "ruleId": "NOISE-03"
     },
     {
       "assetId": "building.fence.wood.connected.0000",
@@ -155,24 +23,48 @@
       "ruleId": "NOISE-02"
     },
     {
+      "assetId": "building.fence.wood.connected.0010",
+      "ruleId": "NOISE-03"
+    },
+    {
       "assetId": "building.fence.wood.connected.0011",
       "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.fence.wood.connected.0011",
+      "ruleId": "NOISE-03"
     },
     {
       "assetId": "building.fence.wood.connected.0100",
       "ruleId": "NOISE-02"
     },
     {
+      "assetId": "building.fence.wood.connected.0100",
+      "ruleId": "NOISE-03"
+    },
+    {
       "assetId": "building.fence.wood.connected.0101",
       "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.fence.wood.connected.0101",
+      "ruleId": "NOISE-03"
     },
     {
       "assetId": "building.fence.wood.connected.0110",
       "ruleId": "NOISE-02"
     },
     {
+      "assetId": "building.fence.wood.connected.0110",
+      "ruleId": "NOISE-03"
+    },
+    {
       "assetId": "building.fence.wood.connected.0111",
       "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.fence.wood.connected.0111",
+      "ruleId": "NOISE-03"
     },
     {
       "assetId": "building.fence.wood.connected.1001",
@@ -183,80 +75,20 @@
       "ruleId": "NOISE-02"
     },
     {
-      "assetId": "building.fence.wood.connected.1011",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.fence.wood.connected.1100",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.fence.wood.connected.1101",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.fence.wood.connected.1110",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.fence.wood.connected.1111",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.market",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.wall.plaster",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1010",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.wall.plaster.connected.1110",
-      "ruleId": "NOISE-02"
-    },
-    {
-      "assetId": "building.barracks",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.fence.wood",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.fence.wood.connected.0010",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.fence.wood.connected.0011",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.fence.wood.connected.0100",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.fence.wood.connected.0101",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.fence.wood.connected.0110",
-      "ruleId": "NOISE-03"
-    },
-    {
-      "assetId": "building.fence.wood.connected.0111",
-      "ruleId": "NOISE-03"
-    },
-    {
       "assetId": "building.fence.wood.connected.1010",
       "ruleId": "NOISE-03"
     },
     {
       "assetId": "building.fence.wood.connected.1011",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.fence.wood.connected.1011",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "building.fence.wood.connected.1100",
+      "ruleId": "NOISE-02"
     },
     {
       "assetId": "building.fence.wood.connected.1100",
@@ -264,11 +96,23 @@
     },
     {
       "assetId": "building.fence.wood.connected.1101",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.fence.wood.connected.1101",
       "ruleId": "NOISE-03"
     },
     {
       "assetId": "building.fence.wood.connected.1110",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.fence.wood.connected.1110",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "building.fence.wood.connected.1111",
+      "ruleId": "NOISE-02"
     },
     {
       "assetId": "building.fence.wood.connected.1111",
@@ -371,8 +215,36 @@
       "ruleId": "NOISE-03"
     },
     {
+      "assetId": "building.market",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.tenshu.test",
+      "ruleId": "GEO-01"
+    },
+    {
       "assetId": "building.tenshu.test",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "building.wall.plaster",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0010",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1000",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010",
+      "ruleId": "NOISE-02"
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1110",
+      "ruleId": "NOISE-02"
     },
     {
       "assetId": "building.wood_bridge",
@@ -408,7 +280,15 @@
     },
     {
       "assetId": "deco.bamboo.1",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "deco.bamboo.1",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "deco.reeds.1",
+      "ruleId": "NOISE-01"
     },
     {
       "assetId": "deco.reeds.1",
@@ -424,11 +304,23 @@
     },
     {
       "assetId": "deco.tree.pine.2",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "deco.tree.pine.2",
       "ruleId": "NOISE-03"
     },
     {
       "assetId": "deco.weeds.1",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "deco.weeds.1",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "overlay.cell.selected",
+      "ruleId": "NOISE-01"
     },
     {
       "assetId": "overlay.path.step",
@@ -439,24 +331,140 @@
       "ruleId": "NOISE-03"
     },
     {
+      "assetId": "terrain.slope.dirt.e",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "terrain.slope.dirt.s",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.archer.anim.attack",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.archer.anim.death",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.archer.anim.idle",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.archer.anim.walk",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.archer.idle.south",
+      "ruleId": "NOISE-01"
+    },
+    {
       "assetId": "unit.archer.idle.south",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "unit.cavalry.anim.attack",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.cavalry.anim.death",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.cavalry.anim.idle",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.cavalry.anim.walk",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.cavalry.idle.south",
+      "ruleId": "NOISE-01"
     },
     {
       "assetId": "unit.cavalry.idle.south",
       "ruleId": "NOISE-03"
     },
     {
+      "assetId": "unit.engineer.anim.attack",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.engineer.anim.death",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.musketeer.anim.attack",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.musketeer.anim.death",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.musketeer.anim.idle",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.musketeer.anim.walk",
+      "ruleId": "NOISE-01"
+    },
+    {
       "assetId": "unit.musketeer.idle.south",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "unit.spear_ashigaru.anim.attack",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.spear_ashigaru.anim.death",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.spear_ashigaru.anim.idle",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.spear_ashigaru.anim.walk",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.spear_ashigaru.idle.south",
+      "ruleId": "NOISE-01"
     },
     {
       "assetId": "unit.spear_ashigaru.idle.south",
       "ruleId": "NOISE-03"
     },
     {
+      "assetId": "unit.supply_cart.anim.death",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.supply_cart.anim.walk",
+      "ruleId": "NOISE-01"
+    },
+    {
       "assetId": "unit.supply_cart.idle.south",
       "ruleId": "NOISE-03"
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.attack",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.death",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.idle",
+      "ruleId": "NOISE-01"
+    },
+    {
+      "assetId": "unit.sword_ashigaru.anim.walk",
+      "ruleId": "NOISE-01"
     }
   ]
 }
