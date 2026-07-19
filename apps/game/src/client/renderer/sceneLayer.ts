@@ -22,7 +22,13 @@ import {
   UNIT_GROUND_OFFSET_Y
 } from "./camera";
 import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
-import { bridgeCellAssetCandidates, buildingAssetCandidates, honmaruCellAssetCandidates, isBridgeBuildingType } from "./gameRules";
+import {
+  bridgeCellAssetCandidates,
+  bridgeDeckLiftAt,
+  buildingAssetCandidates,
+  honmaruCellAssetCandidates,
+  isBridgeBuildingType
+} from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, footprintBounds, isoBehind } from "./renderGeometry";
 import type { FootprintRect } from "./renderGeometry";
@@ -98,6 +104,7 @@ export class RetainedScene {
   private readonly dyingVisuals = new Map<UnitId, UnitVisual>();
   private decorationVisuals: DecorationVisual[] = [];
   private flagVisuals: FlagVisual[] = [];
+  private bridgeLiftByCell = new Map<string, number>();
   private staticSignature: string | null = null;
   private lastSnapshot: WorldSnapshot | null = null;
   private lastAssets: ReadonlyMap<string, LoadedAsset> | null = null;
@@ -145,8 +152,25 @@ export class RetainedScene {
       this.staticSignature = signature;
     }
 
+    if (snapshotChanged) {
+      this.rebuildBridgeLifts(snapshot);
+    }
     if (snapshotChanged || assetsChanged || sheetsChanged) {
       this.syncUnits(snapshot, assets);
+    }
+  }
+
+  /** Per-cell deck lifts so units render standing on bridge decks. */
+  private rebuildBridgeLifts(snapshot: WorldSnapshot): void {
+    this.bridgeLiftByCell.clear();
+    for (const building of snapshot.buildings) {
+      if (!isBridgeBuildingType(building.type) || building.lifecycleState !== "intact") {
+        continue;
+      }
+      const cells = building.footprint.length > 0 ? building.footprint : [building.position];
+      for (const cell of cells) {
+        this.bridgeLiftByCell.set(`${cell.x},${cell.y}`, bridgeDeckLiftAt(building, cell));
+      }
     }
   }
 
@@ -164,7 +188,8 @@ export class RetainedScene {
     screenHeight: number
   ): void {
     const map = this.lastSnapshot?.map ?? null;
-    const surfaceOffsetAt = (cell: CellCoord): number => surfaceOffsetYAt(map, cell);
+    const surfaceOffsetAt = (cell: CellCoord): number =>
+      surfaceOffsetYAt(map, cell) - (this.bridgeLiftByCell.get(`${cell.x},${cell.y}`) ?? 0);
     for (const visual of this.unitVisuals.values()) {
       const target = interpolateUnitRenderPosition(visual.unit, elapsedTicks, surfaceOffsetAt);
       const display = resolveDisplayPosition(visual.displayPosition, target, frameDeltaMs);
