@@ -57,6 +57,11 @@ function parseArgs(argv) {
       if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Error("--cell expects x,y");
       options.cell = { x, y };
     } else if (arg === "--zoom") options.zoom = Number(next());
+    else if (arg === "--viewport") {
+      const [width, height] = next().split("x").map(Number);
+      if (!Number.isFinite(width) || !Number.isFinite(height)) throw new Error("--viewport expects WxH");
+      options.viewport = { width, height };
+    }
     else if (arg === "--tick") options.tick = Number(next());
     else if (arg === "--settle") options.settleMs = Number(next());
     else if (arg === "--help" || arg === "-h") {
@@ -65,7 +70,7 @@ function parseArgs(argv) {
           "Usage:",
           "  node qa/shot.mjs --preset <name> [--shot <shotName>] [--out-dir dir] [--base-url url]",
           "  node qa/shot.mjs --url <url> --out <path> [--cell x,y] [--zoom n]",
-          "Options: --settle <ms> (asset settle wait, default 15000)",
+          "Options: --settle <ms> (asset settle wait, default 15000), --viewport WxH (default 1600x1000)",
           `Presets: ${REVIEW_SHOTS_PATH}`
         ].join("\n")
       );
