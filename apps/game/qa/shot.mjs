@@ -91,14 +91,20 @@ async function resolveShots(options) {
     if (shots.length === 0) {
       throw new Error(`Preset "${options.preset}" has no shot named "${options.shot}"`);
     }
-    return shots.map((shot) => ({
-      url: `${options.baseUrl}/?scenario=${encodeURIComponent(shot.scenario)}`,
-      out: join(options.outDir, `${options.preset}-${shot.name}.png`),
-      cell: shot.cell,
-      zoom: shot.zoom ?? 0,
-      tick: shot.tick ?? null,
-      label: `${options.preset}/${shot.name} — ${shot.description ?? ""}`
-    }));
+    return shots.map((shot) => {
+      // 3D trial preset shots can request the trial renderer via ?renderer=3d;
+      // omit to keep the shipped 2D renderer.
+      const params = new URLSearchParams({ scenario: shot.scenario });
+      if (shot.renderer !== undefined) params.set("renderer", shot.renderer);
+      return {
+        url: `${options.baseUrl}/?${params.toString()}`,
+        out: join(options.outDir, `${options.preset}-${shot.name}.png`),
+        cell: shot.cell,
+        zoom: shot.zoom ?? 0,
+        tick: shot.tick ?? null,
+        label: `${options.preset}/${shot.name} — ${shot.description ?? ""}`
+      };
+    });
   }
   if (options.url === null || options.out === null) {
     throw new Error("Either --preset or both --url and --out are required (see --help)");

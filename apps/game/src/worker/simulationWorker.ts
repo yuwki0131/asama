@@ -1,5 +1,5 @@
 import { createInitialWorld, applyCommand, deserializeWorld, serializeWorld, snapshotWorld, updateWorld } from "@asama/simulation";
-import { DEFAULT_SCENARIO, scenarios } from "@asama/content";
+import { DEFAULT_SCENARIO, allScenarios } from "@asama/content";
 import {
   SIM_TICKS_PER_SECOND,
   SNAPSHOTS_PER_SECOND,
@@ -14,11 +14,11 @@ function scenarioForId(scenarioId: string | undefined): ScenarioDefinition {
     return elevationFixtureScenario;
   }
   if (scenarioId !== undefined) {
-    const found = scenarios.find(s => s.id === scenarioId);
+    const found = allScenarios.find(s => s.id === scenarioId);
     if (found) return found;
     console.warn(
       `Unknown scenario id "${scenarioId}" — falling back to "${DEFAULT_SCENARIO.id}". ` +
-        `Available: ${scenarios.map(s => s.id).join(", ")}`
+        `Available: ${allScenarios.map(s => s.id).join(", ")}`
     );
   }
   return DEFAULT_SCENARIO;

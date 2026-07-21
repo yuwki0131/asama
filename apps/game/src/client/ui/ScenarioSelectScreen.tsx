@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { scenarios } from "@asama/content";
+import { scenarios, trialScenarios } from "@asama/content";
 import type { ContentScenarioDefinition } from "@asama/content";
+import { getRendererMode } from "../rendererMode";
 
 interface ScenarioSelectScreenProps {
   onSelect: (scenarioId: string) => void;
@@ -27,18 +28,30 @@ const SCENARIO_META: Record<string, { difficulty: string; isShowcase?: boolean }
   "stepped-fortress": { difficulty: "上級" },
   "five-tier-keep": { difficulty: "上級" },
   "free-play": { difficulty: "自由演習" },
+  "hybrid-renderer-trial": { difficulty: "3D TRIAL", isShowcase: true },
 };
 
-const SCENARIO_CARDS: readonly ScenarioCard[] = scenarios.map((scenario) => {
-  const meta = SCENARIO_META[scenario.id] ?? { difficulty: "標準" };
-  return {
-    id: scenario.id,
-    name: scenario.name,
-    difficulty: meta.difficulty,
-    description: (scenario as ContentScenarioDefinition).description ?? "",
-    isShowcase: meta.isShowcase ?? false,
-  };
-});
+/** Trial scenarios are only shown when the URL selects the 3D renderer, so
+ *  the shipped scenario picker stays unchanged for normal players. */
+function computeScenarioCards(): readonly ScenarioCard[] {
+  const rendererMode = getRendererMode();
+  const list: readonly ContentScenarioDefinition[] =
+    rendererMode === "3d"
+      ? [...(trialScenarios as readonly ContentScenarioDefinition[]), ...(scenarios as readonly ContentScenarioDefinition[])]
+      : (scenarios as readonly ContentScenarioDefinition[]);
+  return list.map((scenario) => {
+    const meta = SCENARIO_META[scenario.id] ?? { difficulty: "標準" };
+    return {
+      id: scenario.id,
+      name: scenario.name,
+      difficulty: meta.difficulty,
+      description: scenario.description ?? "",
+      isShowcase: meta.isShowcase ?? false,
+    };
+  });
+}
+
+const SCENARIO_CARDS: readonly ScenarioCard[] = computeScenarioCards();
 
 export function ScenarioSelectScreen({ onSelect }: ScenarioSelectScreenProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);

@@ -140,6 +140,51 @@
           "description": "第1波で (44,117) に湧く敵補給荷車。荷車は湧きセルから動かない(enemyAi)ので tick 3010 まで早送りして撮る"
         }
       ]
+    },
+    "hybrid-3d-trial": {
+      "description": "ハイブリッド2.5D試作: 3D地形+2Dビルボードの共存確認 (docs/09_technical-design/hybrid-3d-renderer.md)。全ショットで renderer=3d 必須。",
+      "shots": [
+        {
+          "name": "overview",
+          "scenario": "hybrid-renderer-trial",
+          "renderer": "3d",
+          "cell": { "x": 52, "y": 55 },
+          "zoom": -2,
+          "description": "トライアルシナリオの全景。曲輪(高台)・石垣・壁・門・矢倉・水堀・空堀・柵が1画面に収まる (HYBRID3D-01)"
+        },
+        {
+          "name": "curved-rampart",
+          "scenario": "hybrid-renderer-trial",
+          "renderer": "3d",
+          "cell": { "x": 46, "y": 56 },
+          "zoom": 3,
+          "description": "曲線状の石垣(rampart-sw)。折れ点で継ぎ目が破綻していないこと・16方向タイル無しで表現できることを確認 (HYBRID3D-02)"
+        },
+        {
+          "name": "wall-gate-yagura",
+          "scenario": "hybrid-renderer-trial",
+          "renderer": "3d",
+          "cell": { "x": 50, "y": 55 },
+          "zoom": 3,
+          "description": "石垣上の白壁と門(2D)と矢倉(2D)の共存。門ビルボードが3D壁と自然に連なるか (HYBRID3D-03)"
+        },
+        {
+          "name": "unit-occlusion",
+          "scenario": "hybrid-renderer-trial",
+          "renderer": "3d",
+          "cell": { "x": 52, "y": 57 },
+          "zoom": 1,
+          "description": "壁後方のユニットが壁で正しく遮蔽されるか(alphaTest+depthTest)。プレイヤー弓兵2体が壁の南側(手前)、槍・刀足軽が壁の北側(奥・曲輪上)に配置されており、透明ビルボードの前後関係が破綻していないこと (HYBRID3D-04)"
+        },
+        {
+          "name": "elevation",
+          "scenario": "hybrid-renderer-trial",
+          "renderer": "3d",
+          "cell": { "x": 52, "y": 54 },
+          "zoom": 3,
+          "description": "曲輪(標高1)と下段(標高0)の段差。石垣スロープ・坂道からのユニット登り降りが読み取れる (HYBRID3D-05)"
+        }
+      ]
     }
   }
 }

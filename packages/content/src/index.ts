@@ -7,6 +7,7 @@ import { cutPassFortScenario } from "./cut-pass-fort";
 import { castleTownGateScenario } from "./castle-town-gate";
 import { steppedFortressScenario } from "./stepped-fortress";
 import { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
+import { hybridRendererTrialScenario } from "./hybrid-renderer-trial";
 
 // --- Building and unit content definitions ---------------------------------
 //
@@ -1410,6 +1411,18 @@ export const scenarios: readonly ScenarioDefinition[] = [
 /** デフォルトシナリオ (初回プレイ = 環郭の城・入門)。 */
 export const DEFAULT_SCENARIO = concentricCastleScenario;
 
+/** Feasibility-test scenarios kept off the shipped roster. Discoverable by
+ *  the worker (via `allScenarios`) but not shown in the main select screen. */
+export const trialScenarios: readonly ContentScenarioDefinition[] = [
+  hybridRendererTrialScenario,
+];
+
+/** Every scenario known to the worker — roster + trial fixtures. */
+export const allScenarios: readonly ScenarioDefinition[] = [
+  ...scenarios,
+  ...trialScenarios,
+];
+
 export * from "./scripts";
 export { mountainCastleScenario } from "./mountain-castle";
 export { freePlayScenario } from "./free-play";
@@ -1419,3 +1432,8 @@ export { cutPassFortScenario } from "./cut-pass-fort";
 export { castleTownGateScenario } from "./castle-town-gate";
 export { steppedFortressScenario } from "./stepped-fortress";
 export { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
+export {
+  hybridRendererTrialScenario,
+  HYBRID_TRIAL_SCENARIO_ID,
+  isHybridTrialScenarioId,
+} from "./hybrid-renderer-trial";

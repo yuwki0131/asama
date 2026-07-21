@@ -182,6 +182,20 @@ button {
   min-height: 0;
 }
 
+/* 3D trial shell (single topbar + full-height canvas). */
+.app-3d-trial {
+  grid-template-rows: 44px 1fr;
+}
+.app-3d-trial .game-view {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.app-3d-trial .game-view > div[data-renderer-mode="3d"] {
+  width: 100%;
+  height: 100%;
+}
+
 .game-canvas {
   width: 100%;
   height: 100%;
