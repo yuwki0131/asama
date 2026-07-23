@@ -13,6 +13,7 @@ import { createSimulationClient, type SimulationClient } from "../worker-client/
 import { LoadingScreen } from "./LoadingScreen";
 import { ScenarioSelectScreen } from "./ScenarioSelectScreen";
 import { ThreeGameCanvas, type ThreeGameCanvasHandle } from "../renderer3d/ThreeGameCanvas";
+import { Minimap3d } from "../renderer3d/Minimap3d";
 import { TRIAL_SCENARIO_ID } from "../rendererMode";
 
 const DEV_SCENARIO_ID = import.meta.env.DEV
@@ -147,6 +148,15 @@ export function App3d() {
             snapshot={snapshot}
             onCellSelected={handleSelectCell}
           />
+          <div className="minimap-3d-wrap" title="クリックでカメラ移動">
+            <Minimap3d
+              snapshot={snapshot}
+              onJump={(cell) => gameCanvasRef.current?.jumpCameraToCell(cell)}
+            />
+            <div className="minimap-3d-help">
+              ↑↓←→/WASD: 移動 &nbsp; +/−: ズーム &nbsp; Home: 中心へ &nbsp; クリック: セル選択
+            </div>
+          </div>
         </section>
       </main>
       {!loadingFaded && (

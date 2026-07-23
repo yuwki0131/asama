@@ -17,8 +17,22 @@ import {
 import type { TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
 import { CELL_SIZE, ELEVATION_HEIGHT } from "./coord";
 
-const GRASS_COLOR = new Color(0x8fae65);
-const CLIFF_COLOR = new Color(0x8a7a63);
+// Per-elevation top color: distinct hues so terraces read at a glance.
+const ELEVATION_COLORS: readonly Color[] = [
+  new Color(0x88a85e), // level 0: grass
+  new Color(0xb4a878), // level 1: tan (raised bailey)
+  new Color(0xc9bfa2), // level 2: light stone plateau
+  new Color(0xd4c7a4), // level 3
+  new Color(0xdac9a4), // level 4
+  new Color(0xe0cea6), // level 5
+];
+const WATER_TOP = new Color(0x3a70a0);
+const CLIFF_COLOR = new Color(0x7d6a54);
+const CLIFF_SHADOW = new Color(0x5b4b3a);
+
+function colorForElevation(level: number): Color {
+  return ELEVATION_COLORS[Math.min(ELEVATION_COLORS.length - 1, Math.max(0, level))]!;
+}
 
 export interface TerrainMesh {
   readonly mesh: Mesh;
@@ -68,11 +82,7 @@ function buildTerrainGeometry(geometry: BufferGeometry, snapshot: WorldSnapshot)
       const elevation = cell?.elevation ?? 0;
       const isWater = cell?.terrain === "water";
       const worldY = (isWater ? -0.15 : elevation) * ELEVATION_HEIGHT;
-      const color = isWater
-        ? new Color(0x3a70a0)
-        : elevation === 0
-          ? GRASS_COLOR
-          : GRASS_COLOR.clone().lerp(new Color(0xa8b57e), Math.min(0.6, elevation * 0.15));
+      const color = isWater ? WATER_TOP : colorForElevation(elevation);
 
       // Top face: one square quad per cell.
       const x0 = x * CELL_SIZE;
@@ -110,9 +120,12 @@ function buildTerrainGeometry(geometry: BufferGeometry, snapshot: WorldSnapshot)
             x1, yTop, z1,
             x1, yBot, z1
           );
-          for (let i = 0; i < 4; i += 1) {
-            colors.push(CLIFF_COLOR.r, CLIFF_COLOR.g, CLIFF_COLOR.b);
-          }
+          // Top edge of the cliff face uses the higher cell's color, bottom
+          // uses a darker shadow tone — reads as a proper terrace face.
+          colors.push(CLIFF_SHADOW.r, CLIFF_SHADOW.g, CLIFF_SHADOW.b);
+          colors.push(CLIFF_COLOR.r, CLIFF_COLOR.g, CLIFF_COLOR.b);
+          colors.push(CLIFF_COLOR.r, CLIFF_COLOR.g, CLIFF_COLOR.b);
+          colors.push(CLIFF_SHADOW.r, CLIFF_SHADOW.g, CLIFF_SHADOW.b);
           indices.push(vertexOffset, vertexOffset + 1, vertexOffset + 2);
           indices.push(vertexOffset, vertexOffset + 2, vertexOffset + 3);
           vertexOffset += 4;
@@ -132,9 +145,12 @@ function buildTerrainGeometry(geometry: BufferGeometry, snapshot: WorldSnapshot)
             x1, yTop, z1,
             x1, yBot, z1
           );
-          for (let i = 0; i < 4; i += 1) {
-            colors.push(CLIFF_COLOR.r, CLIFF_COLOR.g, CLIFF_COLOR.b);
-          }
+          // Top edge of the cliff face uses the higher cell's color, bottom
+          // uses a darker shadow tone — reads as a proper terrace face.
+          colors.push(CLIFF_SHADOW.r, CLIFF_SHADOW.g, CLIFF_SHADOW.b);
+          colors.push(CLIFF_COLOR.r, CLIFF_COLOR.g, CLIFF_COLOR.b);
+          colors.push(CLIFF_COLOR.r, CLIFF_COLOR.g, CLIFF_COLOR.b);
+          colors.push(CLIFF_SHADOW.r, CLIFF_SHADOW.g, CLIFF_SHADOW.b);
           indices.push(vertexOffset, vertexOffset + 2, vertexOffset + 1);
           indices.push(vertexOffset, vertexOffset + 3, vertexOffset + 2);
           vertexOffset += 4;

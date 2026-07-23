@@ -10,7 +10,7 @@
 // bailey sits at cells x=46..57, y=47..54 (center 52,52) and the interesting
 // geometry is packed into the 24x24 window around it.
 
-import type { AreaFeature, LinearFeature, TrialFeatures } from "./features";
+import type { LinearFeature, TrialFeatures } from "./features";
 
 const CX = 52;
 const CY = 52;
@@ -19,40 +19,13 @@ function p(dx: number, dy: number): { x: number; y: number } {
   return { x: CX + dx, y: CY + dy };
 }
 
-/** Hand-authored trial features — deliberately include a curved rampart, a
- *  wall following the same path, an angled fence, and both dry & water moat
- *  segments so the visual comparison is unambiguous. */
+/** Hand-authored trial features — the terrain mesh already visualises the
+ *  scenario's elevation patches, so we don't add redundant bailey polygons.
+ *  What this file does add is an example of a **curved rampart + wall**
+ *  authored as polylines: something the scenario's tile-based walls cannot
+ *  express. That's the whole point of the 3D trial. */
 export const trialFeatures: TrialFeatures = {
-  areas: [
-    // Raised bailey polygon roughly aligned with the scenario's elevation
-    // patch. Slightly larger so the 3D bailey top overlaps the terrain rim
-    // and hides its cliff seams.
-    {
-      id: "bailey-main",
-      kind: "bailey",
-      polygon: [
-        p(-7, -6),
-        p(6, -6),
-        p(6, 3),
-        p(-2, 3),
-        p(-3, 4),
-        p(-7, 4),
-      ],
-      elevation: 1,
-    } satisfies AreaFeature,
-    // A courtyard water pond inside the bailey for visual interest.
-    {
-      id: "pond",
-      kind: "water",
-      polygon: [
-        p(3, -4),
-        p(5, -4),
-        p(5, -1),
-        p(3, -1),
-      ],
-      elevation: 1,
-    } satisfies AreaFeature,
-  ],
+  areas: [],
   linears: [
     // Curved stone rampart tracing the south-west edge of the bailey. The
     // polyline intentionally bends multiple times to demonstrate irregular

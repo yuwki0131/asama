@@ -18,10 +18,10 @@ import type { CellCoord } from "@asama/shared";
  *  unit. 1 world unit ≈ 1 cell keeps the math legible. */
 export const CELL_SIZE = 1;
 
-/** One elevation level in world-Y. Sits at ~30% of a cell width so a 2-level
- *  bailey reads clearly under the fixed oblique camera without dwarfing 2D
- *  billboards. Matches the visual weight of the 2D renderer's 24 px/level. */
-export const ELEVATION_HEIGHT = 0.3;
+/** One elevation level in world-Y. 0.6 cell widths gives a taller, clearly
+ *  readable step under the oblique camera without dwarfing 2D billboards.
+ *  (Earlier 0.3 made 1-level baileys look almost flat from this angle.) */
+export const ELEVATION_HEIGHT = 0.6;
 
 export interface ThreeWorldPoint {
   readonly x: number;

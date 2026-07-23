@@ -33,6 +33,7 @@ import {
   createUnitLayer,
   type BillboardLayer
 } from "./billboards";
+import { createBuildingGeometryLayer, type BuildingGeometryLayer } from "./buildingGeometry";
 import { pickCell } from "./picker";
 
 export interface ThreeSceneOptions {
@@ -98,10 +99,11 @@ export function createThreeScene(options: ThreeSceneOptions): ThreeSceneHandle {
   const selection = createSelectionMarker();
   scene.add(selection.mesh);
 
-  // Billboards (rebuilt on every snapshot for the trial — simple correctness
-  // over per-entity diffing, since the trial scenario is small).
+  // Billboards + procedural building geometry — both rebuilt each snapshot.
+  // Trial scenarios are small enough that per-entity diffing isn't worth it.
   let buildingLayer: BillboardLayer | null = null;
   let unitLayer: BillboardLayer | null = null;
+  let geometryLayer: BuildingGeometryLayer | null = null;
   let latestSnapshot: WorldSnapshot | null = null;
 
   return {
@@ -116,8 +118,14 @@ export function createThreeScene(options: ThreeSceneOptions): ThreeSceneHandle {
         scene.remove(unitLayer.group);
         unitLayer.dispose();
       }
+      if (geometryLayer !== null) {
+        scene.remove(geometryLayer.group);
+        geometryLayer.dispose();
+      }
+      geometryLayer = createBuildingGeometryLayer(snapshot.buildings);
       buildingLayer = createBuildingLayer(snapshot.buildings, assets, buildingSpecs);
       unitLayer = createUnitLayer(snapshot.units, assets);
+      scene.add(geometryLayer.group);
       scene.add(buildingLayer.group);
       scene.add(unitLayer.group);
     },
@@ -146,6 +154,7 @@ export function createThreeScene(options: ThreeSceneOptions): ThreeSceneHandle {
       terrain.dispose();
       if (buildingLayer !== null) buildingLayer.dispose();
       if (unitLayer !== null) unitLayer.dispose();
+      if (geometryLayer !== null) geometryLayer.dispose();
       featureGroup.traverse((obj) => {
         // Only Mesh has geometry/material; use ducktyping to avoid extra imports.
         const anyObj = obj as unknown as {

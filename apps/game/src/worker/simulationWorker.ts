@@ -37,7 +37,12 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
   const message = event.data;
 
   if (message.type === "init") {
-    world = createInitialWorld(scenarioForId(message.scenarioId));
+    try {
+      world = createInitialWorld(scenarioForId(message.scenarioId));
+    } catch (err) {
+      post({ type: "error", message: err instanceof Error ? err.message : String(err) });
+      return;
+    }
     lastSnapshotTick = world.currentTick;
     post({ type: "ready", snapshot: snapshotWorld(world, { includeMapCells: true }) });
     return;

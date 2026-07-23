@@ -129,7 +129,7 @@ export const ThreeGameCanvas = forwardRef<ThreeGameCanvasHandle, ThreeGameCanvas
       return () => canvas.removeEventListener("click", onClick);
     }, [props.onCellSelected]);
 
-    // Middle-drag / arrow keys: pan.
+    // Middle-drag / Shift+left-drag: pan; wheel: zoom.
     useEffect(() => {
       const canvas = canvasRef.current;
       if (canvas === null) return;
@@ -169,6 +169,66 @@ export const ThreeGameCanvas = forwardRef<ThreeGameCanvasHandle, ThreeGameCanvas
         window.removeEventListener("mousemove", onMove);
         window.removeEventListener("mouseup", onUp);
         canvas.removeEventListener("wheel", onWheel);
+      };
+    }, []);
+
+    // Keyboard camera controls: arrow keys / WASD pan, +/- zoom, Home recenters.
+    useEffect(() => {
+      const pressed = new Set<string>();
+      const onKeyDown = (e: KeyboardEvent) => {
+        // Ignore typing in inputs / textareas.
+        const target = e.target;
+        if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return;
+        pressed.add(e.key);
+        const canvas = canvasRef.current;
+        const scene = sceneRef.current;
+        if (canvas === null || scene === null) return;
+        // Instant actions (not tied to hold-loop):
+        if (e.key === "+" || e.key === "=") {
+          scene.camera.zoomStep(1, canvas.width, canvas.height);
+          e.preventDefault();
+        } else if (e.key === "-" || e.key === "_") {
+          scene.camera.zoomStep(-1, canvas.width, canvas.height);
+          e.preventDefault();
+        } else if (e.key === "Home") {
+          scene.camera.centerOnCell({ x: 52, y: 52 });
+          scene.camera.updateProjection(canvas.width, canvas.height);
+          e.preventDefault();
+        } else if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", "W", "A", "S", "D"].includes(e.key)) {
+          e.preventDefault();
+        }
+      };
+      const onKeyUp = (e: KeyboardEvent) => {
+        pressed.delete(e.key);
+      };
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+
+      // Hold-loop for smooth arrow/WASD panning at ~60Hz.
+      const PAN_PX_PER_FRAME = 12;
+      let raf = 0;
+      const step = () => {
+        const canvas = canvasRef.current;
+        const scene = sceneRef.current;
+        if (canvas !== null && scene !== null && pressed.size > 0) {
+          let dx = 0;
+          let dy = 0;
+          if (pressed.has("ArrowLeft") || pressed.has("a") || pressed.has("A")) dx += PAN_PX_PER_FRAME;
+          if (pressed.has("ArrowRight") || pressed.has("d") || pressed.has("D")) dx -= PAN_PX_PER_FRAME;
+          if (pressed.has("ArrowUp") || pressed.has("w") || pressed.has("W")) dy += PAN_PX_PER_FRAME;
+          if (pressed.has("ArrowDown") || pressed.has("s") || pressed.has("S")) dy -= PAN_PX_PER_FRAME;
+          if (dx !== 0 || dy !== 0) {
+            scene.camera.panByScreen(dx, dy, canvas.height);
+          }
+        }
+        raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+
+      return () => {
+        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keyup", onKeyUp);
+        cancelAnimationFrame(raf);
       };
     }, []);
 

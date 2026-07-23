@@ -35,19 +35,20 @@ export const hybridRendererTrialScenario: ContentScenarioDefinition = {
   description:
     "ハイブリッド2.5Dレンダラー技術検証用の小規模シナリオ。3D地形と2D建物ビルボードの共存を確認する。?renderer=3d で起動。",
   initialBuildings: [
-    // Storehouse and yagura sit on the raised bailey as 2D billboards.
+    // Storehouse sits inside the inner (level-2) plateau at (49..51, 49..51).
+    // Yagura sits east of the inner patch on the level-1 bailey — placed on
+    // the far-east edge to avoid the cliff cells the inner patch's east edge
+    // stamps at (55, 49..52).
     { type: "storehouse", position: c(-3, -3) },
-    { type: "yagura", position: c(3, -3) },
+    { type: "yagura", position: c(4, -3) },
 
-    // Wall run along the bailey's south edge with a gate in the middle.
+    // Wall run along the bailey's east edge (avoids the slope column at x=CENTER_X).
     { type: "wall", position: c(-5, 3) },
     { type: "wall", position: c(-4, 3) },
     { type: "wall", position: c(-3, 3) },
-    { type: "gate_wide_3", position: c(-2, 3) },
-    { type: "wall", position: c(1, 3) },
-    { type: "wall", position: c(2, 3) },
-    { type: "wall", position: c(3, 3) },
-    { type: "wall", position: c(4, 3) },
+    { type: "wall", position: c(-2, 3) },
+    { type: "wall", position: c(-1, 3) },
+    { type: "gate_wide_3", position: c(2, 3) }, // gate slightly east so it doesn't overlap the slope
     { type: "wall", position: c(5, 3) },
 
     // Wooden fence along the north edge of the trial window (arbitrary path).
@@ -63,13 +64,13 @@ export const hybridRendererTrialScenario: ContentScenarioDefinition = {
     { type: "dry_moat", position: c(-6, 6) },
     { type: "dry_moat", position: c(-5, 6) },
 
-    // Water moat wraps the SE corner.
+    // Water moat wraps the SE corner (simple L-shape, no bridge to avoid
+    // auto-span placement conflicts with the neighbouring moat cells).
     { type: "water_moat", position: c(5, 5) },
     { type: "water_moat", position: c(6, 5) },
     { type: "water_moat", position: c(7, 5) },
     { type: "water_moat", position: c(7, 6) },
     { type: "water_moat", position: c(7, 7) },
-    { type: "earth_bridge", position: c(6, 6) },
   ],
   initialUnits: [
     // Units on the bailey side of the wall (north of the wall at y=55).
@@ -85,11 +86,12 @@ export const hybridRendererTrialScenario: ContentScenarioDefinition = {
   waves: [],
   elevation: {
     // Two terraces so the elevation shot can show 2 distinct levels:
-    //   - Outer bailey (level 1) covers the north 12x8 area
+    //   - Outer bailey (level 1) covers a 12x9 area extending to y=CENTER_Y+3
+    //     so the slope at y=CENTER_Y+4 can connect to a level-1 plateau at y=CENTER_Y+2
     //   - Honmaru core (level 2) sits inside on 6x4 — proves 2-level differentiation
     patches: [
       {
-        area: { kind: "rect", x: CENTER_X - 6, y: CENTER_Y - 5, width: 12, height: 8 },
+        area: { kind: "rect", x: CENTER_X - 6, y: CENTER_Y - 5, width: 12, height: 9 },
         level: 1,
         skin: "ishigaki",
       },
@@ -100,8 +102,10 @@ export const hybridRendererTrialScenario: ContentScenarioDefinition = {
       },
     ],
     slopes: [
-      // Gentle 2-cell ramp coming up from the south, so units can move
-      // between elevation levels through the gate area.
+      // Gentle 2-cell ramp coming up from the south to the bailey (level 1).
+      // Lower/upper halves stay OUTSIDE the outer patch (else the patch would
+      // clobber the half-step elevations); plateau at y=55 connects to level 1.
+      //   lower = (52, 57), upper = (52, 56), plateau = (52, 55) inside patch.
       { position: c(0, 5), toward: "N", length: 2 },
     ],
   },
