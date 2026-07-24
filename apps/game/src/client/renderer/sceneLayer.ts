@@ -74,10 +74,6 @@ interface UnitVisual {
 interface DecorationVisual {
   readonly position: CellCoord;
   readonly sprite: Sprite;
-  /** Asset id used to detect vegetation types for sway animation. */
-  readonly assetId: string;
-  /** Sprite X at the time the visual was created; used as sway baseline. */
-  readonly baseX: number;
 }
 
 interface FlagVisual {
@@ -232,17 +228,6 @@ export class RetainedScene {
 
     for (const decoration of this.decorationVisuals) {
       decoration.sprite.visible = isVisibleCell(decoration.position, camera, screenWidth, screenHeight);
-      // Vegetation sway: tree and bamboo decorations get a subtle X-axis sine offset.
-      const aid = decoration.assetId;
-      const isTree = aid.startsWith("deco.tree.");
-      const isBamboo = aid.startsWith("deco.bamboo.");
-      if (isTree || isBamboo) {
-        const freq = isBamboo ? 1.2 : 0.8;
-        const amplitude = isBamboo ? 2.0 : 1.5;
-        const phase = cellPhaseOffset(decoration.position);
-        const swayOffset = Math.sin(timeSec * freq + phase * 6.28) * amplitude;
-        decoration.sprite.position.x = decoration.baseX + swayOffset;
-      }
     }
 
     // Flag flutter: nobori banners sway ±0.045 rad around the pole base.
@@ -388,9 +373,7 @@ export class RetainedScene {
         if (sprite !== null) {
           this.decorationVisuals.push({
             position: entry.item.position,
-            sprite,
-            assetId: entry.item.assetId,
-            baseX: sprite.position.x
+            sprite
           });
         }
       }
