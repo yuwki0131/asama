@@ -1046,5 +1046,6 @@ const ECONOMY_TOOLS: readonly { readonly type: BuildingType; readonly label: str
   { type: "market", label: "市場" },
   { type: "barracks", label: "兵舎" },
   { type: "samurai_residence", label: "武家屋敷" },
-  { type: "town_block", label: "町区画" }
+  { type: "town_block", label: "町区画" },
+  { type: "garden", label: "庭園" }
 ];

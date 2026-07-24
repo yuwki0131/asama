@@ -47,6 +47,7 @@ export type BuildingType =
   | "barracks"
   | "samurai_residence"
   | "town_block"
+  | "garden"
   | "farm"
   | "road"
   | "earth_bridge"

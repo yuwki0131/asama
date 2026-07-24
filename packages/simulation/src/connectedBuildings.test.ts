@@ -201,6 +201,42 @@ describe("town block visual variants", () => {
   });
 });
 
+describe("garden visual variants", () => {
+  function freshWorld(): WorldState {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    return world;
+  }
+
+  it("assigns a variant assetId from the garden family", () => {
+    const world = freshWorld();
+    place(world, "garden", { x: 40, y: 40 });
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toMatch(/^building\.garden\.v[0-3]$/);
+  });
+
+  it("is deterministic for the same coordinate across worlds", () => {
+    const first = freshWorld();
+    const second = freshWorld();
+    for (const position of [{ x: 40, y: 40 }, { x: 44, y: 40 }, { x: 40, y: 44 }, { x: 61, y: 63 }]) {
+      place(first, "garden", position);
+      place(second, "garden", position);
+      expect(buildingAt(first, position).assetId).toBe(buildingAt(second, position).assetId);
+    }
+  });
+
+  it("orthogonally adjacent 2x2 lots never share a variant", () => {
+    const world = freshWorld();
+    const anchor = { x: 40, y: 40 };
+    place(world, "garden", anchor);
+    const anchorId = buildingAt(world, anchor).assetId;
+    for (const neighbor of [{ x: 42, y: 40 }, { x: 38, y: 40 }, { x: 40, y: 42 }, { x: 40, y: 38 }]) {
+      place(world, "garden", neighbor);
+      expect(buildingAt(world, neighbor).assetId).not.toBe(anchorId);
+    }
+  });
+});
+
 describe("bridge orientation", () => {
   it("places x3 bridge over N-S river (water north and south, land east and west)", () => {
     const world = createInitialWorld();

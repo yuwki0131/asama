@@ -5677,6 +5677,114 @@
         "trim": false,
         "resizeMode": "exact"
       }
+    },
+    {
+      "assetId": "building.garden.v0",
+      "kind": "building",
+      "output": "building-garden-v0.png",
+      "source": {
+        "type": "blender",
+        "model": "building-garden-v0",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 128,
+        "anchorX": 80,
+        "anchorY": 96
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.garden.v1",
+      "kind": "building",
+      "output": "building-garden-v1.png",
+      "source": {
+        "type": "blender",
+        "model": "building-garden-v1",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 128,
+        "anchorX": 80,
+        "anchorY": 96
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.garden.v2",
+      "kind": "building",
+      "output": "building-garden-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "building-garden-v2",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 128,
+        "anchorX": 80,
+        "anchorY": 96
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.garden.v3",
+      "kind": "building",
+      "output": "building-garden-v3.png",
+      "source": {
+        "type": "blender",
+        "model": "building-garden-v3",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 2,
+        "footprintHeight": 2,
+        "canvasWidth": 160,
+        "canvasHeight": 128,
+        "anchorX": 80,
+        "anchorY": 96
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
     }
   ]
 }

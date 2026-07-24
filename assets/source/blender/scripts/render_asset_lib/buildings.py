@@ -622,6 +622,84 @@ def build_samurai_residence_graybox(scene: bpy.types.Scene) -> None:
     add_leaf_cards(scene, "GardenPinePad2", (-3.5, -1.42, 0.47), (0.17, 0.17, 0.06), 30, [props["bushD"]], seed=59.0, card_size=0.06)
 
 
+def build_garden(scene: bpy.types.Scene, variant: int = 0) -> None:
+    """Combinable 2x2 garden lot (buke-yashiki garden style). Canvas 160x128, anchor 80,96.
+
+    Variants tile side by side: features stay inside a 0.3 margin so the
+    shared gravel pad reads continuous across adjacent lots.
+    """
+    from .vegetation import add_cloud_pad
+
+    props = prop_materials()
+    stone = props["stone"]
+    add_yard_pad(scene, 2.0, 2.0, "gravel")
+
+    # VEG-01: garden foliage uses the approved nihonga cloud-pad vocabulary
+    # (smooth two-value domes), not angular leaf-card clumps.
+    leaf_lit = make_material("GardenLeafLit", (0.100, 0.160, 0.082, 1.0))
+    leaf_shadow = make_material("GardenLeafShadow", (0.045, 0.085, 0.050, 1.0))
+
+    def garden_bush(name: str, cx: float, cy: float, radius: float, seed: float) -> None:
+        add_cloud_pad(scene, name, (cx, cy, radius * 0.5), radius, leaf_lit, leaf_shadow, seed=seed)
+
+    if variant == 0:
+        pond = make_material("GardenPond", (0.040, 0.085, 0.105, 1.0))
+        add_flat_quad(scene, "Pond", (-1.50, -1.36), (-0.54, -0.62), YARD_PAD_HEIGHT + 0.006, pond)
+        rim_stones = (
+            (-1.56, -1.10), (-1.36, -1.42), (-0.96, -1.44), (-0.52, -1.26),
+            (-0.46, -0.86), (-0.78, -0.55), (-1.28, -0.56), (-1.58, -0.78),
+        )
+        for index, (rx, ry) in enumerate(rim_stones):
+            add_box(scene, f"PondRim{index}", *map_box((rx - 0.06, ry - 0.05, 0.0), (rx + 0.06, ry + 0.05, 0.08)), stone)
+        garden_bush("V0Bush", -1.68, -0.36, 0.20, 11.0)
+        add_prop_weeds(scene, -0.36, -1.68, props)
+    elif variant == 1:
+        # Karesansui islands: tapered frustums read as boulders, spread along
+        # the iso-horizontal so clusters never stack into a screen column.
+        rocks = (
+            ("Main", (-1.48, -1.38), (-1.12, -1.08), 0.22, 0.09),
+            ("Side", (-1.08, -1.54), (-0.86, -1.34), 0.12, 0.05),
+            ("B", (-0.72, -0.74), (-0.48, -0.52), 0.15, 0.06),
+            ("C", (-1.68, -0.62), (-1.48, -0.46), 0.09, 0.04),
+            ("D", (-0.58, -1.56), (-0.42, -1.42), 0.08, 0.03),
+        )
+        for suffix, low, high, top, inset in rocks:
+            add_frustum(scene, f"KareRock{suffix}", low, high, 0.0, top, inset, stone)
+        garden_bush("V1Moss", -0.42, -1.10, 0.15, 13.0)
+        add_prop_weeds(scene, -1.66, -1.66, props)
+    elif variant == 2:
+        add_prop_lantern(scene, -1.42, -1.34, props)
+        step_stones = ((-0.42, -0.46), (-0.72, -0.72), (-1.02, -1.00), (-1.34, -0.82), (-0.82, -1.38))
+        for index, (tx, ty) in enumerate(step_stones):
+            add_box(scene, f"StepStone{index}", *map_box((tx - 0.09, ty - 0.07, 0.0), (tx + 0.09, ty + 0.07, 0.035)), stone)
+        garden_bush("V2Bush", -0.44, -1.62, 0.22, 17.0)
+        add_prop_weeds(scene, -1.66, -0.40, props)
+    else:
+        from .core import add_beam
+        bark = make_textured_material("GardenPineBark", (0.075, 0.048, 0.032), (0.130, 0.088, 0.056), scale=(14.0, 14.0, 3.0))
+        cx, cy = -1.20, -1.20
+        p0 = (cx, cy, 0.0)
+        p1 = (cx + 0.12, cy + 0.08, 0.26)
+        p2 = (cx - 0.05, cy - 0.03, 0.54)
+        p3 = (cx + 0.16, cy + 0.09, 0.82)
+        add_beam(scene, "GPTrunk1", p0, p1, 0.11, bark, tip_thickness=0.085)
+        add_beam(scene, "GPTrunk2", p1, p2, 0.085, bark, tip_thickness=0.06)
+        add_beam(scene, "GPTrunk3", p2, p3, 0.06, bark, tip_thickness=0.035)
+        tiers = (
+            (p2, (cx - 0.38, cy - 0.22, 0.56), 0.22),
+            (p2, (cx + 0.36, cy + 0.22, 0.64), 0.19),
+            (p3, (cx - 0.24, cy - 0.08, 0.84), 0.16),
+            (p3, (cx + 0.02, cy + 0.02, 0.96), 0.17),
+        )
+        for index, (base, tip, radius) in enumerate(tiers):
+            add_beam(scene, f"GPBranch{index}", base, (tip[0], tip[1], tip[2] - 0.05), 0.035, bark, tip_thickness=0.018)
+            add_cloud_pad(scene, f"GPPad{index}", (tip[0], tip[1], tip[2] + 0.03), radius, leaf_lit, leaf_shadow, seed=float(83 + index * 11))
+        garden_bush("V3Bush1", -0.52, -0.50, 0.24, 19.0)
+        garden_bush("V3Bush2", -1.62, -0.44, 0.16, 23.0)
+        add_frustum(scene, "PineRock", (-0.64, -1.60), (-0.44, -1.44), 0.0, 0.12, 0.05, stone)
+        add_prop_weeds(scene, -0.40, -1.06, props)
+
+
 def build_town_block_graybox(scene: bpy.types.Scene) -> None:
     """Machi on a 6x6 lot. Canvas 416x304, anchor 208,272."""
     mats = building_material_set()

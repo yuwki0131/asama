@@ -48,6 +48,7 @@ export function buildingTypeLabel(type: BuildingType): string {
     barracks: "兵舎",
     samurai_residence: "侍屋敷",
     town_block: "町区画",
+    garden: "庭園",
     farm: "農地",
     road: "道",
     earth_bridge: "土橋",

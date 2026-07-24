@@ -174,6 +174,15 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.town_block",
     gateState: null
   },
+  garden: {
+    type: "garden",
+    category: "residential",
+    maxHp: 100,
+    footprint: { width: 2, height: 2 },
+    passable: false,
+    assetId: "building.garden.v0",
+    gateState: null
+  },
   farm: {
     type: "farm",
     category: "economy",
