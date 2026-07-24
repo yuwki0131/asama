@@ -17,7 +17,7 @@ from .buildings import (
     build_samurai_residence_graybox, build_town_block_graybox, build_garden,
     build_yagura_small_graybox, build_farm_paddy,
     build_gate_wood, build_wall_plaster_mask, build_wall_hazama_mask, build_fence_wood_mask,
-    build_wall_diagonal, build_wall_ladder, build_tenshu_graybox, build_tenshu,
+    build_wall_diagonal, build_wall_diagonal_arm, build_wall_ladder, build_tenshu_graybox, build_tenshu,
 )
 from .vegetation import (
     build_tree_pine, build_tree_cedar, build_tree_broadleaf,
@@ -67,6 +67,10 @@ MODEL_REGISTRY = {
     "wall-ladder": build_wall_ladder,
     "wall-diagonal-nwse": lambda scene: build_wall_diagonal(scene, "nwse"),
     "wall-diagonal-nesw": lambda scene: build_wall_diagonal(scene, "nesw"),
+    "wall-diagonal-arm-nw": lambda scene: build_wall_diagonal_arm(scene, "nw"),
+    "wall-diagonal-arm-ne": lambda scene: build_wall_diagonal_arm(scene, "ne"),
+    "wall-diagonal-arm-se": lambda scene: build_wall_diagonal_arm(scene, "se"),
+    "wall-diagonal-arm-sw": lambda scene: build_wall_diagonal_arm(scene, "sw"),
     "tree-pine": build_tree_pine,
     "tree-pine-2": lambda scene: build_tree_pine(scene, variant=1),
     "tree-cedar": build_tree_cedar,

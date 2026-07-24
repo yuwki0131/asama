@@ -1147,6 +1147,28 @@
       }
     },
     {
+      "assetId": "building.wall.diagonal.nwse",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-nwse.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.diagonal.nesw",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-nesw.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
       "assetId": "building.dry_moat.connected.0000",
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0000.png",
@@ -6559,9 +6581,9 @@
       }
     },
     {
-      "assetId": "building.wall.diagonal.nwse",
+      "assetId": "building.wall.diagonal.arm.nw",
       "kind": "building",
-      "file": "generated/building-wall-diagonal-nwse.png",
+      "file": "generated/building-wall-diagonal-arm-nw.png",
       "width": 64,
       "height": 96,
       "anchor": {
@@ -6570,9 +6592,31 @@
       }
     },
     {
-      "assetId": "building.wall.diagonal.nesw",
+      "assetId": "building.wall.diagonal.arm.ne",
       "kind": "building",
-      "file": "generated/building-wall-diagonal-nesw.png",
+      "file": "generated/building-wall-diagonal-arm-ne.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.diagonal.arm.se",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-arm-se.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.diagonal.arm.sw",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-arm-sw.png",
       "width": 64,
       "height": 96,
       "anchor": {
