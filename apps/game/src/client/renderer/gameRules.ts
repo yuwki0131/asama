@@ -360,6 +360,105 @@ export function diagonalJunctionArms(building: BuildingSnapshot, snapshot: World
   );
 }
 
+// A grid corner key k names the point at the NW corner of cell k. Offsets of
+// the 4 cells sharing key k, paired with which of that cell's corners k is.
+const CORNER_SHARING_CELLS: readonly { ox: number; oy: number; corner: DiagonalArmCorner }[] = [
+  { ox: 0, oy: 0, corner: "nw" },
+  { ox: -1, oy: 0, corner: "ne" },
+  { ox: 0, oy: -1, corner: "sw" },
+  { ox: -1, oy: -1, corner: "se" }
+];
+
+// Unit direction (in cell space) of a wall segment leaving a corner toward
+// the contributing cell's center / along the diagonal.
+const CORNER_SEGMENT_DIRECTION: Record<DiagonalArmCorner, { dx: 1 | -1; dy: 1 | -1 }> = {
+  nw: { dx: 1, dy: 1 },
+  ne: { dx: -1, dy: 1 },
+  sw: { dx: 1, dy: -1 },
+  se: { dx: -1, dy: -1 }
+};
+
+interface CornerSegment {
+  readonly cell: CellCoord;
+  readonly dx: 1 | -1;
+  readonly dy: 1 | -1;
+}
+
+function incidentWallSegmentsAt(key: CellCoord, snapshot: WorldSnapshot | null): readonly CornerSegment[] {
+  const segments: CornerSegment[] = [];
+  for (const { ox, oy, corner } of CORNER_SHARING_CELLS) {
+    const cell = { x: key.x + ox, y: key.y + oy };
+    const neighbor = findBuildingAtCell(cell, snapshot);
+    if (neighbor === null || neighbor.lifecycleState !== "intact") {
+      continue;
+    }
+    const direction = CORNER_SEGMENT_DIRECTION[corner];
+    if (neighbor.type === "diagonal_wall_nwse") {
+      // nwse touches its own NW and SE corners only.
+      if (corner === "nw" || corner === "se") {
+        segments.push({ cell, ...direction });
+      }
+    } else if (neighbor.type === "diagonal_wall_nesw") {
+      if (corner === "ne" || corner === "sw") {
+        segments.push({ cell, ...direction });
+      }
+    } else if (neighbor.type === "wall" || neighbor.type === "hazama_wall") {
+      if (diagonalJunctionArms(neighbor, snapshot).includes(corner)) {
+        segments.push({ cell, ...direction });
+      }
+    }
+  }
+  return segments;
+}
+
+// An elbow junction (exactly two perpendicular segments meeting at a corner,
+// no straight-through pair) leaves the walls' outer cut faces exposed, so it
+// gets a square corner-cap post. T-joints, crossings and straight runs have a
+// collinear pair and stay uncapped. The front-most participant cell (max x+y,
+// then max x) owns the cap so it draws above both wall sprites.
+export function junctionCornerCaps(building: BuildingSnapshot, snapshot: WorldSnapshot | null): readonly CellCoord[] {
+  if (building.lifecycleState !== "intact") {
+    return [];
+  }
+  if (
+    building.type !== "wall" &&
+    building.type !== "hazama_wall" &&
+    building.type !== "diagonal_wall_nwse" &&
+    building.type !== "diagonal_wall_nesw"
+  ) {
+    return [];
+  }
+  const position = building.position;
+  const keys: readonly CellCoord[] = [
+    { x: position.x, y: position.y },
+    { x: position.x + 1, y: position.y },
+    { x: position.x, y: position.y + 1 },
+    { x: position.x + 1, y: position.y + 1 }
+  ];
+  const caps: CellCoord[] = [];
+  for (const key of keys) {
+    const segments = incidentWallSegmentsAt(key, snapshot);
+    if (segments.length < 2) {
+      continue;
+    }
+    if (segments.some((a) => segments.some((b) => a.dx === -b.dx && a.dy === -b.dy))) {
+      continue;
+    }
+    const owner = segments.reduce((best, candidate) => {
+      const bestDepth = best.cell.x + best.cell.y;
+      const candidateDepth = candidate.cell.x + candidate.cell.y;
+      if (candidateDepth !== bestDepth) {
+        return candidateDepth > bestDepth ? candidate : best;
+      }
+      return candidate.cell.x > best.cell.x ? candidate : best;
+    });
+    if (owner.cell.x === position.x && owner.cell.y === position.y) {
+      caps.push(key);
+    }
+  }
+  return caps;
+}
+
 function isNeSwGateType(buildingType: BuildingType): boolean {
   return (
     buildingType === "gate_wide_2_ne_sw" ||

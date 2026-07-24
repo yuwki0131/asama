@@ -29,7 +29,7 @@ import {
   diagonalJunctionArms,
   honmaruCellAssetCandidates,
   isBridgeBuildingType,
-  type DiagonalArmCorner
+  junctionCornerCaps
 } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, footprintBounds, isoBehind } from "./renderGeometry";
@@ -74,10 +74,6 @@ interface UnitVisual {
 interface DecorationVisual {
   readonly position: CellCoord;
   readonly sprite: Sprite;
-  /** Asset id used to detect vegetation types for sway animation. */
-  readonly assetId: string;
-  /** Sprite X at the time the visual was created; used as sway baseline. */
-  readonly baseX: number;
 }
 
 interface FlagVisual {
@@ -232,17 +228,6 @@ export class RetainedScene {
 
     for (const decoration of this.decorationVisuals) {
       decoration.sprite.visible = isVisibleCell(decoration.position, camera, screenWidth, screenHeight);
-      // Vegetation sway: tree and bamboo decorations get a subtle X-axis sine offset.
-      const aid = decoration.assetId;
-      const isTree = aid.startsWith("deco.tree.");
-      const isBamboo = aid.startsWith("deco.bamboo.");
-      if (isTree || isBamboo) {
-        const freq = isBamboo ? 1.2 : 0.8;
-        const amplitude = isBamboo ? 2.0 : 1.5;
-        const phase = cellPhaseOffset(decoration.position);
-        const swayOffset = Math.sin(timeSec * freq + phase * 6.28) * amplitude;
-        decoration.sprite.position.x = decoration.baseX + swayOffset;
-      }
     }
 
     // Flag flutter: nobori banners sway ±0.045 rad around the pole base.
@@ -388,9 +373,7 @@ export class RetainedScene {
         if (sprite !== null) {
           this.decorationVisuals.push({
             position: entry.item.position,
-            sprite,
-            assetId: entry.item.assetId,
-            baseX: sprite.position.x
+            sprite
           });
         }
       }
@@ -827,15 +810,15 @@ function addBuildingSprite(
     sprite.tint = 0xffaaa0;
   }
 
-  // Junction arms bridging straight walls to adjacent diagonal walls. The NW
-  // arm runs up-screen and must sit behind the wall sprite (which then hides
-  // the arm's center-side cut face); the other corners run level or
-  // down-screen and overlay the wall.
+  // Junction arms bridging straight walls to adjacent diagonal walls. All
+  // arms draw behind the wall sprite: the wall band then hides each arm's
+  // center-side cut face and coping hatch, while the corner-side half stays
+  // visible past the wall pixels.
   const arms = diagonalJunctionArms(building, snapshot);
-  const addArmSprite = (corner: DiagonalArmCorner): void => {
+  for (const corner of arms) {
     const asset = assets.get(`building.wall.diagonal.arm.${corner}`);
     if (asset === undefined) {
-      return;
+      continue;
     }
     const arm = new Sprite(asset.texture);
     arm.anchor.set(asset.anchor.x, asset.anchor.y);
@@ -844,14 +827,22 @@ function addBuildingSprite(
       arm.tint = 0xffaaa0;
     }
     layer.addChild(arm);
-  };
-  if (arms.includes("nw")) {
-    addArmSprite("nw");
   }
   layer.addChild(sprite);
-  for (const corner of arms) {
-    if (corner !== "nw") {
-      addArmSprite(corner);
+
+  // Elbow junctions expose unmitered cut faces at the shared corner; a square
+  // cap post drawn by the front-most participant covers them.
+  const capAsset = assets.get("building.wall.corner.cap");
+  if (capAsset !== undefined) {
+    for (const key of junctionCornerCaps(building, snapshot)) {
+      const cap = new Sprite(capAsset.texture);
+      cap.anchor.set(capAsset.anchor.x, capAsset.anchor.y);
+      const corner = gridCornerToWorld(key);
+      cap.position.set(roundWorldPixel(corner.x, zoom), roundWorldPixel(corner.y + offsetY, zoom));
+      if (building.owner === "enemy") {
+        cap.tint = 0xffaaa0;
+      }
+      layer.addChild(cap);
     }
   }
 
