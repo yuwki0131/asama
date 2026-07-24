@@ -259,6 +259,8 @@ export const SIEGE_BALANCE = {
 export const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
   "wall",
   "hazama_wall",
+  "diagonal_wall_nwse",
+  "diagonal_wall_nesw",
   "fence",
   "gate_wide_2",
   "gate_wide_3",

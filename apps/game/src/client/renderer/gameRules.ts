@@ -81,6 +81,8 @@ export function isCenterAnchoredBuilding(buildingType: BuildingType): boolean {
     buildingType === "fence" ||
     buildingType === "wall" ||
     buildingType === "hazama_wall" ||
+    buildingType === "diagonal_wall_nwse" ||
+    buildingType === "diagonal_wall_nesw" ||
     isGateType(buildingType) ||
     buildingType === "dry_moat" ||
     buildingType === "water_moat" ||
@@ -97,7 +99,12 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.fence.wood";
   }
 
-  if (building.type === "wall" || building.type === "hazama_wall") {
+  if (
+    building.type === "wall" ||
+    building.type === "hazama_wall" ||
+    building.type === "diagonal_wall_nwse" ||
+    building.type === "diagonal_wall_nesw"
+  ) {
     return "building.wall.plaster";
   }
 

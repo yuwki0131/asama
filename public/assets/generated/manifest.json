@@ -113,6 +113,182 @@
       }
     },
     {
+      "assetId": "building.honmaru.tile.connected.0000",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0001",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0010",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0011",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0100",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0101",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0110",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.0111",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1000",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1001",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1010",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1011",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1100",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1101",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1110",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.honmaru.tile.connected.1111",
+      "kind": "building",
+      "file": "generated/building-honmaru-tile-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
       "assetId": "building.storehouse",
       "kind": "building",
       "file": "generated/building-storehouse.png",
@@ -2486,6 +2662,50 @@
       "anchor": {
         "x": 0.5,
         "y": 0.9
+      }
+    },
+    {
+      "assetId": "building.garden.v0",
+      "kind": "building",
+      "file": "generated/building-garden-v0.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.garden.v1",
+      "kind": "building",
+      "file": "generated/building-garden-v1.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.garden.v2",
+      "kind": "building",
+      "file": "generated/building-garden-v2.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.garden.v3",
+      "kind": "building",
+      "file": "generated/building-garden-v3.png",
+      "width": 160,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
       }
     },
     {
@@ -6339,223 +6559,25 @@
       }
     },
     {
-      "assetId": "building.honmaru.tile.connected.0000",
+      "assetId": "building.wall.diagonal.nwse",
       "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0000.png",
+      "file": "generated/building-wall-diagonal-nwse.png",
       "width": 64,
-      "height": 32,
+      "height": 96,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
+        "y": 0.8333333333333334
       }
     },
     {
-      "assetId": "building.honmaru.tile.connected.0001",
+      "assetId": "building.wall.diagonal.nesw",
       "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0001.png",
+      "file": "generated/building-wall-diagonal-nesw.png",
       "width": 64,
-      "height": 32,
+      "height": 96,
       "anchor": {
         "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.0010",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.0011",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.0100",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.0101",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.0110",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.0111",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-0111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1000",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1000.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1001",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1001.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1010",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1010.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1011",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1011.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1100",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1100.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1101",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1101.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1110",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1110.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.honmaru.tile.connected.1111",
-      "kind": "building",
-      "file": "generated/building-honmaru-tile-connected-1111.png",
-      "width": 64,
-      "height": 32,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.garden.v0",
-      "kind": "building",
-      "file": "generated/building-garden-v0.png",
-      "width": 160,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.garden.v1",
-      "kind": "building",
-      "file": "generated/building-garden-v1.png",
-      "width": 160,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.garden.v2",
-      "kind": "building",
-      "file": "generated/building-garden-v2.png",
-      "width": 160,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
-      }
-    },
-    {
-      "assetId": "building.garden.v3",
-      "kind": "building",
-      "file": "generated/building-garden-v3.png",
-      "width": 160,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.75
+        "y": 0.8333333333333334
       }
     }
   ],
