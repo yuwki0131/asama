@@ -370,6 +370,33 @@ def build_wall_diagonal(scene: bpy.types.Scene, orientation: str) -> None:
     _diag_gable(scene, "DiagWallCoping", a, b, WALL_COPING_THICKNESS / 2.0, WALL_BODY_TOP, WALL_COPING_TOP, coping)
 
 
+def build_wall_diagonal_arm(scene: bpy.types.Scene, corner: str) -> None:
+    """Junction arm from cell center to one corner, overlaid on straight walls.
+
+    Straight walls run through edge midpoints while diagonal walls run through
+    cell corners, so their lines never meet; this arm bridges center->corner.
+    The center end extends 0.15 past the center so its cut face hides under
+    the straight wall sprite drawn at the same cell.
+    """
+    mats = building_material_set()
+    plaster, stone, coping = mats["plaster"], mats["stone"], mats["roof"]
+
+    corners = {
+        "nw": (-0.5, -0.5),
+        "ne": (0.5, -0.5),
+        "se": (0.5, 0.5),
+        "sw": (-0.5, 0.5),
+    }
+    cx, cy = corners[corner]
+    overshoot = 0.15
+    a = (-cx * overshoot / 0.5, -cy * overshoot / 0.5)
+    b = (cx, cy)
+
+    _diag_prism(scene, "DiagArmBase", a, b, WALL_BASE_THICKNESS / 2.0, 0.0, WALL_BASE_HEIGHT, stone)
+    _diag_prism(scene, "DiagArmBody", a, b, WALL_BODY_THICKNESS / 2.0, WALL_BASE_HEIGHT, WALL_BODY_TOP, plaster)
+    _diag_gable(scene, "DiagArmCoping", a, b, WALL_COPING_THICKNESS / 2.0, WALL_BODY_TOP, WALL_COPING_TOP, coping)
+
+
 def build_wall_ladder(scene: bpy.types.Scene) -> None:
     """Siege ladder leaning over a wall cell. Canvas 64x96, anchor 32,80."""
     wood = make_material("LadderWood", (0.52, 0.40, 0.24, 1.0))

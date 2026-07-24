@@ -26,8 +26,10 @@ import {
   bridgeCellAssetCandidates,
   bridgeDeckLiftAt,
   buildingAssetCandidates,
+  diagonalJunctionArms,
   honmaruCellAssetCandidates,
-  isBridgeBuildingType
+  isBridgeBuildingType,
+  type DiagonalArmCorner
 } from "./gameRules";
 import { interpolateUnitRenderPosition, resolveDisplayPosition, type WorldPoint } from "./interpolation";
 import { buildingRenderPoint, footprintBounds, isoBehind } from "./renderGeometry";
@@ -366,7 +368,7 @@ export class RetainedScene {
       } else if (entry.kind === "slope") {
         addSlopeCellSprites(this.staticLayer, entry.item, snapshot.map, assets);
       } else if (entry.kind === "building") {
-        addBuildingSprite(this.staticLayer, entry.item, assets, zoom, snapshot.economy.season);
+        addBuildingSprite(this.staticLayer, entry.item, assets, zoom, snapshot.economy.season, snapshot);
         // Flag pennant for castle buildings on intact structures only.
         const building = entry.item;
         if (
@@ -802,7 +804,8 @@ function addBuildingSprite(
   building: BuildingSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
   zoom: number,
-  season: Season
+  season: Season,
+  snapshot: WorldSnapshot
 ): void {
   if (isBridgeBuildingType(building.type)) {
     addBridgeSprites(layer, building, assets, zoom);
@@ -823,7 +826,34 @@ function addBuildingSprite(
   if (building.owner === "enemy") {
     sprite.tint = 0xffaaa0;
   }
+
+  // Junction arms bridging straight walls to adjacent diagonal walls. The NW
+  // arm runs up-screen and must sit behind the wall sprite (which then hides
+  // the arm's center-side cut face); the other corners run level or
+  // down-screen and overlay the wall.
+  const arms = diagonalJunctionArms(building, snapshot);
+  const addArmSprite = (corner: DiagonalArmCorner): void => {
+    const asset = assets.get(`building.wall.diagonal.arm.${corner}`);
+    if (asset === undefined) {
+      return;
+    }
+    const arm = new Sprite(asset.texture);
+    arm.anchor.set(asset.anchor.x, asset.anchor.y);
+    arm.position.set(sprite.position.x, sprite.position.y);
+    if (building.owner === "enemy") {
+      arm.tint = 0xffaaa0;
+    }
+    layer.addChild(arm);
+  };
+  if (arms.includes("nw")) {
+    addArmSprite("nw");
+  }
   layer.addChild(sprite);
+  for (const corner of arms) {
+    if (corner !== "nw") {
+      addArmSprite(corner);
+    }
+  }
 
   if (building.ladderHp !== null) {
     const ladderAsset = assets.get("building.wall.ladder.attached");

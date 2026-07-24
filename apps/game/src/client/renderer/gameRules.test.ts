@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates, honmaruCellAssetCandidates } from "./gameRules";
-import type { BuildingSnapshot, CellCoord, Season } from "@asama/shared";
+import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates, diagonalJunctionArms, honmaruCellAssetCandidates } from "./gameRules";
+import type { BuildingSnapshot, CellCoord, Season, WorldSnapshot } from "@asama/shared";
 
 function mockBuilding(overrides: Partial<BuildingSnapshot> = {}): BuildingSnapshot {
   return {
@@ -179,5 +179,59 @@ describe("honmaruCellAssetCandidates per-cell tiling", () => {
       "building.honmaru.marker",
       "overlay.cell.selected"
     ]);
+  });
+});
+
+describe("diagonalJunctionArms", () => {
+  function wallAt(x: number, y: number, type: BuildingSnapshot["type"] = "wall", lifecycleState = "intact"): BuildingSnapshot {
+    return mockBuilding({
+      id: `w-${x}-${y}-${type}`,
+      type,
+      position: { x, y },
+      footprint: [{ x, y }],
+      passable: false,
+      lifecycleState: lifecycleState as BuildingSnapshot["lifecycleState"],
+      assetId: type === "wall" ? "building.wall.plaster.connected.0000" : `building.${type}`
+    });
+  }
+
+  function snapshotWith(buildings: readonly BuildingSnapshot[]): WorldSnapshot {
+    return { buildings } as unknown as WorldSnapshot;
+  }
+
+  it("adds one arm per corner toward the touching diagonal (diagonal neighbours)", () => {
+    const host = wallAt(10, 10);
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(11, 11, "diagonal_wall_nwse")]))).toEqual(["se"]);
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(9, 9, "diagonal_wall_nwse")]))).toEqual(["nw"]);
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(11, 9, "diagonal_wall_nesw")]))).toEqual(["ne"]);
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(9, 11, "diagonal_wall_nesw")]))).toEqual(["sw"]);
+  });
+
+  it("detects diagonals in edge-adjacent cells whose line touches the shared corner", () => {
+    const host = wallAt(10, 10);
+    // nwse at (10,9): its SE corner is the host's NE corner.
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(10, 9, "diagonal_wall_nwse")]))).toEqual(["ne"]);
+    // nesw at (10,9): its SW corner is the host's NW corner.
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(10, 9, "diagonal_wall_nesw")]))).toEqual(["nw"]);
+    // nwse at (11,10): its NW corner is the host's NE corner.
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(11, 10, "diagonal_wall_nwse")]))).toEqual(["ne"]);
+  });
+
+  it("ignores diagonals whose line does not touch any host corner", () => {
+    const host = wallAt(10, 10);
+    // nesw at (11,11) touches (11.5,10.5)/(10.5,11.5) - neither is a host corner.
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(11, 11, "diagonal_wall_nesw")]))).toEqual([]);
+  });
+
+  it("applies to hazama walls but not to other building types", () => {
+    const diagonal = wallAt(11, 11, "diagonal_wall_nwse");
+    expect(diagonalJunctionArms(wallAt(10, 10, "hazama_wall"), snapshotWith([diagonal]))).toEqual(["se"]);
+    expect(diagonalJunctionArms(mockBuilding({ position: { x: 10, y: 10 }, footprint: [{ x: 10, y: 10 }] }), snapshotWith([diagonal]))).toEqual([]);
+  });
+
+  it("requires both host and diagonal to be intact", () => {
+    const host = wallAt(10, 10);
+    expect(diagonalJunctionArms(host, snapshotWith([wallAt(11, 11, "diagonal_wall_nwse", "destroyed")]))).toEqual([]);
+    expect(diagonalJunctionArms(wallAt(10, 10, "wall", "destroyed"), snapshotWith([wallAt(11, 11, "diagonal_wall_nwse")]))).toEqual([]);
   });
 });

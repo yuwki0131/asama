@@ -310,6 +310,56 @@ export function honmaruCellAssetCandidates(building: BuildingSnapshot, cell: Cel
   return [`building.honmaru.tile.connected.${mask}`, "building.honmaru.marker", finalBuildingFallbackAssetId(building)];
 }
 
+export type DiagonalArmCorner = "nw" | "ne" | "se" | "sw";
+
+// Straight walls run through edge midpoints while diagonal walls run through
+// cell corners, so a junction needs a center->corner arm on the straight-wall
+// cell. An arm at corner c is required iff any of the 3 other cells sharing c
+// holds an intact diagonal wall whose diagonal line touches c (nwse touches
+// its own NW+SE corners, nesw touches NE+SW).
+const DIAGONAL_ARM_PROBES: Record<DiagonalArmCorner, readonly { dx: number; dy: number; diagonal: BuildingType }[]> = {
+  nw: [
+    { dx: -1, dy: -1, diagonal: "diagonal_wall_nwse" },
+    { dx: 0, dy: -1, diagonal: "diagonal_wall_nesw" },
+    { dx: -1, dy: 0, diagonal: "diagonal_wall_nesw" }
+  ],
+  ne: [
+    { dx: 0, dy: -1, diagonal: "diagonal_wall_nwse" },
+    { dx: 1, dy: -1, diagonal: "diagonal_wall_nesw" },
+    { dx: 1, dy: 0, diagonal: "diagonal_wall_nwse" }
+  ],
+  se: [
+    { dx: 1, dy: 0, diagonal: "diagonal_wall_nesw" },
+    { dx: 1, dy: 1, diagonal: "diagonal_wall_nwse" },
+    { dx: 0, dy: 1, diagonal: "diagonal_wall_nesw" }
+  ],
+  sw: [
+    { dx: -1, dy: 0, diagonal: "diagonal_wall_nwse" },
+    { dx: -1, dy: 1, diagonal: "diagonal_wall_nesw" },
+    { dx: 0, dy: 1, diagonal: "diagonal_wall_nwse" }
+  ]
+};
+
+export const DIAGONAL_ARM_CORNERS: readonly DiagonalArmCorner[] = ["nw", "ne", "se", "sw"];
+
+export function diagonalJunctionArms(building: BuildingSnapshot, snapshot: WorldSnapshot | null): readonly DiagonalArmCorner[] {
+  if (building.type !== "wall" && building.type !== "hazama_wall") {
+    return [];
+  }
+  if (building.lifecycleState !== "intact") {
+    return [];
+  }
+  return DIAGONAL_ARM_CORNERS.filter((corner) =>
+    DIAGONAL_ARM_PROBES[corner].some((probe) => {
+      const neighbor = findBuildingAtCell(
+        { x: building.position.x + probe.dx, y: building.position.y + probe.dy },
+        snapshot
+      );
+      return neighbor !== null && neighbor.type === probe.diagonal && neighbor.lifecycleState === "intact";
+    })
+  );
+}
+
 function isNeSwGateType(buildingType: BuildingType): boolean {
   return (
     buildingType === "gate_wide_2_ne_sw" ||
