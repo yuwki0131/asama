@@ -1169,6 +1169,17 @@
       }
     },
     {
+      "assetId": "building.wall.corner.cap",
+      "kind": "building",
+      "file": "generated/building-wall-corner-cap.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
       "assetId": "building.dry_moat.connected.0000",
       "kind": "building",
       "file": "generated/building-dry-moat-connected-0000.png",

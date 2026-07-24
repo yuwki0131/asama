@@ -375,8 +375,9 @@ def build_wall_diagonal_arm(scene: bpy.types.Scene, corner: str) -> None:
 
     Straight walls run through edge midpoints while diagonal walls run through
     cell corners, so their lines never meet; this arm bridges center->corner.
-    The center end extends 0.15 past the center so its cut face hides under
-    the straight wall sprite drawn at the same cell.
+    The arm ends exactly at the center: it draws before the wall sprite, whose
+    band covers the center-side cut face. Any overshoot past the center pokes
+    above the run's ridge silhouette for camera-facing (se/sw) arms.
     """
     mats = building_material_set()
     plaster, stone, coping = mats["plaster"], mats["stone"], mats["roof"]
@@ -387,14 +388,35 @@ def build_wall_diagonal_arm(scene: bpy.types.Scene, corner: str) -> None:
         "se": (0.5, 0.5),
         "sw": (-0.5, 0.5),
     }
-    cx, cy = corners[corner]
-    overshoot = 0.15
-    a = (-cx * overshoot / 0.5, -cy * overshoot / 0.5)
-    b = (cx, cy)
+    a = (0.0, 0.0)
+    b = corners[corner]
 
     _diag_prism(scene, "DiagArmBase", a, b, WALL_BASE_THICKNESS / 2.0, 0.0, WALL_BASE_HEIGHT, stone)
     _diag_prism(scene, "DiagArmBody", a, b, WALL_BODY_THICKNESS / 2.0, WALL_BASE_HEIGHT, WALL_BODY_TOP, plaster)
     _diag_gable(scene, "DiagArmCoping", a, b, WALL_COPING_THICKNESS / 2.0, WALL_BODY_TOP, WALL_COPING_TOP, coping)
+
+
+def build_wall_corner_cap(scene: bpy.types.Scene) -> None:
+    """Square corner post capping perpendicular wall elbows at a cell corner.
+
+    Elbow joints (two perpendicular wall segments with no through-line) leave
+    their outer-corner cut faces open because each piece ends exactly at the
+    corner point. This post is slightly larger than the wall cross-section and
+    covers those faces. Geometry is centered on the render origin; the
+    renderer positions the sprite at the grid corner point, not a cell center.
+    """
+    mats = building_material_set()
+    plaster, stone, coping = mats["plaster"], mats["stone"], mats["roof"]
+
+    add_box(scene, "CapBase", *map_box((-0.26, -0.26, 0.0), (0.26, 0.26, WALL_BASE_HEIGHT)), stone)
+    add_box(scene, "CapBody", *map_box((-0.20, -0.20, WALL_BASE_HEIGHT), (0.20, 0.20, WALL_BODY_TOP)), plaster)
+
+    half = 0.30
+    apex_z = WALL_COPING_TOP + 0.06
+    corners = [(-half, -half), (half, -half), (half, half), (-half, half)]
+    vertices = [(*map_xy(x, y), WALL_BODY_TOP) for x, y in corners] + [(0.0, 0.0, apex_z)]
+    faces = [(0, 1, 2, 3), (0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4)]
+    add_mesh(scene, "CapCoping", vertices, faces, coping)
 
 
 def build_wall_ladder(scene: bpy.types.Scene) -> None:

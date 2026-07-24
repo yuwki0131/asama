@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates, diagonalJunctionArms, honmaruCellAssetCandidates } from "./gameRules";
+import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates, diagonalJunctionArms, honmaruCellAssetCandidates, junctionCornerCaps } from "./gameRules";
 import type { BuildingSnapshot, CellCoord, Season, WorldSnapshot } from "@asama/shared";
 
 function mockBuilding(overrides: Partial<BuildingSnapshot> = {}): BuildingSnapshot {
@@ -233,5 +233,88 @@ describe("diagonalJunctionArms", () => {
     const host = wallAt(10, 10);
     expect(diagonalJunctionArms(host, snapshotWith([wallAt(11, 11, "diagonal_wall_nwse", "destroyed")]))).toEqual([]);
     expect(diagonalJunctionArms(wallAt(10, 10, "wall", "destroyed"), snapshotWith([wallAt(11, 11, "diagonal_wall_nwse")]))).toEqual([]);
+  });
+});
+
+describe("junctionCornerCaps", () => {
+  function wallAt(x: number, y: number, type: BuildingSnapshot["type"] = "wall", lifecycleState = "intact"): BuildingSnapshot {
+    return mockBuilding({
+      id: `w-${x}-${y}-${type}`,
+      type,
+      position: { x, y },
+      footprint: [{ x, y }],
+      passable: false,
+      lifecycleState: lifecycleState as BuildingSnapshot["lifecycleState"],
+      assetId: type === "wall" ? "building.wall.plaster.connected.0000" : `building.${type}`
+    });
+  }
+
+  function snapshotWith(buildings: readonly BuildingSnapshot[]): WorldSnapshot {
+    return { buildings } as unknown as WorldSnapshot;
+  }
+
+  it("caps a diagonal-diagonal elbow at the shared corner, owned by the front-most cell", () => {
+    const nwse = wallAt(10, 10, "diagonal_wall_nwse");
+    const nesw = wallAt(10, 11, "diagonal_wall_nesw");
+    const snapshot = snapshotWith([nwse, nesw]);
+    // nwse SE corner (11,11) === nesw NE corner: perpendicular elbow.
+    expect(junctionCornerCaps(nesw, snapshot)).toEqual([{ x: 11, y: 11 }]);
+    expect(junctionCornerCaps(nwse, snapshot)).toEqual([]);
+  });
+
+  it("caps an elbow opening the other way", () => {
+    const nesw = wallAt(10, 10, "diagonal_wall_nesw");
+    const nwse = wallAt(11, 10, "diagonal_wall_nwse");
+    const snapshot = snapshotWith([nesw, nwse]);
+    // nesw NE corner (11,10) === nwse NW corner.
+    expect(junctionCornerCaps(nwse, snapshot)).toEqual([{ x: 11, y: 10 }]);
+    expect(junctionCornerCaps(nesw, snapshot)).toEqual([]);
+  });
+
+  it("does not cap straight-through diagonal chains", () => {
+    const a = wallAt(10, 10, "diagonal_wall_nwse");
+    const b = wallAt(11, 11, "diagonal_wall_nwse");
+    const snapshot = snapshotWith([a, b]);
+    expect(junctionCornerCaps(a, snapshot)).toEqual([]);
+    expect(junctionCornerCaps(b, snapshot)).toEqual([]);
+  });
+
+  it("does not cap T-joints or crossings (collinear pair present)", () => {
+    const chainA = wallAt(10, 10, "diagonal_wall_nwse");
+    const chainB = wallAt(11, 11, "diagonal_wall_nwse");
+    const tee = wallAt(10, 11, "diagonal_wall_nesw");
+    const cross = wallAt(11, 10, "diagonal_wall_nesw");
+    const teeSnapshot = snapshotWith([chainA, chainB, tee]);
+    expect(junctionCornerCaps(chainA, teeSnapshot)).toEqual([]);
+    expect(junctionCornerCaps(chainB, teeSnapshot)).toEqual([]);
+    expect(junctionCornerCaps(tee, teeSnapshot)).toEqual([]);
+    const crossSnapshot = snapshotWith([chainA, chainB, tee, cross]);
+    for (const building of [chainA, chainB, tee, cross]) {
+      expect(junctionCornerCaps(building, crossSnapshot)).toEqual([]);
+    }
+  });
+
+  it("treats a straight wall's junction arm as a segment: collinear with the diagonal means no cap", () => {
+    const host = wallAt(10, 10);
+    const diagonal = wallAt(11, 11, "diagonal_wall_nwse");
+    const snapshot = snapshotWith([host, diagonal]);
+    expect(junctionCornerCaps(host, snapshot)).toEqual([]);
+    expect(junctionCornerCaps(diagonal, snapshot)).toEqual([]);
+  });
+
+  it("caps an elbow between a straight wall's arm and a perpendicular diagonal", () => {
+    const host = wallAt(10, 10);
+    const nesw = wallAt(10, 11, "diagonal_wall_nesw");
+    const snapshot = snapshotWith([host, nesw]);
+    // Host grows an SE arm toward key (11,11); nesw's NE corner is the same key.
+    expect(diagonalJunctionArms(host, snapshot)).toEqual(["se"]);
+    expect(junctionCornerCaps(nesw, snapshot)).toEqual([{ x: 11, y: 11 }]);
+    expect(junctionCornerCaps(host, snapshot)).toEqual([]);
+  });
+
+  it("ignores destroyed participants", () => {
+    const nwse = wallAt(10, 10, "diagonal_wall_nwse", "destroyed");
+    const nesw = wallAt(10, 11, "diagonal_wall_nesw");
+    expect(junctionCornerCaps(nesw, snapshotWith([nwse, nesw]))).toEqual([]);
   });
 });
