@@ -24,6 +24,14 @@ function p(dx: number, dy: number): { x: number; y: number } {
  *  What this file does add is an example of a **curved rampart + wall**
  *  authored as polylines: something the scenario's tile-based walls cannot
  *  express. That's the whole point of the 3D trial. */
+/** Passed to the scene for every non-trial scenario: the hand-authored
+ *  polylines below are positioned for hybrid-renderer-trial's map and would
+ *  render as stray geometry anywhere else. */
+export const noTrialFeatures: TrialFeatures = {
+  areas: [],
+  linears: [],
+};
+
 export const trialFeatures: TrialFeatures = {
   areas: [],
   linears: [

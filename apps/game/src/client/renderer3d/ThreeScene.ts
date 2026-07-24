@@ -48,6 +48,9 @@ export interface ThreeSceneHandle {
   camera: CameraControls;
   pickCellAt(clientX: number, clientY: number, canvasRect: DOMRect): { x: number; y: number } | null;
   setSelectedCell(cell: { x: number; y: number } | null): void;
+  /** Recenter on the scenario's tenshu (or map center). No-op before the
+   *  first snapshot. */
+  centerOnHome(): void;
   render(): void;
   dispose(): void;
 }
@@ -70,8 +73,9 @@ export function createThreeScene(options: ThreeSceneOptions): ThreeSceneHandle {
   scene.background = new Color(0xd6d3c0);
 
   const cameraControls = createCameraControls(width, height);
-  // Center on the trial scenario region (cells 46..58, 46..60 around 52,52).
-  cameraControls.centerOnCell({ x: 52, y: 52 });
+  // The camera is centered on the scenario's tenshu when the first snapshot
+  // arrives (see setSnapshot); until then the focus stays at the origin.
+  let homeCell: { x: number; y: number } | null = null;
 
   // Restrained lighting: one soft directional key + ambient fill. Avoids the
   // "shiny plastic castle game" look the trial spec explicitly warns against.
@@ -109,6 +113,10 @@ export function createThreeScene(options: ThreeSceneOptions): ThreeSceneHandle {
   return {
     setSnapshot(snapshot) {
       latestSnapshot = snapshot;
+      if (homeCell === null) {
+        homeCell = computeHomeCell(snapshot);
+        cameraControls.centerOnCell(homeCell);
+      }
       terrain.rebuild(snapshot);
       if (buildingLayer !== null) {
         scene.remove(buildingLayer.group);
@@ -147,6 +155,11 @@ export function createThreeScene(options: ThreeSceneOptions): ThreeSceneHandle {
       );
       selection.setCell(cell, cellRow?.elevation ?? 0);
     },
+    centerOnHome() {
+      if (homeCell !== null) {
+        cameraControls.centerOnCell(homeCell);
+      }
+    },
     render() {
       renderer.render(scene, cameraControls.camera);
     },
@@ -166,6 +179,35 @@ export function createThreeScene(options: ThreeSceneOptions): ThreeSceneHandle {
       });
       renderer.dispose();
     }
+  };
+}
+
+function computeHomeCell(snapshot: WorldSnapshot): { x: number; y: number } {
+  const tenshu = snapshot.buildings.find((b) => b.type === "tenshu");
+  if (tenshu !== undefined) {
+    const spec = buildingSpecs[tenshu.type];
+    return {
+      x: tenshu.position.x + Math.floor(spec.footprint.width / 2),
+      y: tenshu.position.y + Math.floor(spec.footprint.height / 2),
+    };
+  }
+  // No tenshu (e.g. the trial scenario): fall back to the centroid of the
+  // initial buildings, which frames whatever castle content the map has.
+  if (snapshot.buildings.length > 0) {
+    let sumX = 0;
+    let sumY = 0;
+    for (const b of snapshot.buildings) {
+      sumX += b.position.x;
+      sumY += b.position.y;
+    }
+    return {
+      x: Math.round(sumX / snapshot.buildings.length),
+      y: Math.round(sumY / snapshot.buildings.length),
+    };
+  }
+  return {
+    x: Math.floor(snapshot.map.width / 2),
+    y: Math.floor(snapshot.map.height / 2),
   };
 }
 

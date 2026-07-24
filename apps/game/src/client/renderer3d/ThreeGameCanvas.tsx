@@ -10,8 +10,9 @@ import { forwardRef } from "react";
 import type { CellCoord, WorldSnapshot } from "@asama/shared";
 import { createThreeScene, type ThreeSceneHandle } from "./ThreeScene";
 import { loadThreeAssets, type ThreeAssetMap } from "./assets";
-import { trialFeatures } from "./trialFeatures";
+import { noTrialFeatures, trialFeatures } from "./trialFeatures";
 import { cellToScreen } from "./picker";
+import { TRIAL_SCENARIO_ID } from "../rendererMode";
 
 export interface ThreeGameCanvasHandle {
   cellToScreenPoint(cell: CellCoord): { x: number; y: number } | null;
@@ -22,6 +23,7 @@ export interface ThreeGameCanvasHandle {
 
 export interface ThreeGameCanvasProps {
   snapshot: WorldSnapshot | null;
+  scenarioId: string;
   onCellSelected?: (cell: CellCoord | null) => void;
 }
 
@@ -48,10 +50,13 @@ export const ThreeGameCanvas = forwardRef<ThreeGameCanvasHandle, ThreeGameCanvas
           if (canvas === null || container === null) return;
           canvas.width = container.clientWidth;
           canvas.height = container.clientHeight;
+          // The hand-authored trial polylines only make sense on the trial
+          // scenario's map; every other scenario gets an empty feature set.
           const scene = createThreeScene({
             canvas,
             assets,
-            trialFeatures,
+            trialFeatures:
+              props.scenarioId === TRIAL_SCENARIO_ID ? trialFeatures : noTrialFeatures,
           });
           sceneRef.current = scene;
           if (pendingSnapshotRef.current !== null) {
@@ -191,7 +196,7 @@ export const ThreeGameCanvas = forwardRef<ThreeGameCanvasHandle, ThreeGameCanvas
           scene.camera.zoomStep(-1, canvas.width, canvas.height);
           e.preventDefault();
         } else if (e.key === "Home") {
-          scene.camera.centerOnCell({ x: 52, y: 52 });
+          scene.centerOnHome();
           scene.camera.updateProjection(canvas.width, canvas.height);
           e.preventDefault();
         } else if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", "W", "A", "S", "D"].includes(e.key)) {

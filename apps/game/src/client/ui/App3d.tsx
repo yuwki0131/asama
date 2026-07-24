@@ -144,7 +144,9 @@ export function App3d() {
         </header>
         <section className="game-view" style={{ flex: 1, position: "relative" }}>
           <ThreeGameCanvas
+            key={selectedScenarioId}
             ref={gameCanvasRef}
+            scenarioId={selectedScenarioId}
             snapshot={snapshot}
             onCellSelected={handleSelectCell}
           />
