@@ -54,6 +54,24 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.wall.plaster",
     gateState: null
   },
+  diagonal_wall_nwse: {
+    type: "diagonal_wall_nwse",
+    category: "castle",
+    maxHp: 260,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.wall.diagonal.nwse",
+    gateState: null
+  },
+  diagonal_wall_nesw: {
+    type: "diagonal_wall_nesw",
+    category: "castle",
+    maxHp: 260,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.wall.diagonal.nesw",
+    gateState: null
+  },
   gate_wide_2: {
     type: "gate_wide_2",
     category: "castle",

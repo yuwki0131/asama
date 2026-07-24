@@ -2076,6 +2076,60 @@
       }
     },
     {
+      "assetId": "building.wall.diagonal.nwse",
+      "kind": "building",
+      "output": "building-wall-diagonal-nwse.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-diagonal-nwse",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.diagonal.nesw",
+      "kind": "building",
+      "output": "building-wall-diagonal-nesw.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-diagonal-nesw",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
       "assetId": "building.dry_moat.connected.0000",
       "kind": "building",
       "output": "building-dry-moat-connected-0000.png",

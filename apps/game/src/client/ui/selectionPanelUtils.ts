@@ -34,6 +34,8 @@ export function buildingTypeLabel(type: BuildingType): string {
     yagura: "矢倉",
     wall: "石塀",
     hazama_wall: "狭間塀",
+    diagonal_wall_nwse: "斜め塀(縦)",
+    diagonal_wall_nesw: "斜め塀(横)",
     fence: "木塀",
     gate_wide_2: "門(広2)",
     gate_wide_3: "門(広3 NW-SE)",

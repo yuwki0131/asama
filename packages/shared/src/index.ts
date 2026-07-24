@@ -34,6 +34,8 @@ export type BuildingType =
   | "fence"
   | "wall"
   | "hazama_wall"
+  | "diagonal_wall_nwse"
+  | "diagonal_wall_nesw"
   | "gate_wide_2"
   | "gate_wide_3"
   | "gate_narrow_3"

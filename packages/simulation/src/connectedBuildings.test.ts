@@ -379,3 +379,37 @@ describe("hazama wall loophole assets", () => {
     expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe("building.wall.plaster.connected.0100");
   });
 });
+
+describe("diagonal walls", () => {
+  it("keeps the fixed orientation asset id regardless of neighbors", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "diagonal_wall_nwse", { x: 20, y: 20 });
+    place(world, "diagonal_wall_nwse", { x: 21, y: 21 });
+    place(world, "diagonal_wall_nesw", { x: 30, y: 21 });
+    place(world, "diagonal_wall_nesw", { x: 29, y: 22 });
+
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toBe("building.wall.diagonal.nwse");
+    expect(buildingAt(world, { x: 21, y: 21 }).assetId).toBe("building.wall.diagonal.nwse");
+    expect(buildingAt(world, { x: 30, y: 21 }).assetId).toBe("building.wall.diagonal.nesw");
+    expect(buildingAt(world, { x: 29, y: 22 }).assetId).toBe("building.wall.diagonal.nesw");
+  });
+
+  it("does not join the orthogonal connected-mask network of straight walls", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "wall", { x: 40, y: 40 });
+    place(world, "diagonal_wall_nwse", { x: 41, y: 40 });
+
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe("building.wall.plaster.connected.0000");
+    expect(buildingAt(world, { x: 41, y: 40 }).assetId).toBe("building.wall.diagonal.nwse");
+  });
+
+  it("blocks movement like a wall cell", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "diagonal_wall_nesw", { x: 50, y: 50 });
+    const building = buildingAt(world, { x: 50, y: 50 });
+    expect(building.passable).toBe(false);
+  });
+});

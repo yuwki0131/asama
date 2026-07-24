@@ -7,6 +7,7 @@ from .core import (
     WALL_DIRECTIONS, wall_arm_box,
     WALL_BASE_THICKNESS, WALL_BASE_HEIGHT, WALL_BODY_THICKNESS,
     WALL_BODY_TOP, WALL_COPING_THICKNESS, WALL_COPING_TOP, WALL_EPSILON,
+    ROOF_CURVE_SEGMENTS, ROOF_CURVE_EXPONENT,
 )
 from .materials import (
     building_material_set, make_gate_ground_material, make_ishigaki_material,
@@ -299,6 +300,74 @@ def build_wall_hazama_mask(scene: bpy.types.Scene, mask: str, shape: int) -> Non
         j = (i + 1) % count
         faces.append((i, j, count + j, count + i))
     add_mesh(scene, f"HazamaOpening{shape}", vertices, faces, dark)
+
+
+def _diag_prism(scene: bpy.types.Scene, name: str, a: tuple[float, float], b: tuple[float, float], half: float, z0: float, z1: float, material: bpy.types.Material) -> None:
+    """Vertical-sided prism along the map-space segment a->b."""
+    import math
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    length = math.hypot(dx, dy)
+    px, py = -dy / length * half, dx / length * half
+    corners = [
+        (a[0] + px, a[1] + py), (b[0] + px, b[1] + py),
+        (b[0] - px, b[1] - py), (a[0] - px, a[1] - py),
+    ]
+    vertices = [(*map_xy(x, y), z0) for x, y in corners] + [(*map_xy(x, y), z1) for x, y in corners]
+    faces = [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    add_mesh(scene, name, vertices, faces, material)
+
+
+def _diag_gable(scene: bpy.types.Scene, name: str, a: tuple[float, float], b: tuple[float, float], half: float, base_z: float, ridge_z: float, material: bpy.types.Material) -> None:
+    """Sori-curved coping prism with the ridge along the map segment a->b
+    (add_gable_roof only supports x/y ridge axes)."""
+    import math
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    length = math.hypot(dx, dy)
+    px, py = -dy / length, dx / length
+
+    def profile(t: float) -> float:
+        return base_z + (ridge_z - base_z) * (t ** ROOF_CURVE_EXPONENT)
+
+    steps = [i / ROOF_CURVE_SEGMENTS for i in range(ROOF_CURVE_SEGMENTS + 1)]
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+
+    def row(offset: float, z: float) -> tuple[int, int]:
+        index = len(vertices)
+        vertices.append((*map_xy(a[0] + px * offset, a[1] + py * offset), z))
+        vertices.append((*map_xy(b[0] + px * offset, b[1] + py * offset), z))
+        return index, index + 1
+
+    south = [row(half * (1.0 - t), profile(t)) for t in steps]
+    north = [row(-half * (1.0 - t), profile(t)) for t in steps]
+    for slope in (south, north):
+        for (a0, b0), (a1, b1) in zip(slope, slope[1:]):
+            faces.append((a0, b0, b1, a1))
+    for end in (0, 1):
+        loop = [south[i][end] for i in range(len(south))] + [north[i][end] for i in range(len(north) - 2, -1, -1)]
+        faces.append(tuple(loop))
+    add_mesh(scene, name, vertices, faces, material)
+
+
+def build_wall_diagonal(scene: bpy.types.Scene, orientation: str) -> None:
+    """Plaster wall running corner-to-corner across the cell diagonal.
+
+    nwse: NW corner to SE corner (grid direction (1,1), screen-vertical run).
+    nesw: NE corner to SW corner (grid direction (1,-1), screen-horizontal run).
+    Cross-section matches the straight plaster wall so chains and junctions
+    read as the same wall family.
+    """
+    mats = building_material_set()
+    plaster, stone, coping = mats["plaster"], mats["stone"], mats["roof"]
+
+    if orientation == "nwse":
+        a, b = (-0.5, -0.5), (0.5, 0.5)
+    else:
+        a, b = (0.5, -0.5), (-0.5, 0.5)
+
+    _diag_prism(scene, "DiagWallBase", a, b, WALL_BASE_THICKNESS / 2.0, 0.0, WALL_BASE_HEIGHT, stone)
+    _diag_prism(scene, "DiagWallBody", a, b, WALL_BODY_THICKNESS / 2.0, WALL_BASE_HEIGHT, WALL_BODY_TOP, plaster)
+    _diag_gable(scene, "DiagWallCoping", a, b, WALL_COPING_THICKNESS / 2.0, WALL_BODY_TOP, WALL_COPING_TOP, coping)
 
 
 def build_wall_ladder(scene: bpy.types.Scene) -> None:
