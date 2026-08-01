@@ -307,24 +307,40 @@ describe("elevation: interaction on high ground", () => {
 
   it("places a wall on the level-2 terrace via a click at the lifted cell", async () => {
     await centerOnHill();
-    await page.getByRole("button", { name: "壁", exact: true }).click();
-    const point = await cellToScreen(page, TERRACE_BUILD_CELL);
-    expect(point).not.toBeNull();
-    await page.mouse.click(point!.x, point!.y);
+    // Click the wall tool, then wait until React commits the tool state (the
+    // button turns .active) — otherwise the map click below can land first
+    // and be handled as a selection click instead of a build placement.
+    const wallButton = page.getByRole("button", { name: "壁", exact: true });
+    await wallButton.click();
+    let toolActive = false;
+    for (let attempt = 0; attempt < 30 && !toolActive; attempt += 1) {
+      toolActive = (((await wallButton.getAttribute("class")) ?? "")).includes("active");
+      if (!toolActive) await page.waitForTimeout(100);
+    }
+    expect(toolActive, "wall build tool did not become active").toBe(true);
+    // Re-issue the click if it is silently dropped (same phenomenon as the
+    // move-order test above: pointer events can vanish while textures upload).
+    let wall: { elevation: number } | null = null;
+    let point: { x: number; y: number } | null = null;
+    for (let attempt = 0; attempt < 3 && wall === null; attempt += 1) {
+      point = await cellToScreen(page, TERRACE_BUILD_CELL);
+      expect(point).not.toBeNull();
+      await page.mouse.click(point!.x, point!.y);
 
-    const wall = await page.evaluate(async (cell) => {
-      const bridge = window.__asamaTest;
-      if (!bridge) return null;
-      const tick = bridge.getSnapshot()?.currentTick ?? 0;
-      await bridge.waitForTick(tick + 3);
-      const snap = bridge.getSnapshot();
-      const building = snap?.buildings.find(
-        (b) => b.type === "wall" && b.position.x === cell.x && b.position.y === cell.y
-      );
-      if (!building || !snap) return null;
-      const terrain = snap.map.cells[cell.y * snap.map.width + cell.x];
-      return { elevation: terrain?.elevation ?? 0 };
-    }, TERRACE_BUILD_CELL);
+      wall = await page.evaluate(async (cell) => {
+        const bridge = window.__asamaTest;
+        if (!bridge) return null;
+        const tick = bridge.getSnapshot()?.currentTick ?? 0;
+        await bridge.waitForTick(tick + 5);
+        const snap = bridge.getSnapshot();
+        const building = snap?.buildings.find(
+          (b) => b.type === "wall" && b.position.x === cell.x && b.position.y === cell.y
+        );
+        if (!building || !snap) return null;
+        const terrain = snap.map.cells[cell.y * snap.map.width + cell.x];
+        return { elevation: terrain?.elevation ?? 0 };
+      }, TERRACE_BUILD_CELL);
+    }
     expect(wall, "wall was not placed on the clicked terrace cell").not.toBeNull();
     expect(wall?.elevation).toBe(2);
 
