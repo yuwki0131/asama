@@ -81,8 +81,9 @@
 
 - コミット規約: `v$(date +%y%m%d%H%M)` スナップショット、PRはCI green条件付きマージ
 - E2E はポート5179専有 → 直列実行。ゾンビ vitest は `pkill -f "[v]itest"`
-- 実画面スクショはシーン構築 ~15秒待ち必須(waitForTimeout(18000))。ただし devバンドルは
-  main-threadテクスチャロード(preferWorkers:false)のため全ロード ~150秒 — `qa/shot.mjs --settle 155000`
+- 実画面スクショはシーン構築 ~15秒待ち必須(waitForTimeout(18000))。devバンドルは
+  main-threadテクスチャロード(preferWorkers:false)だが、assets.tsの一括 `Assets.load(urls)`
+  バッチ化で全ロードは30秒以内に収まる — `qa/shot.mjs --settle 30000` 目安
 - セーブAPI(/api/saves)は `pnpm --filter @asama/game run dev:server`(ポート3000)が別途必要。
   未起動だと画面右上に赤い "save failed (500)" が出てQAスクショに写り込む
 - Blender: `ASAMA_BLENDER_BIN=/nix/store/s0jp4xvpkzc3j00xf7m4d5j385k487lj-blender-5.1.1/bin/blender`
