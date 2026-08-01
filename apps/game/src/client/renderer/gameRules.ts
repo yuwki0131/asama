@@ -79,6 +79,50 @@ export function buildingAssetCandidates(building: BuildingSnapshot, season?: Sea
   return [building.assetId, baseBuildingAssetId(building), finalBuildingFallbackAssetId(building)];
 }
 
+export interface WallPathPiece {
+  readonly type: BuildingType;
+  readonly position: CellCoord;
+}
+
+/**
+ * Octile wall path for drag-draw: a diagonal leg (45° wall pieces) consumes
+ * the shorter axis first, then a straight leg of the drag tool finishes the
+ * dominant axis. On an exact diagonal the whole run is diagonal pieces; the
+ * diagonal→straight junction visual is covered by the DIAG-04 junction arms.
+ */
+export function planWallPath(tool: BuildingType, anchor: CellCoord, target: CellCoord): readonly WallPathPiece[] {
+  const dx = target.x - anchor.x;
+  const dy = target.y - anchor.y;
+  const sx = Math.sign(dx);
+  const sy = Math.sign(dy);
+  const ax = Math.abs(dx);
+  const ay = Math.abs(dy);
+  const diagonalSteps = Math.min(ax, ay);
+  const diagonalType: BuildingType = sx === sy ? "diagonal_wall_nwse" : "diagonal_wall_nesw";
+
+  const pieces: WallPathPiece[] = [];
+  if (ax === ay && diagonalSteps > 0) {
+    for (let k = 0; k <= diagonalSteps; k += 1) {
+      pieces.push({ type: diagonalType, position: { x: anchor.x + k * sx, y: anchor.y + k * sy } });
+    }
+    return pieces;
+  }
+
+  for (let k = 0; k < diagonalSteps; k += 1) {
+    pieces.push({ type: diagonalType, position: { x: anchor.x + k * sx, y: anchor.y + k * sy } });
+  }
+  if (ax > ay) {
+    for (let i = diagonalSteps; i <= ax; i += 1) {
+      pieces.push({ type: tool, position: { x: anchor.x + i * sx, y: anchor.y + diagonalSteps * sy } });
+    }
+  } else {
+    for (let i = diagonalSteps; i <= ay; i += 1) {
+      pieces.push({ type: tool, position: { x: anchor.x + diagonalSteps * sx, y: anchor.y + i * sy } });
+    }
+  }
+  return pieces;
+}
+
 export function isCenterAnchoredBuilding(buildingType: BuildingType): boolean {
   return (
     buildingType === "fence" ||

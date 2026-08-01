@@ -13,7 +13,8 @@ import { createAerialOverlay, resizeAerialOverlay } from "./aerialOverlay";
 import { loadAnimationSheets, loadGeneratedAssets, type AnimationSheetAsset, type LoadedAsset } from "./assets";
 import { cellToWorld, centerCameraOnCell, roundScreenPixel, snapCamera, worldToScreen, type CameraState } from "./camera";
 import { tileOffsetYAt } from "./elevation";
-import { registerKeyboardInput, registerPointerInput } from "./input";
+import type { WallPathPiece } from "./gameRules";
+import { registerKeyboardInput, registerPointerInput, type DragState } from "./input";
 import { elapsedSimTicks } from "./interpolation";
 import { drawMinimap, jumpCameraFromMinimap, MAP_HEIGHT, MAP_WIDTH, type MinimapTerrainCache } from "./minimap";
 import { focusCellDebugRows } from "./focusCellDebug";
@@ -143,15 +144,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const minimapRef = useRef<HTMLCanvasElement | null>(null);
   const minimapTerrainRef = useRef<MinimapTerrainCache | null>(null);
   const cameraRef = useRef<CameraState>({ x: 0, y: 0, zoom: 1 });
-  const dragRef = useRef<{
-    pointerId: number;
-    mode: "select" | "pan" | "build";
-    startX: number;
-    startY: number;
-    lastX: number;
-    lastY: number;
-    moved: boolean;
-  } | null>(null);
+  const dragRef = useRef<DragState | null>(null);
   const cameraRafRef = useRef<number | null>(null);
   const [ready, setReady] = useState(false);
   const [assets, setAssets] = useState<ReadonlyMap<string, LoadedAsset>>(new Map());
@@ -162,6 +155,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
     onCellSelectedRef.current?.(cell);
   }, []);
   const [localInvalidMoveTarget, setLocalInvalidMoveTarget] = useState<CellCoord | null>(null);
+  const [wallPlan, setWallPlan] = useState<readonly WallPathPiece[] | null>(null);
   const [cameraVersion, setCameraVersion] = useState(0);
   const [selectionBox, setSelectionBox] = useState<{
     readonly x0: number;
@@ -490,7 +484,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       debugOverlayVisible,
       hoverCell,
       selectedCell,
-      localInvalidMoveTarget
+      localInvalidMoveTarget,
+      wallPlan
     );
     drawMinimap(minimapRef.current, minimapTerrainRef, snapshot, cameraRef.current, hostRef.current);
     if (effectsLayerRef.current !== null) {
@@ -499,7 +494,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
     // cameraVersion is not read by renderScene, but camera pans and zooms
     // mutate cameraRef without new state; the version bump re-triggers this
     // effect so the scene follows the camera.
-  }, [assets, buildTool, cameraVersion, debugOverlayVisible, hoverCell, localInvalidMoveTarget, ready, selectedCell, snapshot]);
+  }, [assets, buildTool, cameraVersion, debugOverlayVisible, hoverCell, localInvalidMoveTarget, ready, selectedCell, snapshot, wallPlan]);
 
   useEffect(() => {
     const app = appRef.current;
@@ -536,6 +531,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       setSelectedCell,
       setLocalInvalidMoveTarget,
       setSelectionBox,
+      setWallPlan,
       onMoveSelected
     });
   }, [onMoveSelected, ready, scheduleCameraRender]);
