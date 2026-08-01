@@ -20,10 +20,59 @@ export interface BuildingSpec {
   readonly category: BuildingCategory;
   readonly maxHp: number;
   readonly footprint: { readonly width: number; readonly height: number };
+  /** 矩形でないフットプリント(円弧壁の階段状セル列など)。アンカーセル相対
+   *  オフセット。指定時は footprint 矩形の代わりにこちらが専有セルになる。 */
+  readonly footprintCells?: readonly { readonly x: number; readonly y: number }[];
   readonly passable: boolean;
   readonly movementCostModifier?: number;
   readonly assetId: string;
   readonly gateState: GateState | null;
+}
+
+// 四分円弧壁: 円中心Cはセル角(半整数座標)、半径 R = span − 0.5。両端点が
+// セル辺の中点に正接(グリッド軸方向)で乗るため直線壁と面一で接続できる。
+// quadrant は膨らみ方向 (sx,sy): ne=(+,−) se=(+,+) sw=(−,+) nw=(−,−)。
+// アンカーセルは南北正接側の端点セル。
+function arcFootprintCells(
+  span: 3 | 4,
+  sx: 1 | -1,
+  sy: 1 | -1
+): readonly { readonly x: number; readonly y: number }[] {
+  const base =
+    span === 3
+      ? [
+          [0, 0],
+          [0, 1],
+          [-1, 1],
+          [-1, 2],
+          [-2, 2]
+        ]
+      : [
+          [0, 0],
+          [0, 1],
+          [-1, 1],
+          [-1, 2],
+          [-2, 2],
+          [-2, 3],
+          [-3, 3]
+        ];
+  return base.map(([x = 0, y = 0]) => ({ x: x * sx, y: y * sy }));
+}
+
+function arcWallSpec(span: 3 | 4, quadrant: "ne" | "se" | "sw" | "nw"): BuildingSpec {
+  const sx = quadrant === "ne" || quadrant === "se" ? 1 : -1;
+  const sy = quadrant === "se" || quadrant === "sw" ? 1 : -1;
+  const cells = arcFootprintCells(span, sx, sy);
+  return {
+    type: `arc_wall_r${span}_${quadrant}` as BuildingType,
+    category: "castle",
+    maxHp: cells.length * 260,
+    footprint: { width: span, height: span },
+    footprintCells: cells,
+    passable: false,
+    assetId: `building.wall.arc.r${span}.${quadrant}`,
+    gateState: null
+  };
 }
 
 export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
@@ -72,6 +121,14 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.wall.diagonal.nesw",
     gateState: null
   },
+  arc_wall_r3_ne: arcWallSpec(3, "ne"),
+  arc_wall_r3_se: arcWallSpec(3, "se"),
+  arc_wall_r3_sw: arcWallSpec(3, "sw"),
+  arc_wall_r3_nw: arcWallSpec(3, "nw"),
+  arc_wall_r4_ne: arcWallSpec(4, "ne"),
+  arc_wall_r4_se: arcWallSpec(4, "se"),
+  arc_wall_r4_sw: arcWallSpec(4, "sw"),
+  arc_wall_r4_nw: arcWallSpec(4, "nw"),
   gate_wide_2: {
     type: "gate_wide_2",
     category: "castle",

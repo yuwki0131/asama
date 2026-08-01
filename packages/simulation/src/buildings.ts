@@ -4,7 +4,9 @@ import {
   BLOCKED_MOVEMENT_COST,
   FOOD_BALANCE,
   SIEGE_BALANCE,
+  arcQuadrantSigns,
   cardinalDirections,
+  isArcWall,
   isBridge,
   isGate,
   isInsideMap,
@@ -83,7 +85,7 @@ export const buildingDefinitions: Record<BuildingType, BuildingDefinition> = Obj
       type: spec.type,
       category: spec.category,
       maxHp: spec.maxHp,
-      footprint: rectangularFootprint(spec.footprint.width, spec.footprint.height),
+      footprint: spec.footprintCells ?? rectangularFootprint(spec.footprint.width, spec.footprint.height),
       passable: spec.passable,
       movementCostModifier: spec.movementCostModifier ?? (spec.passable ? 1 : BLOCKED_MOVEMENT_COST),
       assetId: spec.assetId,
@@ -531,6 +533,8 @@ function connectionMask(world: WorldState, building: BuildingState): string {
         ? "1"
         : connectsToAdjacentGateFootprint(world, building, direction)
         ? "1"
+        : connectsToAdjacentArcEndpoint(world, building, direction)
+        ? "1"
         : "0"
     )
     .join("");
@@ -552,6 +556,44 @@ function connectsToAdjacentGateFootprint(world: WorldState, building: BuildingSt
 
     return gateEndpointNeighborCells(neighbor).some(
       (endpoint) => endpoint !== null && sameCell(endpoint, building.position) && neighbor.footprint.some((cell) => sameCell(cell, target))
+    );
+  });
+}
+
+/** 円弧壁の端点セルと、その外側で直線壁が接続すべき隣接セルのペア。
+ *  南北正接端点=アンカーセル(外側は−sy方向)、東西正接端点=フットプリント
+ *  末尾セル(外側は−sx方向)。 */
+export function arcEndpointConnections(
+  arc: BuildingState
+): readonly { readonly endpoint: CellCoord; readonly outside: CellCoord }[] {
+  const { sx, sy } = arcQuadrantSigns(arc.type);
+  const northSouth = arc.position;
+  const eastWest = arc.footprint[arc.footprint.length - 1];
+  if (eastWest === undefined) {
+    return [];
+  }
+  return [
+    { endpoint: northSouth, outside: { x: northSouth.x, y: northSouth.y - sy } },
+    { endpoint: eastWest, outside: { x: eastWest.x - sx, y: eastWest.y } }
+  ];
+}
+
+function connectsToAdjacentArcEndpoint(world: WorldState, building: BuildingState, direction: CellCoord): boolean {
+  if (building.type !== "fence" && !isWall(building.type)) {
+    return false;
+  }
+
+  const target = {
+    x: building.position.x + direction.x,
+    y: building.position.y + direction.y
+  };
+  return world.buildings.some((neighbor) => {
+    if (neighbor.lifecycleState !== "intact" || !isArcWall(neighbor.type)) {
+      return false;
+    }
+
+    return arcEndpointConnections(neighbor).some(
+      (connection) => sameCell(connection.outside, building.position) && sameCell(connection.endpoint, target)
     );
   });
 }
