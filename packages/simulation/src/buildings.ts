@@ -303,12 +303,45 @@ export function createBuildingState(
   };
 }
 
+// Cell→building occupancy index. getBuildingAt is the innermost loop of A*
+// (every neighbor probe), so a linear scan over ~600 buildings × footprint
+// makes pathfinding O(cells × buildings) and froze large scenarios to
+// ~200ms/tick. The index is cached per world and rebuilt only when the
+// buildings array changes: additions push (length changes) and removals
+// reassign a filtered array (identity changes), so (identity, length) is a
+// sound invalidation key. Lifecycle-state changes never add or remove
+// footprint cells, so they are filtered at query time instead.
+interface BuildingIndexCache {
+  buildings: readonly BuildingState[];
+  length: number;
+  index: Map<string, BuildingState>;
+}
+
+const buildingIndexCaches = new WeakMap<WorldState, BuildingIndexCache>();
+
+function buildingIndex(world: WorldState): Map<string, BuildingState> {
+  const { buildings } = world;
+  const cached = buildingIndexCaches.get(world);
+  if (cached !== undefined && cached.buildings === buildings && cached.length === buildings.length) {
+    return cached.index;
+  }
+  const index = new Map<string, BuildingState>();
+  for (const building of buildings) {
+    for (const cell of building.footprint) {
+      const key = `${cell.x},${cell.y}`;
+      // First match wins, mirroring the previous array-order find().
+      if (!index.has(key)) {
+        index.set(key, building);
+      }
+    }
+  }
+  buildingIndexCaches.set(world, { buildings, length: buildings.length, index });
+  return index;
+}
+
 export function getBuildingAt(world: WorldState, coord: CellCoord): BuildingState | null {
-  return (
-    world.buildings.find(
-      (building) => building.lifecycleState === "intact" && building.footprint.some((cell) => sameCell(cell, coord))
-    ) ?? null
-  );
+  const building = buildingIndex(world).get(`${coord.x},${coord.y}`);
+  return building !== undefined && building.lifecycleState === "intact" ? building : null;
 }
 
 export function clearUnitPathsThrough(world: WorldState, footprint: readonly CellCoord[]): void {

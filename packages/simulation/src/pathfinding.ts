@@ -62,6 +62,7 @@ export function findPath(world: WorldState, start: CellCoord, goal: CellCoord, p
   }
 
   const open = new Map<string, PathNode>();
+  const heap = new OpenHeap();
   const closed = new Set<string>();
   const nodes = new Map<string, PathNode>();
   const startKey = cellKey(start);
@@ -72,10 +73,22 @@ export function findPath(world: WorldState, start: CellCoord, goal: CellCoord, p
     parentKey: null
   };
   open.set(startKey, startNode);
+  heap.push(startNode);
   nodes.set(startKey, startNode);
 
-  while (open.size > 0) {
-    const current = lowestCostNode(open);
+  for (;;) {
+    // Lazy deletion: superseded entries stay in the heap and are skipped when
+    // they no longer match the open set's current node for their cell.
+    let current: PathNode | undefined;
+    for (;;) {
+      current = heap.pop();
+      if (current === undefined || open.get(cellKey(current.coord)) === current) {
+        break;
+      }
+    }
+    if (current === undefined) {
+      break;
+    }
     const currentKey = cellKey(current.coord);
     open.delete(currentKey);
 
@@ -105,6 +118,7 @@ export function findPath(world: WorldState, start: CellCoord, goal: CellCoord, p
         parentKey: currentKey
       };
       open.set(neighborKey, nextNode);
+      heap.push(nextNode);
       nodes.set(neighborKey, nextNode);
     }
   }
@@ -149,19 +163,62 @@ interface PathNode {
   readonly parentKey: string | null;
 }
 
-function lowestCostNode(nodes: Map<string, PathNode>): PathNode {
-  let best: PathNode | null = null;
-  for (const node of nodes.values()) {
-    if (best === null || node.f < best.f || (node.f === best.f && cellKey(node.coord) < cellKey(best.coord))) {
-      best = node;
+/**
+ * Binary min-heap over (f, cellKey) — the same total order the previous
+ * linear open-set scan used, so node expansion order (and thus paths) stays
+ * byte-for-byte deterministic. Distinct cells always differ in cellKey, so
+ * the minimum is unique.
+ */
+class OpenHeap {
+  private readonly items: PathNode[] = [];
+
+  push(node: PathNode): void {
+    const { items } = this;
+    items.push(node);
+    let i = items.length - 1;
+    while (i > 0) {
+      const parent = (i - 1) >> 1;
+      if (!lessThan(items[i]!, items[parent]!)) {
+        break;
+      }
+      [items[i], items[parent]] = [items[parent]!, items[i]!];
+      i = parent;
     }
   }
 
-  if (best === null) {
-    throw new Error("Cannot select a path node from an empty open set");
+  pop(): PathNode | undefined {
+    const { items } = this;
+    if (items.length === 0) {
+      return undefined;
+    }
+    const top = items[0];
+    const last = items.pop()!;
+    if (items.length > 0) {
+      items[0] = last;
+      let i = 0;
+      for (;;) {
+        const left = i * 2 + 1;
+        const right = left + 1;
+        let smallest = i;
+        if (left < items.length && lessThan(items[left]!, items[smallest]!)) {
+          smallest = left;
+        }
+        if (right < items.length && lessThan(items[right]!, items[smallest]!)) {
+          smallest = right;
+        }
+        if (smallest === i) {
+          break;
+        }
+        [items[i], items[smallest]] = [items[smallest]!, items[i]!];
+        i = smallest;
+      }
+    }
+    return top;
   }
+}
 
-  return best;
+function lessThan(a: PathNode, b: PathNode): boolean {
+  return a.f < b.f || (a.f === b.f && cellKey(a.coord) < cellKey(b.coord));
 }
 
 function reconstructPath(goalKey: string, nodes: Map<string, PathNode>): CellCoord[] {
