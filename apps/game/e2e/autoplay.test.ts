@@ -9,7 +9,7 @@
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Browser, Page } from "playwright-core";
-import { launchBrowser, newPage, openGame } from "./helpers";
+import { getConsoleMsgs, launchBrowser, newPage, openGame } from "./helpers";
 import {
   concentricCastleScript,
   linearFortressScript,
@@ -162,9 +162,11 @@ async function resolveAndEnqueue(
  *
  * A 200ms fallback prevents hanging when the game ends before targetTick,
  * since currentTick freezes on game-end and waitForTick would never resolve.
+ * The ~5s iteration cap returns control to the caller's loop so the
+ * frozen-sim watchdog upstream can observe stalled ticks.
  */
 async function pollUntilTickOrOutcome(page: Page, targetTick: number): Promise<void> {
-  for (;;) {
+  for (let i = 0; i < 25; i++) {
     const done = await page.evaluate(
       async ({ t, fallbackMs }: { t: number; fallbackMs: number }) => {
         const bridge = window.__asamaTest;
@@ -200,6 +202,12 @@ async function runPlaythrough(page: Page, script: PlaythroughScript): Promise<vo
   let seqBase = 200;
   let stepIdx = 0;
 
+  // Frozen-sim watchdog: fail fast (with recent console output) if the tick
+  // counter stops advancing, instead of hanging until the vitest timeout.
+  let lastTick = -1;
+  let lastAdvanceMs = Date.now();
+  let lastLogMs = Date.now();
+
   for (;;) {
     const state = await page.evaluate(() => {
       const snap = window.__asamaTest?.getSnapshot();
@@ -219,6 +227,22 @@ async function runPlaythrough(page: Page, script: PlaythroughScript): Promise<vo
 
     const { tick, outcome } = state;
 
+    if (tick !== lastTick) {
+      lastTick = tick;
+      lastAdvanceMs = Date.now();
+    } else if (outcome === null && Date.now() - lastAdvanceMs > 30_000) {
+      const msgs = getConsoleMsgs(page).slice(-40).join("\n");
+      throw new Error(
+        `Simulation frozen: tick=${tick} did not advance for 30s ` +
+        `(scenario "${script.scenarioId}", stepIdx=${stepIdx}/${steps.length}).\n` +
+        `Recent browser console:\n${msgs || "(no console output)"}`
+      );
+    }
+    if (Date.now() - lastLogMs > 60_000) {
+      lastLogMs = Date.now();
+      console.log(`[autoplay] ${script.scenarioId}: tick=${tick} stepIdx=${stepIdx}/${steps.length}`);
+    }
+
     // Dispatch all pending steps
     while (stepIdx < steps.length && (steps[stepIdx]!.atTick) <= tick) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -232,19 +256,9 @@ async function runPlaythrough(page: Page, script: PlaythroughScript): Promise<vo
         // Hard: game must conclude within maxTick — this catches frozen/hung simulations.
         expect(outcome.tick, "outcome.tick ≤ maxTick").toBeLessThanOrEqual(expectedOutcome.maxTick);
 
-        // Advisory: log mismatches between script expectedOutcome and actual.
-        // concentricCastleScript sends all player units south, leaving the honmaru
-        // undefended while the enemy breaches the gates (see requests/content/).
-        // These are soft checks so the crash-detection test still passes while the
-        // script strategy is being fixed.
-        // TODO: harden once concentricCastleScript is corrected.
-        if (outcome.reason !== expectedOutcome.outcome) {
-          console.warn(
-            `[autoplay] outcome mismatch for "${script.scenarioId}": ` +
-            `expected ${expectedOutcome.outcome} (${expectedOutcome.winner}), ` +
-            `got ${outcome.reason} (${outcome.winner}) at tick ${outcome.tick}`
-          );
-        }
+        // Hard: outcome reason and winner must match the script's expectation.
+        expect(outcome.reason, "outcome.reason").toBe(expectedOutcome.outcome);
+        expect(outcome.winner, "outcome.winner").toBe(expectedOutcome.winner);
 
         if (expectedOutcome.casualtyBand && outcome.winner === expectedOutcome.winner) {
           const survivingIds = await page.evaluate(() => {
@@ -297,9 +311,11 @@ describe("autoplay: concentric-castle (scenario A)", () => {
     await page?.close();
   });
 
+  // 900s: supply_cut resolves near tick 14800 at 4x, but leave headroom
+  // comparable to the mountain-castle run (700s for 24000 ticks).
   it("plays concentric-castle to supply_cut outcome within maxTick", async () => {
     await runPlaythrough(page, concentricCastleScript);
-  }, 600_000);
+  }, 900_000);
 });
 
 // ── Scenario B: linear-fortress (skipped) ─────────────────────────────────
