@@ -2,7 +2,7 @@ import type { Application, Container } from "pixi.js";
 import type { CellCoord, WorldSnapshot } from "@asama/shared";
 import { clearLayer, type LoadedAsset } from "./assets";
 import { roundScreenPixel, type CameraState } from "./camera";
-import { getSnapshotCell, isInsideSnapshotMap } from "./gameRules";
+import { canPreviewPlaceBuildingCell, getSnapshotCell, isInsideSnapshotMap, type WallPathPiece } from "./gameRules";
 import { addAlignmentDebugOverlay, addCellActionPreview, addOverlaySprite, addPathSprites } from "./overlayLayer";
 import { buildTerrainChunks, terrainKeyFor, updateTerrainChunkVisibility } from "./terrainLayer";
 import type { ToolMode } from "./GameCanvas";
@@ -27,7 +27,8 @@ export function renderScene(
   debugOverlayVisible: boolean,
   hoverCell: CellCoord | null,
   selectedCell: CellCoord | null,
-  localInvalidMoveTarget: CellCoord | null
+  localInvalidMoveTarget: CellCoord | null,
+  wallPlan: readonly WallPathPiece[] | null
 ): void {
   if (app === null || world === null || terrainLayer === null || overlayLayer === null || debugLayer === null) {
     return;
@@ -53,7 +54,15 @@ export function renderScene(
     addPathSprites(overlayLayer, unit, assets, snapshot.map);
   }
 
-  if (selectedCell !== null) {
+  if (wallPlan !== null) {
+    for (const piece of wallPlan) {
+      if (!isInsideSnapshotMap(piece.position, snapshot)) {
+        continue;
+      }
+      const valid = canPreviewPlaceBuildingCell(snapshot, piece.position, piece.type);
+      addOverlaySprite(overlayLayer, piece.position, valid ? "overlay.build.valid" : "overlay.build.invalid", assets, snapshot.map);
+    }
+  } else if (selectedCell !== null) {
     addCellActionPreview(overlayLayer, selectedCell, snapshot, buildTool, assets);
   }
 

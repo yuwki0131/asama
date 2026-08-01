@@ -7,7 +7,14 @@ import {
   type CameraState
 } from "./camera";
 import { pickCellAtScreenPoint } from "./elevation";
-import { canPreviewPlaceBuildingCell, findBuildingAtCell, getSnapshotCell, isSnapshotPassable } from "./gameRules";
+import {
+  canPreviewPlaceBuildingCell,
+  findBuildingAtCell,
+  getSnapshotCell,
+  isSnapshotPassable,
+  planWallPath,
+  type WallPathPiece
+} from "./gameRules";
 import { findUnitAtScreenPoint, unitScreenPoint } from "./sceneLayer";
 import type { ToolMode } from "./GameCanvas";
 
@@ -15,21 +22,33 @@ const DOUBLE_CLICK_MS = 350;
 const DOUBLE_CLICK_RADIUS_PX = 8;
 const DOUBLE_PRESS_MS = 600;
 
-interface DragState {
+// Drag state lives in a React ref (not closure vars) because the pointer
+// input effect re-registers whenever its deps change (e.g. every snapshot
+// render), which would wipe closure state mid-gesture.
+export interface DragState {
   pointerId: number;
-  mode: "select" | "pan" | "build";
+  mode: "select" | "pan" | "build" | "wallplan";
   startX: number;
   startY: number;
   lastX: number;
   lastY: number;
   moved: boolean;
+  wallPlanAnchor?: CellCoord;
+  lastWallPlanCell?: CellCoord;
 }
 
 /** Building types that support drag-to-place (1×1 connection-kit pieces). */
-const DRAG_BUILD_TYPES = new Set<ToolMode>(["fence", "wall", "hazama_wall", "road", "dry_moat", "water_moat"]);
+const DRAG_BUILD_TYPES = new Set<ToolMode>(["fence", "road", "dry_moat", "water_moat"]);
+
+/** Wall-family tools that drag-draw an octile snap path (straight + 45° pieces). */
+const WALL_PLAN_TYPES = new Set<ToolMode>(["wall", "hazama_wall"]);
 
 function isDragBuildTool(tool: ToolMode): tool is BuildingType {
   return DRAG_BUILD_TYPES.has(tool);
+}
+
+function isWallPlanTool(tool: ToolMode): tool is BuildingType {
+  return WALL_PLAN_TYPES.has(tool);
 }
 
 export interface InputRefs {
@@ -70,6 +89,7 @@ export interface PointerInputOptions {
       readonly y1: number;
     } | null
   ) => void;
+  readonly setWallPlan: (plan: readonly WallPathPiece[] | null) => void;
   readonly onMoveSelected: (destination: CellCoord) => void;
 }
 
@@ -171,6 +191,7 @@ export function registerPointerInput({
   setSelectedCell,
   setLocalInvalidMoveTarget,
   setSelectionBox,
+  setWallPlan,
   onMoveSelected
 }: PointerInputOptions): () => void {
   let lastClickTime = 0;
@@ -178,6 +199,7 @@ export function registerPointerInput({
   let lastClickScreenY = -Infinity;
   // Tracks the last cell placed during a drag-build gesture to avoid duplicate placement.
   let lastBuildCell: { x: number; y: number } | null = null;
+  // Wall drag-draw: anchor cell of the current snap-path gesture.
 
   // Elevation-aware screen → cell: a raised cell's diamond is drawn 24px per
   // level higher, so the inverse must probe the lifted grids from the top
@@ -193,6 +215,27 @@ export function registerPointerInput({
     }
     if (event.button === 1) {
       event.preventDefault();
+    }
+
+    // Wall drag-draw: anchor on pointer down, preview an octile snap path
+    // while dragging, place all pieces on pointer up.
+    if (event.button === 0 && isWallPlanTool(refs.buildToolRef.current)) {
+      const rect = canvas.getBoundingClientRect();
+      const clickedCell = pickCell(event.clientX - rect.left, event.clientY - rect.top);
+      setWallPlan(planWallPath(refs.buildToolRef.current as BuildingType, clickedCell, clickedCell));
+      refs.dragRef.current = {
+        pointerId: event.pointerId,
+        mode: "wallplan",
+        startX: event.clientX,
+        startY: event.clientY,
+        lastX: event.clientX,
+        lastY: event.clientY,
+        moved: false,
+        wallPlanAnchor: clickedCell,
+        lastWallPlanCell: clickedCell
+      };
+      canvas.setPointerCapture(event.pointerId);
+      return;
     }
 
     // Drag-to-build: for 1×1 connection-kit types, fire placement on pointer
@@ -238,6 +281,23 @@ export function registerPointerInput({
       const totalDy = event.clientY - drag.startY;
       if (!drag.moved && Math.hypot(totalDx, totalDy) > 6) {
         drag.moved = true;
+      }
+
+      if (drag.mode === "wallplan") {
+        const rect = canvas.getBoundingClientRect();
+        const currentCell = pickCell(event.clientX - rect.left, event.clientY - rect.top);
+        const anchor = drag.wallPlanAnchor;
+        const last = drag.lastWallPlanCell;
+        if (anchor != null && (last == null || currentCell.x !== last.x || currentCell.y !== last.y)) {
+          const activeTool = refs.buildToolRef.current;
+          if (isWallPlanTool(activeTool)) {
+            setWallPlan(planWallPath(activeTool as BuildingType, anchor, currentCell));
+          }
+          drag.lastWallPlanCell = currentCell;
+        }
+        drag.lastX = event.clientX;
+        drag.lastY = event.clientY;
+        return;
       }
 
       if (drag.mode === "build") {
@@ -294,6 +354,24 @@ export function registerPointerInput({
     // Drag-build gesture ends: placement already fired on down/move, skip up.
     if (drag.mode === "build") {
       lastBuildCell = null;
+      return;
+    }
+
+    // Wall drag-draw ends: place every plan piece whose cell is still free.
+    if (drag.mode === "wallplan") {
+      const rect = canvas.getBoundingClientRect();
+      const releaseCell = pickCell(event.clientX - rect.left, event.clientY - rect.top);
+      const activeTool = refs.buildToolRef.current;
+      const snapshot = refs.snapshotRef.current;
+      const anchor = drag.wallPlanAnchor;
+      if (anchor != null && isWallPlanTool(activeTool) && snapshot !== null) {
+        for (const piece of planWallPath(activeTool as BuildingType, anchor, releaseCell)) {
+          if (canPreviewPlaceBuildingCell(snapshot, piece.position, piece.type)) {
+            refs.onPlaceBuildingRef.current(piece.type, piece.position);
+          }
+        }
+      }
+      setWallPlan(null);
       return;
     }
 

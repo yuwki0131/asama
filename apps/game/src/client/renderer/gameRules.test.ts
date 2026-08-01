@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates, diagonalJunctionArms, honmaruCellAssetCandidates, junctionCornerCaps } from "./gameRules";
+import { bridgeAxis, bridgeCellAssetCandidates, buildingAssetCandidates, diagonalJunctionArms, honmaruCellAssetCandidates, junctionCornerCaps, planWallPath } from "./gameRules";
 import type { BuildingSnapshot, CellCoord, Season, WorldSnapshot } from "@asama/shared";
 
 function mockBuilding(overrides: Partial<BuildingSnapshot> = {}): BuildingSnapshot {
@@ -316,5 +316,75 @@ describe("junctionCornerCaps", () => {
     const nwse = wallAt(10, 10, "diagonal_wall_nwse", "destroyed");
     const nesw = wallAt(10, 11, "diagonal_wall_nesw");
     expect(junctionCornerCaps(nesw, snapshotWith([nwse, nesw]))).toEqual([]);
+  });
+});
+
+describe("planWallPath", () => {
+  it("returns a single tool piece for a same-cell drag", () => {
+    expect(planWallPath("wall", { x: 5, y: 5 }, { x: 5, y: 5 })).toEqual([
+      { type: "wall", position: { x: 5, y: 5 } }
+    ]);
+  });
+
+  it("plans a pure horizontal run of straight pieces", () => {
+    expect(planWallPath("wall", { x: 5, y: 5 }, { x: 8, y: 5 })).toEqual([
+      { type: "wall", position: { x: 5, y: 5 } },
+      { type: "wall", position: { x: 6, y: 5 } },
+      { type: "wall", position: { x: 7, y: 5 } },
+      { type: "wall", position: { x: 8, y: 5 } }
+    ]);
+  });
+
+  it("plans a pure vertical run in the negative direction", () => {
+    expect(planWallPath("hazama_wall", { x: 5, y: 5 }, { x: 5, y: 3 })).toEqual([
+      { type: "hazama_wall", position: { x: 5, y: 5 } },
+      { type: "hazama_wall", position: { x: 5, y: 4 } },
+      { type: "hazama_wall", position: { x: 5, y: 3 } }
+    ]);
+  });
+
+  it("plans an all-diagonal nwse run when |dx| equals |dy|", () => {
+    expect(planWallPath("wall", { x: 5, y: 5 }, { x: 7, y: 7 })).toEqual([
+      { type: "diagonal_wall_nwse", position: { x: 5, y: 5 } },
+      { type: "diagonal_wall_nwse", position: { x: 6, y: 6 } },
+      { type: "diagonal_wall_nwse", position: { x: 7, y: 7 } }
+    ]);
+  });
+
+  it("plans an all-diagonal nesw run for opposite-sign axes", () => {
+    expect(planWallPath("wall", { x: 5, y: 5 }, { x: 3, y: 7 })).toEqual([
+      { type: "diagonal_wall_nesw", position: { x: 5, y: 5 } },
+      { type: "diagonal_wall_nesw", position: { x: 4, y: 6 } },
+      { type: "diagonal_wall_nesw", position: { x: 3, y: 7 } }
+    ]);
+  });
+
+  it("consumes the diagonal leg first, then finishes straight along x", () => {
+    expect(planWallPath("wall", { x: 5, y: 5 }, { x: 9, y: 7 })).toEqual([
+      { type: "diagonal_wall_nwse", position: { x: 5, y: 5 } },
+      { type: "diagonal_wall_nwse", position: { x: 6, y: 6 } },
+      { type: "wall", position: { x: 7, y: 7 } },
+      { type: "wall", position: { x: 8, y: 7 } },
+      { type: "wall", position: { x: 9, y: 7 } }
+    ]);
+  });
+
+  it("consumes the diagonal leg first, then finishes straight along y", () => {
+    expect(planWallPath("wall", { x: 5, y: 5 }, { x: 4, y: 9 })).toEqual([
+      { type: "diagonal_wall_nesw", position: { x: 5, y: 5 } },
+      { type: "wall", position: { x: 4, y: 6 } },
+      { type: "wall", position: { x: 4, y: 7 } },
+      { type: "wall", position: { x: 4, y: 8 } },
+      { type: "wall", position: { x: 4, y: 9 } }
+    ]);
+  });
+
+  it("handles negative mixed drags", () => {
+    expect(planWallPath("wall", { x: 5, y: 5 }, { x: 2, y: 4 })).toEqual([
+      { type: "diagonal_wall_nwse", position: { x: 5, y: 5 } },
+      { type: "wall", position: { x: 4, y: 4 } },
+      { type: "wall", position: { x: 3, y: 4 } },
+      { type: "wall", position: { x: 2, y: 4 } }
+    ]);
   });
 });
