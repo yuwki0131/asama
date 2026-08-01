@@ -84,11 +84,20 @@ export interface WallPathPiece {
   readonly position: CellCoord;
 }
 
+const PLAN_DIAGONAL_TYPES: Partial<Record<BuildingType, { readonly nwse: BuildingType; readonly nesw: BuildingType }>> = {
+  wall: { nwse: "diagonal_wall_nwse", nesw: "diagonal_wall_nesw" },
+  hazama_wall: { nwse: "diagonal_wall_nwse", nesw: "diagonal_wall_nesw" },
+  fence: { nwse: "diagonal_fence_nwse", nesw: "diagonal_fence_nesw" },
+  dry_moat: { nwse: "diagonal_dry_moat_nwse", nesw: "diagonal_dry_moat_nesw" },
+  water_moat: { nwse: "diagonal_water_moat_nwse", nesw: "diagonal_water_moat_nesw" }
+};
+
 /**
- * Octile wall path for drag-draw: a diagonal leg (45° wall pieces) consumes
- * the shorter axis first, then a straight leg of the drag tool finishes the
- * dominant axis. On an exact diagonal the whole run is diagonal pieces; the
- * diagonal→straight junction visual is covered by the DIAG-04 junction arms.
+ * Octile wall path for drag-draw: a diagonal leg (45° pieces of the tool's
+ * family) consumes the shorter axis first, then a straight leg of the drag
+ * tool finishes the dominant axis. On an exact diagonal the whole run is
+ * diagonal pieces; the diagonal→straight junction visual is covered by the
+ * DIAG-04 junction arms.
  */
 export function planWallPath(tool: BuildingType, anchor: CellCoord, target: CellCoord): readonly WallPathPiece[] {
   const dx = target.x - anchor.x;
@@ -98,7 +107,8 @@ export function planWallPath(tool: BuildingType, anchor: CellCoord, target: Cell
   const ax = Math.abs(dx);
   const ay = Math.abs(dy);
   const diagonalSteps = Math.min(ax, ay);
-  const diagonalType: BuildingType = sx === sy ? "diagonal_wall_nwse" : "diagonal_wall_nesw";
+  const diagonalPair = PLAN_DIAGONAL_TYPES[tool];
+  const diagonalType: BuildingType = diagonalPair === undefined ? tool : sx === sy ? diagonalPair.nwse : diagonalPair.nesw;
 
   const pieces: WallPathPiece[] = [];
   if (ax === ay && diagonalSteps > 0) {
@@ -128,8 +138,7 @@ export function isCenterAnchoredBuilding(buildingType: BuildingType): boolean {
     buildingType === "fence" ||
     buildingType === "wall" ||
     buildingType === "hazama_wall" ||
-    buildingType === "diagonal_wall_nwse" ||
-    buildingType === "diagonal_wall_nesw" ||
+    buildingType.startsWith("diagonal_") ||
     buildingType.startsWith("arc_wall_") ||
     isGateType(buildingType) ||
     buildingType === "dry_moat" ||
@@ -232,7 +241,12 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.tenshu.test";
   }
 
-  if (building.type.startsWith("arc_wall_")) {
+  if (
+    building.type.startsWith("arc_wall_") ||
+    building.type.startsWith("diagonal_fence_") ||
+    building.type.startsWith("diagonal_dry_moat_") ||
+    building.type.startsWith("diagonal_water_moat_")
+  ) {
     return building.assetId;
   }
 
@@ -240,11 +254,11 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
 }
 
 function finalBuildingFallbackAssetId(building: BuildingSnapshot): string {
-  if (building.type === "dry_moat") {
+  if (building.type === "dry_moat" || building.type.startsWith("diagonal_dry_moat_")) {
     return "terrain.dirt.base";
   }
 
-  if (building.type === "water_moat") {
+  if (building.type === "water_moat" || building.type.startsWith("diagonal_water_moat_")) {
     return "terrain.water.base";
   }
 
@@ -369,33 +383,50 @@ export type DiagonalArmCorner = "nw" | "ne" | "se" | "sw";
 // cell. An arm at corner c is required iff any of the 3 other cells sharing c
 // holds an intact diagonal wall whose diagonal line touches c (nwse touches
 // its own NW+SE corners, nesw touches NE+SW).
-const DIAGONAL_ARM_PROBES: Record<DiagonalArmCorner, readonly { dx: number; dy: number; diagonal: BuildingType }[]> = {
+type DiagonalOrientation = "nwse" | "nesw";
+
+const DIAGONAL_ARM_PROBES: Record<DiagonalArmCorner, readonly { dx: number; dy: number; orientation: DiagonalOrientation }[]> = {
   nw: [
-    { dx: -1, dy: -1, diagonal: "diagonal_wall_nwse" },
-    { dx: 0, dy: -1, diagonal: "diagonal_wall_nesw" },
-    { dx: -1, dy: 0, diagonal: "diagonal_wall_nesw" }
+    { dx: -1, dy: -1, orientation: "nwse" },
+    { dx: 0, dy: -1, orientation: "nesw" },
+    { dx: -1, dy: 0, orientation: "nesw" }
   ],
   ne: [
-    { dx: 0, dy: -1, diagonal: "diagonal_wall_nwse" },
-    { dx: 1, dy: -1, diagonal: "diagonal_wall_nesw" },
-    { dx: 1, dy: 0, diagonal: "diagonal_wall_nwse" }
+    { dx: 0, dy: -1, orientation: "nwse" },
+    { dx: 1, dy: -1, orientation: "nesw" },
+    { dx: 1, dy: 0, orientation: "nwse" }
   ],
   se: [
-    { dx: 1, dy: 0, diagonal: "diagonal_wall_nesw" },
-    { dx: 1, dy: 1, diagonal: "diagonal_wall_nwse" },
-    { dx: 0, dy: 1, diagonal: "diagonal_wall_nesw" }
+    { dx: 1, dy: 0, orientation: "nesw" },
+    { dx: 1, dy: 1, orientation: "nwse" },
+    { dx: 0, dy: 1, orientation: "nesw" }
   ],
   sw: [
-    { dx: -1, dy: 0, diagonal: "diagonal_wall_nwse" },
-    { dx: -1, dy: 1, diagonal: "diagonal_wall_nesw" },
-    { dx: 0, dy: 1, diagonal: "diagonal_wall_nwse" }
+    { dx: -1, dy: 0, orientation: "nwse" },
+    { dx: -1, dy: 1, orientation: "nesw" },
+    { dx: 0, dy: 1, orientation: "nwse" }
   ]
 };
 
 export const DIAGONAL_ARM_CORNERS: readonly DiagonalArmCorner[] = ["nw", "ne", "se", "sw"];
 
+// Hosts drawing junction arms toward their family's diagonal pieces.
+function armDiagonalTypeFor(host: BuildingType, orientation: DiagonalOrientation): BuildingType | null {
+  if (host === "wall" || host === "hazama_wall") {
+    return orientation === "nwse" ? "diagonal_wall_nwse" : "diagonal_wall_nesw";
+  }
+  if (host === "fence") {
+    return orientation === "nwse" ? "diagonal_fence_nwse" : "diagonal_fence_nesw";
+  }
+  return null;
+}
+
+export function diagonalArmAssetFamily(host: BuildingType): string {
+  return host === "fence" ? "building.fence.wood.diagonal.arm" : "building.wall.diagonal.arm";
+}
+
 export function diagonalJunctionArms(building: BuildingSnapshot, snapshot: WorldSnapshot | null): readonly DiagonalArmCorner[] {
-  if (building.type !== "wall" && building.type !== "hazama_wall") {
+  if (armDiagonalTypeFor(building.type, "nwse") === null) {
     return [];
   }
   if (building.lifecycleState !== "intact") {
@@ -407,7 +438,11 @@ export function diagonalJunctionArms(building: BuildingSnapshot, snapshot: World
         { x: building.position.x + probe.dx, y: building.position.y + probe.dy },
         snapshot
       );
-      return neighbor !== null && neighbor.type === probe.diagonal && neighbor.lifecycleState === "intact";
+      return (
+        neighbor !== null &&
+        neighbor.type === armDiagonalTypeFor(building.type, probe.orientation) &&
+        neighbor.lifecycleState === "intact"
+      );
     })
   );
 }

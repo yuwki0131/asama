@@ -1014,6 +1014,8 @@ function buildingTypeCounts(snapshot: WorldSnapshot | null): string {
 // Building tools split by category for the 3-row header layout.
 const CASTLE_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [
   { type: "fence", label: "柵" },
+  { type: "diagonal_fence_nwse", label: "斜柵縦" },
+  { type: "diagonal_fence_nesw", label: "斜柵横" },
   { type: "wall", label: "壁" },
   { type: "hazama_wall", label: "狭間壁" },
   { type: "diagonal_wall_nwse", label: "斜壁縦" },
@@ -1037,7 +1039,11 @@ const CASTLE_TOOLS: readonly { readonly type: BuildingType; readonly label: stri
 
 const INFRA_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [
   { type: "dry_moat", label: "空堀" },
+  { type: "diagonal_dry_moat_nwse", label: "斜空堀縦" },
+  { type: "diagonal_dry_moat_nesw", label: "斜空堀横" },
   { type: "water_moat", label: "水堀" },
+  { type: "diagonal_water_moat_nwse", label: "斜水堀縦" },
+  { type: "diagonal_water_moat_nesw", label: "斜水堀横" },
   { type: "road", label: "道" },
   { type: "earth_bridge", label: "土橋" },
   { type: "wood_bridge", label: "木橋" }

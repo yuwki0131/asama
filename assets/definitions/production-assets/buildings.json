@@ -2238,6 +2238,276 @@
       }
     },
     {
+      "assetId": "building.fence.wood.diagonal.nwse",
+      "kind": "building",
+      "output": "building-fence-wood-diagonal-nwse.png",
+      "source": {
+        "type": "blender",
+        "model": "fence-wood-diagonal-nwse",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.nesw",
+      "kind": "building",
+      "output": "building-fence-wood-diagonal-nesw.png",
+      "source": {
+        "type": "blender",
+        "model": "fence-wood-diagonal-nesw",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.nw",
+      "kind": "building",
+      "output": "building-fence-wood-diagonal-arm-nw.png",
+      "source": {
+        "type": "blender",
+        "model": "fence-wood-diagonal-arm-nw",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.ne",
+      "kind": "building",
+      "output": "building-fence-wood-diagonal-arm-ne.png",
+      "source": {
+        "type": "blender",
+        "model": "fence-wood-diagonal-arm-ne",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.se",
+      "kind": "building",
+      "output": "building-fence-wood-diagonal-arm-se.png",
+      "source": {
+        "type": "blender",
+        "model": "fence-wood-diagonal-arm-se",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.sw",
+      "kind": "building",
+      "output": "building-fence-wood-diagonal-arm-sw.png",
+      "source": {
+        "type": "blender",
+        "model": "fence-wood-diagonal-arm-sw",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 48
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.diagonal.nwse",
+      "kind": "building",
+      "output": "building-dry-moat-diagonal-nwse.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-diagonal-nwse",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.dry_moat.diagonal.nesw",
+      "kind": "building",
+      "output": "building-dry-moat-diagonal-nesw.png",
+      "source": {
+        "type": "blender",
+        "model": "dry-moat-diagonal-nesw",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.diagonal.nwse",
+      "kind": "building",
+      "output": "building-water-moat-diagonal-nwse.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-diagonal-nwse",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.water_moat.diagonal.nesw",
+      "kind": "building",
+      "output": "building-water-moat-diagonal-nesw.png",
+      "source": {
+        "type": "blender",
+        "model": "water-moat-diagonal-nesw",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 64,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
       "assetId": "building.wall.corner.cap",
       "kind": "building",
       "output": "building-wall-corner-cap.png",

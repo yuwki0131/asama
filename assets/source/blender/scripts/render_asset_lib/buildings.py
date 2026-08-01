@@ -396,6 +396,59 @@ def build_wall_diagonal_arm(scene: bpy.types.Scene, corner: str) -> None:
     _diag_gable(scene, "DiagArmCoping", a, b, WALL_COPING_THICKNESS / 2.0, WALL_BODY_TOP, WALL_COPING_TOP, coping)
 
 
+DIAGONAL_CORNERS = {
+    "nw": (-0.5, -0.5),
+    "ne": (0.5, -0.5),
+    "se": (0.5, 0.5),
+    "sw": (-0.5, 0.5),
+}
+
+
+def _fence_diagonal_run(scene: bpy.types.Scene, prefix: str, a: tuple[float, float], b: tuple[float, float], center_post: bool) -> None:
+    """Posts + 2-level rails along the map segment a->b (post spacing matches
+    the straight fence's 0.24 absolute pitch)."""
+    import math
+    mats = building_material_set()
+    wood, dark = mats["wood"], mats["dark_wood"]
+
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    length = math.hypot(dx, dy)
+    ux, uy = dx / length, dy / length
+
+    if center_post:
+        fence_post(scene, f"{prefix}PostCenter", a[0], a[1], dark, FENCE_HEIGHT + 0.05)
+    distance = 0.24
+    index = 0
+    while distance < length - FENCE_POST_SIZE:
+        fence_post(scene, f"{prefix}Post{index}", a[0] + ux * distance, a[1] + uy * distance, dark)
+        distance += 0.24
+        index += 1
+    fence_post(scene, f"{prefix}PostEnd", b[0], b[1], dark)
+
+    for level, (z0, z1) in enumerate(FENCE_RAIL_LEVELS):
+        _diag_prism(scene, f"{prefix}Rail{level}", a, b, FENCE_RAIL_THICKNESS / 2.0, z0, z1, wood)
+
+
+def build_fence_diagonal(scene: bpy.types.Scene, orientation: str) -> None:
+    """Wood fence running corner-to-corner across the cell diagonal.
+
+    nwse: NW corner to SE corner. nesw: NE corner to SW corner. Post pitch and
+    rail cross-section match the straight fence so chains read as one family.
+    """
+    if orientation == "nwse":
+        a, b = (-0.5, -0.5), (0.5, 0.5)
+    else:
+        a, b = (0.5, -0.5), (-0.5, 0.5)
+    _fence_diagonal_run(scene, "DiagFenceA", (0.0, 0.0), a, center_post=True)
+    _fence_diagonal_run(scene, "DiagFenceB", (0.0, 0.0), b, center_post=False)
+
+
+def build_fence_diagonal_arm(scene: bpy.types.Scene, corner: str) -> None:
+    """Junction arm from cell center to one corner, overlaid on straight
+    fences that neighbor a diagonal fence (mirrors build_wall_diagonal_arm)."""
+    _fence_diagonal_run(scene, "DiagFenceArm", (0.0, 0.0), DIAGONAL_CORNERS[corner], center_post=False)
+
+
 def _arc_stations(span: int, sx: float, sy: float, count: int = 24) -> list[tuple[tuple[float, float], tuple[float, float]]]:
     """Sample points and outward radial normals along a quarter circle.
 

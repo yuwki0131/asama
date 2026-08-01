@@ -38,10 +38,16 @@ export interface DragState {
 }
 
 /** Building types that support drag-to-place (1×1 connection-kit pieces). */
-const DRAG_BUILD_TYPES = new Set<ToolMode>(["fence", "road", "dry_moat", "water_moat"]);
+const DRAG_BUILD_TYPES = new Set<ToolMode>(["road"]);
 
-/** Wall-family tools that drag-draw an octile snap path (straight + 45° pieces). */
-const WALL_PLAN_TYPES = new Set<ToolMode>(["wall", "hazama_wall"]);
+/** Tools that drag-draw an octile snap path (straight + 45° pieces). */
+const WALL_PLAN_TYPES = new Set<ToolMode>([
+  "wall",
+  "hazama_wall",
+  "fence",
+  "dry_moat",
+  "water_moat",
+]);
 
 function isDragBuildTool(tool: ToolMode): tool is BuildingType {
   return DRAG_BUILD_TYPES.has(tool);

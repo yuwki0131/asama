@@ -234,6 +234,16 @@ describe("diagonalJunctionArms", () => {
     expect(diagonalJunctionArms(host, snapshotWith([wallAt(11, 11, "diagonal_wall_nwse", "destroyed")]))).toEqual([]);
     expect(diagonalJunctionArms(wallAt(10, 10, "wall", "destroyed"), snapshotWith([wallAt(11, 11, "diagonal_wall_nwse")]))).toEqual([]);
   });
+
+  it("gives fence hosts arms toward diagonal fences only", () => {
+    const host = wallAt(10, 10, "fence");
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(11, 11, "diagonal_fence_nwse")]))).toEqual(["se"]);
+    // A diagonal wall does not connect to a fence host (different family).
+    expect(diagonalJunctionArms(host, snapshotWith([host, wallAt(11, 11, "diagonal_wall_nwse")]))).toEqual([]);
+    // Nor does a diagonal fence connect to a wall host.
+    const wallHost = wallAt(10, 10);
+    expect(diagonalJunctionArms(wallHost, snapshotWith([wallHost, wallAt(11, 11, "diagonal_fence_nwse")]))).toEqual([]);
+  });
 });
 
 describe("junctionCornerCaps", () => {
@@ -385,6 +395,32 @@ describe("planWallPath", () => {
       { type: "wall", position: { x: 4, y: 4 } },
       { type: "wall", position: { x: 3, y: 4 } },
       { type: "wall", position: { x: 2, y: 4 } }
+    ]);
+  });
+
+  it("maps fence drags onto diagonal fence pieces", () => {
+    expect(planWallPath("fence", { x: 5, y: 5 }, { x: 7, y: 7 })).toEqual([
+      { type: "diagonal_fence_nwse", position: { x: 5, y: 5 } },
+      { type: "diagonal_fence_nwse", position: { x: 6, y: 6 } },
+      { type: "diagonal_fence_nwse", position: { x: 7, y: 7 } }
+    ]);
+    expect(planWallPath("fence", { x: 5, y: 5 }, { x: 3, y: 7 })).toEqual([
+      { type: "diagonal_fence_nesw", position: { x: 5, y: 5 } },
+      { type: "diagonal_fence_nesw", position: { x: 4, y: 6 } },
+      { type: "diagonal_fence_nesw", position: { x: 3, y: 7 } }
+    ]);
+  });
+
+  it("maps moat drags onto diagonal moat pieces then straight moats", () => {
+    expect(planWallPath("dry_moat", { x: 5, y: 5 }, { x: 8, y: 6 })).toEqual([
+      { type: "diagonal_dry_moat_nwse", position: { x: 5, y: 5 } },
+      { type: "dry_moat", position: { x: 6, y: 6 } },
+      { type: "dry_moat", position: { x: 7, y: 6 } },
+      { type: "dry_moat", position: { x: 8, y: 6 } }
+    ]);
+    expect(planWallPath("water_moat", { x: 5, y: 5 }, { x: 4, y: 6 })).toEqual([
+      { type: "diagonal_water_moat_nesw", position: { x: 5, y: 5 } },
+      { type: "diagonal_water_moat_nesw", position: { x: 4, y: 6 } }
     ]);
   });
 });
