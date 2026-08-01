@@ -667,10 +667,14 @@ function connectsTo(building: BuildingState, neighbor: BuildingState | null): bo
     return isWall(neighbor.type);
   }
 
-  return (
-    building.type === neighbor.type &&
-    (building.type === "dry_moat" || building.type === "water_moat" || building.type === "road")
-  );
+  if (building.type === "dry_moat" || building.type === "water_moat") {
+    // 斜め堀ピースの水路はセル角→角で、どの共有辺にも水路端の角が含まれる。
+    // 同族斜めピースを接続扱いにしないと直線堀末端が土手キャップで塞がり、
+    // 面取りコーナーで水路が分断して見える(MOAT-02)。
+    return neighbor.type === building.type || neighbor.type.startsWith(`diagonal_${building.type}_`);
+  }
+
+  return building.type === neighbor.type && building.type === "road";
 }
 
 function bridgeOrientation(world: WorldState, position: CellCoord): "x" | "y" {

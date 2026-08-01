@@ -600,12 +600,13 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
   name: "環郭の城",
   description: "同心円状の防衛リングで敵の南進を食い止める入門シナリオ。補給荷車を撃破して撤退タイマーを発動させよう。",
   initialBuildings: [
-    // === 本丸(内郭) — 壁リング x=56-70, y=28-43 ===
-    // 北壁
-    { type: "wall", position: { x: 56, y: 66 } },
-    { type: "wall", position: { x: 57, y: 66 } },
-    { type: "wall", position: { x: 58, y: 66 } },
-    { type: "wall", position: { x: 59, y: 66 } },
+    // === 本丸(内郭) — 壁リング x=56-70, y=66-81。四隅は円弧壁(r4)で丸める ===
+    // 円弧壁コーナー (arc_wall_r4): アンカーから象限方向に階段状7セルを占有
+    { type: "arc_wall_r4_nw", position: { x: 56, y: 69 } },
+    { type: "arc_wall_r4_ne", position: { x: 70, y: 69 } },
+    { type: "arc_wall_r4_sw", position: { x: 56, y: 78 } },
+    { type: "arc_wall_r4_se", position: { x: 70, y: 78 } },
+    // 北壁 (x=60-66; 両端は円弧壁)
     { type: "wall", position: { x: 60, y: 66 } },
     { type: "wall", position: { x: 61, y: 66 } },
     { type: "wall", position: { x: 62, y: 66 } },
@@ -613,14 +614,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 64, y: 66 } },
     { type: "wall", position: { x: 65, y: 66 } },
     { type: "wall", position: { x: 66, y: 66 } },
-    { type: "wall", position: { x: 67, y: 66 } },
-    { type: "wall", position: { x: 68, y: 66 } },
-    { type: "wall", position: { x: 69, y: 66 } },
-    { type: "wall", position: { x: 70, y: 66 } },
-    // 西壁
-    { type: "wall", position: { x: 56, y: 67 } },
-    { type: "wall", position: { x: 56, y: 68 } },
-    { type: "wall", position: { x: 56, y: 69 } },
+    // 西壁 (y=70-77)
     { type: "wall", position: { x: 56, y: 70 } },
     { type: "wall", position: { x: 56, y: 71 } },
     { type: "wall", position: { x: 56, y: 72 } },
@@ -629,13 +623,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 56, y: 75 } },
     { type: "wall", position: { x: 56, y: 76 } },
     { type: "wall", position: { x: 56, y: 77 } },
-    { type: "wall", position: { x: 56, y: 78 } },
-    { type: "wall", position: { x: 56, y: 79 } },
-    { type: "wall", position: { x: 56, y: 80 } },
-    // 東壁
-    { type: "wall", position: { x: 70, y: 67 } },
-    { type: "wall", position: { x: 70, y: 68 } },
-    { type: "wall", position: { x: 70, y: 69 } },
+    // 東壁 (y=70-77)
     { type: "wall", position: { x: 70, y: 70 } },
     { type: "wall", position: { x: 70, y: 71 } },
     { type: "wall", position: { x: 70, y: 72 } },
@@ -644,31 +632,27 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 70, y: 75 } },
     { type: "wall", position: { x: 70, y: 76 } },
     { type: "wall", position: { x: 70, y: 77 } },
-    { type: "wall", position: { x: 70, y: 78 } },
-    { type: "wall", position: { x: 70, y: 79 } },
-    { type: "wall", position: { x: 70, y: 80 } },
-    // 南壁 — gate_wide_3 at x=62 (x=62,63,64 を占有)
-    { type: "wall", position: { x: 56, y: 81 } },
-    { type: "wall", position: { x: 57, y: 81 } },
-    { type: "wall", position: { x: 58, y: 81 } },
-    { type: "wall", position: { x: 59, y: 81 } },
+    // 南壁 (x=60-66) — gate_wide_3 at x=62 (x=62,63,64 を占有)
     { type: "wall", position: { x: 60, y: 81 } },
     { type: "wall", position: { x: 61, y: 81 } },
     { type: "gate_wide_3", position: { x: 62, y: 81 } },
     { type: "wall", position: { x: 65, y: 81 } },
     { type: "wall", position: { x: 66, y: 81 } },
-    { type: "wall", position: { x: 67, y: 81 } },
-    { type: "wall", position: { x: 68, y: 81 } },
-    { type: "wall", position: { x: 69, y: 81 } },
-    { type: "wall", position: { x: 70, y: 81 } },
     // 天守(5×5) + 本丸マーカー
     { type: "tenshu", position: { x: 58, y: 68 } },
     { type: "honmaru", position: { x: 65, y: 76 }, size: 4 },
 
-    // === 水堀リング x=54-72, y=26-45 ===
-    // 北堀
-    { type: "water_moat", position: { x: 54, y: 64 } },
-    { type: "water_moat", position: { x: 55, y: 64 } },
+    // === 水堀リング x=54-72, y=64-83。四隅は斜め水堀2枚の面取り ===
+    // 斜め水堀コーナー (nesw="/", nwse="\")
+    { type: "diagonal_water_moat_nesw", position: { x: 55, y: 64 } },
+    { type: "diagonal_water_moat_nesw", position: { x: 54, y: 65 } },
+    { type: "diagonal_water_moat_nwse", position: { x: 71, y: 64 } },
+    { type: "diagonal_water_moat_nwse", position: { x: 72, y: 65 } },
+    { type: "diagonal_water_moat_nwse", position: { x: 54, y: 82 } },
+    { type: "diagonal_water_moat_nwse", position: { x: 55, y: 83 } },
+    { type: "diagonal_water_moat_nesw", position: { x: 72, y: 82 } },
+    { type: "diagonal_water_moat_nesw", position: { x: 71, y: 83 } },
+    // 北堀 (x=56-70)
     { type: "water_moat", position: { x: 56, y: 64 } },
     { type: "water_moat", position: { x: 57, y: 64 } },
     { type: "water_moat", position: { x: 58, y: 64 } },
@@ -684,10 +668,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "water_moat", position: { x: 68, y: 64 } },
     { type: "water_moat", position: { x: 69, y: 64 } },
     { type: "water_moat", position: { x: 70, y: 64 } },
-    { type: "water_moat", position: { x: 71, y: 64 } },
-    { type: "water_moat", position: { x: 72, y: 64 } },
-    // 西堀
-    { type: "water_moat", position: { x: 54, y: 65 } },
+    // 西堀 (y=66-81)
     { type: "water_moat", position: { x: 54, y: 66 } },
     { type: "water_moat", position: { x: 54, y: 67 } },
     { type: "water_moat", position: { x: 54, y: 68 } },
@@ -704,9 +685,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "water_moat", position: { x: 54, y: 79 } },
     { type: "water_moat", position: { x: 54, y: 80 } },
     { type: "water_moat", position: { x: 54, y: 81 } },
-    { type: "water_moat", position: { x: 54, y: 82 } },
-    // 東堀
-    { type: "water_moat", position: { x: 72, y: 65 } },
+    // 東堀 (y=66-81)
     { type: "water_moat", position: { x: 72, y: 66 } },
     { type: "water_moat", position: { x: 72, y: 67 } },
     { type: "water_moat", position: { x: 72, y: 68 } },
@@ -723,10 +702,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "water_moat", position: { x: 72, y: 79 } },
     { type: "water_moat", position: { x: 72, y: 80 } },
     { type: "water_moat", position: { x: 72, y: 81 } },
-    { type: "water_moat", position: { x: 72, y: 82 } },
-    // 南堀 — earth_bridge at x=63 (土橋は大手道と一直線)
-    { type: "water_moat", position: { x: 54, y: 83 } },
-    { type: "water_moat", position: { x: 55, y: 83 } },
+    // 南堀 (x=56-70) — earth_bridge at x=63 (土橋は大手道と一直線)
     { type: "water_moat", position: { x: 56, y: 83 } },
     { type: "water_moat", position: { x: 57, y: 83 } },
     { type: "water_moat", position: { x: 58, y: 83 } },
@@ -742,13 +718,20 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "water_moat", position: { x: 68, y: 83 } },
     { type: "water_moat", position: { x: 69, y: 83 } },
     { type: "water_moat", position: { x: 70, y: 83 } },
-    { type: "water_moat", position: { x: 71, y: 83 } },
-    { type: "water_moat", position: { x: 72, y: 83 } },
 
-    // === 二之丸(外郭) — 柵リング x=48-78, y=20-57 ===
-    // 北柵
-    { type: "fence", position: { x: 48, y: 58 } },
-    { type: "fence", position: { x: 49, y: 58 } },
+    // === 二之丸(外郭) — 柵リング x=48-78, y=58-95。四隅は斜め柵の面取り(北2枚/南3枚) ===
+    // 斜め柵コーナー (nesw="/", nwse="\")
+    { type: "diagonal_fence_nesw", position: { x: 49, y: 58 } },
+    { type: "diagonal_fence_nesw", position: { x: 48, y: 59 } },
+    { type: "diagonal_fence_nwse", position: { x: 77, y: 58 } },
+    { type: "diagonal_fence_nwse", position: { x: 78, y: 59 } },
+    { type: "diagonal_fence_nwse", position: { x: 48, y: 93 } },
+    { type: "diagonal_fence_nwse", position: { x: 49, y: 94 } },
+    { type: "diagonal_fence_nwse", position: { x: 50, y: 95 } },
+    { type: "diagonal_fence_nesw", position: { x: 78, y: 93 } },
+    { type: "diagonal_fence_nesw", position: { x: 77, y: 94 } },
+    { type: "diagonal_fence_nesw", position: { x: 76, y: 95 } },
+    // 北柵 (x=50-76)
     { type: "fence", position: { x: 50, y: 58 } },
     { type: "fence", position: { x: 51, y: 58 } },
     { type: "fence", position: { x: 52, y: 58 } },
@@ -776,10 +759,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "fence", position: { x: 74, y: 58 } },
     { type: "fence", position: { x: 75, y: 58 } },
     { type: "fence", position: { x: 76, y: 58 } },
-    { type: "fence", position: { x: 77, y: 58 } },
-    { type: "fence", position: { x: 78, y: 58 } },
-    // 西柵
-    { type: "fence", position: { x: 48, y: 59 } },
+    // 西柵 (y=60-92)
     { type: "fence", position: { x: 48, y: 60 } },
     { type: "fence", position: { x: 48, y: 61 } },
     { type: "fence", position: { x: 48, y: 62 } },
@@ -813,10 +793,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "fence", position: { x: 48, y: 90 } },
     { type: "fence", position: { x: 48, y: 91 } },
     { type: "fence", position: { x: 48, y: 92 } },
-    { type: "fence", position: { x: 48, y: 93 } },
-    { type: "fence", position: { x: 48, y: 94 } },
-    // 東柵
-    { type: "fence", position: { x: 78, y: 59 } },
+    // 東柵 (y=60-92)
     { type: "fence", position: { x: 78, y: 60 } },
     { type: "fence", position: { x: 78, y: 61 } },
     { type: "fence", position: { x: 78, y: 62 } },
@@ -850,12 +827,7 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "fence", position: { x: 78, y: 90 } },
     { type: "fence", position: { x: 78, y: 91 } },
     { type: "fence", position: { x: 78, y: 92 } },
-    { type: "fence", position: { x: 78, y: 93 } },
-    { type: "fence", position: { x: 78, y: 94 } },
-    // 南柵 — gate_wide_3 at x=62 (大手道南門)
-    { type: "fence", position: { x: 48, y: 95 } },
-    { type: "fence", position: { x: 49, y: 95 } },
-    { type: "fence", position: { x: 50, y: 95 } },
+    // 南柵 (x=51-75) — gate_wide_3 at x=62 (大手道南門)
     { type: "fence", position: { x: 51, y: 95 } },
     { type: "fence", position: { x: 52, y: 95 } },
     { type: "fence", position: { x: 53, y: 95 } },
@@ -879,9 +851,6 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "fence", position: { x: 73, y: 95 } },
     { type: "fence", position: { x: 74, y: 95 } },
     { type: "fence", position: { x: 75, y: 95 } },
-    { type: "fence", position: { x: 76, y: 95 } },
-    { type: "fence", position: { x: 77, y: 95 } },
-    { type: "fence", position: { x: 78, y: 95 } },
 
     // === 二之丸内部 — 隅櫓2基・蔵2棟・兵舎・市場・侍屋敷 ===
     // 隅櫓: 北西・北東
