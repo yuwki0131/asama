@@ -2,7 +2,10 @@ import { buildingSpecs } from "@asama/content";
 import type { BuildingSnapshot, BuildingType, CellCoord, Season, TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
 
 const BUILDING_FOOTPRINTS: Record<BuildingType, readonly CellCoord[]> = Object.fromEntries(
-  Object.values(buildingSpecs).map((spec) => [spec.type, rectangleFootprint(spec.footprint.width, spec.footprint.height)])
+  Object.values(buildingSpecs).map((spec) => [
+    spec.type,
+    spec.footprintCells ?? rectangleFootprint(spec.footprint.width, spec.footprint.height)
+  ])
 ) as Record<BuildingType, readonly CellCoord[]>;
 
 export function isInsideSnapshotMap(cell: CellCoord, snapshot: WorldSnapshot): boolean {
@@ -83,6 +86,7 @@ export function isCenterAnchoredBuilding(buildingType: BuildingType): boolean {
     buildingType === "hazama_wall" ||
     buildingType === "diagonal_wall_nwse" ||
     buildingType === "diagonal_wall_nesw" ||
+    buildingType.startsWith("arc_wall_") ||
     isGateType(buildingType) ||
     buildingType === "dry_moat" ||
     buildingType === "water_moat" ||
@@ -182,6 +186,10 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
 
   if (building.type === "tenshu") {
     return "building.tenshu.test";
+  }
+
+  if (building.type.startsWith("arc_wall_")) {
+    return building.assetId;
   }
 
   return "building.honmaru.marker";

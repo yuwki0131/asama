@@ -104,6 +104,18 @@ function geo01Contract(asset: ManifestAssetMeta): Geo01Contract | null {
   const { assetId, width, height } = asset;
   const centerX = width / 2;
 
+  if (isInAssetFamily(assetId, "building.wall.arc")) {
+    const span = /\.r(\d+)\./.exec(assetId);
+    if (span === null) {
+      return null;
+    }
+    // Arc walls anchor on the footprint bbox center of a span×span cell
+    // block, with a 16px pad below the block diamond's bottom vertex:
+    // anchorRow = height - 16 - span*16.
+    const n = Number(span[1]);
+    return { family: `arc-wall(${n}-span)`, expectedAnchorXPx: centerX, expectedAnchorRowPx: height - 16 - n * 16 };
+  }
+
   if (
     assetId.startsWith("deco.") ||
     isInAssetFamily(assetId, "building.road") ||

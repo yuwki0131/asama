@@ -261,6 +261,14 @@ export const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
   "hazama_wall",
   "diagonal_wall_nwse",
   "diagonal_wall_nesw",
+  "arc_wall_r3_ne",
+  "arc_wall_r3_se",
+  "arc_wall_r3_sw",
+  "arc_wall_r3_nw",
+  "arc_wall_r4_ne",
+  "arc_wall_r4_se",
+  "arc_wall_r4_sw",
+  "arc_wall_r4_nw",
   "fence",
   "gate_wide_2",
   "gate_wide_3",
@@ -340,6 +348,19 @@ export function isGate(type: BuildingType): boolean {
 
 export function isWall(type: BuildingType): boolean {
   return type === "wall" || type === "hazama_wall";
+}
+
+export function isArcWall(type: BuildingType): boolean {
+  return type.startsWith("arc_wall_");
+}
+
+/** 円弧壁の膨らみ方向 (sx,sy)。ne=(+,−) se=(+,+) sw=(−,+) nw=(−,−)。 */
+export function arcQuadrantSigns(type: BuildingType): { readonly sx: 1 | -1; readonly sy: 1 | -1 } {
+  const quadrant = type.slice(-2);
+  return {
+    sx: quadrant === "ne" || quadrant === "se" ? 1 : -1,
+    sy: quadrant === "se" || quadrant === "sw" ? 1 : -1
+  };
 }
 
 export function isNeSwGate(type: BuildingType): boolean {

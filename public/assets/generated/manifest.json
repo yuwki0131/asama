@@ -1169,6 +1169,50 @@
       }
     },
     {
+      "assetId": "building.wall.diagonal.arm.nw",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-arm-nw.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.diagonal.arm.ne",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-arm-ne.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.diagonal.arm.se",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-arm-se.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.diagonal.arm.sw",
+      "kind": "building",
+      "file": "generated/building-wall-diagonal-arm-sw.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
       "assetId": "building.wall.corner.cap",
       "kind": "building",
       "file": "generated/building-wall-corner-cap.png",
@@ -6592,47 +6636,91 @@
       }
     },
     {
-      "assetId": "building.wall.diagonal.arm.nw",
+      "assetId": "building.wall.arc.r3.ne",
       "kind": "building",
-      "file": "generated/building-wall-diagonal-arm-nw.png",
-      "width": 64,
-      "height": 96,
+      "file": "generated/building-wall-arc-r3-ne.png",
+      "width": 224,
+      "height": 176,
       "anchor": {
         "x": 0.5,
-        "y": 0.8333333333333334
+        "y": 0.6363636363636364
       }
     },
     {
-      "assetId": "building.wall.diagonal.arm.ne",
+      "assetId": "building.wall.arc.r3.se",
       "kind": "building",
-      "file": "generated/building-wall-diagonal-arm-ne.png",
-      "width": 64,
-      "height": 96,
+      "file": "generated/building-wall-arc-r3-se.png",
+      "width": 224,
+      "height": 176,
       "anchor": {
         "x": 0.5,
-        "y": 0.8333333333333334
+        "y": 0.6363636363636364
       }
     },
     {
-      "assetId": "building.wall.diagonal.arm.se",
+      "assetId": "building.wall.arc.r3.sw",
       "kind": "building",
-      "file": "generated/building-wall-diagonal-arm-se.png",
-      "width": 64,
-      "height": 96,
+      "file": "generated/building-wall-arc-r3-sw.png",
+      "width": 224,
+      "height": 176,
       "anchor": {
         "x": 0.5,
-        "y": 0.8333333333333334
+        "y": 0.6363636363636364
       }
     },
     {
-      "assetId": "building.wall.diagonal.arm.sw",
+      "assetId": "building.wall.arc.r3.nw",
       "kind": "building",
-      "file": "generated/building-wall-diagonal-arm-sw.png",
-      "width": 64,
-      "height": 96,
+      "file": "generated/building-wall-arc-r3-nw.png",
+      "width": 224,
+      "height": 176,
       "anchor": {
         "x": 0.5,
-        "y": 0.8333333333333334
+        "y": 0.6363636363636364
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.ne",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-ne.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.se",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-se.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.sw",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-sw.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.nw",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-nw.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
       }
     }
   ],

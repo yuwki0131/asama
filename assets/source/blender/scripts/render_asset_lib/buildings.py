@@ -396,6 +396,118 @@ def build_wall_diagonal_arm(scene: bpy.types.Scene, corner: str) -> None:
     _diag_gable(scene, "DiagArmCoping", a, b, WALL_COPING_THICKNESS / 2.0, WALL_BODY_TOP, WALL_COPING_TOP, coping)
 
 
+def _arc_stations(span: int, sx: float, sy: float, count: int = 24) -> list[tuple[tuple[float, float], tuple[float, float]]]:
+    """Sample points and outward radial normals along a quarter circle.
+
+    The circle center sits on a cell corner so both endpoints land on cell
+    edge midpoints with grid-axis tangents (flush butt joints to straight
+    walls). Model origin is the footprint bbox center, hence the local center
+    offset of -span/2 per axis. theta=0 is the N-S tangent end (anchor cell),
+    theta=90 the E-W tangent end.
+    """
+    import math
+
+    radius = span - 0.5
+    cx, cy = -sx * span / 2.0, -sy * span / 2.0
+    stations: list[tuple[tuple[float, float], tuple[float, float]]] = []
+    for i in range(count + 1):
+        theta = math.pi / 2.0 * i / count
+        nx, ny = sx * math.cos(theta), sy * math.sin(theta)
+        stations.append(((cx + radius * nx, cy + radius * ny), (nx, ny)))
+    return stations
+
+
+def _arc_prism(
+    scene: bpy.types.Scene,
+    name: str,
+    stations: list[tuple[tuple[float, float], tuple[float, float]]],
+    half: float,
+    z0: float,
+    z1: float,
+    material: bpy.types.Material,
+) -> None:
+    """Vertical-sided prism swept along the arc stations."""
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for (px, py), (nx, ny) in stations:
+        ox, oy = px + nx * half, py + ny * half
+        ix, iy = px - nx * half, py - ny * half
+        vertices.append((*map_xy(ox, oy), z0))
+        vertices.append((*map_xy(ox, oy), z1))
+        vertices.append((*map_xy(ix, iy), z0))
+        vertices.append((*map_xy(ix, iy), z1))
+    for i in range(len(stations) - 1):
+        a = i * 4
+        b = a + 4
+        faces.append((a, a + 1, b + 1, b))
+        faces.append((a + 2, a + 3, b + 3, b + 2))
+        faces.append((a + 1, a + 3, b + 3, b + 1))
+        faces.append((a, a + 2, b + 2, b))
+    faces.append((0, 1, 3, 2))
+    last = (len(stations) - 1) * 4
+    faces.append((last, last + 1, last + 3, last + 2))
+    add_mesh(scene, name, vertices, faces, material)
+
+
+def _arc_gable(
+    scene: bpy.types.Scene,
+    name: str,
+    stations: list[tuple[tuple[float, float], tuple[float, float]]],
+    half: float,
+    base_z: float,
+    ridge_z: float,
+    material: bpy.types.Material,
+) -> None:
+    """Sori-curved coping swept along the arc, ridge on the arc line."""
+
+    def profile(t: float) -> float:
+        return base_z + (ridge_z - base_z) * (t ** ROOF_CURVE_EXPONENT)
+
+    steps = [i / ROOF_CURVE_SEGMENTS for i in range(ROOF_CURVE_SEGMENTS + 1)]
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    station_count = len(stations)
+
+    def ring(offset_sign: float, t: float) -> int:
+        index = len(vertices)
+        offset = offset_sign * half * (1.0 - t)
+        z = profile(t)
+        for (px, py), (nx, ny) in stations:
+            vertices.append((*map_xy(px + nx * offset, py + ny * offset), z))
+        return index
+
+    rows_by_sign = {sign: [ring(sign, t) for t in steps] for sign in (1.0, -1.0)}
+    for rows in rows_by_sign.values():
+        for r0, r1 in zip(rows, rows[1:]):
+            for i in range(station_count - 1):
+                faces.append((r0 + i, r0 + i + 1, r1 + i + 1, r1 + i))
+    outer, inner = rows_by_sign[1.0], rows_by_sign[-1.0]
+    for end in (0, station_count - 1):
+        loop = [r + end for r in outer] + [r + end for r in reversed(inner[:-1])]
+        faces.append(tuple(loop))
+    add_mesh(scene, name, vertices, faces, material)
+
+
+def build_wall_arc(scene: bpy.types.Scene, span: int, quadrant: str) -> None:
+    """Quarter-arc plaster wall bulging toward `quadrant` (ne/se/sw/nw).
+
+    Same WALL_* cross-section as the straight plaster wall (stone base,
+    plaster body, sori coping) so arcs read as the same wall family. Flat end
+    caps at theta=0/90 butt flush against straight walls or adjacent arcs;
+    four same-radius quadrants around a common corner compose a full circle.
+    """
+    mats = building_material_set()
+    plaster, stone, coping = mats["plaster"], mats["stone"], mats["roof"]
+
+    sx = 1.0 if quadrant in ("ne", "se") else -1.0
+    sy = 1.0 if quadrant in ("se", "sw") else -1.0
+    stations = _arc_stations(span, sx, sy)
+
+    _arc_prism(scene, "ArcWallBase", stations, WALL_BASE_THICKNESS / 2.0, 0.0, WALL_BASE_HEIGHT, stone)
+    _arc_prism(scene, "ArcWallBody", stations, WALL_BODY_THICKNESS / 2.0, WALL_BASE_HEIGHT, WALL_BODY_TOP, plaster)
+    _arc_gable(scene, "ArcWallCoping", stations, WALL_COPING_THICKNESS / 2.0, WALL_BODY_TOP, WALL_COPING_TOP, coping)
+
+
 def build_wall_corner_cap(scene: bpy.types.Scene) -> None:
     """Square corner post capping perpendicular wall elbows at a cell corner.
 

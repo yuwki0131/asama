@@ -413,3 +413,104 @@ describe("diagonal walls", () => {
     expect(building.passable).toBe(false);
   });
 });
+
+describe("arc walls", () => {
+  it("occupies the staircase footprint cells and nothing else (r3 se)", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "arc_wall_r3_se", { x: 20, y: 20 });
+
+    const expected = [
+      { x: 20, y: 20 },
+      { x: 20, y: 21 },
+      { x: 19, y: 21 },
+      { x: 19, y: 22 },
+      { x: 18, y: 22 }
+    ];
+    const building = buildingAt(world, { x: 20, y: 20 });
+    expect(building.footprint).toHaveLength(expected.length);
+    for (const cell of expected) {
+      expect(building.footprint.some((c) => c.x === cell.x && c.y === cell.y)).toBe(true);
+    }
+    expect(building.maxHp).toBe(1300);
+    expect(building.passable).toBe(false);
+    expect(building.assetId).toBe("building.wall.arc.r3.se");
+  });
+
+  it("occupies 7 cells for r4 and mirrors offsets per quadrant (r4 nw)", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "arc_wall_r4_nw", { x: 40, y: 40 });
+
+    const expected = [
+      { x: 40, y: 40 },
+      { x: 40, y: 39 },
+      { x: 41, y: 39 },
+      { x: 41, y: 38 },
+      { x: 42, y: 38 },
+      { x: 42, y: 37 },
+      { x: 43, y: 37 }
+    ];
+    const building = buildingAt(world, { x: 40, y: 40 });
+    expect(building.footprint).toHaveLength(expected.length);
+    for (const cell of expected) {
+      expect(building.footprint.some((c) => c.x === cell.x && c.y === cell.y)).toBe(true);
+    }
+    expect(building.maxHp).toBe(1820);
+  });
+
+  it("connects a straight wall toward the N-S tangent endpoint", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "arc_wall_r3_se", { x: 20, y: 20 });
+    place(world, "wall", { x: 20, y: 19 });
+
+    expect(buildingAt(world, { x: 20, y: 19 }).assetId).toBe("building.wall.plaster.connected.0010");
+  });
+
+  it("connects a straight wall toward the E-W tangent endpoint", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "arc_wall_r3_se", { x: 20, y: 20 });
+    place(world, "wall", { x: 17, y: 22 });
+
+    expect(buildingAt(world, { x: 17, y: 22 }).assetId).toBe("building.wall.plaster.connected.0100");
+  });
+
+  it("does not connect walls adjacent to non-endpoint arc cells", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "arc_wall_r3_se", { x: 20, y: 20 });
+    place(world, "wall", { x: 21, y: 20 });
+    place(world, "wall", { x: 21, y: 21 });
+
+    expect(buildingAt(world, { x: 21, y: 20 }).assetId).toBe("building.wall.plaster.connected.0010");
+    expect(buildingAt(world, { x: 21, y: 21 }).assetId).toBe("building.wall.plaster.connected.1000");
+  });
+
+  it("keeps its own fixed asset id regardless of neighbors", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "arc_wall_r4_ne", { x: 60, y: 60 });
+    place(world, "wall", { x: 60, y: 61 });
+
+    expect(buildingAt(world, { x: 60, y: 60 }).assetId).toBe("building.wall.arc.r4.ne");
+  });
+
+  it("drops the wall connection after the arc is demolished", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "arc_wall_r3_se", { x: 20, y: 20 });
+    place(world, "wall", { x: 20, y: 19 });
+    demolish(world, { x: 20, y: 20 });
+
+    expect(buildingAt(world, { x: 20, y: 19 }).assetId).toBe("building.wall.plaster.connected.0000");
+  });
+});
