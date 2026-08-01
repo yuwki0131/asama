@@ -10,6 +10,9 @@ const VALID_BUILDING_TYPES = new Set([
   "dry_moat", "water_moat", "storehouse", "market", "barracks",
   "samurai_residence", "town_block", "farm", "road",
   "earth_bridge", "wood_bridge", "honmaru", "tenshu", "yagura",
+  "arc_wall_r4_ne", "arc_wall_r4_se", "arc_wall_r4_sw", "arc_wall_r4_nw",
+  "diagonal_fence_nwse", "diagonal_fence_nesw",
+  "diagonal_water_moat_nwse", "diagonal_water_moat_nesw",
 ]);
 
 const VALID_UNIT_TYPES = new Set([
@@ -149,6 +152,37 @@ describe("concentricCastleScenario", () => {
       (b) => b.type === "fence"
     );
     expect(fences.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it("has arc_wall_r4 on all four inner-wall corners (curve vocabulary)", () => {
+    const arcs = concentricCastleScenario.initialBuildings.filter((b) =>
+      b.type.startsWith("arc_wall_r4_")
+    );
+    const quadrants = new Set(arcs.map((b) => b.type.slice(-2)));
+    expect(quadrants).toEqual(new Set(["ne", "se", "sw", "nw"]));
+  });
+
+  it("has diagonal fence chamfers on all four ninomaru corners", () => {
+    const diagonals = concentricCastleScenario.initialBuildings.filter((b) =>
+      b.type.startsWith("diagonal_fence_")
+    );
+    expect(diagonals.length).toBe(10);
+  });
+
+  it("has diagonal water-moat chamfers on all four moat corners", () => {
+    const diagonals = concentricCastleScenario.initialBuildings.filter((b) =>
+      b.type.startsWith("diagonal_water_moat_")
+    );
+    expect(diagonals.length).toBe(8);
+  });
+
+  it("has no two buildings occupying the same cell", () => {
+    const seen = new Set<string>();
+    for (const b of concentricCastleScenario.initialBuildings) {
+      const key = `${b.position.x},${b.position.y}`;
+      expect(seen.has(key), `duplicate anchor at ${key}`).toBe(false);
+      seen.add(key);
+    }
   });
 
   it("has at least 2 yagura (corner watchtowers)", () => {

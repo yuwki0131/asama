@@ -414,6 +414,40 @@ describe("diagonal walls", () => {
   });
 });
 
+describe("diagonal moat junctions", () => {
+  it("opens a straight water moat end toward an adjacent same-family diagonal piece", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "water_moat", { x: 20, y: 20 });
+    place(world, "water_moat", { x: 21, y: 20 });
+    place(world, "diagonal_water_moat_nesw", { x: 19, y: 20 });
+
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toMatch(/^building\.water_moat\.connected\.0101/);
+    expect(buildingAt(world, { x: 19, y: 20 }).assetId).toBe("building.water_moat.diagonal.nesw");
+  });
+
+  it("opens a straight dry moat end toward an adjacent same-family diagonal piece", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "dry_moat", { x: 30, y: 30 });
+    place(world, "diagonal_dry_moat_nwse", { x: 30, y: 29 });
+
+    expect(buildingAt(world, { x: 30, y: 30 }).assetId).toMatch(/^building\.dry_moat\.connected\.1000/);
+  });
+
+  it("does not connect a water moat to a diagonal dry moat (different family)", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "water_moat", { x: 40, y: 40 });
+    place(world, "diagonal_dry_moat_nesw", { x: 39, y: 40 });
+
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toMatch(/^building\.water_moat\.connected\.0000/);
+  });
+});
+
 describe("arc walls", () => {
   it("occupies the staircase footprint cells and nothing else (r3 se)", () => {
     const world = createInitialWorld();

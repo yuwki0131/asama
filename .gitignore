@@ -5,6 +5,7 @@ coverage/
 *.log
 *.tsbuildinfo
 saves/**/*.tmp
+saves/**/*.jcastle
 __pycache__/
 scratchpad/
 assets/intermediate/

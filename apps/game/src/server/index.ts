@@ -10,7 +10,8 @@ const gzipAsync = promisify(gzip);
 const rootDir = resolve(process.cwd(), "../..");
 const savesDir = join(rootDir, "saves");
 const publicDir = join(rootDir, "public");
-const server = Fastify({ logger: true });
+// セーブデータ(非圧縮JSON)は数MBに達するため既定1MiBのbodyLimitでは413になる
+const server = Fastify({ logger: true, bodyLimit: 64 * 1024 * 1024 });
 
 server.get("/api/content/index", async () => ({
   contentVersion: "0.0.0",

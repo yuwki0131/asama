@@ -118,8 +118,17 @@ describe("functional: drag-build walls", () => {
   });
 
   it("dragging wall tool across 5 cells places 5 wall buildings", async () => {
-    // Click the "壁" (wall) button in the build toolbar
-    await page.getByRole("button", { name: "壁", exact: true }).click();
+    // Click the "壁" (wall) button, then wait until React commits the tool
+    // state (the button turns .active) — otherwise the drag below can start
+    // before the tool is armed and place nothing.
+    const wallButton = page.getByRole("button", { name: "壁", exact: true });
+    await wallButton.click();
+    let toolActive = false;
+    for (let attempt = 0; attempt < 30 && !toolActive; attempt += 1) {
+      toolActive = (((await wallButton.getAttribute("class")) ?? "")).includes("active");
+      if (!toolActive) await page.waitForTimeout(100);
+    }
+    expect(toolActive, "wall build tool did not become active").toBe(true);
 
     // Cells to drag across: {46,65}→{46,69} — open terrain south of the outer ring.
     // Using x=46 constant, y increments from 65 to 69 = 5 cells.
@@ -139,31 +148,34 @@ describe("functional: drag-build walls", () => {
 
     const [start, ...rest] = validPoints as [{ x: number; y: number }, ...{ x: number; y: number }[]];
 
-    // Count walls before
-    const wallsBefore = await page.evaluate(
-      () => window.__asamaTest?.getSnapshot()?.buildings.filter((b) => b.type === "wall").length ?? 0
-    );
+    const countWalls = () =>
+      page.evaluate(
+        () => window.__asamaTest?.getSnapshot()?.buildings.filter((b) => b.type === "wall").length ?? 0
+      );
+    const wallsBefore = await countWalls();
 
-    // Perform pointerdown → pointermove × 4 → pointerup
-    await page.mouse.move(start.x, start.y);
-    await page.mouse.down();
-    for (const pt of rest) {
-      // Move in small increments to ensure the drag gesture registers each cell
-      await page.mouse.move(pt.x, pt.y, { steps: 4 });
+    // Perform pointerdown → pointermove × 4 → pointerup. Redo the whole drag
+    // if it is silently dropped (pointer events can vanish while textures
+    // upload); a drop places zero walls, so retrying is safe.
+    let wallsAfter = wallsBefore;
+    for (let attempt = 0; attempt < 3 && wallsAfter === wallsBefore; attempt += 1) {
+      await page.mouse.move(start.x, start.y);
+      await page.mouse.down();
+      for (const pt of rest) {
+        // Move in small increments to ensure the drag gesture registers each cell
+        await page.mouse.move(pt.x, pt.y, { steps: 4 });
+      }
+      await page.mouse.up();
+
+      // Wait for snapshot to reflect the placed buildings
+      await page.evaluate(async () => {
+        const bridge = window.__asamaTest;
+        if (!bridge) return;
+        const tick = bridge.getSnapshot()?.currentTick ?? 0;
+        await bridge.waitForTick(tick + 5);
+      });
+      wallsAfter = await countWalls();
     }
-    await page.mouse.up();
-
-    // Wait for snapshot to reflect the placed buildings
-    await page.evaluate(async () => {
-      const bridge = window.__asamaTest;
-      if (!bridge) return;
-      const tick = bridge.getSnapshot()?.currentTick ?? 0;
-      await bridge.waitForTick(tick + 2);
-    });
-
-    const wallsAfter = await page.evaluate(
-      () => window.__asamaTest?.getSnapshot()?.buildings.filter((b) => b.type === "wall").length ?? 0
-    );
 
     expect(wallsAfter - wallsBefore, "Expected 5 new walls to be placed").toBe(5);
   });

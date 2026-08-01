@@ -9,13 +9,19 @@
 - **量子化カーブ語彙 全4フェーズ完了(2026-08-01、PR#108-113)**:
   斜め45°壁(アーム/角柱キャップ) → 四分円弧壁 arc_wall_r{3,4} → 壁ドラッグのオクタイル
   スナップ(planWallPath) → 堀・柵の斜め語彙6タイプ+柵アーム
-- 2026-08-01: 現断面完了パッケージを実施中(concentricCastleScript修正+E2E hard check復帰 /
-  新語彙のシナリオ実戦投入 / L2要観察クローズ / ドキュメント同期)。
-  次ビジョン候補は `next-vision-backlog.md` に集約済み
+- 2026-08-01: **現断面完了パッケージ完了**:
+  - concentricCastleScript修正+E2E hard check復帰(PR#114、sim性能修正・ワーカー配信バグ修正含む)
+  - 新語彙のシナリオ実戦投入: concentric-castle 内郭四隅=arc_wall_r4、水堀四隅=斜め水堀面取り8、
+    外柵四隅=斜め柵面取り10(北はk=2で隅櫓接続、南はk=3)。L1 lint 0違反、L2別コンテキストレビュー合格
+  - 副産物修正: 直線堀⇔斜め堀の合流断絶(土手キャップ)を接続マスクで解消(MOAT-02新設)、
+    PIXI devバンドルのworkerテクスチャローダ停止対策(preferWorkers:false)、
+    セーブAPIのbodyLimit 413修正
+  - L2要観察クローズ: 柵nesw合流部の切れ目 → 350%拡大精査でPASS、クローズ
+  - ドキュメント同期+次ビジョン台帳は `next-vision-backlog.md` に集約済み(e006295)
 
 ## 進行中の作業 (2026-08-01現在)
 
-- 現断面完了パッケージ(上記4件)。完了後はユーザーの実プレイ判定待ちに戻る
+- 現断面完了パッケージは完了。ユーザーの実プレイ判定待ちに戻る
 
 ## 大方針メモ
 
@@ -75,7 +81,11 @@
 
 - コミット規約: `v$(date +%y%m%d%H%M)` スナップショット、PRはCI green条件付きマージ
 - E2E はポート5179専有 → 直列実行。ゾンビ vitest は `pkill -f "[v]itest"`
-- 実画面スクショはシーン構築 ~15秒待ち必須(waitForTimeout(18000))
+- 実画面スクショはシーン構築 ~15秒待ち必須(waitForTimeout(18000))。devバンドルは
+  main-threadテクスチャロード(preferWorkers:false)だが、assets.tsの一括 `Assets.load(urls)`
+  バッチ化で全ロードは30秒以内に収まる — `qa/shot.mjs --settle 30000` 目安
+- セーブAPI(/api/saves)は `pnpm --filter @asama/game run dev:server`(ポート3000)が別途必要。
+  未起動だと画面右上に赤い "save failed (500)" が出てQAスクショに写り込む
 - Blender: `ASAMA_BLENDER_BIN=/nix/store/s0jp4xvpkzc3j00xf7m4d5j385k487lj-blender-5.1.1/bin/blender`
 - registry.py を変更すると全レンダーキャッシュ無効化 → アニメ基盤は別レジストリ/ドライバに隔離する方針
 - 上限例外: codex/claude のサブスク上限に達しそうな場合のみユーザーに相談(それ以外は止まらない)

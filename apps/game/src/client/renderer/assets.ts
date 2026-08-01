@@ -53,13 +53,16 @@ export async function loadGeneratedAssets(): Promise<ReadonlyMap<string, LoadedA
   }
 
   const manifest = (await response.json()) as AssetManifest;
+  // Blender renders PNG with straight alpha; no alphaMode override needed.
+  // If bright fringing appears at tile edges, try: { alphaMode: ALPHA_MODES.PREMULTIPLIED_ALPHA }
+  // 一括ロード(逐次awaitだとリクエスト往復がアセット数ぶん直列化し、
+  // main-threadロード時に600+アセットで数分かかる)
+  const urls = manifest.assets.map((asset) => `/assets/${asset.file}`);
+  const textures = await Assets.load<Texture>(urls);
   const loaded = new Map<string, LoadedAsset>();
   for (const asset of manifest.assets) {
-    // Blender renders PNG with straight alpha; no alphaMode override needed.
-    // If bright fringing appears at tile edges, try: { alphaMode: ALPHA_MODES.PREMULTIPLIED_ALPHA }
-    const texture = await Assets.load<Texture>(`/assets/${asset.file}`);
     loaded.set(asset.assetId, {
-      texture,
+      texture: textures[`/assets/${asset.file}`]!,
       anchor: asset.anchor
     });
   }
@@ -113,9 +116,12 @@ export async function loadAnimationSheets(): Promise<ReadonlyMap<string, Animati
   }
 
   const manifest = (await response.json()) as AssetManifest;
+  const animations = manifest.animations ?? [];
+  const urls = animations.map((anim) => `/assets/${anim.file}`);
+  const textures = await Assets.load<Texture>(urls);
   const loaded = new Map<string, AnimationSheetAsset>();
-  for (const anim of manifest.animations ?? []) {
-    const texture = await Assets.load<Texture>(`/assets/${anim.file}`);
+  for (const anim of animations) {
+    const texture = textures[`/assets/${anim.file}`]!;
     const key = `${anim.unitAssetId}.anim.${anim.action}`;
     loaded.set(key, {
       unitAssetId: anim.unitAssetId,

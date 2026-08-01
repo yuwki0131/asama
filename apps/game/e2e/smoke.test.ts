@@ -59,6 +59,14 @@ describe("smoke: startup", () => {
   });
 
   it("no fallback sprites rendered (no overlay.cell.selected golden pixels)", async () => {
+    // The DEV-default alignment debug overlay draws gold footprint outlines
+    // (#ffd166) that the haze grading near the canvas top shifts into the
+    // fallback color window — turn it off before sampling pixels.
+    const debugButton = page.getByRole("button", { name: "Debug" });
+    if (((await debugButton.getAttribute("class")) ?? "").includes("active")) {
+      await debugButton.click();
+    }
+
     // Speed 0 to freeze the frame, then screenshot the canvas element.
     // Wait 1s to let any in-flight animation or delayed asset state settle.
     await page.evaluate(() => window.__asamaTest?.setSpeed(0));
