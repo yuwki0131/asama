@@ -37,7 +37,7 @@
 - [07_scenarios](./07_scenarios/): シナリオ、MVP、AIプロファイル
 - [08_data-model](./08_data-model/): 概念モデル、セーブ、定義データ
 - [09_technical-design](./09_technical-design/): 技術設計。現時点では雛形
-- [10_development](./10_development/): MVP範囲、ロードマップ、テスト、未解決事項
+- [10_development](./10_development/): MVP範囲、ロードマップ、テスト、未解決事項、並列開発体制
 
 ## Coding Agent向け推奨読書順
 
