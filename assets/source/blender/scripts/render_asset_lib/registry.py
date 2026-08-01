@@ -9,6 +9,7 @@ from .terrain import (
     build_water_transition_tile, build_water_transition_inner_tile,
     build_terrain_mask, build_terrain_base,
     build_road_mask, build_dry_moat_mask, build_water_moat_mask, build_trench_moat,
+    build_trench_moat_diagonal,
     build_earth_bridge, build_wood_bridge,
 )
 from .buildings import (
@@ -18,6 +19,7 @@ from .buildings import (
     build_yagura_small_graybox, build_farm_paddy,
     build_gate_wood, build_wall_plaster_mask, build_wall_hazama_mask, build_fence_wood_mask,
     build_wall_diagonal, build_wall_diagonal_arm, build_wall_corner_cap, build_wall_arc, build_wall_ladder, build_tenshu_graybox, build_tenshu,
+    build_fence_diagonal, build_fence_diagonal_arm,
 )
 from .vegetation import (
     build_tree_pine, build_tree_cedar, build_tree_broadleaf,
@@ -72,6 +74,16 @@ MODEL_REGISTRY = {
     "wall-diagonal-arm-se": lambda scene: build_wall_diagonal_arm(scene, "se"),
     "wall-diagonal-arm-sw": lambda scene: build_wall_diagonal_arm(scene, "sw"),
     "wall-corner-cap": build_wall_corner_cap,
+    "fence-wood-diagonal-nwse": lambda scene: build_fence_diagonal(scene, "nwse"),
+    "fence-wood-diagonal-nesw": lambda scene: build_fence_diagonal(scene, "nesw"),
+    "fence-wood-diagonal-arm-nw": lambda scene: build_fence_diagonal_arm(scene, "nw"),
+    "fence-wood-diagonal-arm-ne": lambda scene: build_fence_diagonal_arm(scene, "ne"),
+    "fence-wood-diagonal-arm-se": lambda scene: build_fence_diagonal_arm(scene, "se"),
+    "fence-wood-diagonal-arm-sw": lambda scene: build_fence_diagonal_arm(scene, "sw"),
+    "dry-moat-diagonal-nwse": lambda scene: build_trench_moat_diagonal(scene, False, "nwse"),
+    "dry-moat-diagonal-nesw": lambda scene: build_trench_moat_diagonal(scene, False, "nesw"),
+    "water-moat-diagonal-nwse": lambda scene: build_trench_moat_diagonal(scene, True, "nwse"),
+    "water-moat-diagonal-nesw": lambda scene: build_trench_moat_diagonal(scene, True, "nesw"),
     "wall-arc-r3-ne": lambda scene: build_wall_arc(scene, 3, "ne"),
     "wall-arc-r3-se": lambda scene: build_wall_arc(scene, 3, "se"),
     "wall-arc-r3-sw": lambda scene: build_wall_arc(scene, 3, "sw"),

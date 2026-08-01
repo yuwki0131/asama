@@ -10,6 +10,7 @@ import {
   isBridge,
   isGate,
   isInsideMap,
+  isMoat,
   isNeSwGate,
   isWall,
   sameCell
@@ -696,8 +697,7 @@ function isWaterNeighbor(world: WorldState, coord: CellCoord): boolean {
   }
   if (getCell(world, coord).terrain === "water") return true;
   const neighbor = getBuildingAt(world, coord);
-  return neighbor !== null && neighbor.lifecycleState === "intact" &&
-    (neighbor.type === "water_moat" || neighbor.type === "dry_moat");
+  return neighbor !== null && neighbor.lifecycleState === "intact" && isMoat(neighbor.type);
 }
 
 export function attachLadder(wall: BuildingState): void {

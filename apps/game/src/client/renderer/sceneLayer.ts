@@ -26,6 +26,7 @@ import {
   bridgeCellAssetCandidates,
   bridgeDeckLiftAt,
   buildingAssetCandidates,
+  diagonalArmAssetFamily,
   diagonalJunctionArms,
   honmaruCellAssetCandidates,
   isBridgeBuildingType,
@@ -816,7 +817,7 @@ function addBuildingSprite(
   // visible past the wall pixels.
   const arms = diagonalJunctionArms(building, snapshot);
   for (const corner of arms) {
-    const asset = assets.get(`building.wall.diagonal.arm.${corner}`);
+    const asset = assets.get(`${diagonalArmAssetFamily(building.type)}.${corner}`);
     if (asset === undefined) {
       continue;
     }

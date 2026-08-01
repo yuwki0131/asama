@@ -461,6 +461,111 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool, phase: tup
         add_flat_quad(scene, f"SkirtCorner{name}", low, high, 0.0005, holdout)
 
 
+def build_trench_moat_diagonal(scene: bpy.types.Scene, water: bool, orientation: str) -> None:
+    """Moat trench running corner-to-corner across the cell diagonal.
+
+    nwse: NW corner to SE corner. nesw: NE corner to SW corner. A sunk floor
+    band along the diagonal with rim/lip/bank strips on both sides; the band
+    overshoots both corners slightly so chained diagonal tiles read as one
+    continuous trench. Off-band tile area stays transparent (terrain shows).
+    """
+    import math
+    earth = make_bank_material()
+    rim_mat = make_material("MoatRim", (0.150, 0.124, 0.088, 1.0))
+    lip_mat = make_material("MoatGrassLip", (0.105, 0.150, 0.070, 1.0))
+    surface = make_trench_surface_material(water, (0.0, 0.0), 0.0)
+    surface_z = (-MOAT_DEPTH + 0.08) if water else -DRY_MOAT_DEPTH
+
+    if orientation == "nwse":
+        a, b = (-0.5, -0.5), (0.5, 0.5)
+    else:
+        a, b = (0.5, -0.5), (-0.5, 0.5)
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    length = math.hypot(dx, dy)
+    ux, uy = dx / length, dy / length
+    px, py = -uy, ux
+
+    overshoot = 0.04
+    a = (a[0] - ux * overshoot, a[1] - uy * overshoot)
+    b = (b[0] + ux * overshoot, b[1] + uy * overshoot)
+
+    half_top = 0.42
+    rim_w = 0.09
+    # Steeper than straight-moat MOAT_SLOPE: the side-on (nesw) view is mostly
+    # bank face, so a gentle slope leaves almost no visible water surface.
+    slope = 0.14
+
+    def offset(point: tuple[float, float], side: float, amount: float) -> tuple[float, float]:
+        return (point[0] + px * side * amount, point[1] + py * side * amount)
+
+    floor = [offset(a, 1.0, half_top), offset(b, 1.0, half_top), offset(b, -1.0, half_top), offset(a, -1.0, half_top)]
+    add_mesh(scene, "DiagTrenchFloor", [(*map_xy(x, y), surface_z) for x, y in floor], [(0, 1, 2, 3)], surface)
+
+    for side in (1.0, -1.0):
+        top0, top1 = offset(a, side, half_top), offset(b, side, half_top)
+        bot0, bot1 = offset(a, side, half_top - slope), offset(b, side, half_top - slope)
+        out0, out1 = offset(a, side, half_top + rim_w), offset(b, side, half_top + rim_w)
+        add_mesh(scene, f"DiagBank{side}",
+            [(*map_xy(*top0), 0.0), (*map_xy(*top1), 0.0), (*map_xy(*bot1), surface_z), (*map_xy(*bot0), surface_z)],
+            [(0, 1, 2, 3)], earth)
+        add_mesh(scene, f"DiagRim{side}",
+            [(*map_xy(*top0), 0.0), (*map_xy(*top1), 0.0), (*map_xy(*out1), 0.0), (*map_xy(*out0), 0.0)],
+            [(0, 1, 2, 3)], rim_mat)
+        add_mesh(scene, f"DiagLip{side}",
+            [(*map_xy(*top0), 0.0), (*map_xy(*top1), 0.0), (*map_xy(*top1), -0.035), (*map_xy(*top0), -0.035)],
+            [(0, 1, 2, 3)], lip_mat)
+
+    # Holdout skirts clip band bleed into edge neighbors and off-diagonal
+    # corners. On-diagonal corners stay open so chained tiles bleed into each
+    # other through the shared corner: the near strip of each adjacent edge
+    # skirt is notched back by `notch` around the open corner, otherwise the
+    # band pinches to a point at every cell boundary (scalloped chain).
+    holdout = make_holdout_material()
+    # Band-parallel skirts: occlude everything outside the rim outer edge along
+    # the whole (extended) band, exactly where neighbor terrain would sit in
+    # true 3D. Kills water pixels leaking through skirt notches (sawtooth) and
+    # keeps the band's outer silhouette a clean diagonal line.
+    rim_edge = half_top + rim_w
+    a_ext = (a[0] - ux * 1.0, a[1] - uy * 1.0)
+    b_ext = (b[0] + ux * 1.0, b[1] + uy * 1.0)
+    for side in (1.0, -1.0):
+        quad = [
+            offset(a_ext, side, rim_edge), offset(b_ext, side, rim_edge),
+            offset(b_ext, side, rim_edge + 2.5), offset(a_ext, side, rim_edge + 2.5),
+        ]
+        add_mesh(scene, f"SkirtBand{side}", [(*map_xy(x, y), 0.0005) for x, y in quad], [(0, 1, 2, 3)], holdout)
+    notch = half_top + rim_w + overshoot
+    open_corners = ("NW", "SE") if orientation == "nwse" else ("NE", "SW")
+    edge_corners = {"N": ("NW", "NE"), "S": ("SW", "SE"), "W": ("NW", "SW"), "E": ("NE", "SE")}
+    for name, far_low, far_high, near_low, near_high in (
+        ("N", (-0.5, -3.0), (0.5, -0.5 - notch), (-0.5, -0.5 - notch), (0.5, -0.5)),
+        ("S", (-0.5, 0.5 + notch), (0.5, 3.0), (-0.5, 0.5), (0.5, 0.5 + notch)),
+        ("W", (-3.0, -0.5), (-0.5 - notch, 0.5), (-0.5 - notch, -0.5), (-0.5, 0.5)),
+        ("E", (0.5 + notch, -0.5), (3.0, 0.5), (0.5, -0.5), (0.5 + notch, 0.5)),
+    ):
+        add_flat_quad(scene, f"Skirt{name}Far", far_low, far_high, 0.0005, holdout)
+        low, high = list(near_low), list(near_high)
+        for corner in edge_corners[name]:
+            if corner not in open_corners:
+                continue
+            axis = 0 if name in ("N", "S") else 1
+            clip_low = corner[1] == "W" if axis == 0 else corner[0] == "N"
+            if clip_low:
+                low[axis] = min(low[axis] + notch, high[axis])
+            else:
+                high[axis] = max(high[axis] - notch, low[axis])
+        add_flat_quad(scene, f"Skirt{name}Near", tuple(low), tuple(high), 0.0005, holdout)
+    for name, low, high in (
+        ("NW", (-3.0, -3.0), (-0.5, -0.5)),
+        ("NE", (0.5, -3.0), (3.0, -0.5)),
+        ("SW", (-3.0, 0.5), (-0.5, 3.0)),
+        ("SE", (0.5, 0.5), (3.0, 3.0)),
+    ):
+        if name in open_corners:
+            continue
+        add_flat_quad(scene, f"SkirtCorner{name}", low, high, 0.0005, holdout)
+
+
 def build_dry_moat_mask(scene: bpy.types.Scene, mask: str) -> None:
     build_trench_moat(scene, mask, water=False)
 

@@ -103,6 +103,24 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.wall.plaster",
     gateState: null
   },
+  diagonal_fence_nwse: {
+    type: "diagonal_fence_nwse",
+    category: "castle",
+    maxHp: 120,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.fence.wood.diagonal.nwse",
+    gateState: null
+  },
+  diagonal_fence_nesw: {
+    type: "diagonal_fence_nesw",
+    category: "castle",
+    maxHp: 120,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.fence.wood.diagonal.nesw",
+    gateState: null
+  },
   diagonal_wall_nwse: {
     type: "diagonal_wall_nwse",
     category: "castle",
@@ -202,6 +220,44 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     footprint: { width: 1, height: 1 },
     passable: false,
     assetId: "building.water_moat",
+    gateState: null
+  },
+  diagonal_dry_moat_nwse: {
+    type: "diagonal_dry_moat_nwse",
+    category: "moat",
+    maxHp: 9999,
+    footprint: { width: 1, height: 1 },
+    passable: true,
+    movementCostModifier: 5,
+    assetId: "building.dry_moat.diagonal.nwse",
+    gateState: null
+  },
+  diagonal_dry_moat_nesw: {
+    type: "diagonal_dry_moat_nesw",
+    category: "moat",
+    maxHp: 9999,
+    footprint: { width: 1, height: 1 },
+    passable: true,
+    movementCostModifier: 5,
+    assetId: "building.dry_moat.diagonal.nesw",
+    gateState: null
+  },
+  diagonal_water_moat_nwse: {
+    type: "diagonal_water_moat_nwse",
+    category: "moat",
+    maxHp: 9999,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.water_moat.diagonal.nwse",
+    gateState: null
+  },
+  diagonal_water_moat_nesw: {
+    type: "diagonal_water_moat_nesw",
+    category: "moat",
+    maxHp: 9999,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.water_moat.diagonal.nesw",
     gateState: null
   },
   storehouse: {

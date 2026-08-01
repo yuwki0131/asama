@@ -270,6 +270,8 @@ export const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
   "arc_wall_r4_sw",
   "arc_wall_r4_nw",
   "fence",
+  "diagonal_fence_nwse",
+  "diagonal_fence_nesw",
   "gate_wide_2",
   "gate_wide_3",
   "gate_narrow_3",
@@ -352,6 +354,17 @@ export function isWall(type: BuildingType): boolean {
 
 export function isArcWall(type: BuildingType): boolean {
   return type.startsWith("arc_wall_");
+}
+
+export function isMoat(type: BuildingType): boolean {
+  return (
+    type === "dry_moat" ||
+    type === "water_moat" ||
+    type === "diagonal_dry_moat_nwse" ||
+    type === "diagonal_dry_moat_nesw" ||
+    type === "diagonal_water_moat_nwse" ||
+    type === "diagonal_water_moat_nesw"
+  );
 }
 
 /** 円弧壁の膨らみ方向 (sx,sy)。ne=(+,−) se=(+,+) sw=(−,+) nw=(−,−)。 */

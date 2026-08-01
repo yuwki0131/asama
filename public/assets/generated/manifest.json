@@ -1213,6 +1213,72 @@
       }
     },
     {
+      "assetId": "building.fence.wood.diagonal.nwse",
+      "kind": "building",
+      "file": "generated/building-fence-wood-diagonal-nwse.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.nesw",
+      "kind": "building",
+      "file": "generated/building-fence-wood-diagonal-nesw.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.nw",
+      "kind": "building",
+      "file": "generated/building-fence-wood-diagonal-arm-nw.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.ne",
+      "kind": "building",
+      "file": "generated/building-fence-wood-diagonal-arm-ne.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.se",
+      "kind": "building",
+      "file": "generated/building-fence-wood-diagonal-arm-se.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
+      "assetId": "building.fence.wood.diagonal.arm.sw",
+      "kind": "building",
+      "file": "generated/building-fence-wood-diagonal-arm-sw.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    {
       "assetId": "building.wall.corner.cap",
       "kind": "building",
       "file": "generated/building-wall-corner-cap.png",
@@ -1221,6 +1287,94 @@
       "anchor": {
         "x": 0.5,
         "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r3.ne",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r3-ne.png",
+      "width": 224,
+      "height": 176,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6363636363636364
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r3.se",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r3-se.png",
+      "width": 224,
+      "height": 176,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6363636363636364
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r3.sw",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r3-sw.png",
+      "width": 224,
+      "height": 176,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6363636363636364
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r3.nw",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r3-nw.png",
+      "width": 224,
+      "height": 176,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6363636363636364
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.ne",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-ne.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.se",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-se.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.sw",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-sw.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
+      }
+    },
+    {
+      "assetId": "building.wall.arc.r4.nw",
+      "kind": "building",
+      "file": "generated/building-wall-arc-r4-nw.png",
+      "width": 288,
+      "height": 200,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6
       }
     },
     {
@@ -6636,91 +6790,47 @@
       }
     },
     {
-      "assetId": "building.wall.arc.r3.ne",
+      "assetId": "building.dry_moat.diagonal.nwse",
       "kind": "building",
-      "file": "generated/building-wall-arc-r3-ne.png",
-      "width": 224,
-      "height": 176,
+      "file": "generated/building-dry-moat-diagonal-nwse.png",
+      "width": 64,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.6363636363636364
+        "y": 0.25
       }
     },
     {
-      "assetId": "building.wall.arc.r3.se",
+      "assetId": "building.dry_moat.diagonal.nesw",
       "kind": "building",
-      "file": "generated/building-wall-arc-r3-se.png",
-      "width": 224,
-      "height": 176,
+      "file": "generated/building-dry-moat-diagonal-nesw.png",
+      "width": 64,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.6363636363636364
+        "y": 0.25
       }
     },
     {
-      "assetId": "building.wall.arc.r3.sw",
+      "assetId": "building.water_moat.diagonal.nwse",
       "kind": "building",
-      "file": "generated/building-wall-arc-r3-sw.png",
-      "width": 224,
-      "height": 176,
+      "file": "generated/building-water-moat-diagonal-nwse.png",
+      "width": 64,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.6363636363636364
+        "y": 0.25
       }
     },
     {
-      "assetId": "building.wall.arc.r3.nw",
+      "assetId": "building.water_moat.diagonal.nesw",
       "kind": "building",
-      "file": "generated/building-wall-arc-r3-nw.png",
-      "width": 224,
-      "height": 176,
+      "file": "generated/building-water-moat-diagonal-nesw.png",
+      "width": 64,
+      "height": 64,
       "anchor": {
         "x": 0.5,
-        "y": 0.6363636363636364
-      }
-    },
-    {
-      "assetId": "building.wall.arc.r4.ne",
-      "kind": "building",
-      "file": "generated/building-wall-arc-r4-ne.png",
-      "width": 288,
-      "height": 200,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.6
-      }
-    },
-    {
-      "assetId": "building.wall.arc.r4.se",
-      "kind": "building",
-      "file": "generated/building-wall-arc-r4-se.png",
-      "width": 288,
-      "height": 200,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.6
-      }
-    },
-    {
-      "assetId": "building.wall.arc.r4.sw",
-      "kind": "building",
-      "file": "generated/building-wall-arc-r4-sw.png",
-      "width": 288,
-      "height": 200,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.6
-      }
-    },
-    {
-      "assetId": "building.wall.arc.r4.nw",
-      "kind": "building",
-      "file": "generated/building-wall-arc-r4-nw.png",
-      "width": 288,
-      "height": 200,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.6
+        "y": 0.25
       }
     }
   ],
