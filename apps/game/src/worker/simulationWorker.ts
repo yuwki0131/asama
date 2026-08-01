@@ -30,6 +30,7 @@ let speed: 0 | 1 | 2 | 4 = 0;
 let lastTime = performance.now();
 let accumulatedMs = 0;
 let lastSnapshotTick = 0;
+let outcomeSnapshotPosted = false;
 const tickMs = 1000 / SIM_TICKS_PER_SECOND;
 const snapshotIntervalTicks = SIM_TICKS_PER_SECOND / SNAPSHOTS_PER_SECOND;
 
@@ -39,6 +40,7 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
   if (message.type === "init") {
     world = createInitialWorld(scenarioForId(message.scenarioId));
     lastSnapshotTick = world.currentTick;
+    outcomeSnapshotPosted = false;
     post({ type: "ready", snapshot: snapshotWorld(world, { includeMapCells: true }) });
     return;
   }
@@ -82,6 +84,7 @@ self.addEventListener("message", (event: MessageEvent<MainToWorkerMessage>) => {
       return;
     }
     lastSnapshotTick = world.currentTick;
+    outcomeSnapshotPosted = world.outcome !== null;
     post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: true }) });
   }
 });
@@ -101,7 +104,15 @@ function loop(now: number): void {
     processed += 1;
   }
 
-  if (world.currentTick - lastSnapshotTick >= snapshotIntervalTicks) {
+  // On game end currentTick freezes, so the interval condition below can never
+  // fire again — without this, the outcome-bearing snapshot is only delivered
+  // when the end tick happens to align with the snapshot interval, and the
+  // client hangs on a stale pre-outcome snapshot otherwise.
+  if (world.outcome !== null && !outcomeSnapshotPosted) {
+    outcomeSnapshotPosted = true;
+    lastSnapshotTick = world.currentTick;
+    post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: false }) });
+  } else if (world.currentTick - lastSnapshotTick >= snapshotIntervalTicks) {
     lastSnapshotTick = world.currentTick;
     post({ type: "snapshot", snapshot: snapshotWorld(world, { includeMapCells: false }) });
   }
