@@ -7,6 +7,7 @@ import { cutPassFortScenario } from "./cut-pass-fort";
 import { castleTownGateScenario } from "./castle-town-gate";
 import { steppedFortressScenario } from "./stepped-fortress";
 import { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
+import { ogakiCastleScenario } from "./ogaki-castle";
 
 // --- Building and unit content definitions ---------------------------------
 //
@@ -1513,6 +1514,7 @@ export const scenarios: readonly ScenarioDefinition[] = [
   steppedFortressScenario,
   fiveTierKeepScenario,
   takaishigakiShowcaseScenario,
+  ogakiCastleScenario,
   freePlayScenario,
 ];
 
@@ -1528,3 +1530,4 @@ export { cutPassFortScenario } from "./cut-pass-fort";
 export { castleTownGateScenario } from "./castle-town-gate";
 export { steppedFortressScenario } from "./stepped-fortress";
 export { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
+export { ogakiCastleScenario } from "./ogaki-castle";
