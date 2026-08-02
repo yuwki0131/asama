@@ -82,7 +82,7 @@ export function updateEnemyAi(world: WorldState): void {
         unit.task = { kind: "ladder", target: wall.position, progress: 0 };
         continue;
       }
-      const moat = nearestBuildingOfTypes(world, unit, ["dry_moat", "water_moat", "diagonal_dry_moat_nwse", "diagonal_dry_moat_nesw", "diagonal_water_moat_nwse", "diagonal_water_moat_nesw"]);
+      const moat = nearestBuildingOfTypes(world, unit, ["dry_moat", "water_moat", "river", "diagonal_dry_moat_nwse", "diagonal_dry_moat_nesw", "diagonal_water_moat_nwse", "diagonal_water_moat_nesw", "diagonal_river_nwse", "diagonal_river_nesw"]);
       if (moat !== null) {
         unit.task = { kind: "fillMoat", target: moat.position, progress: 0 };
         continue;

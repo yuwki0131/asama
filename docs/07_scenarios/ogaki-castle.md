@@ -94,7 +94,7 @@ v3の中核目標: 岐阜県大垣城の**史実上の最盛期城郭**を一つ
 
 - [対応済] 天守のスケール: tenshu_large(5x5、4層4階、building.tenshu.ogaki、Blender OGAKIバリアント)を追加
 - [対応済] 崖スキン: v2の`skin: "ishigaki"`段丘で対応できた(予想に反し不足なし)
-- [未対応] 独立した川(水門川)のterraforming — トライ版は幅広water_moatで代替、水面が堀と同一スキン
+- [対応済] 独立した川(水門川): 自然堤のriverファミリー(building.river.*、草の縁+葦+岩、connected16マスク+p/vバリアント+斜め2種)を追加し、総堀の北〜西辺(水門川転用部)をwater_moat→riverに差し替え。川⇔水堀は水門相当で同一水面として接続(フルレンダーは統括パイプライン待ち)
 - [未対応] 細街路・町屋密度(town_blockが4x4単位、短冊型町割りが出ない)
 - [対応済] 櫓門: gate_yagura_3 / gate_yagura_3_ne_sw(石垣袖+渡櫓、building.gate.yagura.*、Blender build_gate_yagura)を追加し本丸鉄門に適用
 

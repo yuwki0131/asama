@@ -453,7 +453,7 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
 
   // Moat interiors carry world-phased / seed-varied textures so straight
   // runs read as one continuous excavation instead of a repeating tile.
-  if (building.type === "dry_moat" || building.type === "water_moat") {
+  if (building.type === "dry_moat" || building.type === "water_moat" || building.type === "river") {
     if (mask === "0101") {
       const phase = ((building.position.x % 4) + 4) % 4;
       return phase === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.p${phase}`;
@@ -577,6 +577,10 @@ function connectedAssetFamily(type: BuildingType): string | null {
     return "building.water_moat";
   }
 
+  if (type === "river") {
+    return "building.river";
+  }
+
   if (type === "road") {
     return "building.road";
   }
@@ -691,11 +695,23 @@ function connectsTo(building: BuildingState, neighbor: BuildingState | null): bo
     return isWall(neighbor.type);
   }
 
-  if (building.type === "dry_moat" || building.type === "water_moat") {
+  if (building.type === "dry_moat" || building.type === "water_moat" || building.type === "river") {
     // 斜め堀ピースの水路はセル角→角で、どの共有辺にも水路端の角が含まれる。
     // 同族斜めピースを接続扱いにしないと直線堀末端が土手キャップで塞がり、
     // 面取りコーナーで水路が分断して見える(MOAT-02)。
-    return neighbor.type === building.type || neighbor.type.startsWith(`diagonal_${building.type}_`);
+    if (neighbor.type === building.type || neighbor.type.startsWith(`diagonal_${building.type}_`)) {
+      return true;
+    }
+    // 川と水堀は同一水面として接続する(水門: 大垣の水門川⇔総堀)。閉じた
+    // 土手キャップで水が堰き止められて見えるのを防ぐ。空堀は水面を持たない
+    // ため対象外。
+    const waterFamilies = ["water_moat", "river"];
+    if (waterFamilies.includes(building.type)) {
+      return waterFamilies.some(
+        (family) => neighbor.type === family || neighbor.type.startsWith(`diagonal_${family}_`)
+      );
+    }
+    return false;
   }
 
   return building.type === neighbor.type && building.type === "road";

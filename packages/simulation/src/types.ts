@@ -367,7 +367,10 @@ export function isMoat(type: BuildingType): boolean {
     type === "diagonal_dry_moat_nwse" ||
     type === "diagonal_dry_moat_nesw" ||
     type === "diagonal_water_moat_nwse" ||
-    type === "diagonal_water_moat_nesw"
+    type === "diagonal_water_moat_nesw" ||
+    type === "river" ||
+    type === "diagonal_river_nwse" ||
+    type === "diagonal_river_nesw"
   );
 }
 

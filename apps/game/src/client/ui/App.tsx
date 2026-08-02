@@ -1047,6 +1047,9 @@ const INFRA_TOOLS: readonly { readonly type: BuildingType; readonly label: strin
   { type: "water_moat", label: "水堀" },
   { type: "diagonal_water_moat_nwse", label: "斜水堀縦" },
   { type: "diagonal_water_moat_nesw", label: "斜水堀横" },
+  { type: "river", label: "川" },
+  { type: "diagonal_river_nwse", label: "斜川縦" },
+  { type: "diagonal_river_nesw", label: "斜川横" },
   { type: "road", label: "道" },
   { type: "earth_bridge", label: "土橋" },
   { type: "wood_bridge", label: "木橋" }
