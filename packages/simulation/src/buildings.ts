@@ -20,7 +20,8 @@ import { connectedTerrainAssetId, getCell } from "./map";
 
 const LOT_BUILDING_TYPES = new Set<BuildingType>([
   "tenshu", "tenshu_large", "storehouse", "market", "barracks",
-  "samurai_residence", "town_block", "garden", "farm", "yagura", "honmaru"
+  "samurai_residence", "town_block", "machiya", "machiya_ne_sw",
+  "garden", "farm", "yagura", "honmaru"
 ]);
 
 export function isLotBuilding(type: BuildingType): boolean {
@@ -431,6 +432,10 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
     return townBlockVariantAssetId(building.position);
   }
 
+  if (building.type === "machiya" || building.type === "machiya_ne_sw") {
+    return machiyaVariantAssetId(building.type, building.position);
+  }
+
   if (building.type === "garden") {
     return gardenVariantAssetId(building.position);
   }
@@ -487,6 +492,23 @@ export function gardenVariantAssetId(position: CellCoord): string {
   const lotY = Math.floor(position.y / 2);
   const variant = (((lotX + lotY * 3) % GARDEN_VARIANT_COUNT) + GARDEN_VARIANT_COUNT) % GARDEN_VARIANT_COUNT;
   return `building.garden.v${variant}`;
+}
+
+/**
+ * Machiya strips mix three facade variants so a terraced row reads as
+ * individual townhouses. Same pure-hash scheme as townBlockVariantAssetId
+ * (deterministic per anchor cell, distinct seed so a machiya row does not
+ * mirror the variant rhythm of nearby town blocks). The two orientations
+ * share the hash but resolve to their own sprite family.
+ */
+export const MACHIYA_VARIANT_COUNT = 3;
+
+export function machiyaVariantAssetId(type: "machiya" | "machiya_ne_sw", position: CellCoord): string {
+  let h = (position.x * 374761393 + position.y * 668265263 + 557123) >>> 0;
+  h = (h ^ (h >>> 13)) >>> 0;
+  const variant = (h % MACHIYA_VARIANT_COUNT) + 1;
+  const orientation = type === "machiya_ne_sw" ? "ne_sw" : "nw_se";
+  return `building.machiya.${orientation}.v${variant}`;
 }
 
 export const TOWN_BLOCK_VARIANT_COUNT = 5;

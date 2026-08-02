@@ -225,6 +225,43 @@ describe("town block visual variants", () => {
   });
 });
 
+describe("machiya visual variants", () => {
+  function freshWorld(): WorldState {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    return world;
+  }
+
+  it("assigns a variant assetId from the orientation's own sprite family", () => {
+    const world = freshWorld();
+    place(world, "machiya", { x: 40, y: 40 });
+    place(world, "machiya_ne_sw", { x: 50, y: 40 });
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toMatch(/^building\.machiya\.nw_se\.v[1-3]$/);
+    expect(buildingAt(world, { x: 50, y: 40 }).assetId).toMatch(/^building\.machiya\.ne_sw\.v[1-3]$/);
+  });
+
+  it("is deterministic for the same coordinate across worlds", () => {
+    const first = freshWorld();
+    const second = freshWorld();
+    for (const position of [{ x: 40, y: 40 }, { x: 44, y: 40 }, { x: 40, y: 44 }, { x: 64, y: 64 }]) {
+      place(first, "machiya", position);
+      place(second, "machiya", position);
+      expect(buildingAt(first, position).assetId).toBe(buildingAt(second, position).assetId);
+    }
+  });
+
+  it("varies along a terraced street of adjacent lots", () => {
+    const world = freshWorld();
+    const positions = [40, 42, 44, 46, 48, 50].map((x) => ({ x, y: 40 }));
+    for (const position of positions) {
+      place(world, "machiya", position);
+    }
+    const ids = new Set(positions.map((position) => buildingAt(world, position).assetId));
+    expect(ids.size).toBeGreaterThanOrEqual(2);
+  });
+});
+
 describe("garden visual variants", () => {
   function freshWorld(): WorldState {
     const world = createInitialWorld();

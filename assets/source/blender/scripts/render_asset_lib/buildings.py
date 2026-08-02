@@ -2035,3 +2035,106 @@ def build_farm_paddy(scene: bpy.types.Scene, season: str = "spring") -> None:
                         *map_box((rx - 0.024 + jitter, ry - 0.024, 0.042), (rx + 0.024 + jitter, ry + 0.024, 0.085 + 0.012 * ((row + col) % 2))),
                         mat,
                     )
+
+
+def build_machiya(scene: bpy.types.Scene, variant: int = 1, orientation: str = "nw_se") -> None:
+    """Tanzaku machiya (narrow-frontage townhouse) on a 2x1 lot.
+
+    Local frame: u along the long axis in [-2, 0], v across in [-1, 0].
+    orientation "nw_se" keeps (u, v) = (x, y); "ne_sw" swaps to a 1x2 lot.
+    Variants: 1 = hirairi plaster two-story with koshi lattice, 2 = tsumairi
+    dark-plank house with white gable verge and door awning, 3 = itabuki
+    stone-weighted plank roof cottage. Canvas 192x160, anchor 112,128 (nw_se)
+    / 80,128 (ne_sw).
+    """
+    swap = orientation == "ne_sw"
+
+    def pt(u: float, v: float) -> tuple[float, float]:
+        return (v, u) if swap else (u, v)
+
+    def rect(a: tuple[float, float], b: tuple[float, float]) -> tuple[tuple[float, float], tuple[float, float]]:
+        (ax, ay), (bx, by) = pt(*a), pt(*b)
+        return (min(ax, bx), min(ay, by)), (max(ax, bx), max(ay, by))
+
+    def box(name: str, a: tuple[float, float], b: tuple[float, float], z0: float, z1: float, material: bpy.types.Material) -> None:
+        low, high = rect(a, b)
+        add_box(scene, name, *map_box((low[0], low[1], z0), (high[0], high[1], z1)), material)
+
+    axis = "y" if swap else "x"
+    mats = building_material_set()
+    props = prop_materials()
+    cloth = make_material("MachiyaNoren", (0.075, 0.105, 0.200, 1.0))
+    splash = make_material("MachiyaSplash", (0.150, 0.140, 0.122, 1.0))
+
+    add_yard_pad(scene, 1.0 if swap else 2.0, 2.0 if swap else 1.0, "dirt")
+
+    if variant == 1:
+        # Hirairi: plaster tsushi-nikai facing the long side. Door + noren and
+        # koshi lattice on the long face, mushiko windows under the eaves.
+        plinth_top, wall_top, ridge_top = 0.10, 1.18, 1.56
+        box("Plinth", (-1.94, -0.94), (-0.06, -0.05), 0.0, plinth_top, mats["stone"])
+        box("Body", (-1.88, -0.88), (-0.12, -0.10), plinth_top, wall_top, mats["plaster"])
+        box("Splash", (-1.90, -0.90), (-0.10, -0.08), plinth_top, plinth_top + 0.07, splash)
+        # Long street face (v-high): central doorway, indigo noren, koshi.
+        box("Door", (-1.25, -0.105), (-0.85, -0.070), plinth_top, 0.78, mats["dark_wood"])
+        box("Noren", (-1.29, -0.070), (-0.81, -0.050), 0.56, 0.80, cloth)
+        for side, (k0, k1) in enumerate(((-1.80, -1.33), (-0.77, -0.20))):
+            box(f"KoshiBack{side}", (k0, -0.100), (k1, -0.080), 0.16, 0.72, mats["trim"])
+            bar = k0 + 0.03
+            while bar < k1 - 0.03:
+                box(f"Koshi{side}{bar:.2f}", (bar, -0.080), (bar + 0.035, -0.060), 0.16, 0.72, mats["dark_wood"])
+                bar += 0.10
+        # Mushiko-mado: squat barred openings in the upper plaster.
+        for index, (w0, w1) in enumerate(((-1.62, -1.18), (-0.86, -0.42))):
+            box(f"MushikoBack{index}", (w0, -0.100), (w1, -0.082), 0.86, 1.06, mats["trim"])
+            bar = w0 + 0.045
+            while bar < w1 - 0.02:
+                box(f"Mushiko{index}{bar:.2f}", (bar, -0.082), (bar + 0.032, -0.062), 0.86, 1.06, mats["plaster"])
+                bar += 0.085
+        # Gable-end face (u-high): weatherboard skirt against rain splash.
+        box("Shitami", (-0.120, -0.86), (-0.098, -0.12), plinth_top, 0.58, mats["dark_wood"])
+        add_kawara_roof(
+            scene, "MachiyaRoof", *rect((-2.0, -1.0), (0.0, 0.0)), wall_top, ridge_top, axis,
+            mats["roof"] if axis == "x" else mats["roof_y"], mats["trim"], verge_material=mats["plaster"],
+        )
+    elif variant == 2:
+        # Tsumairi: dark shitami-ita planks, entrance on the gable end under a
+        # slab awning; the white-plastered verge marks the street gable.
+        plinth_top, wall_top, ridge_top = 0.08, 0.90, 1.34
+        box("Plinth", (-1.94, -0.94), (-0.06, -0.05), 0.0, plinth_top, mats["stone"])
+        box("Body", (-1.88, -0.88), (-0.12, -0.10), plinth_top, wall_top, mats["dark_wood"])
+        box("Splash", (-1.90, -0.90), (-0.10, -0.08), plinth_top, plinth_top + 0.06, splash)
+        # Gable street face (u-high): door, noren, awning band.
+        box("Door", (-0.125, -0.63), (-0.095, -0.35), plinth_top, 0.72, mats["wood"])
+        box("Noren", (-0.095, -0.66), (-0.075, -0.32), 0.52, 0.74, cloth)
+        box("Hisashi", (-0.115, -0.90), (-0.02, -0.08), 0.76, 0.80, mats["trim"])
+        # Long face: two barred koshi windows in the planking.
+        for index, (w0, w1) in enumerate(((-1.66, -1.24), (-0.84, -0.42))):
+            box(f"KoshiBack{index}", (w0, -0.100), (w1, -0.080), 0.30, 0.64, mats["trim"])
+            bar = w0 + 0.03
+            while bar < w1 - 0.03:
+                box(f"Koshi{index}{bar:.2f}", (bar, -0.080), (bar + 0.035, -0.060), 0.30, 0.64, mats["dark_wood"])
+                bar += 0.095
+        add_kawara_roof(
+            scene, "MachiyaRoof", *rect((-2.0, -1.0), (0.0, 0.0)), wall_top, ridge_top, axis,
+            mats["roof"] if axis == "x" else mats["roof_y"], mats["trim"], verge_material=mats["plaster"],
+        )
+    else:
+        # Itabuki cottage: low plank walls under a stone-weighted board roof.
+        plinth_top, wall_top, ridge_top = 0.06, 0.74, 1.06
+        box("Plinth", (-1.94, -0.94), (-0.06, -0.05), 0.0, plinth_top, mats["stone"])
+        box("Body", (-1.88, -0.88), (-0.12, -0.10), plinth_top, wall_top, mats["wood"])
+        box("Splash", (-1.90, -0.90), (-0.10, -0.08), plinth_top, plinth_top + 0.055, splash)
+        box("Shitami", (-1.885, -0.885), (-0.115, -0.095), plinth_top, 0.36, mats["dark_wood"])
+        box("Door", (-1.30, -0.105), (-0.95, -0.070), plinth_top, 0.62, mats["dark_wood"])
+        for index, (w0, w1) in enumerate(((-1.74, -1.42), (-0.72, -0.34)),):
+            box(f"WinBack{index}", (w0, -0.100), (w1, -0.082), 0.34, 0.60, mats["trim"])
+            bar = w0 + 0.03
+            while bar < w1 - 0.03:
+                box(f"WinBar{index}{bar:.2f}", (bar, -0.082), (bar + 0.032, -0.062), 0.34, 0.60, mats["dark_wood"])
+                bar += 0.09
+        add_itabuki_roof(
+            scene, "MachiyaRoof", *rect((-2.0, -1.0), (0.0, 0.0)), wall_top, ridge_top, axis,
+            mats["dark_wood"], props["stone"],
+        )
+        add_prop_weeds(scene, *pt(-1.82, -0.14), props)

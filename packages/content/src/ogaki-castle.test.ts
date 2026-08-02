@@ -80,4 +80,28 @@ describe("ogakiCastleScenario", () => {
     // 天守台マウンドの虎口スロープ二段(L0→L1→L2、兵糧BFSと移動の接続用)
     expect(ogakiCastleScenario.elevation?.slopes).toHaveLength(2);
   });
+
+  it("lines the streets with tanzaku machiya rows in both orientations", () => {
+    const machiya = ogakiCastleScenario.initialBuildings.filter(
+      (building) => building.type === "machiya" || building.type === "machiya_ne_sw"
+    );
+    expect(machiya.length).toBeGreaterThanOrEqual(100);
+    expect(new Set(machiya.map((building) => building.type)).size).toBe(2);
+
+    // 美濃路(y=61)は両側町: 街道の北帯(y59-60)と南帯(y62-63)に間口1セルの町屋が向かい合う。
+    const northStrip = machiya.filter((building) => building.type === "machiya_ne_sw" && building.position.y === 59);
+    const southStrip = machiya.filter((building) => building.type === "machiya_ne_sw" && building.position.y === 62);
+    expect(northStrip.length).toBeGreaterThanOrEqual(10);
+    expect(southStrip.length).toBeGreaterThanOrEqual(10);
+
+    // 背割り長屋列: x=34/x=37 の奥行き2セル列に挟まれた x=36 は裏路地として空く。
+    const occupied = new Set(
+      ogakiCastleScenario.initialBuildings.flatMap((building) => occupiedCells(building).map((cell) => `${cell.x},${cell.y}`))
+    );
+    for (let y = 64; y <= 99; y += 1) {
+      expect(occupied.has(`34,${y}`), `terrace 34,${y}`).toBe(true);
+      expect(occupied.has(`37,${y}`), `terrace 37,${y}`).toBe(true);
+      expect(occupied.has(`36,${y}`), `back alley 36,${y}`).toBe(false);
+    }
+  });
 });
