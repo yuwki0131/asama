@@ -17,7 +17,7 @@ from .buildings import (
     build_market_graybox, build_barracks_graybox,
     build_samurai_residence_graybox, build_town_block_graybox, build_garden,
     build_yagura_small_graybox, build_farm_paddy,
-    build_gate_wood, build_wall_plaster_mask, build_wall_hazama_mask, build_fence_wood_mask,
+    build_gate_wood, build_gate_yagura, build_wall_plaster_mask, build_wall_hazama_mask, build_fence_wood_mask,
     build_wall_diagonal, build_wall_diagonal_arm, build_wall_corner_cap, build_wall_arc, build_wall_ladder, build_tenshu_graybox, build_tenshu,
     build_fence_diagonal, build_fence_diagonal_arm,
 )
@@ -148,6 +148,10 @@ def resolve_model(name: str):
             return lambda scene: build_gate_wood(scene, axis, 3, mask, doors_closed=state == "closed", opening=1)
         width = int(size[1:])
         return lambda scene: build_gate_wood(scene, axis, width, mask, doors_closed=state == "closed")
+    yagura_gate = re.fullmatch(r"gate-yagura-(closed|open)-(nw_se|ne_sw)-n3-([01]{4})", name)
+    if yagura_gate is not None:
+        state, axis, mask = yagura_gate.group(1), yagura_gate.group(2), yagura_gate.group(3)
+        return lambda scene: build_gate_yagura(scene, axis, mask, doors_closed=state == "closed")
     shore_v = re.fullmatch(r"terrain-water-connected-([01]{4})-v([12])", name)
     if shore_v is not None:
         mask, v = shore_v.group(1), int(shore_v.group(2))

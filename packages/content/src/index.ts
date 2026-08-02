@@ -204,6 +204,26 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.gate.wood.closed.ne_sw.narrow3",
     gateState: "closed"
   },
+  // 櫓門: 狭門と同じ3マス占有・中央1マス通行だが、通用口の上に渡櫓が載る
+  // 重厚な城門 (大垣城本丸鉄門の史実形式)。石垣袖+漆喰渡櫓で耐久も高い。
+  gate_yagura_3: {
+    type: "gate_yagura_3",
+    category: "castle",
+    maxHp: 520,
+    footprint: { width: 3, height: 1 },
+    passable: false,
+    assetId: "building.gate.yagura.closed.nw_se.narrow3.connected.0101",
+    gateState: "closed"
+  },
+  gate_yagura_3_ne_sw: {
+    type: "gate_yagura_3_ne_sw",
+    category: "castle",
+    maxHp: 520,
+    footprint: { width: 1, height: 3 },
+    passable: false,
+    assetId: "building.gate.yagura.closed.ne_sw.narrow3.connected.1010",
+    gateState: "closed"
+  },
   dry_moat: {
     type: "dry_moat",
     category: "moat",

@@ -189,6 +189,14 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.gate.wood.closed.narrow3";
   }
 
+  if (building.type === "gate_yagura_3") {
+    return "building.gate.yagura.closed.nw_se.narrow3.connected.0101";
+  }
+
+  if (building.type === "gate_yagura_3_ne_sw") {
+    return "building.gate.yagura.closed.ne_sw.narrow3.connected.1010";
+  }
+
   if (building.type === "dry_moat") {
     return "building.dry_moat";
   }
@@ -554,7 +562,8 @@ function isNeSwGateType(buildingType: BuildingType): boolean {
   return (
     buildingType === "gate_wide_2_ne_sw" ||
     buildingType === "gate_wide_3_ne_sw" ||
-    buildingType === "gate_narrow_3_ne_sw"
+    buildingType === "gate_narrow_3_ne_sw" ||
+    buildingType === "gate_yagura_3_ne_sw"
   );
 }
 
@@ -563,6 +572,7 @@ function isGateType(buildingType: BuildingType): boolean {
     buildingType === "gate_wide_2" ||
     buildingType === "gate_wide_3" ||
     buildingType === "gate_narrow_3" ||
+    buildingType === "gate_yagura_3" ||
     isNeSwGateType(buildingType)
   );
 }

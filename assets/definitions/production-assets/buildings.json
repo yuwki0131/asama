@@ -5343,6 +5343,438 @@
       }
     },
     {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-nw-se-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-nw_se-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-nw-se-narrow3-connected-0100.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-nw_se-n3-0100",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-nw-se-narrow3-connected-0001.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-nw_se-n3-0001",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-nw-se-narrow3-connected-0101.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-nw_se-n3-0101",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-ne-sw-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-ne_sw-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-ne-sw-narrow3-connected-1000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-ne_sw-n3-1000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-ne-sw-narrow3-connected-0010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-ne_sw-n3-0010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "output": "building-gate-yagura-closed-ne-sw-narrow3-connected-1010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-closed-ne_sw-n3-1010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-yagura-open-nw-se-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-nw_se-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "output": "building-gate-yagura-open-nw-se-narrow3-connected-0100.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-nw_se-n3-0100",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "output": "building-gate-yagura-open-nw-se-narrow3-connected-0001.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-nw_se-n3-0001",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "output": "building-gate-yagura-open-nw-se-narrow3-connected-0101.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-nw_se-n3-0101",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 3,
+        "footprintHeight": 1,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "output": "building-gate-yagura-open-ne-sw-narrow3-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-ne_sw-n3-0000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "output": "building-gate-yagura-open-ne-sw-narrow3-connected-1000.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-ne_sw-n3-1000",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "output": "building-gate-yagura-open-ne-sw-narrow3-connected-0010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-ne_sw-n3-0010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "output": "building-gate-yagura-open-ne-sw-narrow3-connected-1010.png",
+      "source": {
+        "type": "blender",
+        "model": "gate-yagura-open-ne_sw-n3-1010",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 3,
+        "canvasWidth": 224,
+        "canvasHeight": 224,
+        "anchorX": 112,
+        "anchorY": 184
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.35
+        }
+      }
+    },
+    {
       "assetId": "building.wall.ladder.attached",
       "kind": "building",
       "output": "building-wall-ladder-attached.png",

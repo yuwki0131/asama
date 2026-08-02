@@ -154,6 +154,30 @@ describe("connected building asset masks", () => {
     );
   });
 
+  it("resolves yagura gates to the building.gate.yagura family", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "gate_yagura_3", { x: 40, y: 40 });
+    place(world, "wall", { x: 39, y: 40 });
+    place(world, "wall", { x: 43, y: 40 });
+
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toBe(
+      "building.gate.yagura.open.nw_se.narrow3.connected.0101"
+    );
+    expect(buildingAt(world, { x: 39, y: 40 }).assetId).toBe("building.wall.plaster.connected.0100");
+  });
+
+  it("resolves NE-SW yagura gates with N-S wall masks", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    place(world, "gate_yagura_3_ne_sw", { x: 70, y: 70 });
+    place(world, "wall", { x: 70, y: 69 });
+
+    expect(buildingAt(world, { x: 70, y: 71 }).assetId).toBe(
+      "building.gate.yagura.open.ne_sw.narrow3.connected.1000"
+    );
+  });
+
   it("computes connected masks for road surfaces", () => {
     const world = createInitialWorld();
     resetBuildings(world);

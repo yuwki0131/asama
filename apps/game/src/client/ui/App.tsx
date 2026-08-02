@@ -1032,6 +1032,8 @@ const CASTLE_TOOLS: readonly { readonly type: BuildingType; readonly label: stri
   { type: "gate_wide_3_ne_sw", label: "門NE" },
   { type: "gate_narrow_3", label: "狭門NW" },
   { type: "gate_narrow_3_ne_sw", label: "狭門NE" },
+  { type: "gate_yagura_3", label: "櫓門NW" },
+  { type: "gate_yagura_3_ne_sw", label: "櫓門NE" },
   { type: "yagura", label: "矢倉" },
   { type: "honmaru", label: "本丸" },
   { type: "tenshu", label: "天守" },
