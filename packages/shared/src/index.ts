@@ -70,6 +70,7 @@ export type BuildingType =
   | "wood_bridge"
   | "honmaru"
   | "tenshu"
+  | "tenshu_large"
   | "yagura";
 export type BuildingCategory = "castle" | "moat" | "economy" | "military" | "residential" | "infrastructure" | "objective";
 export type BuildingLifecycleState = "intact" | "destroyed";

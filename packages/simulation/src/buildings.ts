@@ -19,7 +19,7 @@ import type { BuildingDefinition, BuildingState, TerrainCellState, WorldState } 
 import { connectedTerrainAssetId, getCell } from "./map";
 
 const LOT_BUILDING_TYPES = new Set<BuildingType>([
-  "tenshu", "storehouse", "market", "barracks",
+  "tenshu", "tenshu_large", "storehouse", "market", "barracks",
   "samurai_residence", "town_block", "garden", "farm", "yagura", "honmaru"
 ]);
 

@@ -374,6 +374,15 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.tenshu.main",
     gateState: null
   },
+  tenshu_large: {
+    type: "tenshu_large",
+    category: "objective",
+    maxHp: 9999,
+    footprint: { width: 5, height: 5 },
+    passable: false,
+    assetId: "building.tenshu.ogaki",
+    gateState: null
+  },
   yagura: {
     type: "yagura",
     category: "castle",

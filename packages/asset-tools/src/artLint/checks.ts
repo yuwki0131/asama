@@ -96,6 +96,7 @@ const STANDARD_LOT_FOOTPRINTS: readonly (readonly [string, number, number])[] = 
   ["building.barracks", 4, 3],
   ["building.samurai_residence", 4, 4],
   ["building.town_block", 6, 6],
+  ["building.tenshu.ogaki", 5, 5],
   ["building.tenshu", 4, 4],
   ["building.yagura", 2, 2]
 ];

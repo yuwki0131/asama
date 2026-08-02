@@ -67,7 +67,7 @@ describe("ogakiCastleScenario", () => {
   });
 
   it("contains the keep, seven outer gates, and required bridge types", () => {
-    expect(ogakiCastleScenario.initialBuildings.filter((building) => building.type === "tenshu")).toHaveLength(1);
+    expect(ogakiCastleScenario.initialBuildings.filter((building) => building.type === "tenshu_large")).toHaveLength(1);
     const outerGate = (x: number, y: number) =>
       (x === 14 || x === 114 || y === 12 || y === 112);
     expect(ogakiCastleScenario.initialBuildings.filter((building) => building.type.startsWith("gate_") && outerGate(building.position.x, building.position.y))).toHaveLength(7);

@@ -6354,6 +6354,30 @@
       }
     },
     {
+      "assetId": "building.tenshu.ogaki",
+      "kind": "building",
+      "output": "building-tenshu-ogaki.png",
+      "source": {
+        "type": "blender",
+        "model": "building-tenshu-ogaki",
+        "renderSpec": "painterly",
+        "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 5,
+        "footprintHeight": 5,
+        "canvasWidth": 384,
+        "canvasHeight": 400,
+        "anchorX": 192,
+        "anchorY": 368
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
       "assetId": "building.garden.v0",
       "kind": "building",
       "output": "building-garden-v0.png",

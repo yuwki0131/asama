@@ -1195,6 +1195,18 @@ TENSHU_VARIANTS = {
         "top_rise": 0.66,
         "hafu": ((0, "S", 0.60), (1, "E", 0.55)),
     },
+    # 大垣城天守 (4層4階) on a 5x5 lot: one more roof than A, same design
+    # language. Tier-0 fills the wider mound crest flush (crest ~2.14 half
+    # for base_half 2.45 → tier-0 half 5.25*0.75/2=1.97, stone rim ~0.17
+    # like A). Canvas 384x400, anchor 192,368.
+    "OGAKI": {
+        "lot_half": 2.5,
+        "mound_base_half": 2.45,
+        "tiers": ((5.25, 1.62), (3.95, 1.40), (2.90, 1.24), (1.80, 1.10)),
+        "rises": (0.34, 0.32, 0.30),
+        "top_rise": 0.60,
+        "hafu": ((0, "S", 0.36), (1, "E", 0.40), (2, "S", 0.44)),
+    },
 }
 
 
@@ -1625,14 +1637,16 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
     hem = mats["hem"]
     gold = make_material("TenshuShachi", (0.58, 0.46, 0.17, 1.0))
 
-    cx, cy = -2.0, -2.0  # lot center of the [-4,0]x[-4,0] footprint
+    lot_half = spec.get("lot_half", 2.0)
+    mound_base_half = spec.get("mound_base_half", TENSHU_MOUND_BASE_HALF)
+    cx, cy = -lot_half, -lot_half  # lot center of the [-2*lot_half,0]^2 footprint
 
     # --- Ishigaki mound: ONE terrain step tall, built with the exact same
     # coursed kirikomi masonry as the terrain revetments (ISHIGAKI-03: one
     # stone-wall vocabulary — no patchwork between mound and terrain walls).
     # No corner quoin blocks (user ruling 2026-07-19).
     height = TENSHU_ISHIGAKI_TOP
-    crest_half = _kirikomi_mound(scene, cx, cy, TENSHU_MOUND_BASE_HALF, height)
+    crest_half = _kirikomi_mound(scene, cx, cy, mound_base_half, height)
 
     # Thin gravel bed under the first story. The story wall rises within
     # ~0.14 units of the stone crest, so only a sliver of this (plus the
@@ -1642,7 +1656,7 @@ def build_tenshu(scene: bpy.types.Scene, variant: str = TENSHU_DEFAULT_VARIANT, 
 
     tiers = [(w * s, body_h * s) for w, body_h in spec["tiers"]]
     rises = [r * s for r in spec["rises"]]
-    _tenshu_entrance(scene, cx, cy, TENSHU_MOUND_BASE_HALF, height, tiers[0][0] / 2.0, mats, s)
+    _tenshu_entrance(scene, cx, cy, mound_base_half, height, tiers[0][0] / 2.0, mats, s)
     hafu_spec = {(t, f): w for t, f, w in spec["hafu"]}
     skirt_h = 0.14 * s
     hem_top = 0.23 * s

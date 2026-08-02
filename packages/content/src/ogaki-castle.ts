@@ -202,7 +202,7 @@ export const ogakiCastleScenario: ContentScenarioDefinition = {
     ...hLine("wall", 58, 67, 51, [62, 63, 64]),
     at("gate_narrow_3", 62, 51),
     at("yagura", 56, 38), at("yagura", 68, 38), at("yagura", 56, 50), at("yagura", 68, 50),
-    at("tenshu", 58, 40), at("honmaru", 64, 42),
+    at("tenshu_large", 58, 40), at("honmaru", 64, 42),
     ...filledBorder("water_moat", 52, 34, 73, 54, 3, honmaruBridge),
     ...cells("diagonal_water_moat_nesw", [[52, 34], [53, 34], [52, 35]]),
     ...cells("diagonal_water_moat_nwse", [[72, 34], [73, 34], [73, 35]]),

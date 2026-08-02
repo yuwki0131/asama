@@ -359,7 +359,7 @@ export class RetainedScene {
         const building = entry.item;
         if (
           building.lifecycleState === "intact" &&
-          (building.type === "yagura" || building.type === "tenshu" || building.type === "honmaru")
+          (building.type === "yagura" || building.type === "tenshu" || building.type === "tenshu_large" || building.type === "honmaru")
         ) {
           const flagGraphics = createFlagGraphics(building, zoom);
           this.staticLayer.addChild(flagGraphics);
@@ -1039,7 +1039,7 @@ function isoSort(items: SceneItemForSort[]): void {
 
   // Enough passes for a terrace-top building to bubble back past the row of
   // cliff cells hanging off its south/east edge (up to footprint-width swaps;
-  // the widest building, the 4x4 tenshu, needs 4).
+  // the widest building, the 5x5 tenshu_large, needs 5).
   const PASSES = 8;
   for (let pass = 0; pass < PASSES; pass++) {
     let swapped = false;
