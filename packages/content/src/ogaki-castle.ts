@@ -94,9 +94,13 @@ const outerMoat = [
 ];
 // Build the four differently-sized reaches explicitly (corners intentionally overlap
 // geometrically only in water coverage, never as duplicate placements).
+// North and west are the Suimon-gawa (牛屋川転用の川): natural-levee "river"
+// tiles instead of the excavated water_moat, so 川 and 堀 finally read
+// differently. East and south stay the dug 総堀 (water_moat). The river and
+// the moat connect as one water surface at both junctions (水門相当).
 outerMoat.length = 0;
-for (let y = 7; y <= 11; y += 1) for (let x = 9; x <= 117; x += 1) if (!outerMoatOpenings.has(`${x},${y}`)) outerMoat.push(at("water_moat", x, y));
-for (let x = 9; x <= 13; x += 1) for (let y = 12; y <= 115; y += 1) if (!outerMoatOpenings.has(`${x},${y}`)) outerMoat.push(at("water_moat", x, y));
+for (let y = 7; y <= 11; y += 1) for (let x = 9; x <= 117; x += 1) if (!outerMoatOpenings.has(`${x},${y}`)) outerMoat.push(at("river", x, y));
+for (let x = 9; x <= 13; x += 1) for (let y = 12; y <= 115; y += 1) if (!outerMoatOpenings.has(`${x},${y}`)) outerMoat.push(at("river", x, y));
 for (let x = 115; x <= 117; x += 1) for (let y = 12; y <= 112; y += 1) if (!outerMoatOpenings.has(`${x},${y}`)) outerMoat.push(at("water_moat", x, y));
 for (let y = 113; y <= 115; y += 1) for (let x = 14; x <= 117; x += 1) if (!outerMoatOpenings.has(`${x},${y}`)) outerMoat.push(at("water_moat", x, y));
 const proceduralRiverCells = new Set([

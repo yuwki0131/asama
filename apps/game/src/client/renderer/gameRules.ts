@@ -89,7 +89,8 @@ const PLAN_DIAGONAL_TYPES: Partial<Record<BuildingType, { readonly nwse: Buildin
   hazama_wall: { nwse: "diagonal_wall_nwse", nesw: "diagonal_wall_nesw" },
   fence: { nwse: "diagonal_fence_nwse", nesw: "diagonal_fence_nesw" },
   dry_moat: { nwse: "diagonal_dry_moat_nwse", nesw: "diagonal_dry_moat_nesw" },
-  water_moat: { nwse: "diagonal_water_moat_nwse", nesw: "diagonal_water_moat_nesw" }
+  water_moat: { nwse: "diagonal_water_moat_nwse", nesw: "diagonal_water_moat_nesw" },
+  river: { nwse: "diagonal_river_nwse", nesw: "diagonal_river_nesw" }
 };
 
 /**
@@ -143,6 +144,7 @@ export function isCenterAnchoredBuilding(buildingType: BuildingType): boolean {
     isGateType(buildingType) ||
     buildingType === "dry_moat" ||
     buildingType === "water_moat" ||
+    buildingType === "river" ||
     buildingType === "honmaru" ||
     buildingType === "farm" ||
     buildingType === "road" ||
@@ -205,6 +207,10 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.water_moat";
   }
 
+  if (building.type === "river") {
+    return "building.river";
+  }
+
   if (building.type === "storehouse") {
     return "building.storehouse";
   }
@@ -265,7 +271,8 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     building.type.startsWith("arc_wall_") ||
     building.type.startsWith("diagonal_fence_") ||
     building.type.startsWith("diagonal_dry_moat_") ||
-    building.type.startsWith("diagonal_water_moat_")
+    building.type.startsWith("diagonal_water_moat_") ||
+    building.type.startsWith("diagonal_river_")
   ) {
     return building.assetId;
   }
@@ -279,6 +286,10 @@ function finalBuildingFallbackAssetId(building: BuildingSnapshot): string {
   }
 
   if (building.type === "water_moat" || building.type.startsWith("diagonal_water_moat_")) {
+    return "terrain.water.base";
+  }
+
+  if (building.type === "river" || building.type.startsWith("diagonal_river_")) {
     return "terrain.water.base";
   }
 

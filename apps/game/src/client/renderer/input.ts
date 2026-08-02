@@ -47,6 +47,7 @@ const WALL_PLAN_TYPES = new Set<ToolMode>([
   "fence",
   "dry_moat",
   "water_moat",
+  "river",
 ]);
 
 function isDragBuildTool(tool: ToolMode): tool is BuildingType {

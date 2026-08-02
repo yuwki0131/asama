@@ -281,6 +281,33 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.water_moat.diagonal.nesw",
     gateState: null
   },
+  river: {
+    type: "river",
+    category: "moat",
+    maxHp: 9999,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.river",
+    gateState: null
+  },
+  diagonal_river_nwse: {
+    type: "diagonal_river_nwse",
+    category: "moat",
+    maxHp: 9999,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.river.diagonal.nwse",
+    gateState: null
+  },
+  diagonal_river_nesw: {
+    type: "diagonal_river_nesw",
+    category: "moat",
+    maxHp: 9999,
+    footprint: { width: 1, height: 1 },
+    passable: false,
+    assetId: "building.river.diagonal.nesw",
+    gateState: null
+  },
   storehouse: {
     type: "storehouse",
     category: "economy",

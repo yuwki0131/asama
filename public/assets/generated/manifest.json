@@ -3391,6 +3391,435 @@
       }
     },
     {
+      "assetId": "building.river",
+      "kind": "building",
+      "file": "generated/building-river.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.river.diagonal.nwse",
+      "kind": "building",
+      "file": "generated/building-river-diagonal-nwse.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.25
+      }
+    },
+    {
+      "assetId": "building.river.diagonal.nesw",
+      "kind": "building",
+      "file": "generated/building-river-diagonal-nesw.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.25
+      }
+    },
+    {
+      "assetId": "building.river.connected.0000",
+      "kind": "building",
+      "file": "generated/building-river-connected-0000.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0001",
+      "kind": "building",
+      "file": "generated/building-river-connected-0001.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0010",
+      "kind": "building",
+      "file": "generated/building-river-connected-0010.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0011",
+      "kind": "building",
+      "file": "generated/building-river-connected-0011.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0100",
+      "kind": "building",
+      "file": "generated/building-river-connected-0100.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0101",
+      "kind": "building",
+      "file": "generated/building-river-connected-0101.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0110",
+      "kind": "building",
+      "file": "generated/building-river-connected-0110.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0111",
+      "kind": "building",
+      "file": "generated/building-river-connected-0111.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1000",
+      "kind": "building",
+      "file": "generated/building-river-connected-1000.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1001",
+      "kind": "building",
+      "file": "generated/building-river-connected-1001.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1010",
+      "kind": "building",
+      "file": "generated/building-river-connected-1010.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1011",
+      "kind": "building",
+      "file": "generated/building-river-connected-1011.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1100",
+      "kind": "building",
+      "file": "generated/building-river-connected-1100.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1101",
+      "kind": "building",
+      "file": "generated/building-river-connected-1101.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1110",
+      "kind": "building",
+      "file": "generated/building-river-connected-1110.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1111",
+      "kind": "building",
+      "file": "generated/building-river-connected-1111.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0101.p1",
+      "kind": "building",
+      "file": "generated/river-connected-0101-p1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0101.p2",
+      "kind": "building",
+      "file": "generated/river-connected-0101-p2.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0101.p3",
+      "kind": "building",
+      "file": "generated/river-connected-0101-p3.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1010.p1",
+      "kind": "building",
+      "file": "generated/river-connected-1010-p1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1010.p2",
+      "kind": "building",
+      "file": "generated/river-connected-1010-p2.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1010.p3",
+      "kind": "building",
+      "file": "generated/river-connected-1010-p3.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0000.v1",
+      "kind": "building",
+      "file": "generated/river-connected-0000-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0001.v1",
+      "kind": "building",
+      "file": "generated/river-connected-0001-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0010.v1",
+      "kind": "building",
+      "file": "generated/river-connected-0010-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0011.v1",
+      "kind": "building",
+      "file": "generated/river-connected-0011-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0100.v1",
+      "kind": "building",
+      "file": "generated/river-connected-0100-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0110.v1",
+      "kind": "building",
+      "file": "generated/river-connected-0110-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.0111.v1",
+      "kind": "building",
+      "file": "generated/river-connected-0111-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1000.v1",
+      "kind": "building",
+      "file": "generated/river-connected-1000-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1001.v1",
+      "kind": "building",
+      "file": "generated/river-connected-1001-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1011.v1",
+      "kind": "building",
+      "file": "generated/river-connected-1011-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1100.v1",
+      "kind": "building",
+      "file": "generated/river-connected-1100-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1101.v1",
+      "kind": "building",
+      "file": "generated/river-connected-1101-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1110.v1",
+      "kind": "building",
+      "file": "generated/river-connected-1110-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
+      "assetId": "building.river.connected.1111.v1",
+      "kind": "building",
+      "file": "generated/river-connected-1111-v1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3333333333333333
+      }
+    },
+    {
       "assetId": "terrain.cliff.face.s.h1",
       "kind": "terrain",
       "file": "generated/terrain-cliff-face-s-h1.png",

@@ -66,6 +66,33 @@ describe("ogakiCastleScenario", () => {
     }
   });
 
+  it("uses river tiles for the Suimon-gawa north/west reaches and water moats for the dug east/south reaches", () => {
+    const byCell = new Map<string, string>();
+    for (const building of ogakiCastleScenario.initialBuildings) {
+      byCell.set(`${building.position.x},${building.position.y}`, building.type);
+    }
+
+    // North reach (y7-11) and west reach (x9-13) are the converted river.
+    expect(byCell.get("60,9")).toBe("river");
+    expect(byCell.get("10,90")).toBe("river");
+    expect(byCell.get("100,7")).toBe("river");
+    // East (x115-117) and south (y113-115) stay excavated water moats.
+    expect(byCell.get("116,70")).toBe("water_moat");
+    expect(byCell.get("60,114")).toBe("water_moat");
+    // Inner castle moats (honmaru / ninomaru / middle) remain water_moat.
+    expect(byCell.get("52,56")).toBe("water_moat");
+    expect(byCell.get("88,50")).toBe("water_moat");
+
+    // The converted river reaches stay closed water barriers: full bands
+    // except at the earth-bridge crossings and the procedural-river gaps.
+    for (let x = 14; x <= 114; x += 1) {
+      for (let y = 7; y <= 11; y += 1) {
+        const type = byCell.get(`${x},${y}`);
+        expect(["river", "earth_bridge"], `north river band ${x},${y}`).toContain(type);
+      }
+    }
+  });
+
   it("contains the keep, seven outer gates, and required bridge types", () => {
     expect(ogakiCastleScenario.initialBuildings.filter((building) => building.type === "tenshu_large")).toHaveLength(1);
     const outerGate = (x: number, y: number) =>

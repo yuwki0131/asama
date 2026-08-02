@@ -509,6 +509,58 @@ describe("diagonal moat junctions", () => {
   });
 });
 
+describe("river family", () => {
+  it("computes connected masks in the river asset family", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "river", { x: 20, y: 20 });
+    place(world, "river", { x: 21, y: 20 });
+    place(world, "river", { x: 22, y: 20 });
+
+    expect(buildingAt(world, { x: 21, y: 20 }).assetId).toMatch(/^building\.river\.connected\.0101/);
+    expect(buildingAt(world, { x: 20, y: 20 }).assetId).toMatch(/^building\.river\.connected\.0100/);
+  });
+
+  it("phases straight-run river interiors like the moat family", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    for (let x = 20; x <= 24; x += 1) place(world, "river", { x, y: 30 });
+
+    // Interior 0101 cells cycle .p1/.p2/.p3 by x%4 with the plain tile at phase 0.
+    expect(buildingAt(world, { x: 21, y: 30 }).assetId).toBe("building.river.connected.0101.p1");
+    expect(buildingAt(world, { x: 22, y: 30 }).assetId).toBe("building.river.connected.0101.p2");
+    expect(buildingAt(world, { x: 23, y: 30 }).assetId).toBe("building.river.connected.0101.p3");
+  });
+
+  it("opens a straight river end toward an adjacent diagonal river piece", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "river", { x: 40, y: 40 });
+    place(world, "diagonal_river_nesw", { x: 39, y: 40 });
+
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toMatch(/^building\.river\.connected\.0001/);
+    expect(buildingAt(world, { x: 39, y: 40 }).assetId).toBe("building.river.diagonal.nesw");
+  });
+
+  it("connects river and water moat into one water surface (水門) but not dry moat", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    place(world, "river", { x: 50, y: 50 });
+    place(world, "water_moat", { x: 51, y: 50 });
+    place(world, "dry_moat", { x: 50, y: 49 });
+
+    // River opens east toward the moat; the moat opens west toward the river.
+    expect(buildingAt(world, { x: 50, y: 50 }).assetId).toMatch(/^building\.river\.connected\.0100/);
+    expect(buildingAt(world, { x: 51, y: 50 }).assetId).toMatch(/^building\.water_moat\.connected\.0001/);
+    // Dry moat has no water surface: neither side connects.
+    expect(buildingAt(world, { x: 50, y: 49 }).assetId).toMatch(/^building\.dry_moat\.connected\.0000/);
+  });
+});
+
 describe("arc walls", () => {
   it("occupies the staircase footprint cells and nothing else (r3 se)", () => {
     const world = createInitialWorld();

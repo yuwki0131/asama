@@ -10,6 +10,7 @@ from .terrain import (
     build_terrain_mask, build_terrain_base,
     build_road_mask, build_dry_moat_mask, build_water_moat_mask, build_trench_moat,
     build_trench_moat_diagonal,
+    build_river, build_river_mask, build_river_diagonal,
     build_earth_bridge, build_wood_bridge,
 )
 from .buildings import (
@@ -93,6 +94,8 @@ MODEL_REGISTRY = {
     "dry-moat-diagonal-nesw": lambda scene: build_trench_moat_diagonal(scene, False, "nesw"),
     "water-moat-diagonal-nwse": lambda scene: build_trench_moat_diagonal(scene, True, "nwse"),
     "water-moat-diagonal-nesw": lambda scene: build_trench_moat_diagonal(scene, True, "nesw"),
+    "river-diagonal-nwse": lambda scene: build_river_diagonal(scene, "nwse"),
+    "river-diagonal-nesw": lambda scene: build_river_diagonal(scene, "nesw"),
     "wall-arc-r3-ne": lambda scene: build_wall_arc(scene, 3, "ne"),
     "wall-arc-r3-se": lambda scene: build_wall_arc(scene, 3, "se"),
     "wall-arc-r3-sw": lambda scene: build_wall_arc(scene, 3, "sw"),
@@ -130,6 +133,7 @@ def resolve_model(name: str):
         ("road-connected-", build_road_mask),
         ("dry-moat-connected-", build_dry_moat_mask),
         ("water-moat-connected-", build_water_moat_mask),
+        ("river-connected-", build_river_mask),
     ):
         if name.startswith(prefix):
             mask = name[len(prefix):]
@@ -148,6 +152,14 @@ def resolve_model(name: str):
             phase = (p, 0.0) if mask == "0101" else (0.0, p)
             return lambda scene: build_trench_moat(scene, mask, is_water, phase=phase)
         return lambda scene: build_trench_moat(scene, mask, is_water, seed=1.0)
+    river_variant = re.fullmatch(r"river-connected-([01]{4})-(p([123])|v1)", name)
+    if river_variant is not None:
+        mask, suffix = river_variant.group(1), river_variant.group(2)
+        if suffix.startswith("p"):
+            p = float(river_variant.group(3))
+            phase = (p, 0.0) if mask == "0101" else (0.0, p)
+            return lambda scene: build_river(scene, mask, phase=phase)
+        return lambda scene: build_river(scene, mask, seed=1.0)
     gate = re.fullmatch(r"gate-wood-(closed|open)-(nw_se|ne_sw)-(w[123]|n3)-([01]{4})", name)
     if gate is not None:
         state, axis, size, mask = gate.group(1), gate.group(2), gate.group(3), gate.group(4)

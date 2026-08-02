@@ -129,7 +129,11 @@ function geo01Contract(asset: ManifestAssetMeta): Geo01Contract | null {
     return { family: "ground-tile", expectedAnchorXPx: centerX, expectedAnchorRowPx: height - 16 };
   }
 
-  if (isInAssetFamily(assetId, "building.dry_moat") || isInAssetFamily(assetId, "building.water_moat")) {
+  if (
+    isInAssetFamily(assetId, "building.dry_moat") ||
+    isInAssetFamily(assetId, "building.water_moat") ||
+    isInAssetFamily(assetId, "building.river")
+  ) {
     return { family: "moat", expectedAnchorXPx: centerX, expectedAnchorRowPx: 16 };
   }
 
