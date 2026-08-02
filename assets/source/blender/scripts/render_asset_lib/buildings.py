@@ -2138,3 +2138,12 @@ def build_machiya(scene: bpy.types.Scene, variant: int = 1, orientation: str = "
             mats["dark_wood"], props["stone"],
         )
         add_prop_weeds(scene, *pt(-1.82, -0.14), props)
+
+    # Corner plugs: the plinth/splash/shitami skirts step outward past the wall
+    # face, so at each silhouette corner a diagonal sight line can slip between
+    # skirt top and eave past both wall faces, leaving pinhole alpha gaps
+    # (NOISE-06). Wall-height posts 0.005 proud of the plinth close them.
+    plug = mats["plaster"] if variant == 1 else mats["dark_wood"]
+    for su, (u0, u1) in (("W", (-1.945, -1.80)), ("E", (-0.20, -0.055))):
+        for sv, (v0, v1) in (("S", (-0.945, -0.80)), ("N", (-0.20, -0.045))):
+            box(f"CornerPlug{su}{sv}", (u0, v0), (u1, v1), 0.0, wall_top, plug)
