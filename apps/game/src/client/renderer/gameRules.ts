@@ -225,6 +225,14 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.town_block";
   }
 
+  if (building.type === "machiya") {
+    return "building.machiya.nw_se.v1";
+  }
+
+  if (building.type === "machiya_ne_sw") {
+    return "building.machiya.ne_sw.v1";
+  }
+
   if (building.type === "garden") {
     return "building.garden.v0";
   }

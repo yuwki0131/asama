@@ -326,6 +326,24 @@ export const buildingSpecs: Record<BuildingType, BuildingSpec> = {
     assetId: "building.town_block",
     gateState: null
   },
+  machiya: {
+    type: "machiya",
+    category: "residential",
+    maxHp: 150,
+    footprint: { width: 2, height: 1 },
+    passable: false,
+    assetId: "building.machiya.nw_se.v1",
+    gateState: null
+  },
+  machiya_ne_sw: {
+    type: "machiya_ne_sw",
+    category: "residential",
+    maxHp: 150,
+    footprint: { width: 1, height: 2 },
+    passable: false,
+    assetId: "building.machiya.ne_sw.v1",
+    gateState: null
+  },
   garden: {
     type: "garden",
     category: "residential",

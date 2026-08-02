@@ -121,6 +121,26 @@ for (const [x, y] of [
   [19, 98], [27, 98], [19, 106], [27, 106],
 ] as const) townBlocks.push(at("town_block", x, y));
 
+// 短冊型町割り: 間口が狭く奥行きの深い町屋が街路に軒を連ねる帯。town_blockの
+// 面的な町区画はそのまま残し、通り沿いだけを町屋列に差し替えて粒度を出す。
+const machiyaRows: ScenarioBuildingPlacement[] = [];
+// 美濃路(y=61)両側町: 間口1セルの町屋が街道を挟んで向かい合う。
+for (let x = 16; x <= 31; x += 1) {
+  machiyaRows.push(at("machiya_ne_sw", x, 59), at("machiya_ne_sw", x, 62));
+}
+// 背割り長屋列: 南北通り(x=33 / x=39)に面する奥行き2セルの町屋。x=36 が背割り(裏路地)。
+for (let y = 64; y <= 99; y += 1) {
+  machiyaRows.push(at("machiya", 34, y), at("machiya", 37, y));
+}
+// 南横町(y=102)沿いの町屋テラス。南大手道(x=62..63)は通行帯として空け、
+// 石尾根(道路と同じ x≈84+cos(y/11)*5 の帯、建設不能地形)も避ける。
+for (let x = 42; x <= 89; x += 1) {
+  if (x === 62 || x === 63) continue;
+  const onStoneRidge = [103, 104].some((y) => Math.abs(x - 84 - Math.round(Math.cos(y / 11) * 5)) <= 1);
+  if (onStoneRidge) continue;
+  machiyaRows.push(at("machiya_ne_sw", x, 103));
+}
+
 const roads: ScenarioBuildingPlacement[] = [];
 // Minoji: west/east moat approaches turn at both banks instead of forming one line.
 roads.push(...hLine("road", 15, 39, 61), ...vLine("road", 39, 62, 102), ...hLine("road", 39, 91, 102), ...vLine("road", 91, 60, 101), ...hLine("road", 91, 113, 60));
@@ -236,6 +256,7 @@ export const ogakiCastleScenario: ContentScenarioDefinition = {
     ], 20),
 
     ...townBlocks,
+    ...machiyaRows,
     ...roads,
     at("market", 38, 106), at("market", 74, 106),
     at("storehouse", 55, 106), at("storehouse", 82, 106),

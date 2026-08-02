@@ -3281,6 +3281,72 @@
       }
     },
     {
+      "assetId": "building.machiya.nw_se.v1",
+      "kind": "building",
+      "file": "generated/building-machiya-v1-nw_se.png",
+      "width": 192,
+      "height": 160,
+      "anchor": {
+        "x": 0.5833333333333334,
+        "y": 0.8
+      }
+    },
+    {
+      "assetId": "building.machiya.nw_se.v2",
+      "kind": "building",
+      "file": "generated/building-machiya-v2-nw_se.png",
+      "width": 192,
+      "height": 160,
+      "anchor": {
+        "x": 0.5833333333333334,
+        "y": 0.8
+      }
+    },
+    {
+      "assetId": "building.machiya.nw_se.v3",
+      "kind": "building",
+      "file": "generated/building-machiya-v3-nw_se.png",
+      "width": 192,
+      "height": 160,
+      "anchor": {
+        "x": 0.5833333333333334,
+        "y": 0.8
+      }
+    },
+    {
+      "assetId": "building.machiya.ne_sw.v1",
+      "kind": "building",
+      "file": "generated/building-machiya-v1-ne_sw.png",
+      "width": 192,
+      "height": 160,
+      "anchor": {
+        "x": 0.4166666666666667,
+        "y": 0.8
+      }
+    },
+    {
+      "assetId": "building.machiya.ne_sw.v2",
+      "kind": "building",
+      "file": "generated/building-machiya-v2-ne_sw.png",
+      "width": 192,
+      "height": 160,
+      "anchor": {
+        "x": 0.4166666666666667,
+        "y": 0.8
+      }
+    },
+    {
+      "assetId": "building.machiya.ne_sw.v3",
+      "kind": "building",
+      "file": "generated/building-machiya-v3-ne_sw.png",
+      "width": 192,
+      "height": 160,
+      "anchor": {
+        "x": 0.4166666666666667,
+        "y": 0.8
+      }
+    },
+    {
       "assetId": "building.garden.v0",
       "kind": "building",
       "file": "generated/building-garden-v0.png",
