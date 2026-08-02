@@ -31,6 +31,7 @@ export function buildingTypeLabel(type: BuildingType): string {
   const labels: Record<BuildingType, string> = {
     honmaru: "本丸",
     tenshu: "天守",
+    tenshu_large: "大天守",
     yagura: "矢倉",
     wall: "石塀",
     hazama_wall: "狭間塀",

@@ -56,6 +56,7 @@ MODEL_REGISTRY = {
     "building-tenshu-var-a": lambda scene: build_tenshu(scene, variant="A"),
     "building-tenshu-var-b": lambda scene: build_tenshu(scene, variant="B"),
     "building-tenshu-var-c": lambda scene: build_tenshu(scene, variant="C"),
+    "building-tenshu-ogaki": lambda scene: build_tenshu(scene, variant="OGAKI"),
     # 2026-07-18 resize selection gate: keep volume at 0.60 / 0.75 of PR#62.
     "building-tenshu-scale-060": lambda scene: build_tenshu(scene, scale=0.60),
     "building-tenshu-scale-075": lambda scene: build_tenshu(scene, scale=0.75),

@@ -1034,7 +1034,8 @@ const CASTLE_TOOLS: readonly { readonly type: BuildingType; readonly label: stri
   { type: "gate_narrow_3_ne_sw", label: "狭門NE" },
   { type: "yagura", label: "矢倉" },
   { type: "honmaru", label: "本丸" },
-  { type: "tenshu", label: "天守" }
+  { type: "tenshu", label: "天守" },
+  { type: "tenshu_large", label: "大天守" }
 ];
 
 const INFRA_TOOLS: readonly { readonly type: BuildingType; readonly label: string }[] = [

@@ -241,6 +241,10 @@ function baseBuildingAssetId(building: BuildingSnapshot): string {
     return "building.tenshu.test";
   }
 
+  if (building.type === "tenshu_large") {
+    return "building.tenshu.ogaki";
+  }
+
   if (
     building.type.startsWith("arc_wall_") ||
     building.type.startsWith("diagonal_fence_") ||
