@@ -2632,6 +2632,182 @@
       }
     },
     {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-nw-se-narrow3-connected-0000.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-nw-se-narrow3-connected-0100.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-nw-se-narrow3-connected-0001.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-nw-se-narrow3-connected-0101.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-ne-sw-narrow3-connected-0000.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-ne-sw-narrow3-connected-1000.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-ne-sw-narrow3-connected-0010.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.closed.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-closed-ne-sw-narrow3-connected-1010.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0000",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-nw-se-narrow3-connected-0000.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0100",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-nw-se-narrow3-connected-0100.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0001",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-nw-se-narrow3-connected-0001.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.nw_se.narrow3.connected.0101",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-nw-se-narrow3-connected-0101.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.0000",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-ne-sw-narrow3-connected-0000.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.1000",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-ne-sw-narrow3-connected-1000.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.0010",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-ne-sw-narrow3-connected-0010.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
+      "assetId": "building.gate.yagura.open.ne_sw.narrow3.connected.1010",
+      "kind": "building",
+      "file": "generated/building-gate-yagura-open-ne-sw-narrow3-connected-1010.png",
+      "width": 224,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8214285714285714
+      }
+    },
+    {
       "assetId": "building.wall.ladder.attached",
       "kind": "building",
       "file": "generated/building-wall-ladder-attached.png",

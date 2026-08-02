@@ -518,11 +518,13 @@ function hazamaWallAssetId(world: WorldState, building: BuildingState): string {
 function connectedGateAssetId(world: WorldState, gate: BuildingState): string {
   const orientation = isNeSwGate(gate.type) ? "ne_sw" : "nw_se";
   const state = gate.gateState ?? "closed";
+  const isYagura = gate.type === "gate_yagura_3" || gate.type === "gate_yagura_3_ne_sw";
+  const family = isYagura ? "yagura" : "wood";
   const sizeSegment =
-    gate.type === "gate_narrow_3" || gate.type === "gate_narrow_3_ne_sw"
+    isYagura || gate.type === "gate_narrow_3" || gate.type === "gate_narrow_3_ne_sw"
       ? "narrow3"
       : `width${gate.footprint.length}`;
-  return `building.gate.wood.${state}.${orientation}.${sizeSegment}.connected.${gateConnectionMask(world, gate)}`;
+  return `building.gate.${family}.${state}.${orientation}.${sizeSegment}.connected.${gateConnectionMask(world, gate)}`;
 }
 
 function gateConnectionMask(world: WorldState, gate: BuildingState): string {

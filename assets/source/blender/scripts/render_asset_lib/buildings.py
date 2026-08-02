@@ -35,6 +35,13 @@ GATE_BEAM_BOTTOM = 1.08
 GATE_BEAM_TOP = 1.30
 GATE_ROOF_TOP = 1.72
 
+# Yagura-mon (tower gate) geometry constants
+GATE_YAGURA_FLANK_HALF = 0.44
+GATE_YAGURA_FLANK_TOP = 1.32
+GATE_YAGURA_FLOOR_TOP = 1.44
+GATE_YAGURA_BODY_TOP = 2.30
+GATE_YAGURA_RIDGE = 2.72
+
 # Fence geometry constants
 FENCE_HEIGHT = 0.72
 FENCE_POST_SIZE = 0.10
@@ -636,6 +643,12 @@ def gate_box(axis: str, along0: float, along1: float, across_half: float, z0: fl
     return (min(x0, x1), min(y0, y1), z0), (max(x0, x1), max(y0, y1), z1)
 
 
+def gate_box_offset(axis: str, along0: float, along1: float, across0: float, across1: float, z0: float, z1: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    x0, y0 = gate_axis_point(axis, along0, across0)
+    x1, y1 = gate_axis_point(axis, along1, across1)
+    return (min(x0, x1), min(y0, y1), z0), (max(x0, x1), max(y0, y1), z1)
+
+
 def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, doors_closed: bool = True, opening: int | None = None) -> None:
     """Wooden gate spanning `width` cells. When `opening` is given (narrow
     gate), only that many central cells form the doorway and the remaining
@@ -715,6 +728,196 @@ def build_gate_wood(scene: bpy.types.Scene, axis: str, width: int, mask: str, do
             continue
         low, high = gate_box(axis, along0, along1, WALL_BASE_THICKNESS / 2.0, 0.0, WALL_BASE_HEIGHT)
         add_box(scene, f"Stub{name}Base", *map_box(low, high), stone)
+        low, high = gate_box(axis, along0, along1, WALL_BODY_THICKNESS / 2.0, WALL_BASE_HEIGHT, WALL_BODY_TOP)
+        add_box(scene, f"Stub{name}Body", *map_box(low, high), plaster)
+        low, high = gate_box(axis, along0, along1, WALL_COPING_THICKNESS / 2.0, 0.0, 0.0)
+        wlow, whigh = map_box(low, high)
+        add_gable_roof(scene, f"Stub{name}Coping", (wlow[0], wlow[1]), (whigh[0], whigh[1]), WALL_BODY_TOP, WALL_COPING_TOP, ridge_axis, roof_mat)
+
+
+def _kirikomi_prism(scene: bpy.types.Scene, prefix: str, cx: float, cy: float,
+                    half_x: float, half_y: float, height: float, seed_base: float) -> None:
+    """Rectangular battered ishigaki mass in the SAME coursed kirikomi-hagi
+    vocabulary as _kirikomi_mound / the terrain revetments (ISHIGAKI-03:
+    one stone-wall language everywhere). Mirrors the mound's construction
+    for a non-square footprint: joint backing, stone crest cap, per-face
+    running-bond stone quads with aging toward the foot."""
+    from .elevation import tiles as _tiles
+
+    amp = min(_tiles.ISHIGAKI_BATTER * height, _tiles.ISHIGAKI_SORI_MAX)
+
+    def inset(t: float) -> float:
+        return amp * (1.0 - (1.0 - t) ** 2)
+
+    segments = 6
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    ring_starts: list[int] = []
+    for k in range(segments + 1):
+        t = k / segments
+        hx, hy = half_x - inset(t), half_y - inset(t)
+        z = height * t
+        ring_starts.append(len(vertices))
+        for x, y in ((cx - hx, cy - hy), (cx + hx, cy - hy), (cx + hx, cy + hy), (cx - hx, cy + hy)):
+            vertices.append((*map_xy(x, y), z))
+    for k in range(segments):
+        a, b = ring_starts[k], ring_starts[k + 1]
+        for i in range(4):
+            j = (i + 1) % 4
+            faces.append((a + i, a + j, b + j, b + i))
+    add_mesh(scene, f"{prefix}Joint", vertices, faces, _tiles._kirikomi_joint_material())
+
+    crest_x, crest_y = half_x - inset(1.0), half_y - inset(1.0)
+    cap = [(*map_xy(x, y), height) for x, y in
+           ((cx - crest_x, cy - crest_y), (cx + crest_x, cy - crest_y), (cx + crest_x, cy + crest_y), (cx - crest_x, cy + crest_y))]
+    add_mesh(scene, f"{prefix}Cap", cap, [(0, 1, 2, 3)], _tiles._kirikomi_stone_materials()[3])
+
+    stones = _tiles._kirikomi_stone_materials()
+    damp, mossy = _tiles._kirikomi_weathered_materials()
+    n_courses = max(1, round(height / _tiles.KIRI_COURSE))
+    for face_index, (nx, ny) in enumerate(((0.0, -1.0), (1.0, 0.0), (0.0, 1.0), (-1.0, 0.0))):
+        seed = seed_base + face_index
+        h_n = half_y if ny != 0.0 else half_x
+        h_a = half_x if ny != 0.0 else half_y
+        for j in range(n_courses):
+            z1 = height - j * _tiles.KIRI_COURSE
+            z0 = max(0.0, z1 - _tiles.KIRI_COURSE + _tiles.KIRI_BED)
+            z_c = 0.5 * (z0 + z1)
+            t_c = z_c / height
+            o_c = h_n - inset(t_c) + _tiles.KIRI_LIP
+            slope = -2.0 * (amp / height) * (1.0 - t_c)
+            a_lim = h_a - inset(t_c)
+            shift = 0.16 + 0.24 * _tiles._hash01(seed, j, 81.0)
+            a = -a_lim - shift
+            k = 0
+            while a < a_lim - 0.02:
+                width = 0.24 + 0.16 * _tiles._hash01(seed, j, 90.0 + 7.0 * k)
+                a0 = max(-a_lim, a)
+                a1 = min(a_lim, a + width - _tiles.KIRI_GAP)
+                if a1 - a0 > 0.03:
+                    roll = _tiles._hash01(seed, j, 60.0 + 5.0 * k)
+                    material = stones[int(roll * 5.0) % 5]
+                    depth = j / max(1, n_courses - 1)
+                    age = _tiles._hash01(seed, j, 70.0 + 3.0 * k)
+                    if depth > 0.75 and age < 0.12 + 0.30 * (depth - 0.75) / 0.25:
+                        material = mossy
+                    elif depth > 0.5 and age > 0.85 - 0.40 * (depth - 0.5) / 0.5:
+                        material = damp
+                    a_c = 0.5 * (a0 + a1)
+                    tilt_a = 0.055 * (_tiles._hash01(seed, j, 71.0 + k) - 0.5)
+                    tilt_z = 0.055 * (_tiles._hash01(seed, j, 72.0 + k) - 0.5)
+                    quad: list[tuple[float, float, float]] = []
+                    for aa, zz in ((a0, z0), (a1, z0), (a0, z1), (a1, z1)):
+                        o = o_c + (slope + tilt_z) * (zz - z_c) + tilt_a * (aa - a_c)
+                        if ny != 0.0:
+                            x, y = cx + aa, cy + o * ny
+                        else:
+                            x, y = cx + o * nx, cy + aa
+                        quad.append((*map_xy(x, y), zz))
+                    add_mesh(scene, f"{prefix}Stone{face_index}_{j}_{k}", quad, [(0, 1, 3, 2)], material)
+                a += width
+                k += 1
+
+
+def build_gate_yagura(scene: bpy.types.Scene, axis: str, mask: str, doors_closed: bool = True) -> None:
+    """Yagura-mon (櫓門): 3-cell tower gate. Two battered ishigaki masses
+    flank a 1-cell doorway, and a plaster watari-yagura with a kawara roof
+    spans the full width above the passage — the historical form of Ogaki
+    castle's Kurogane-mon."""
+    mats = building_material_set()
+    wood, door, plaster = mats["dark_wood"], mats["wood"], mats["plaster"]
+
+    half = 1.5
+    ohalf = 0.5
+    ridge_axis = "x" if axis == "nw_se" else "y"
+    roof_mat = mats["roof"] if ridge_axis == "x" else mats["roof_y"]
+
+    ground = make_gate_ground_material(axis)
+    if axis == "nw_se":
+        add_box(scene, "Sill", *map_box((-half, -0.5, 0.0), (half, 0.5, 0.02)), ground)
+    else:
+        add_box(scene, "Sill", *map_box((-0.5, -half, 0.0), (0.5, half, 0.02)), ground)
+
+    # Battered stone flanks carrying the tower — coursed kirikomi-hagi
+    # matching the tenshu mound / terrain ishigaki skin (ISHIGAKI-03).
+    for label, center, seed_base in (("E", 1.0, 11.0), ("W", -1.0, 15.0)):
+        fx, fy = gate_axis_point(axis, center, 0.0)
+        ha, ho = 0.5, GATE_YAGURA_FLANK_HALF
+        hx, hy = (ha, ho) if axis == "nw_se" else (ho, ha)
+        _kirikomi_prism(scene, f"Flank{label}", fx, fy, hx, hy, GATE_YAGURA_FLANK_TOP, seed_base)
+
+    # Doorway: pillars hug the 1-cell opening, doors or open leaves, beam.
+    for label, along in (("Near", ohalf - 0.10), ("Far", -ohalf + 0.10)):
+        low, high = gate_box(axis, along - GATE_PILLAR_SIZE / 2.0, along + GATE_PILLAR_SIZE / 2.0, GATE_PILLAR_SIZE / 2.0, 0.0, GATE_YAGURA_FLANK_TOP)
+        add_box(scene, f"Pillar{label}", *map_box(low, high), wood)
+    if doors_closed:
+        low, high = gate_box(axis, -ohalf + 0.06, ohalf - 0.06, GATE_DOOR_THICKNESS / 2.0, 0.0, GATE_DOOR_HEIGHT)
+        add_box(scene, "Doors", *map_box(low, high), door)
+    else:
+        for side in (-1.0, 1.0):
+            # Leaves swung back into the passage, shortened (across 0.28) so
+            # the free vertical edge stays inside the tower shadow, and the
+            # end grain wrapped in flat dark frame strips: a bare leaf edge
+            # in the key light catches a grazing specular that reads as a
+            # bright glyph-like blob (NOISE-06).
+            low, high = gate_box(axis, side * (ohalf - 0.14), side * (ohalf - 0.10), 0.28, 0.0, GATE_DOOR_HEIGHT)
+            add_box(scene, f"OpenLeaf{side}", *map_box(low, high), door)
+            for edge in (-1.0, 1.0):
+                low, high = gate_box_offset(axis, side * (ohalf - 0.15), side * (ohalf - 0.09), edge * 0.26, edge * 0.30, 0.0, GATE_DOOR_HEIGHT)
+                add_box(scene, f"LeafFrame{side}{edge}", *map_box(low, high), mats["trim"])
+        # Shadow backplate in the far half of the passage: sight lines between
+        # the swung-back leaves would otherwise exit over the far sill edge to
+        # transparent background, reading as a bright slit (NOISE-06).
+        shadow = make_material("GatePassageShadow", (0.030, 0.027, 0.025, 1.0))
+        low, high = gate_box_offset(axis, -ohalf + 0.04, ohalf - 0.04, -0.46, -0.08, 0.02, GATE_YAGURA_FLANK_TOP)
+        add_box(scene, "PassageShadow", *map_box(low, high), shadow)
+    # Kabuki lintel filling the band between door top and tower floor so no
+    # sight line escapes over the doors (NOISE-06 see-through slits).
+    low, high = gate_box(axis, -ohalf + 0.04, ohalf - 0.04, 0.16, GATE_DOOR_HEIGHT - 0.02, GATE_YAGURA_FLANK_TOP + 0.02)
+    add_box(scene, "Beam", *map_box(low, high), wood)
+    # The kirikomi flanks batter inward with height, opening a wedge gap
+    # between the stone face and the doorway pillars; plug it with dark wood
+    # panels hidden inside the stone at ground level (NOISE-06 alpha holes).
+    for side in (-1.0, 1.0):
+        low, high = gate_box(axis, side * (ohalf - 0.12), side * 1.05, 0.16, 0.0, GATE_YAGURA_FLANK_TOP + 0.02)
+        add_box(scene, f"WedgePanel{side}", *map_box(low, high), wood)
+
+    # Tower floor slab bridging the flanks over the doorway.
+    low, high = gate_box(axis, -half - 0.06, half + 0.06, GATE_YAGURA_FLANK_HALF + 0.02, GATE_YAGURA_FLANK_TOP, GATE_YAGURA_FLOOR_TOP)
+    add_box(scene, "TowerFloor", *map_box(low, high), wood)
+
+    # Watari-yagura body: plaster with corner posts and shuttered windows.
+    body_half = GATE_YAGURA_FLANK_HALF - 0.04
+    low, high = gate_box(axis, -half + 0.02, half - 0.02, body_half, GATE_YAGURA_FLOOR_TOP, GATE_YAGURA_BODY_TOP)
+    add_box(scene, "TowerBody", *map_box(low, high), plaster)
+    for label, along in (("E", half - 0.10), ("W", -half + 0.10)):
+        low, high = gate_box(axis, along - 0.06, along + 0.06, body_half + 0.015, GATE_YAGURA_FLOOR_TOP, GATE_YAGURA_BODY_TOP)
+        add_box(scene, f"TowerPost{label}", *map_box(low, high), wood)
+    for index, along in enumerate((-0.95, 0.0, 0.95)):
+        low, high = gate_box(axis, along - 0.17, along + 0.17, body_half + 0.012, GATE_YAGURA_FLOOR_TOP + 0.34, GATE_YAGURA_FLOOR_TOP + 0.62)
+        add_box(scene, f"TowerWindow{index}", *map_box(low, high), wood)
+
+    roof_low, roof_high = gate_box(axis, -half - 0.18, half + 0.18, body_half + 0.16, 0.0, 0.0)
+    add_kawara_roof(
+        scene,
+        "TowerRoof",
+        (min(roof_low[0], roof_high[0]), min(roof_low[1], roof_high[1])),
+        (max(roof_low[0], roof_high[0]), max(roof_low[1], roof_high[1])),
+        GATE_YAGURA_BODY_TOP,
+        GATE_YAGURA_RIDGE,
+        ridge_axis,
+        roof_mat,
+        mats["trim"],
+        verge_material=plaster,
+    )
+
+    bits = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    end_direction = {"nw_se": (("E", half - 0.30, half), ("W", -half, -half + 0.30)), "ne_sw": (("S", half - 0.30, half), ("N", -half, -half + 0.30))}
+    for name, along0, along1 in end_direction[axis]:
+        if not bits.get(name, False):
+            continue
+        low, high = gate_box(axis, along0, along1, WALL_BASE_THICKNESS / 2.0, 0.0, WALL_BASE_HEIGHT)
+        add_box(scene, f"Stub{name}Base", *map_box(low, high), mats["stone"])
         low, high = gate_box(axis, along0, along1, WALL_BODY_THICKNESS / 2.0, WALL_BASE_HEIGHT, WALL_BODY_TOP)
         add_box(scene, f"Stub{name}Body", *map_box(low, high), plaster)
         low, high = gate_box(axis, along0, along1, WALL_COPING_THICKNESS / 2.0, 0.0, 0.0)

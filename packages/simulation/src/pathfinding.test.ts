@@ -438,6 +438,30 @@ describe("gate passability", () => {
     expect(isPassable(world, { x: 30, y: 32 })).toBe(false);
   });
 
+  it("gate_yagura_3 open: only the center cell is passable, stone flanks never are", () => {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    world.units = [];
+
+    const error = applyCommand(
+      world,
+      command({ type: "placeBuilding", buildingType: "gate_yagura_3", position: { x: 12, y: 12 } })
+    );
+    expect(error).toBeNull();
+
+    const gate = world.buildings.find((b) => b.type === "gate_yagura_3");
+    expect(gate?.gateState).toBe("open");
+
+    expect(isPassable(world, { x: 12, y: 12 })).toBe(false);
+    expect(isPassable(world, { x: 13, y: 12 })).toBe(true);
+    expect(isPassable(world, { x: 14, y: 12 })).toBe(false);
+
+    applyCommand(world, command({ type: "toggleGate", position: { x: 12, y: 12 } }));
+    expect(gate?.gateState).toBe("closed");
+    expect(isPassable(world, { x: 13, y: 12 })).toBe(false);
+  });
+
   it("narrow gate: pathfinding routes through the center cell only", () => {
     const world = createInitialWorld();
     normalizeMap(world);

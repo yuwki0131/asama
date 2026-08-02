@@ -47,13 +47,13 @@ describe("ogakiCastleScenario", () => {
 
     for (let x = 56; x <= 69; x += 1) {
       expect(["wall", "yagura"], `north wall ${x},58`).toContain(byCell.get(`${x},58`));
-      expect(["wall", "yagura", "gate_narrow_3"], `south wall ${x},71`).toContain(byCell.get(`${x},71`));
+      expect(["wall", "yagura", "gate_yagura_3"], `south wall ${x},71`).toContain(byCell.get(`${x},71`));
     }
     for (let y = 58; y <= 71; y += 1) {
       expect(["wall", "yagura"], `west wall 56,${y}`).toContain(byCell.get(`56,${y}`));
       expect(["wall", "yagura"], `east wall 69,${y}`).toContain(byCell.get(`69,${y}`));
     }
-    expect(byCell.get("63,71")).toBe("gate_narrow_3");
+    expect(byCell.get("63,71")).toBe("gate_yagura_3");
 
     for (let y = 54; y <= 74; y += 1) {
       for (let x = 52; x <= 73; x += 1) {

@@ -265,7 +265,9 @@ export function isPassable(world: WorldState, coord: CellCoord, perspective?: "p
       (building.type === "gate_wide_3" ||
         building.type === "gate_wide_3_ne_sw" ||
         building.type === "gate_narrow_3" ||
-        building.type === "gate_narrow_3_ne_sw") &&
+        building.type === "gate_narrow_3_ne_sw" ||
+        building.type === "gate_yagura_3" ||
+        building.type === "gate_yagura_3_ne_sw") &&
       effectivePassable
     ) {
       const centerCell = building.footprint[Math.floor(building.footprint.length / 2)];

@@ -54,6 +54,8 @@ export function buildingTypeLabel(type: BuildingType): string {
     gate_wide_2_ne_sw: "門(広2 NE-SW)",
     gate_wide_3_ne_sw: "門(広3 NE-SW)",
     gate_narrow_3_ne_sw: "門(狭3 NE-SW)",
+    gate_yagura_3: "櫓門(NW-SE)",
+    gate_yagura_3_ne_sw: "櫓門(NE-SW)",
     dry_moat: "空堀",
     water_moat: "水堀",
     diagonal_dry_moat_nwse: "斜め空堀(縦)",

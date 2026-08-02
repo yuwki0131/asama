@@ -52,6 +52,8 @@ export type BuildingType =
   | "gate_wide_2_ne_sw"
   | "gate_wide_3_ne_sw"
   | "gate_narrow_3_ne_sw"
+  | "gate_yagura_3"
+  | "gate_yagura_3_ne_sw"
   | "dry_moat"
   | "water_moat"
   | "diagonal_dry_moat_nwse"

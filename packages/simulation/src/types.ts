@@ -277,7 +277,9 @@ export const BREACHABLE_BUILDING_TYPES: readonly BuildingType[] = [
   "gate_narrow_3",
   "gate_wide_2_ne_sw",
   "gate_wide_3_ne_sw",
-  "gate_narrow_3_ne_sw"
+  "gate_narrow_3_ne_sw",
+  "gate_yagura_3",
+  "gate_yagura_3_ne_sw"
 ];
 
 /** Compatibility export: the default scenario's waves (tests, tooling). */
@@ -344,7 +346,9 @@ export function isGate(type: BuildingType): boolean {
     type === "gate_narrow_3" ||
     type === "gate_wide_2_ne_sw" ||
     type === "gate_wide_3_ne_sw" ||
-    type === "gate_narrow_3_ne_sw"
+    type === "gate_narrow_3_ne_sw" ||
+    type === "gate_yagura_3" ||
+    type === "gate_yagura_3_ne_sw"
   );
 }
 
@@ -377,7 +381,7 @@ export function arcQuadrantSigns(type: BuildingType): { readonly sx: 1 | -1; rea
 }
 
 export function isNeSwGate(type: BuildingType): boolean {
-  return type === "gate_wide_2_ne_sw" || type === "gate_wide_3_ne_sw" || type === "gate_narrow_3_ne_sw";
+  return type === "gate_wide_2_ne_sw" || type === "gate_wide_3_ne_sw" || type === "gate_narrow_3_ne_sw" || type === "gate_yagura_3_ne_sw";
 }
 
 export function isBridge(type: BuildingType): boolean {
