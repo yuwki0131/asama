@@ -29,6 +29,19 @@ export interface AsamaTestBridge {
    * swap texture per season). Pass null to follow the simulation again.
    */
   setSeason(season: Season | null): void;
+  /** DEV/QA: leaf display objects whose global bounds contain a screen point. */
+  debugObjectsAt(x: number, y: number): string[] | null;
+  /** DEV/QA: toggle world sub-layer visibility (0=terrain,2=scene). */
+  debugSetLayerVisible(index: number, visible: boolean): void;
+  /** DEV/QA: chroma-key mode for composite lint — magenta clear color and
+   *  hidden terrain underlay so uncovered ground pixels become detectable. */
+  debugChromaMode(enabled: boolean): void;
+  /** DEV/QA: camera state + per-terrain-chunk culling bounds/visibility. */
+  debugTerrainCulling(): {
+    camera: { x: number; y: number; zoom: number };
+    screen: { width: number; height: number };
+    chunks: { bounds: { minX: number; minY: number; maxX: number; maxY: number }; visible: boolean }[];
+  } | null;
 }
 
 declare global {

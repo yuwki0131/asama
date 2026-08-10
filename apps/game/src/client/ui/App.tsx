@@ -123,6 +123,14 @@ export function App() {
       setTone: (enabled) => {
         gameCanvasRef.current?.setTone(enabled);
       },
+      debugObjectsAt: (x, y) => gameCanvasRef.current?.debugObjectsAt(x, y) ?? null,
+      debugSetLayerVisible: (index, visible) => {
+        gameCanvasRef.current?.debugSetLayerVisible(index, visible);
+      },
+      debugChromaMode: (enabled) => {
+        gameCanvasRef.current?.debugChromaMode(enabled);
+      },
+      debugTerrainCulling: () => gameCanvasRef.current?.debugTerrainCulling() ?? null,
       setSeason: (season) => {
         seasonOverrideRef.current = season;
         const raw = rawSnapshotRef.current;

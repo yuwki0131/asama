@@ -260,6 +260,22 @@ describe("machiya visual variants", () => {
     const ids = new Set(positions.map((position) => buildingAt(world, position).assetId));
     expect(ids.size).toBeGreaterThanOrEqual(2);
   });
+
+  it("never repeats a facade on adjacent lots (composite lint REP rule)", () => {
+    // The old pure-hash pick produced streets with 7 identical facades in a
+    // row. Lots step 2 cells along a strip; the position cycle changes the
+    // variant on every 1- or 2-cell step in either axis.
+    const world = freshWorld();
+    const xA = { x: 40, y: 40 };
+    const xB = { x: 42, y: 40 };
+    const yA = { x: 60, y: 40 };
+    const yB = { x: 60, y: 42 };
+    for (const position of [xA, xB, yA, yB]) {
+      place(world, "machiya", position);
+    }
+    expect(buildingAt(world, xA).assetId).not.toBe(buildingAt(world, xB).assetId);
+    expect(buildingAt(world, yA).assetId).not.toBe(buildingAt(world, yB).assetId);
+  });
 });
 
 describe("garden visual variants", () => {
@@ -506,6 +522,34 @@ describe("diagonal moat junctions", () => {
     place(world, "diagonal_dry_moat_nesw", { x: 39, y: 40 });
 
     expect(buildingAt(world, { x: 40, y: 40 }).assetId).toMatch(/^building\.water_moat\.connected\.0000/);
+  });
+});
+
+describe("wide-mask moat variant alternation", () => {
+  it("alternates base/v1 on orthogonal neighbors of a double-row moat (composite lint REP rule)", () => {
+    // Wide masks (0111/1101/1111) only have base+v1 art; the old hash pick
+    // allowed 5 identical tiles in a row. Checkerboard parity guarantees
+    // same-mask orthogonal neighbors inside a 4x4 block always differ.
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    for (let x = 20; x <= 23; x++) {
+      for (let y = 20; y <= 21; y++) {
+        place(world, "water_moat", { x, y });
+      }
+    }
+    const pairs: [CellCoord, CellCoord][] = [
+      [{ x: 21, y: 20 }, { x: 22, y: 20 }],
+      [{ x: 21, y: 21 }, { x: 22, y: 21 }]
+    ];
+    for (const [a, b] of pairs) {
+      const idA = buildingAt(world, a).assetId;
+      const idB = buildingAt(world, b).assetId;
+      const maskOf = (id: string): string => /\.connected\.([01]{4})/.exec(id)?.[1] ?? "";
+      expect(maskOf(idA)).not.toBe("");
+      expect(maskOf(idA)).toBe(maskOf(idB));
+      expect(idA).not.toBe(idB);
+    }
   });
 });
 

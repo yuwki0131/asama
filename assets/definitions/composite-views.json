@@ -1,0 +1,15 @@
+{
+  "comment": "Standard camera positions for composite lint (qa/composite-lint.mjs). 'cell: null' = the scenario's untouched first view — the most important frame, always keep it first. Other views tile the map at zoom 1 so every region is machine-checked.",
+  "scenarios": {
+    "ogaki-castle": {
+      "views": [
+        { "name": "first", "cell": null },
+        { "name": "center", "cell": { "x": 64, "y": 64 } },
+        { "name": "nw", "cell": { "x": 36, "y": 36 } },
+        { "name": "ne", "cell": { "x": 92, "y": 36 } },
+        { "name": "sw", "cell": { "x": 36, "y": 92 } },
+        { "name": "se", "cell": { "x": 92, "y": 92 } }
+      ]
+    }
+  }
+}

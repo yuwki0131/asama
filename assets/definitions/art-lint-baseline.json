@@ -1,5 +1,50 @@
 {
   "version": 1,
   "note": "既知のアートルール違反 (docs/05_map-and-art/art-rulebook.md)。段階導入用: ここに載っている assetId×ruleId は assets:lint:art で fail しない。修正したらエントリを削除すること。再生成: assets:lint:art --write-baseline",
-  "entries": []
+  "entries": [
+    {
+      "assetId": "building.dry_moat",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p1",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p2",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.dry_moat.connected.1010.p3",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.dry_moat.diagonal.nesw",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width2.connected.0000",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width2.connected.1000",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width3.connected.0000",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width3.connected.0010",
+      "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "building.gate.wood.closed.ne_sw.width3.connected.1000",
+      "ruleId": "LUM-01"
+    }
+  ]
 }

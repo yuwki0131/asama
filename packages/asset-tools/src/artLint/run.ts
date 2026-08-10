@@ -9,6 +9,7 @@ import {
   checkInteriorHoles,
   checkMarkerColors,
   checkMatteFringe,
+  checkMeanLuma,
   checkSpeckles,
   checkTerrainFaceGeometry,
   terrainFaceSide,
@@ -116,6 +117,10 @@ export async function collectArtLintViolations(): Promise<{
       const noise02 = checkMatteFringe(asset.assetId, image);
       if (noise02 !== null) {
         violations.push(noise02);
+      }
+      const lum01 = checkMeanLuma(asset.assetId, image);
+      if (lum01 !== null) {
+        violations.push(lum01);
       }
     }
   }

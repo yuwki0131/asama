@@ -526,6 +526,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1010",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -715,6 +716,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0000",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -742,6 +744,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0001",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -769,6 +772,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0010",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -796,6 +800,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0011",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -823,6 +828,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0100",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -850,6 +856,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0101",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -877,6 +884,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0110",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -904,6 +912,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-0111",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -931,6 +940,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1000",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -958,6 +968,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1001",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -985,6 +996,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1010",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -1012,6 +1024,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1011",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -1039,6 +1052,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1100",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -1066,6 +1080,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1101",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -1093,6 +1108,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1110",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
@@ -1120,6 +1136,7 @@
       "source": {
         "type": "blender",
         "model": "fence-wood-connected-1111",
+        "registry": "fence",
         "renderSpec": "painterly",
         "supersample": 2
       },
