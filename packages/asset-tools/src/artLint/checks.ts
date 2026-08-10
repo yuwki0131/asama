@@ -13,7 +13,15 @@ export interface RawImage {
   readonly height: number;
 }
 
-export type ArtLintRuleId = "GEO-01" | "GEO-02" | "GEO-03" | "NOISE-01" | "NOISE-02" | "NOISE-03" | "NOISE-04";
+export type ArtLintRuleId =
+  | "GEO-01"
+  | "GEO-02"
+  | "GEO-03"
+  | "NOISE-01"
+  | "NOISE-02"
+  | "NOISE-03"
+  | "NOISE-04"
+  | "LUM-01";
 
 export interface ArtLintViolation {
   readonly assetId: string;
@@ -488,5 +496,42 @@ export function checkMarkerColors(assetId: string, image: RawImage): ArtLintViol
     measured: `${count} pure marker pixel(s): ${samples.join(" ")}`,
     threshold: "0 visible pure-primary/secondary pixels",
     message: "純色マーカー画素(デバッグ/クリーンアップ残滓)禁止"
+  };
+}
+
+/**
+ * LUM-01: opaque-mean luma floor for building sprites. The population median
+ * across production buildings is ~72; sprites whose opaque mean falls below
+ * `minLuma` read as unlit silhouettes at map scale and merge with neighbours
+ * into black masses (the fence/machiya incidents both sat in the 32–42 band).
+ * Intentionally-dark families (recessed dry-moat pits, closed shade-side
+ * gates, 44.6–48.2) live in the art-lint baseline, not in a rule exemption:
+ * new assets must clear the floor.
+ */
+export function checkMeanLuma(assetId: string, image: RawImage, minLuma = 48): ArtLintViolation | null {
+  const { data, width, height } = image;
+  let sum = 0;
+  let count = 0;
+  for (let p = 0; p < width * height; p += 1) {
+    const i = p * 4;
+    if ((data[i + 3] ?? 0) < OPAQUE_ALPHA) {
+      continue;
+    }
+    sum += 0.2126 * (data[i] ?? 0) + 0.7152 * (data[i + 1] ?? 0) + 0.0722 * (data[i + 2] ?? 0);
+    count += 1;
+  }
+  if (count === 0) {
+    return null;
+  }
+  const mean = sum / count;
+  if (mean >= minLuma) {
+    return null;
+  }
+  return {
+    assetId,
+    ruleId: "LUM-01",
+    measured: `opaque-mean luma=${mean.toFixed(1)} (${count}px)`,
+    threshold: `>=${minLuma}`,
+    message: "不透過平均輝度の下限違反(未照明シルエット化の防止)"
   };
 }

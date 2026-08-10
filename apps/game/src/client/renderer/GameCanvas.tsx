@@ -44,6 +44,19 @@ export interface GameCanvasHandle {
   getFps: () => number;
   /** Toggle the grade-C color matrix + aerial haze overlay (default on). */
   setTone: (enabled: boolean) => void;
+  /** DEV-only: leaf display objects whose global bounds contain a screen point. */
+  debugObjectsAt: (x: number, y: number) => string[] | null;
+  /** DEV-only: toggle world sub-layer visibility (0=terrain,2=scene). */
+  debugSetLayerVisible: (index: number, visible: boolean) => void;
+  /** DEV-only: chroma-key mode for composite lint — magenta clear color and
+   *  hidden terrain underlay so uncovered ground pixels become detectable. */
+  debugChromaMode: (enabled: boolean) => void;
+  /** DEV-only: camera state + per-terrain-chunk culling bounds/visibility. */
+  debugTerrainCulling: () => {
+    camera: { x: number; y: number; zoom: number };
+    screen: { width: number; height: number };
+    chunks: { bounds: { minX: number; minY: number; maxX: number; maxY: number }; visible: boolean }[];
+  } | null;
 }
 
 interface GameCanvasProps {
@@ -296,6 +309,67 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       if (aerialOverlay !== null) {
         aerialOverlay.visible = enabled;
       }
+    },
+    debugSetLayerVisible: (index: number, visible: boolean) => {
+      const world = worldRef.current;
+      const child = world?.children[index];
+      if (child !== undefined) {
+        child.visible = visible;
+      }
+    },
+    debugChromaMode: (enabled: boolean) => {
+      const app = appRef.current;
+      const terrainLayer = terrainLayerRef.current;
+      if (app === null || terrainLayer === null) return;
+      app.renderer.background.color = enabled ? 0xff00ff : 0x1c2227;
+      for (const child of terrainLayer.children) {
+        if ((child as Container & { __isTerrainUnderlay?: boolean }).__isTerrainUnderlay === true) {
+          child.visible = !enabled;
+        }
+      }
+    },
+    debugObjectsAt: (x: number, y: number) => {
+      const world = worldRef.current;
+      if (world === null) return null;
+      const out: string[] = [];
+      const walk = (node: Container, path: string, depth: number): void => {
+        if (depth > 12) return;
+        for (let i = 0; i < node.children.length; i += 1) {
+          const child = node.children[i]! as Container & {
+            texture?: { label?: string };
+            __terrainBounds?: unknown;
+          };
+          const label = `${child.constructor.name}${child.label ? `(${child.label})` : ""}[${i}]`;
+          const b = child.getBounds();
+          const contains = x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height;
+          if (!contains) continue;
+          const info = `${path}/${label} vis=${child.visible} a=${child.alpha.toFixed(2)} b=(${Math.round(b.x)},${Math.round(b.y)},${Math.round(b.width)}x${Math.round(b.height)})${child.texture?.label ? ` tex=${child.texture.label}` : ""}`;
+          if (child.children.length === 0) {
+            out.push(info);
+          } else {
+            walk(child, `${path}/${label}`, depth + 1);
+          }
+        }
+      };
+      walk(world, "world", 0);
+      return out;
+    },
+    debugTerrainCulling: () => {
+      const app = appRef.current;
+      const terrainLayer = terrainLayerRef.current;
+      if (app === null || terrainLayer === null) return null;
+      const camera = cameraRef.current;
+      const chunks: { bounds: { minX: number; minY: number; maxX: number; maxY: number }; visible: boolean }[] = [];
+      for (const child of terrainLayer.children) {
+        const bounds = (child as typeof child & { __terrainBounds?: { minX: number; minY: number; maxX: number; maxY: number } }).__terrainBounds;
+        if (bounds === undefined) continue;
+        chunks.push({ bounds, visible: child.visible });
+      }
+      return {
+        camera: { x: camera.x, y: camera.y, zoom: camera.zoom },
+        screen: { width: app.screen.width, height: app.screen.height },
+        chunks
+      };
     }
   }), [scheduleCameraRender]);
 

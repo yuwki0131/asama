@@ -21,6 +21,21 @@ pnpm assets:lint:art
 - 自分の変更で違反を修正したら baseline から該当エントリを削除する
 - baseline に新規エントリを足すのは「既存アセットの棚卸し」のみ。**自分が今作った違反を baseline に隠すのは禁止**
 
+## L1.5: コンポジットlint(マップスケール、必須)
+
+アセット単体では正常でも組み合わせで壊れる欠陥(穴あき空間・黒穴・繰り返し感)を実ゲーム画面で機械検査する。
+判定基準は rulebook の COMP-01〜03。
+
+```bash
+# dev server (apps/game, port 5196) 起動が前提
+cd apps/game && node qa/composite-lint.mjs --scenario <name>   # 例: ogaki-castle
+```
+
+- 標準6ビュー(`assets/definitions/composite-views.json`: first/center/nw/ne/sw/se)を撮影し GAP/VAL/REP を検査
+- **error 0で合格**(infoは既知の設計負債: wall/road直線辺のバリアントプール未整備 → COMP-03)
+- レポート/スクショ/クロマキー画像は `artifacts/composite-lint/<scenario>/` に出力。error時は近傍assetId帰属付き
+- 対象: レンダラー(sceneLayer/terrainLayer)変更、connected系アセット追加・変更、シナリオマップ変更
+
 ## L2: VLMセルフレビュー(必須)
 
 1. 定点スクショを撮る。プリセットは `assets/definitions/review-shots.json`:
@@ -44,7 +59,8 @@ node apps/game/qa/shot.mjs --preset <ishigaki|tenshu|farm|gate>
 
 ユーザーから新規指摘が出たら、修正だけで終わらせない:
 
-- 機械化可能 → `packages/asset-tools/src/artLint/checks.ts` にチェッカー追加(+テスト)
+- 機械化可能(アセット単体) → `packages/asset-tools/src/artLint/checks.ts` にチェッカー追加(+テスト)
+- 機械化可能(組み合わせ・マップスケール) → `apps/game/qa/composite-lint.mjs` に検査追加(+標準ビュー調整)
 - 審美判断 → `art-rulebook.md` の該当セクションに1行追加
 
 ルール追加までがサイクルのクローズ条件。

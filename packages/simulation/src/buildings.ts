@@ -462,9 +462,14 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
       const phase = ((building.position.y % 4) + 4) % 4;
       return phase === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.p${phase}`;
     }
-    let h = (building.position.x * 374761393 + building.position.y * 668265263 + 77003) >>> 0;
+    // Checkerboard parity (not a coin flip) so orthogonal neighbors alternate
+    // base/v1 — a hash pick allowed runs of 5+ identical tiles on wide masks.
+    // The coarse 4x4-block hash shifts the parity per block, so the only
+    // possible repeats are single pairs across block seams (max run 2).
+    let h = (Math.floor(building.position.x / 4) * 374761393 + Math.floor(building.position.y / 4) * 668265263 + 77003) >>> 0;
     h = (h ^ (h >>> 13)) >>> 0;
-    return h % 2 === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.v1`;
+    const pick = (((building.position.x + building.position.y + h) % 2) + 2) % 2;
+    return pick === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.v1`;
   }
 
   return `${family}.connected.${mask}`;
@@ -504,9 +509,15 @@ export function gardenVariantAssetId(position: CellCoord): string {
 export const MACHIYA_VARIANT_COUNT = 3;
 
 export function machiyaVariantAssetId(type: "machiya" | "machiya_ne_sw", position: CellCoord): string {
-  let h = (position.x * 374761393 + position.y * 668265263 + 557123) >>> 0;
+  // Position-cycled selection (not a pure hash): lots step 2 cells along a
+  // strip, and (x + 2y) mod 3 changes on every 2-step in either axis, so a
+  // terraced row never shows the same facade twice in a row — the old hash
+  // pick produced runs of 7 identical facades. The coarse 4x4-block hash
+  // offsets the cycle phase per block so distant streets don't share one
+  // global rhythm; only across a block seam can two equal facades meet.
+  let h = (Math.floor(position.x / 4) * 374761393 + Math.floor(position.y / 4) * 668265263 + 557123) >>> 0;
   h = (h ^ (h >>> 13)) >>> 0;
-  const variant = (h % MACHIYA_VARIANT_COUNT) + 1;
+  const variant = ((((position.x + 2 * position.y + h) % MACHIYA_VARIANT_COUNT) + MACHIYA_VARIANT_COUNT) % MACHIYA_VARIANT_COUNT) + 1;
   const orientation = type === "machiya_ne_sw" ? "ne_sw" : "nw_se";
   return `building.machiya.${orientation}.v${variant}`;
 }

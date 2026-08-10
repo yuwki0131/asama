@@ -114,7 +114,9 @@ export function buildTerrainChunks(
       addTerrainUnderlay(underlayGraphics, cell, touchesWater(cell.coord.x, cell.coord.y));
     }
   }
-  // The underlay sits below all sprite chunks and is never culled.
+  // The underlay sits below all sprite chunks and is never culled. The tag
+  // lets QA tooling hide it to expose ground-coverage gaps (composite lint).
+  (underlayGraphics as Graphics & { __isTerrainUnderlay?: boolean }).__isTerrainUnderlay = true;
   terrainLayer.addChild(underlayGraphics);
 
   // Phase 3 — emit sprite chunks sorted by isometric depth (ascending cx+cy).
@@ -189,6 +191,85 @@ export function buildTerrainChunks(
 }
 
 /**
+ * Straight S/E faces owed by a cliff cell, derived from map geometry: one
+ * face per higher straight neighbour (the N neighbour's S face and/or the W
+ * neighbour's E face — the fixed camera only ever sees S/E faces).
+ */
+function cliffStraightFaces(
+  cell: TerrainCellSnapshot,
+  map: ElevationMapLike
+): Array<{ face: CliffFace; skin: ElevationSkin; highPoint: { x: number; y: number }; anchorY: number }> {
+  const faces: Array<{ face: CliffFace; skin: ElevationSkin; highPoint: { x: number; y: number }; anchorY: number }> = [];
+  if (cell.cliffFace === undefined || cell.cliffHeight === undefined || cell.cliffFace === "se") {
+    return faces;
+  }
+  const specs = [
+    { dx: 0, dy: -1, edge: "s" as const, facing: "S" as const },
+    { dx: -1, dy: 0, edge: "e" as const, facing: "E" as const }
+  ];
+  for (const spec of specs) {
+    const high = cellAt(map, cell.coord.x + spec.dx, cell.coord.y + spec.dy);
+    if (high === null) continue;
+    // Height of the high cell's edge facing this cell; null on a slope's
+    // side edge (the slope draws its own slanted side wall there).
+    const top = edgeSurfaceHeight(high, spec.facing);
+    if (top === null) continue;
+    const drop = top - cell.elevation;
+    if (drop < 1) continue;
+    const h = Math.min(drop, MAX_ELEVATION);
+    const skin = high.elevationSkin;
+    const highPoint = cellToWorld(high.coord);
+    faces.push({
+      face: {
+        edge: spec.edge,
+        topA: top,
+        topB: top,
+        bottom: cell.elevation,
+        assetId: `terrain.${skin}.face.${spec.edge}.h${h}`
+      },
+      skin,
+      highPoint,
+      anchorY: highPoint.y + tileOffsetY(high)
+    });
+  }
+  return faces;
+}
+
+/**
+ * Exact-geometry stone backdrops behind every cliff face and slanted slope
+ * side wall, drawn into ONE graphics that the retained scene inserts BELOW
+ * all its sprites (sceneLayer.ts syncStatic).
+ *
+ * Why: face/side-wall art deliberately recedes from its contract polygon —
+ * ishigaki sori curves the silhouette inward at the top and corners, slope
+ * side walls batter their top toward the ramp — and neighbouring sprites
+ * normally cover each other's receded corners via their half-tile overlap.
+ * At a concave junction of two DIFFERENT piece kinds (slope side wall meets
+ * cliff face) both arts pull away from the shared corner vertical and a
+ * wedge of bare underlay shows through (composite lint GAP finding).
+ *
+ * Painting the un-battered contract quads underneath the whole scene closes
+ * every such wedge with wall-tone while never covering neighbouring art: all
+ * sprites draw on top of the backdrop. (An earlier attempt that drew
+ * backdrops at each cell's OWN depth inside the painter's sort landed on top
+ * of the already-drawn neighbouring wall sprites and broke every connected
+ * wall run — see the fallback note in addCliffCellSprites.)
+ */
+export function addElevationBackdrops(graphics: Graphics, cell: TerrainCellSnapshot, map: ElevationMapLike): void {
+  for (const { face, skin, highPoint } of cliffStraightFaces(cell, map)) {
+    drawFallbackFace(graphics, highPoint, skin, face);
+  }
+  if (cell.slope !== null) {
+    const point = cellToWorld(cell.coord);
+    for (const face of cliffInfoFor(map, cell).faces) {
+      if (face.topA !== face.topB) {
+        drawFallbackFace(graphics, point, cell.elevationSkin, face);
+      }
+    }
+  }
+}
+
+/**
  * Draws a dedicated cliff terrain cell's face/corner sprites into `layer`.
  *
  * Called from the retained scene layer (sceneLayer.ts) where the cliff cell
@@ -228,38 +309,7 @@ export function addCliffCellSprites(
     return;
   }
 
-  // One face per higher straight neighbour: the N neighbour's S face and/or
-  // the W neighbour's E face (the fixed camera only ever sees S/E faces).
-  const specs = [
-    { dx: 0, dy: -1, edge: "s" as const, facing: "S" as const },
-    { dx: -1, dy: 0, edge: "e" as const, facing: "E" as const }
-  ];
-  const faces: Array<{ face: CliffFace; skin: ElevationSkin; highPoint: { x: number; y: number }; anchorY: number }> = [];
-  for (const spec of specs) {
-    const high = cellAt(map, cell.coord.x + spec.dx, cell.coord.y + spec.dy);
-    if (high === null) continue;
-    // Height of the high cell's edge facing this cell; null on a slope's
-    // side edge (the slope draws its own slanted side wall there).
-    const top = edgeSurfaceHeight(high, spec.facing);
-    if (top === null) continue;
-    const drop = top - cell.elevation;
-    if (drop < 1) continue;
-    const h = Math.min(drop, MAX_ELEVATION);
-    const skin = high.elevationSkin;
-    const highPoint = cellToWorld(high.coord);
-    faces.push({
-      face: {
-        edge: spec.edge,
-        topA: top,
-        topB: top,
-        bottom: cell.elevation,
-        assetId: `terrain.${skin}.face.${spec.edge}.h${h}`
-      },
-      skin,
-      highPoint,
-      anchorY: highPoint.y + tileOffsetY(high)
-    });
-  }
+  const faces = cliffStraightFaces(cell, map);
 
   // Fallback polygons are drawn ONLY for faces whose sprite asset is missing.
   //
@@ -560,17 +610,16 @@ function addSlopeSideWalls(
   const anchorY = point.y + tileOffsetY(cell);
   const sideFaces = cliffInfoFor(map, cell).faces.filter((face) => face.topA !== face.topB);
 
+  // Receded/battered art and missing sprites alike are backed by the
+  // scene-wide contract-quad backdrop layer (addElevationBackdrops), so only
+  // the sprites themselves are drawn here.
   for (const face of sideFaces) {
     const asset = assets.get(face.assetId);
     if (asset !== undefined) {
       const sprite = createSpriteFromCandidates([face.assetId], assets);
       sprite.position.set(point.x, anchorY);
       layer.addChild(sprite);
-      continue;
     }
-    const fallback = new Graphics();
-    drawFallbackFace(fallback, point, cell.elevationSkin, face);
-    layer.addChild(fallback);
   }
 }
 

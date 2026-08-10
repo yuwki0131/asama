@@ -38,6 +38,7 @@ import type { FootprintRect } from "./renderGeometry";
 import {
   addCliffCellSprites,
   addElevatedFloorSprites,
+  addElevationBackdrops,
   addSlopeCellSprites,
   cliffFeatureScreenRects,
   slopeFeatureScreenRect,
@@ -345,6 +346,16 @@ export class RetainedScene {
       }
     }
     isoSort(sceneItems);
+
+    // Contract-quad backdrops behind ALL cliff faces / slope side walls,
+    // below every sprite of this layer (see addElevationBackdrops).
+    const elevationBackdrops = new Graphics();
+    for (const cell of snapshot.map.cells) {
+      if (cell.terrain === "cliff" || cell.slope !== null) {
+        addElevationBackdrops(elevationBackdrops, cell, snapshot.map);
+      }
+    }
+    this.staticLayer.addChild(elevationBackdrops);
 
     for (const entry of sceneItems) {
       if (entry.kind === "cliff") {

@@ -5,6 +5,7 @@ import {
   checkInteriorHoles,
   checkMarkerColors,
   checkMatteFringe,
+  checkMeanLuma,
   checkSpeckles,
   checkTerrainFaceGeometry,
   terrainFaceSide,
@@ -369,5 +370,33 @@ describe("NOISE-04 checkMarkerColors", () => {
     fillRect(image, 4, 4, 28, 28, WOOD);
     setPixel(image, 6, 6, [255, 0, 0, 100]); // below OPAQUE_ALPHA
     expect(checkMarkerColors("building.test", image)).toBeNull();
+  });
+});
+
+describe("LUM-01 checkMeanLuma", () => {
+  it("passes a normally lit sprite", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 4, 4, 28, 28, WOOD); // luma ~111
+    expect(checkMeanLuma("building.test", image)).toBeNull();
+  });
+
+  it("flags an unlit-silhouette sprite (fence/machiya incident case)", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 4, 4, 28, 28, [40, 32, 22, 255]); // luma ~33
+    const violation = checkMeanLuma("building.fence", image);
+    expect(violation?.ruleId).toBe("LUM-01");
+    expect(violation?.threshold).toBe(">=48");
+  });
+
+  it("ignores transparent pixels when averaging", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 0, 0, 31, 31, CLEAR); // black-but-transparent must not drag the mean
+    fillRect(image, 4, 4, 28, 28, WOOD);
+    expect(checkMeanLuma("building.test", image)).toBeNull();
+  });
+
+  it("passes a fully transparent image", () => {
+    const image = makeImage(8, 8);
+    expect(checkMeanLuma("building.test", image)).toBeNull();
   });
 });
