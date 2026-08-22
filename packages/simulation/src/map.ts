@@ -337,8 +337,11 @@ export function connectedTerrainAssetId(
     .map((direction) => {
       const x = cell.coord.x + direction.x;
       const y = cell.coord.y + direction.y;
+      // Off-map counts as SAME terrain: the map rim must read as the world
+      // continuing outward (the renderer draws a fading terrain skirt there),
+      // not as an interior region border with shore/fringe art (V-02).
       if (x < 0 || y < 0 || x >= width || y >= height) {
-        return "0";
+        return "1";
       }
 
       return cells[y * width + x]?.terrain === cell.terrain ? "1" : "0";

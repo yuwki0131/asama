@@ -9,6 +9,15 @@
         { "name": "ne", "cell": { "x": 92, "y": 36 } },
         { "name": "sw", "cell": { "x": 36, "y": 92 } },
         { "name": "se", "cell": { "x": 92, "y": 92 } }
+      ],
+      "edgeViewsComment": "EDGE-01 (art-rulebook): rim cells + outward direction for the map-edge fade check. Captured in NORMAL mode (chroma keying would key out the translucent fade itself). Corners use zoom 0.75 so the whole skirt fits on screen along the steep vertical diagonal.",
+      "edgeViews": [
+        { "name": "edge-w", "cell": { "x": 0, "y": 43 }, "outward": { "x": -1, "y": 0 } },
+        { "name": "edge-n", "cell": { "x": 40, "y": 0 }, "outward": { "x": 0, "y": -1 } },
+        { "name": "edge-e", "cell": { "x": 127, "y": 60 }, "outward": { "x": 1, "y": 0 } },
+        { "name": "edge-s", "cell": { "x": 64, "y": 127 }, "outward": { "x": 0, "y": 1 } },
+        { "name": "edge-nw", "cell": { "x": 0, "y": 0 }, "outward": { "x": -1, "y": -1 }, "zoom": 0.75 },
+        { "name": "edge-se", "cell": { "x": 127, "y": 127 }, "outward": { "x": 1, "y": 1 }, "zoom": 0.75 }
       ]
     }
   }

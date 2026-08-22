@@ -12,6 +12,10 @@
 //   REP   (C3) variant repetition: runs of consecutive same-type connected
 //         buildings (moat/river/wall...) resolving to the SAME assetId, which
 //         reads as an obviously tiled pattern. Pure snapshot-data check.
+//   EDGE  (EDGE-01) map-edge fade: the world must dissolve into the background
+//         over the perimeter skirt, not end in a razor cut (patrol V-02).
+//         Measured on dedicated edge views (composite-views.json edgeViews) in
+//         NORMAL render mode — chroma keying would key out the fade itself.
 //
 // Usage:
 //   node qa/composite-lint.mjs --scenario ogaki-castle [--views first,center]
@@ -60,6 +64,20 @@ const REP_FAMILIES = [
 // Families that HAVE a variant pool today (violations are fixable bugs; the
 // rest are reported as info so missing pools surface as design debt).
 const REP_VARIANT_FAMILIES = new Set(["water_moat", "dry_moat", "river", "machiya"]);
+// EDGE-01: rays are cast from a rim cell outward over the DIFF of two
+// screenshots (terrain layer shown vs hidden), which isolates the terrain
+// contribution — the perimeter skirt — from everything composited above
+// (aerial haze gradient fooled a plain background-color comparison into
+// reading the haze's own falloff as a "fade"). Fade extent = the farthest
+// ray distance where terrain still contributes. A razor cut measures ~1 cell
+// (~18-36px; up to ~96px where rim-cell art overhangs the rim); the 12-ring
+// skirt measures 150px+ (radial corner at zoom 0.75) to ~480px (straight
+// edges at zoom 1) — 120 separates both regimes with margin.
+const EDGE_MIN_FADE_PX = 120; // required fade extent at zoom 1 (scaled by view zoom)
+const EDGE_DIFF_DELTA = 10; // max-channel shown-vs-hidden diff ⇒ terrain contributes
+const EDGE_RAY_OFFSETS = [-96, -48, 0, 48, 96]; // perpendicular ray spread (px)
+const EDGE_STEP_PX = 2;
+const EDGE_FAR_CELLS = 15; // rays sample slightly past the 12-ring skirt
 
 function parseArgs(argv) {
   const options = {
@@ -99,10 +117,15 @@ async function loadViews(scenario, filter) {
   } catch {
     // fall through to default first view
   }
-  const views = config.scenarios?.[scenario]?.views ?? [{ name: "first", cell: null }];
+  const sc = config.scenarios?.[scenario];
+  const views = sc?.views ?? [{ name: "first", cell: null }];
+  const edgeViews = sc?.edgeViews ?? [];
   const selected = filter === null ? views : views.filter((v) => filter.includes(v.name));
-  if (selected.length === 0) throw new Error(`No views selected (available: ${views.map((v) => v.name).join(",")})`);
-  return selected;
+  const selectedEdge = filter === null ? edgeViews : edgeViews.filter((v) => filter.includes(v.name));
+  if (selected.length + selectedEdge.length === 0) {
+    throw new Error(`No views selected (available: ${[...views, ...edgeViews].map((v) => v.name).join(",")})`);
+  }
+  return { views: selected, edgeViews: selectedEdge };
 }
 
 // --- geometry helpers -------------------------------------------------------
@@ -444,6 +467,84 @@ async function checkRepetition(page) {
   return [...dedup.values()].sort((a, b) => b.identicalRun - a.identicalRun);
 }
 
+async function checkEdgeFade(page, ctx, view, outPrefix) {
+  const geom = await page.evaluate(([cell, outward]) => ({
+    rim: window.__asamaTest.cellToScreenPoint(cell),
+    inner: window.__asamaTest.cellToScreenPoint({ x: cell.x - outward.x, y: cell.y - outward.y })
+  }), [view.cell, view.outward]);
+  const bufShown = await page.screenshot();
+  await writeFile(`${outPrefix}.png`, bufShown);
+  await page.evaluate(() => window.__asamaTest.debugSetLayerVisible(0, false));
+  await page.waitForTimeout(300);
+  const bufHidden = await page.screenshot();
+  await page.evaluate(() => window.__asamaTest.debugSetLayerVisible(0, true));
+  await page.waitForTimeout(300);
+  const shown = PNG.sync.read(bufShown);
+  const hidden = PNG.sync.read(bufHidden);
+  const { width } = shown;
+
+  const dx = geom.rim.x - geom.inner.x;
+  const dy = geom.rim.y - geom.inner.y;
+  const cellStepPx = Math.hypot(dx, dy);
+  const ux = dx / cellStepPx;
+  const uy = dy / cellStepPx;
+  const perpX = -uy;
+  const perpY = ux;
+  const farPx = cellStepPx * EDGE_FAR_CELLS;
+
+  const inCanvas = (x, y) =>
+    x >= ctx.canvas.x0 + 4 && x <= ctx.canvas.x1 - 4 && y >= ctx.canvas.y0 + 4 && y <= ctx.canvas.y1 - 4;
+  const excluded = (x, y) => ctx.exclusions.some((r) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1);
+  const diffAt = (x, y) => {
+    const o = (Math.round(y) * width + Math.round(x)) * 4;
+    return Math.max(
+      Math.abs(shown.data[o] - hidden.data[o]),
+      Math.abs(shown.data[o + 1] - hidden.data[o + 1]),
+      Math.abs(shown.data[o + 2] - hidden.data[o + 2])
+    );
+  };
+
+  const fades = [];
+  for (const off of EDGE_RAY_OFFSETS) {
+    const ox = geom.rim.x + perpX * off;
+    const oy = geom.rim.y + perpY * off;
+    const diffs = [];
+    for (let t = 0; t <= farPx; t += EDGE_STEP_PX) {
+      const x = ox + ux * t;
+      const y = oy + uy * t;
+      diffs.push(inCanvas(x, y) && !excluded(x, y) ? diffAt(x, y) : null);
+    }
+    if (diffs.filter((d) => d === null).length > diffs.length * 0.2) continue;
+    const smoothed = diffs.map((d, i) => {
+      if (d === null) return null;
+      const win = diffs.slice(Math.max(0, i - 2), i + 3).filter((v) => v !== null);
+      return win.reduce((s, v) => s + v, 0) / win.length;
+    });
+    // The rim cell itself must contribute, otherwise the ray start is covered
+    // by a scene object or the terrain there matches the background — skip.
+    if (smoothed[0] === null || smoothed[0] < EDGE_DIFF_DELTA) continue;
+    let extent = 0;
+    for (let i = 0; i < smoothed.length; i += 1) {
+      if (smoothed[i] !== null && smoothed[i] > EDGE_DIFF_DELTA) extent = i;
+    }
+    fades.push(extent * EDGE_STEP_PX);
+  }
+  if (fades.length === 0) {
+    return {
+      fadePx: null,
+      findings: [{ check: "EDGE", severity: "info", kind: "inconclusive", detail: "no ray with terrain contribution at the rim" }]
+    };
+  }
+  fades.sort((a, b) => a - b);
+  const median = fades[Math.floor(fades.length / 2)];
+  const minFade = Math.round(EDGE_MIN_FADE_PX * (view.zoom ?? 1));
+  const findings = [];
+  if (median < minFade) {
+    findings.push({ check: "EDGE", severity: "error", kind: "razor-edge", fadePx: median, minFadePx: minFade, rays: fades });
+  }
+  return { fadePx: median, findings };
+}
+
 function annotate(outPrefix, findings) {
   const rects = findings.filter((f) => f.bbox !== undefined);
   if (rects.length === 0) return;
@@ -459,7 +560,7 @@ function annotate(outPrefix, findings) {
 // --- main -------------------------------------------------------------------
 
 const options = parseArgs(process.argv.slice(2));
-const views = await loadViews(options.scenario, options.views);
+const { views, edgeViews } = await loadViews(options.scenario, options.views);
 const url = `${options.baseUrl}/?scenario=${encodeURIComponent(options.scenario)}`;
 try {
   const res = await fetch(options.baseUrl, { signal: AbortSignal.timeout(3000) });
@@ -494,6 +595,17 @@ try {
     annotate(outPrefix, findings);
     report.views.push({ name: view.name, cell: view.cell ?? null, findings });
   }
+  for (const view of edgeViews) {
+    await page.evaluate(
+      ([cell, zoom]) => window.__asamaTest.jumpCameraToCell(cell, zoom),
+      [view.cell, view.zoom ?? 1]
+    );
+    await page.waitForTimeout(600);
+    const ctx = await analysisContext(page);
+    const outPrefix = join(outDir, view.name);
+    const { fadePx, findings } = await checkEdgeFade(page, ctx, view, outPrefix);
+    report.views.push({ name: view.name, cell: view.cell, edge: true, fadePx, findings });
+  }
   report.repetition = repetition;
 } finally {
   await browser.close();
@@ -504,8 +616,19 @@ await writeFile(join(outDir, "report.json"), JSON.stringify(report, null, 2));
 let errors = 0;
 let infos = 0;
 for (const view of report.views) {
+  if (view.edge === true && view.fadePx !== null) {
+    console.log(`EDGE ${view.name}: fade ${view.fadePx}px`);
+  }
   for (const f of view.findings) {
     errors += f.severity === "error" ? 1 : 0;
+    infos += f.severity === "info" ? 1 : 0;
+    if (f.check === "EDGE") {
+      console.log(
+        `[${f.severity}] ${view.name} EDGE/${f.kind}` +
+          (f.kind === "razor-edge" ? ` fade=${f.fadePx}px (min ${f.minFadePx}px, rays ${f.rays.join("/")})` : ` ${f.detail}`)
+      );
+      continue;
+    }
     console.log(
       `[${f.severity}] ${view.name} ${f.check}/${f.kind} area=${f.area}px bbox=(${f.bbox.x0},${f.bbox.y0})-(${f.bbox.x1},${f.bbox.y1}) near=${f.nearTextures.join(",")}`
     );
