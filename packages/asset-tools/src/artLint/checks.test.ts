@@ -6,6 +6,7 @@ import {
   checkMarkerColors,
   checkMatteFringe,
   checkMeanLuma,
+  checkMeanLumaCeiling,
   checkSpeckles,
   checkTerrainFaceGeometry,
   checkVariantDiff,
@@ -400,6 +401,34 @@ describe("LUM-01 checkMeanLuma", () => {
   it("passes a fully transparent image", () => {
     const image = makeImage(8, 8);
     expect(checkMeanLuma("building.test", image)).toBeNull();
+  });
+});
+
+describe("LUM-02 checkMeanLumaCeiling", () => {
+  it("passes a normal terrain tile", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 4, 4, 28, 28, [112, 128, 88, 255]); // grass-field luma ~121
+    expect(checkMeanLumaCeiling("terrain.test", image)).toBeNull();
+  });
+
+  it("flags a snow-white tile (stone-ridge incident case)", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 4, 4, 28, 28, [156, 155, 152, 255]); // old stone, luma ~155
+    const violation = checkMeanLumaCeiling("terrain.stone.connected.1111", image);
+    expect(violation?.ruleId).toBe("LUM-02");
+    expect(violation?.threshold).toBe("<=150");
+  });
+
+  it("ignores transparent pixels when averaging", () => {
+    const image = makeImage(32, 32);
+    fillRect(image, 0, 0, 31, 31, [255, 255, 255, 100]); // bright-but-transparent
+    fillRect(image, 4, 4, 28, 28, [112, 128, 88, 255]);
+    expect(checkMeanLumaCeiling("terrain.test", image)).toBeNull();
+  });
+
+  it("passes a fully transparent image", () => {
+    const image = makeImage(8, 8);
+    expect(checkMeanLumaCeiling("terrain.test", image)).toBeNull();
   });
 });
 

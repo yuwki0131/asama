@@ -10,6 +10,7 @@ import {
   checkMarkerColors,
   checkMatteFringe,
   checkMeanLuma,
+  checkMeanLumaCeiling,
   checkSpeckles,
   checkTerrainFaceGeometry,
   checkVariantDiff,
@@ -123,6 +124,12 @@ export async function collectArtLintViolations(): Promise<{
       const lum01 = checkMeanLuma(asset.assetId, image);
       if (lum01 !== null) {
         violations.push(lum01);
+      }
+    }
+    if (asset.kind === "terrain") {
+      const lum02 = checkMeanLumaCeiling(asset.assetId, image);
+      if (lum02 !== null) {
+        violations.push(lum02);
       }
     }
   }

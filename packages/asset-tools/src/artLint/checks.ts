@@ -22,6 +22,7 @@ export type ArtLintRuleId =
   | "NOISE-03"
   | "NOISE-04"
   | "LUM-01"
+  | "LUM-02"
   | "VAR-01";
 
 export interface ArtLintViolation {
@@ -534,6 +535,42 @@ export function checkMeanLuma(assetId: string, image: RawImage, minLuma = 48): A
     measured: `opaque-mean luma=${mean.toFixed(1)} (${count}px)`,
     threshold: `>=${minLuma}`,
     message: "不透過平均輝度の下限違反(未照明シルエット化の防止)"
+  };
+}
+
+/**
+ * LUM-02: opaque-mean luma ceiling for terrain tiles. The terrain population
+ * tops out at ~141 (grass-base); a tile family far above the field reads as
+ * snow/paper at map scale regardless of its texture (the stone-ridge incident:
+ * near-achromatic tiles at 154–160 rendered the procedural ridge as a white
+ * zig-zag road at far zoom, V-12). Ceiling-only — dark terrain (water ~55) is
+ * legitimate and the black-hole side is covered by composite-lint VAL.
+ */
+export function checkMeanLumaCeiling(assetId: string, image: RawImage, maxLuma = 150): ArtLintViolation | null {
+  const { data, width, height } = image;
+  let sum = 0;
+  let count = 0;
+  for (let p = 0; p < width * height; p += 1) {
+    const i = p * 4;
+    if ((data[i + 3] ?? 0) < OPAQUE_ALPHA) {
+      continue;
+    }
+    sum += 0.2126 * (data[i] ?? 0) + 0.7152 * (data[i + 1] ?? 0) + 0.0722 * (data[i + 2] ?? 0);
+    count += 1;
+  }
+  if (count === 0) {
+    return null;
+  }
+  const mean = sum / count;
+  if (mean <= maxLuma) {
+    return null;
+  }
+  return {
+    assetId,
+    ruleId: "LUM-02",
+    measured: `opaque-mean luma=${mean.toFixed(1)} (${count}px)`,
+    threshold: `<=${maxLuma}`,
+    message: "地形タイルの不透過平均輝度の上限違反(雪・紙のような白浮きの防止)"
   };
 }
 
