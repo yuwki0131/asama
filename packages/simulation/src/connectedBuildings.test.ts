@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { applyCommand, createInitialWorld, snapshotWorld, type WorldState } from "./index";
+import { samuraiResidenceVariantAssetId } from "./buildings";
 import type { BuildingSnapshot, BuildingType, CellCoord } from "@asama/shared";
 
 let clientSequence = 0;
@@ -222,6 +223,51 @@ describe("town block visual variants", () => {
     }
     const ids = new Set(positions.map((position) => buildingAt(world, position).assetId));
     expect(ids.size).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("samurai residence visual variants", () => {
+  function freshWorld(): WorldState {
+    const world = createInitialWorld();
+    normalizeMap(world);
+    resetBuildings(world);
+    return world;
+  }
+
+  it("assigns a variant assetId from the samurai residence family", () => {
+    const world = freshWorld();
+    place(world, "samurai_residence", { x: 40, y: 40 });
+    expect(buildingAt(world, { x: 40, y: 40 }).assetId).toMatch(/^building\.samurai_residence(\.v[2-3])?$/);
+  });
+
+  it("is deterministic for the same coordinate across worlds", () => {
+    const first = freshWorld();
+    const second = freshWorld();
+    for (const position of [{ x: 40, y: 40 }, { x: 48, y: 40 }, { x: 40, y: 48 }, { x: 64, y: 64 }]) {
+      place(first, "samurai_residence", position);
+      place(second, "samurai_residence", position);
+      expect(buildingAt(first, position).assetId).toBe(buildingAt(second, position).assetId);
+    }
+  });
+
+  it("varies along a row of compounds", () => {
+    const world = freshWorld();
+    const positions = [24, 32, 40, 48, 56, 64].map((x) => ({ x, y: 40 }));
+    for (const position of positions) {
+      place(world, "samurai_residence", position);
+    }
+    const ids = new Set(positions.map((position) => buildingAt(world, position).assetId));
+    expect(ids.size).toBeGreaterThanOrEqual(2);
+  });
+
+  it("never repeats a variant on orthogonally adjacent compounds (8-cell pitch)", () => {
+    for (let x = 0; x < 160; x += 8) {
+      for (let y = 0; y < 160; y += 8) {
+        const here = samuraiResidenceVariantAssetId({ x, y });
+        expect(samuraiResidenceVariantAssetId({ x: x + 8, y })).not.toBe(here);
+        expect(samuraiResidenceVariantAssetId({ x, y: y + 8 })).not.toBe(here);
+      }
+    }
   });
 });
 

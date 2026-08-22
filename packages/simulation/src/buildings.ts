@@ -432,6 +432,10 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
     return townBlockVariantAssetId(building.position);
   }
 
+  if (building.type === "samurai_residence") {
+    return samuraiResidenceVariantAssetId(building.position);
+  }
+
   if (building.type === "machiya" || building.type === "machiya_ne_sw") {
     return machiyaVariantAssetId(building.type, building.position);
   }
@@ -520,6 +524,31 @@ export function machiyaVariantAssetId(type: "machiya" | "machiya_ne_sw", positio
   const variant = ((((position.x + 2 * position.y + h) % MACHIYA_VARIANT_COUNT) + MACHIYA_VARIANT_COUNT) % MACHIYA_VARIANT_COUNT) + 1;
   const orientation = type === "machiya_ne_sw" ? "ne_sw" : "nw_se";
   return `building.machiya.${orientation}.v${variant}`;
+}
+
+/**
+ * Samurai residences are placed as rows of identical 4x4 compounds on an
+ * 8-cell pitch (the p07 patrol view showed six copies in one frame), so the
+ * single raster gets two tone-family siblings (v2 warm, v3 cool-mossy).
+ * Position-cycled like machiya, not hashed: x/8 mod 3 cycles along a row, so
+ * a horizontal run never shows the same compound twice — a pure hash left
+ * identical pairs adjacent in the p07 review. Each row's phase advances by a
+ * hash-picked step of 1 or 2 (never 3 ≡ 0), so vertical neighbors always
+ * differ too and no two adjacent rows repeat the same sequence.
+ */
+export const SAMURAI_RESIDENCE_VARIANT_COUNT = 3;
+
+export function samuraiResidenceVariantAssetId(position: CellCoord): string {
+  const row = Math.floor(position.y / 8);
+  let phase = 0;
+  for (let r = 1; r <= row; r += 1) {
+    let h = (r * 668265263 + 331817) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    phase += 1 + (h & 1);
+  }
+  const cycle = Math.floor(position.x / 8) + phase;
+  const variant = ((cycle % SAMURAI_RESIDENCE_VARIANT_COUNT) + SAMURAI_RESIDENCE_VARIANT_COUNT) % SAMURAI_RESIDENCE_VARIANT_COUNT;
+  return variant === 0 ? "building.samurai_residence" : `building.samurai_residence.v${variant + 1}`;
 }
 
 export const TOWN_BLOCK_VARIANT_COUNT = 5;
