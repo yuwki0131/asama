@@ -14,8 +14,8 @@ export interface AsamaTestBridge {
   /** Returns the absolute screen position of a cell center in px
    *  (elevation lift included). */
   cellToScreenPoint(cell: { x: number; y: number }): { x: number; y: number } | null;
-  /** Centers the camera on a cell (zoom reset to 1). */
-  jumpCameraToCell(cell: { x: number; y: number }): void;
+  /** Centers the camera on a cell (zoom snapped to nearest step, default 1). */
+  jumpCameraToCell(cell: { x: number; y: number }, zoom?: number): void;
   /** Returns the measured average fps over the last second of render frames. */
   getFps(): number;
   /**

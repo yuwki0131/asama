@@ -21,7 +21,8 @@ export type ArtLintRuleId =
   | "NOISE-02"
   | "NOISE-03"
   | "NOISE-04"
-  | "LUM-01";
+  | "LUM-01"
+  | "VAR-01";
 
 export interface ArtLintViolation {
   readonly assetId: string;
@@ -533,5 +534,63 @@ export function checkMeanLuma(assetId: string, image: RawImage, minLuma = 48): A
     measured: `opaque-mean luma=${mean.toFixed(1)} (${count}px)`,
     threshold: `>=${minLuma}`,
     message: "不透過平均輝度の下限違反(未照明シルエット化の防止)"
+  };
+}
+
+/** `<base>.p1` / `<base>.v2` style variant ids → base id, else null. */
+const VARIANT_SUFFIX_RE = /^(.*)\.(?:p\d+|v\d+)$/;
+
+export function variantBaseId(assetId: string): string | null {
+  const match = VARIANT_SUFFIX_RE.exec(assetId);
+  return match === null ? null : (match[1] ?? null);
+}
+
+/**
+ * VAR-01: effective pixel difference floor for variant pools. Composite-lint
+ * REP only sees assetId runs, so a pool whose members are pixel-near-identical
+ * (the moat/river p1–p3 incident: meanAbsDiff ~8–13 while genuinely distinct
+ * pools like town_block sit at 99+) silently defeats the anti-repetition
+ * variant machinery and reads as wallpaper at map scale. meanAbsDiff sums the
+ * three channel deltas over mutually-opaque pixels; sub-visible legacy pairs
+ * live in the art-lint baseline, not in a rule exemption.
+ */
+export function checkVariantDiff(
+  baseAssetId: string,
+  variantAssetId: string,
+  base: RawImage,
+  variant: RawImage,
+  minDiff = 12
+): ArtLintViolation | null {
+  if (base.width !== variant.width || base.height !== variant.height) {
+    return null;
+  }
+  const baseData = base.data;
+  const variantData = variant.data;
+  let sum = 0;
+  let count = 0;
+  for (let p = 0; p < base.width * base.height; p += 1) {
+    const i = p * 4;
+    if ((baseData[i + 3] ?? 0) < OPAQUE_ALPHA || (variantData[i + 3] ?? 0) < OPAQUE_ALPHA) {
+      continue;
+    }
+    sum +=
+      Math.abs((baseData[i] ?? 0) - (variantData[i] ?? 0)) +
+      Math.abs((baseData[i + 1] ?? 0) - (variantData[i + 1] ?? 0)) +
+      Math.abs((baseData[i + 2] ?? 0) - (variantData[i + 2] ?? 0));
+    count += 1;
+  }
+  if (count === 0) {
+    return null;
+  }
+  const mean = sum / count;
+  if (mean >= minDiff) {
+    return null;
+  }
+  return {
+    assetId: variantAssetId,
+    ruleId: "VAR-01",
+    measured: `meanAbsDiff=${mean.toFixed(1)} vs ${baseAssetId} (${count}px)`,
+    threshold: `>=${minDiff}`,
+    message: "バリアント実効画素差分の下限違反(実質同一バリアントによる反復感防止)"
   };
 }

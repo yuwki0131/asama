@@ -23,6 +23,10 @@
       "ruleId": "LUM-01"
     },
     {
+      "assetId": "building.dry_moat.connected.1110",
+      "ruleId": "LUM-01"
+    },
+    {
       "assetId": "building.dry_moat.diagonal.nesw",
       "ruleId": "LUM-01"
     },
@@ -45,6 +49,190 @@
     {
       "assetId": "building.gate.wood.closed.ne_sw.width3.connected.1000",
       "ruleId": "LUM-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0000.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0000.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0001.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0001.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0010.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0011.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0100.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.0101.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.1000.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.1000.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.1001.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.1010.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.dirt.connected.1100.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.grass.connected.0001.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.grass.connected.1000.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.0010.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.0011.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.0101.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.0110.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.0111.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.0111.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1001.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1010.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1011.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1011.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1100.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1101.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1101.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1110.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.connected.1110.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.es.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.es.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.es.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.ne.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.sw.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.inner.wn.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.ne.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.ne.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.sw.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.sw.v2",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.wn.v1",
+      "ruleId": "VAR-01"
+    },
+    {
+      "assetId": "terrain.water.transition.wn.v2",
+      "ruleId": "VAR-01"
     }
   ]
 }

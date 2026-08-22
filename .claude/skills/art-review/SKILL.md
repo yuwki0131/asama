@@ -65,6 +65,12 @@ node apps/game/qa/shot.mjs --preset <ishigaki|tenshu|farm|gate>
 
 ルール追加までがサイクルのクローズ条件。
 
+## 定期知覚検査(visual-patrolスキル)
+
+L1/L1.5/L2は「既知の測り方」のゲート。まだ測り方を知らない違和感は **visual-patrol** スキル
+(ランダムビュー撮影→別コンテキストVLM抽出→`docs/05_map-and-art/visual-patrol-ledger.md` 台帳化→
+修正→同一seed再パトロール)で拾い、理解できた時点でここ(L1 lint / composite-lint / rulebook)に昇格させる。
+
 ## 適用範囲
 
 - 対象: `public/assets/generated/` に入るPNG、manifest、Blender/rasterパイプライン、レンダラーの見た目に効く変更
