@@ -14,6 +14,7 @@ import {
   type ElevationMapLike,
   type CliffFace
 } from "./elevation";
+import { PRE_GRADE_BACKGROUND_RGB } from "./toneGrade";
 
 // Underlay diamonds have exact tile footprint — no padding — to avoid
 // sub-pixel overlap between the single global underlay Graphics and the
@@ -50,8 +51,18 @@ interface TerrainChunkBounds {
 // smooth fade must come from one gradient, not per-cell opacity.
 const SKIRT_RING_CELLS = 12;
 
-/** Renderer clear color (GameCanvas app background) the skirt fades into. */
-const SKIRT_FADE_COLOR = { r: 28, g: 34, b: 39 };
+// V-11: the fade must reach full opacity BEFORE the skirt's outer edge and the
+// overlay must extend BEYOND it. The outermost tile row's anti-aliased rim and
+// the overlay's own AA edge otherwise coincide on one line, leaving a bright
+// stitch against the void, and the not-yet-opaque last ring leaves a tonal
+// step at the cut.
+const SKIRT_FADE_OPAQUE_TAIL_CELLS = 2;
+const SKIRT_FADE_OVERSCAN_CELLS = 2;
+const SKIRT_FADE_TOTAL_CELLS = SKIRT_RING_CELLS + SKIRT_FADE_OVERSCAN_CELLS;
+
+// The overlay lives inside the tone-graded world, the background does not —
+// the fade must use the pre-grade color that grades onto the clear color.
+const SKIRT_FADE_COLOR = PRE_GRADE_BACKGROUND_RGB;
 
 /** Mirrors the sim's world-anchored macro field (map.ts connectedTerrainAssetId)
  *  so skirt tiles continue the interior macro pattern seamlessly across the rim. */
@@ -66,6 +77,8 @@ function macroAssetId(terrain: string, x: number, y: number): string {
 }
 
 // Smooth fade curve for the skirt gradients (offset → alpha, smoothstep-ish).
+// Offsets are normalized to the fade span (rim → opaque tail start); the
+// texture rescales them so alpha holds at 1 through the tail and overscan.
 const SKIRT_FADE_STOPS: readonly [number, number][] = [
   [0, 0],
   [0.25, 0.16],
@@ -73,6 +86,9 @@ const SKIRT_FADE_STOPS: readonly [number, number][] = [
   [0.75, 0.84],
   [1, 1]
 ];
+
+const SKIRT_FADE_SPAN_RATIO =
+  (SKIRT_RING_CELLS - SKIRT_FADE_OPAQUE_TAIL_CELLS) / SKIRT_FADE_TOTAL_CELLS;
 
 const SKIRT_FADE_TEXTURE_SIZE = 256;
 
@@ -91,8 +107,9 @@ function makeSkirtFadeTexture(radial: boolean): Texture {
     : context.createLinearGradient(0, 0, size, 0);
   const { r, g, b } = SKIRT_FADE_COLOR;
   for (const [offset, alpha] of SKIRT_FADE_STOPS) {
-    gradient.addColorStop(offset, `rgba(${r},${g},${b},${alpha})`);
+    gradient.addColorStop(offset * SKIRT_FADE_SPAN_RATIO, `rgba(${r},${g},${b},${alpha})`);
   }
+  gradient.addColorStop(1, `rgba(${r},${g},${b},1)`);
   context.fillStyle = gradient;
   context.fillRect(0, 0, canvas.width, canvas.height);
   return Texture.from(canvas);
@@ -111,7 +128,7 @@ function makeSkirtFadeTexture(radial: boolean): Texture {
  * square's far tip.
  */
 function buildSkirtFadeOverlay(width: number, height: number): Container {
-  const m = SKIRT_RING_CELLS;
+  const m = SKIRT_FADE_TOTAL_CELLS;
   const gp = (fx: number, fy: number): { x: number; y: number } => ({
     x: (fx - fy) * (TILE_WIDTH / 2),
     y: (fx + fy) * (TILE_HEIGHT / 2)

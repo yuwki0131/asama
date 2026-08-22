@@ -16,6 +16,10 @@
 //         over the perimeter skirt, not end in a razor cut (patrol V-02).
 //         Measured on dedicated edge views (composite-views.json edgeViews) in
 //         NORMAL render mode — chroma keying would key out the fade itself.
+//         (EDGE-02) skirt-band discontinuity: within the outer skirt band the
+//         luma along each outward ray must change smoothly — a bright stitch
+//         line (uncovered tile AA at the fade-overlay boundary) or a tonal
+//         step against the void reads as a hard seam (patrol V-11).
 //
 // Usage:
 //   node qa/composite-lint.mjs --scenario ogaki-castle [--views first,center]
@@ -78,6 +82,11 @@ const EDGE_DIFF_DELTA = 10; // max-channel shown-vs-hidden diff ⇒ terrain cont
 const EDGE_RAY_OFFSETS = [-96, -48, 0, 48, 96]; // perpendicular ray spread (px)
 const EDGE_STEP_PX = 2;
 const EDGE_FAR_CELLS = 15; // rays sample slightly past the 12-ring skirt
+// EDGE-02: in the outer skirt band the fade is ≥84% opaque, so residual
+// terrain variation stays under ~10 luma — any larger jump across a 4px
+// window is a stitch line or a step against the void.
+const EDGE_STITCH_BAND_CELLS = [8, 15]; // outward band checked (cells from rim)
+const EDGE_STITCH_MAX_JUMP = 14; // max luma change across 4px inside the band
 
 function parseArgs(argv) {
   const options = {
@@ -529,16 +538,56 @@ async function checkEdgeFade(page, ctx, view, outPrefix) {
     }
     fades.push(extent * EDGE_STEP_PX);
   }
+  // EDGE-02 — scan every ray's SHOWN luma for discontinuities in the outer
+  // skirt band, independent of the diff-based fade measurement above.
+  const lumaAt = (x, y) => {
+    const o = (Math.round(y) * width + Math.round(x)) * 4;
+    return 0.299 * shown.data[o] + 0.587 * shown.data[o + 1] + 0.114 * shown.data[o + 2];
+  };
+  let worstJump = 0;
+  let worstJumpAt = null;
+  for (const off of EDGE_RAY_OFFSETS) {
+    const ox = geom.rim.x + perpX * off;
+    const oy = geom.rim.y + perpY * off;
+    const t0 = cellStepPx * EDGE_STITCH_BAND_CELLS[0];
+    const t1 = cellStepPx * EDGE_STITCH_BAND_CELLS[1];
+    for (let t = t0; t + 4 <= t1; t += EDGE_STEP_PX) {
+      const ax = ox + ux * t;
+      const ay = oy + uy * t;
+      const bx = ox + ux * (t + 4);
+      const by = oy + uy * (t + 4);
+      if (!inCanvas(ax, ay) || !inCanvas(bx, by) || excluded(ax, ay) || excluded(bx, by)) continue;
+      const jump = Math.abs(lumaAt(bx, by) - lumaAt(ax, ay));
+      if (jump > worstJump) {
+        worstJump = jump;
+        worstJumpAt = { ray: off, cells: Number((t / cellStepPx).toFixed(1)) };
+      }
+    }
+  }
+  const findings = [];
+  if (worstJump > EDGE_STITCH_MAX_JUMP) {
+    findings.push({
+      check: "EDGE",
+      severity: "error",
+      kind: "stitch",
+      jump: Math.round(worstJump),
+      maxJump: EDGE_STITCH_MAX_JUMP,
+      at: worstJumpAt
+    });
+  }
+
   if (fades.length === 0) {
     return {
       fadePx: null,
-      findings: [{ check: "EDGE", severity: "info", kind: "inconclusive", detail: "no ray with terrain contribution at the rim" }]
+      findings: [
+        ...findings,
+        { check: "EDGE", severity: "info", kind: "inconclusive", detail: "no ray with terrain contribution at the rim" }
+      ]
     };
   }
   fades.sort((a, b) => a - b);
   const median = fades[Math.floor(fades.length / 2)];
   const minFade = Math.round(EDGE_MIN_FADE_PX * (view.zoom ?? 1));
-  const findings = [];
   if (median < minFade) {
     findings.push({ check: "EDGE", severity: "error", kind: "razor-edge", fadePx: median, minFadePx: minFade, rays: fades });
   }
@@ -625,7 +674,11 @@ for (const view of report.views) {
     if (f.check === "EDGE") {
       console.log(
         `[${f.severity}] ${view.name} EDGE/${f.kind}` +
-          (f.kind === "razor-edge" ? ` fade=${f.fadePx}px (min ${f.minFadePx}px, rays ${f.rays.join("/")})` : ` ${f.detail}`)
+          (f.kind === "razor-edge"
+            ? ` fade=${f.fadePx}px (min ${f.minFadePx}px, rays ${f.rays.join("/")})`
+            : f.kind === "stitch"
+              ? ` jump=${f.jump} (max ${f.maxJump}) at ray ${f.at.ray}, ${f.at.cells} cells out`
+              : ` ${f.detail}`)
       );
       continue;
     }

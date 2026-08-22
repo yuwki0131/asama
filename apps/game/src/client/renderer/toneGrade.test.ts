@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   AERIAL_FADE_END_RATIO,
   AERIAL_TOP_ALPHA,
+  BACKGROUND_RGB,
+  PRE_GRADE_BACKGROUND_RGB,
   TONE_MATRIX_C,
   aerialAlphaAt,
   applyToneGrade,
@@ -39,6 +41,15 @@ describe("toneGrade grade C matrix", () => {
       expect(Math.abs(actual.b - probe.expected.b)).toBeLessThanOrEqual(1);
     });
   }
+});
+
+describe("PRE_GRADE_BACKGROUND_RGB", () => {
+  it("grades onto the renderer clear color (V-11 skirt fade must match the void)", () => {
+    const graded = applyToneGrade(PRE_GRADE_BACKGROUND_RGB);
+    expect(Math.abs(graded.r - BACKGROUND_RGB.r)).toBeLessThanOrEqual(1);
+    expect(Math.abs(graded.g - BACKGROUND_RGB.g)).toBeLessThanOrEqual(1);
+    expect(Math.abs(graded.b - BACKGROUND_RGB.b)).toBeLessThanOrEqual(1);
+  });
 });
 
 describe("aerialAlphaAt", () => {
