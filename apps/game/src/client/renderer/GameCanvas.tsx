@@ -37,7 +37,7 @@ export type ToolMode =
   | null;
 
 export interface GameCanvasHandle {
-  jumpCameraToCell: (cell: CellCoord) => void;
+  jumpCameraToCell: (cell: CellCoord, zoom?: number) => void;
   /** DEV-only: returns absolute screen position {x,y} of a cell center. */
   cellToScreenPoint: (cell: CellCoord) => { x: number; y: number } | null;
   /** DEV-only: measured average fps over the last second of render frames. */
@@ -274,10 +274,10 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   }, [onRemoveSlope]);
 
   useImperativeHandle(ref, () => ({
-    jumpCameraToCell: (cell: CellCoord) => {
+    jumpCameraToCell: (cell: CellCoord, zoom?: number) => {
       const host = hostRef.current;
       if (host !== null) {
-        centerCameraOnCell(cell, host, cameraRef.current);
+        centerCameraOnCell(cell, host, cameraRef.current, zoom ?? 1);
         scheduleCameraRender();
       }
     },

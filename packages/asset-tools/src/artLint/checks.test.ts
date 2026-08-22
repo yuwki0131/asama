@@ -8,7 +8,9 @@ import {
   checkMeanLuma,
   checkSpeckles,
   checkTerrainFaceGeometry,
+  checkVariantDiff,
   terrainFaceSide,
+  variantBaseId,
   type RawImage
 } from "./checks";
 
@@ -398,5 +400,49 @@ describe("LUM-01 checkMeanLuma", () => {
   it("passes a fully transparent image", () => {
     const image = makeImage(8, 8);
     expect(checkMeanLuma("building.test", image)).toBeNull();
+  });
+});
+
+describe("VAR-01 checkVariantDiff", () => {
+  it("resolves variant base ids", () => {
+    expect(variantBaseId("building.water_moat.ew.p1")).toBe("building.water_moat.ew");
+    expect(variantBaseId("terrain.water.v2")).toBe("terrain.water");
+    expect(variantBaseId("building.water_moat.ew")).toBeNull();
+    expect(variantBaseId("building.gate.width2")).toBeNull();
+  });
+
+  it("flags a pixel-near-identical variant (moat phase incident case)", () => {
+    const base = makeImage(16, 16);
+    fillRect(base, 0, 0, 15, 15, WOOD);
+    const variant = makeImage(16, 16);
+    fillRect(variant, 0, 0, 15, 15, [152, 111, 71, 255]); // meanAbsDiff = 4
+    const violation = checkVariantDiff("building.water_moat.ew", "building.water_moat.ew.p1", base, variant);
+    expect(violation?.ruleId).toBe("VAR-01");
+    expect(violation?.assetId).toBe("building.water_moat.ew.p1");
+    expect(violation?.threshold).toBe(">=12");
+  });
+
+  it("passes a genuinely distinct variant", () => {
+    const base = makeImage(16, 16);
+    fillRect(base, 0, 0, 15, 15, WOOD);
+    const variant = makeImage(16, 16);
+    fillRect(variant, 0, 0, 15, 15, [110, 140, 90, 255]); // meanAbsDiff = 90
+    expect(checkVariantDiff("base", "base.v1", base, variant)).toBeNull();
+  });
+
+  it("only compares mutually-opaque pixels", () => {
+    const base = makeImage(16, 16);
+    fillRect(base, 0, 0, 15, 15, WOOD);
+    const variant = makeImage(16, 16);
+    fillRect(variant, 0, 0, 7, 15, [30, 60, 120, 255]); // distinct where both opaque
+    // right half of variant transparent: identical-vs-transparent must not count
+    expect(checkVariantDiff("base", "base.p1", base, variant)).toBeNull();
+  });
+
+  it("skips mismatched canvas sizes and empty overlap", () => {
+    const base = makeImage(16, 16);
+    fillRect(base, 0, 0, 15, 15, WOOD);
+    expect(checkVariantDiff("base", "base.p1", base, makeImage(8, 8))).toBeNull();
+    expect(checkVariantDiff("base", "base.p1", base, makeImage(16, 16))).toBeNull();
   });
 });

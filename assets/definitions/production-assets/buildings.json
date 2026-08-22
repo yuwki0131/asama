@@ -1004,7 +1004,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -1031,7 +1032,8 @@
         "type": "blender",
         "model": "water-moat-connected-1010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2430,7 +2432,8 @@
         "type": "blender",
         "model": "dry-moat-diagonal-nwse",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2457,7 +2460,8 @@
         "type": "blender",
         "model": "dry-moat-diagonal-nesw",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2484,7 +2488,8 @@
         "type": "blender",
         "model": "water-moat-diagonal-nwse",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2511,7 +2516,8 @@
         "type": "blender",
         "model": "water-moat-diagonal-nesw",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2781,7 +2787,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0000",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2808,7 +2815,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0001",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2835,7 +2843,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2862,7 +2871,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0011",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2889,7 +2899,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0100",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2916,7 +2927,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0101",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2943,7 +2955,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0110",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2970,7 +2983,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0111",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -2997,7 +3011,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1000",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3024,7 +3039,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1001",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3051,7 +3067,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3078,7 +3095,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1011",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3105,7 +3123,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1100",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3132,7 +3151,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1101",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3159,7 +3179,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1110",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3186,7 +3207,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1111",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3213,7 +3235,8 @@
         "type": "blender",
         "model": "water-moat-connected-0000",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3240,7 +3263,8 @@
         "type": "blender",
         "model": "water-moat-connected-0001",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3267,7 +3291,8 @@
         "type": "blender",
         "model": "water-moat-connected-0010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3294,7 +3319,8 @@
         "type": "blender",
         "model": "water-moat-connected-0011",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3321,7 +3347,8 @@
         "type": "blender",
         "model": "water-moat-connected-0100",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3348,7 +3375,8 @@
         "type": "blender",
         "model": "water-moat-connected-0101",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3375,7 +3403,8 @@
         "type": "blender",
         "model": "water-moat-connected-0110",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3402,7 +3431,8 @@
         "type": "blender",
         "model": "water-moat-connected-0111",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3429,7 +3459,8 @@
         "type": "blender",
         "model": "water-moat-connected-1000",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3456,7 +3487,8 @@
         "type": "blender",
         "model": "water-moat-connected-1001",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3483,7 +3515,8 @@
         "type": "blender",
         "model": "water-moat-connected-1010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3510,7 +3543,8 @@
         "type": "blender",
         "model": "water-moat-connected-1011",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3537,7 +3571,8 @@
         "type": "blender",
         "model": "water-moat-connected-1100",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3564,7 +3599,8 @@
         "type": "blender",
         "model": "water-moat-connected-1101",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3591,7 +3627,8 @@
         "type": "blender",
         "model": "water-moat-connected-1110",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3618,7 +3655,8 @@
         "type": "blender",
         "model": "water-moat-connected-1111",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5832,7 +5870,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0101-p1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5856,7 +5895,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0101-p2",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5880,7 +5920,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0101-p3",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5904,7 +5945,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1010-p1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5928,7 +5970,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1010-p2",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5952,7 +5995,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1010-p3",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -5976,7 +6020,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0000-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6000,7 +6045,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0001-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6024,7 +6070,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0010-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6048,7 +6095,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0011-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6072,7 +6120,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0100-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6096,7 +6145,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0110-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6120,7 +6170,8 @@
         "type": "blender",
         "model": "dry-moat-connected-0111-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6144,7 +6195,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1000-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6168,7 +6220,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1001-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6192,7 +6245,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1011-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6216,7 +6270,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1100-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6240,7 +6295,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1101-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6264,7 +6320,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1110-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6288,7 +6345,8 @@
         "type": "blender",
         "model": "dry-moat-connected-1111-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6312,7 +6370,8 @@
         "type": "blender",
         "model": "water-moat-connected-0101-p1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6336,7 +6395,8 @@
         "type": "blender",
         "model": "water-moat-connected-0101-p2",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6360,7 +6420,8 @@
         "type": "blender",
         "model": "water-moat-connected-0101-p3",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6384,7 +6445,8 @@
         "type": "blender",
         "model": "water-moat-connected-1010-p1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6408,7 +6470,8 @@
         "type": "blender",
         "model": "water-moat-connected-1010-p2",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6432,7 +6495,8 @@
         "type": "blender",
         "model": "water-moat-connected-1010-p3",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6456,7 +6520,8 @@
         "type": "blender",
         "model": "water-moat-connected-0000-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6480,7 +6545,8 @@
         "type": "blender",
         "model": "water-moat-connected-0001-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6504,7 +6570,8 @@
         "type": "blender",
         "model": "water-moat-connected-0010-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6528,7 +6595,8 @@
         "type": "blender",
         "model": "water-moat-connected-0011-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6552,7 +6620,8 @@
         "type": "blender",
         "model": "water-moat-connected-0100-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6576,7 +6645,8 @@
         "type": "blender",
         "model": "water-moat-connected-0110-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6600,7 +6670,8 @@
         "type": "blender",
         "model": "water-moat-connected-0111-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6624,7 +6695,8 @@
         "type": "blender",
         "model": "water-moat-connected-1000-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6648,7 +6720,8 @@
         "type": "blender",
         "model": "water-moat-connected-1001-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6672,7 +6745,8 @@
         "type": "blender",
         "model": "water-moat-connected-1011-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6696,7 +6770,8 @@
         "type": "blender",
         "model": "water-moat-connected-1100-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6720,7 +6795,8 @@
         "type": "blender",
         "model": "water-moat-connected-1101-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6744,7 +6820,8 @@
         "type": "blender",
         "model": "water-moat-connected-1110-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -6768,7 +6845,8 @@
         "type": "blender",
         "model": "water-moat-connected-1111-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7116,7 +7194,8 @@
         "type": "blender",
         "model": "river-connected-1010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7143,7 +7222,8 @@
         "type": "blender",
         "model": "river-diagonal-nwse",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7170,7 +7250,8 @@
         "type": "blender",
         "model": "river-diagonal-nesw",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7197,7 +7278,8 @@
         "type": "blender",
         "model": "river-connected-0000",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7224,7 +7306,8 @@
         "type": "blender",
         "model": "river-connected-0001",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7251,7 +7334,8 @@
         "type": "blender",
         "model": "river-connected-0010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7278,7 +7362,8 @@
         "type": "blender",
         "model": "river-connected-0011",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7305,7 +7390,8 @@
         "type": "blender",
         "model": "river-connected-0100",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7332,7 +7418,8 @@
         "type": "blender",
         "model": "river-connected-0101",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7359,7 +7446,8 @@
         "type": "blender",
         "model": "river-connected-0110",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7386,7 +7474,8 @@
         "type": "blender",
         "model": "river-connected-0111",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7413,7 +7502,8 @@
         "type": "blender",
         "model": "river-connected-1000",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7440,7 +7530,8 @@
         "type": "blender",
         "model": "river-connected-1001",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7467,7 +7558,8 @@
         "type": "blender",
         "model": "river-connected-1010",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7494,7 +7586,8 @@
         "type": "blender",
         "model": "river-connected-1011",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7521,7 +7614,8 @@
         "type": "blender",
         "model": "river-connected-1100",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7548,7 +7642,8 @@
         "type": "blender",
         "model": "river-connected-1101",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7575,7 +7670,8 @@
         "type": "blender",
         "model": "river-connected-1110",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7602,7 +7698,8 @@
         "type": "blender",
         "model": "river-connected-1111",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7629,7 +7726,8 @@
         "type": "blender",
         "model": "river-connected-0101-p1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7653,7 +7751,8 @@
         "type": "blender",
         "model": "river-connected-0101-p2",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7677,7 +7776,8 @@
         "type": "blender",
         "model": "river-connected-0101-p3",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7701,7 +7801,8 @@
         "type": "blender",
         "model": "river-connected-1010-p1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7725,7 +7826,8 @@
         "type": "blender",
         "model": "river-connected-1010-p2",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7749,7 +7851,8 @@
         "type": "blender",
         "model": "river-connected-1010-p3",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7773,7 +7876,8 @@
         "type": "blender",
         "model": "river-connected-0000-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7797,7 +7901,8 @@
         "type": "blender",
         "model": "river-connected-0001-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7821,7 +7926,8 @@
         "type": "blender",
         "model": "river-connected-0010-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7845,7 +7951,8 @@
         "type": "blender",
         "model": "river-connected-0011-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7869,7 +7976,8 @@
         "type": "blender",
         "model": "river-connected-0100-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7893,7 +8001,8 @@
         "type": "blender",
         "model": "river-connected-0110-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7917,7 +8026,8 @@
         "type": "blender",
         "model": "river-connected-0111-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7941,7 +8051,8 @@
         "type": "blender",
         "model": "river-connected-1000-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7965,7 +8076,8 @@
         "type": "blender",
         "model": "river-connected-1001-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -7989,7 +8101,8 @@
         "type": "blender",
         "model": "river-connected-1011-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -8013,7 +8126,8 @@
         "type": "blender",
         "model": "river-connected-1100-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -8037,7 +8151,8 @@
         "type": "blender",
         "model": "river-connected-1101-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -8061,7 +8176,8 @@
         "type": "blender",
         "model": "river-connected-1110-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -8085,7 +8201,8 @@
         "type": "blender",
         "model": "river-connected-1111-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trench"
       },
       "geometry": {
         "footprintWidth": 1,

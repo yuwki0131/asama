@@ -82,11 +82,11 @@ export function worldToScreen(point: CellCoord, camera: CameraState): CellCoord 
   };
 }
 
-export function centerCameraOnCell(cell: CellCoord, host: HTMLElement, camera: CameraState): void {
+export function centerCameraOnCell(cell: CellCoord, host: HTMLElement, camera: CameraState, zoom = 1): void {
   const world = cellToWorld(cell);
-  camera.zoom = 1;
-  camera.x = host.clientWidth / 2 - world.x;
-  camera.y = host.clientHeight / 2 - world.y;
+  camera.zoom = nearestZoomStep(zoom);
+  camera.x = host.clientWidth / 2 - world.x * camera.zoom;
+  camera.y = host.clientHeight / 2 - world.y * camera.zoom;
 }
 
 export function isVisibleCell(cell: CellCoord, camera: CameraState, width: number, height: number): boolean {

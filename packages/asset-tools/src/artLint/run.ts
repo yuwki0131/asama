@@ -12,7 +12,9 @@ import {
   checkMeanLuma,
   checkSpeckles,
   checkTerrainFaceGeometry,
+  checkVariantDiff,
   terrainFaceSide,
+  variantBaseId,
   type ArtLintViolation,
   type RawImage
 } from "./checks";
@@ -121,6 +123,30 @@ export async function collectArtLintViolations(): Promise<{
       const lum01 = checkMeanLuma(asset.assetId, image);
       if (lum01 !== null) {
         violations.push(lum01);
+      }
+    }
+  }
+
+  const fileById = new Map(manifest.assets.map((asset) => [asset.assetId, asset.file]));
+  const pools = new Map<string, string[]>();
+  for (const asset of manifest.assets) {
+    const baseId = variantBaseId(asset.assetId);
+    if (baseId !== null && fileById.has(baseId)) {
+      const members = pools.get(baseId);
+      if (members === undefined) {
+        pools.set(baseId, [asset.assetId]);
+      } else {
+        members.push(asset.assetId);
+      }
+    }
+  }
+  for (const [baseId, variantIds] of pools) {
+    const baseImage = await loadRaw(join(publicAssetsDir, fileById.get(baseId) ?? ""));
+    for (const variantId of variantIds) {
+      const variantImage = await loadRaw(join(publicAssetsDir, fileById.get(variantId) ?? ""));
+      const var01 = checkVariantDiff(baseId, variantId, baseImage, variantImage);
+      if (var01 !== null) {
+        violations.push(var01);
       }
     }
   }

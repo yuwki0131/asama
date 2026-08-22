@@ -116,8 +116,8 @@ export function App() {
         }),
       getBuildTool: () => buildToolRef.current,
       cellToScreenPoint: (cell) => gameCanvasRef.current?.cellToScreenPoint(cell) ?? null,
-      jumpCameraToCell: (cell) => {
-        gameCanvasRef.current?.jumpCameraToCell(cell);
+      jumpCameraToCell: (cell, zoom) => {
+        gameCanvasRef.current?.jumpCameraToCell(cell, zoom);
       },
       getFps: () => gameCanvasRef.current?.getFps() ?? 0,
       setTone: (enabled) => {
