@@ -38,7 +38,10 @@ function parseArgs(argv) {
     zooms: [0.5, 0.75, 1, 1.5],
     baseUrl: "http://127.0.0.1:5196",
     outDir: join(REPO_ROOT, "artifacts/visual-patrol"),
-    settleMs: 12000
+    settleMs: 12000,
+    /** Fixed views ("x,y@zoom;..."): targeted shots (map edges, terraces)
+     *  instead of building-biased random sampling. */
+    cells: null
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -54,9 +57,15 @@ function parseArgs(argv) {
     else if (arg === "--base-url") options.baseUrl = next().replace(/\/$/, "");
     else if (arg === "--out-dir") options.outDir = resolve(next());
     else if (arg === "--settle") options.settleMs = Number(next());
+    else if (arg === "--cells")
+      options.cells = next().split(";").map((spec) => {
+        const [xy, zoom = "1"] = spec.split("@");
+        const [x, y] = xy.split(",").map(Number);
+        return { cell: { x, y }, zoom: Number(zoom) };
+      });
     else if (arg === "--help" || arg === "-h") {
       console.log(
-        "Usage: node qa/visual-patrol.mjs --scenario <name> [--count n] [--seed n] [--zooms a,b] [--base-url url] [--out-dir dir] [--settle ms]"
+        "Usage: node qa/visual-patrol.mjs --scenario <name> [--count n] [--seed n] [--zooms a,b] [--cells x,y@zoom;...] [--base-url url] [--out-dir dir] [--settle ms]"
       );
       process.exit(0);
     } else throw new Error(`Unknown argument: ${arg}`);
@@ -109,10 +118,15 @@ async function main() {
   // Sample view centers from building positions (built-area bias); reject
   // centers closer than minDist cells to an already-picked view at the same
   // zoom so one patrol spreads over the map instead of re-shooting one spot.
-  const views = [{ name: "first", cell: null, zoom: 1 }];
+  const views = options.cells !== null ? [] : [{ name: "first", cell: null, zoom: 1 }];
+  if (options.cells !== null) {
+    for (const { cell, zoom } of options.cells) {
+      views.push({ name: `c${String(views.length + 1).padStart(2, "0")}-${cell.x}x${cell.y}-z${zoom}`, cell, zoom });
+    }
+  }
   const picked = [];
   let attempts = 0;
-  while (views.length < options.count + 1 && attempts < options.count * 60) {
+  while (options.cells === null && views.length < options.count + 1 && attempts < options.count * 60) {
     attempts += 1;
     const cell = world.buildingCells[Math.floor(rng() * world.buildingCells.length)];
     const zoom = options.zooms[Math.floor(rng() * options.zooms.length)];

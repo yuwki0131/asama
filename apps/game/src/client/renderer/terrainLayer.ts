@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, Matrix, Sprite, Texture } from "pixi.js";
 import { MAX_ELEVATION } from "@asama/shared";
 import type { ElevationSkin, TerrainCellSnapshot, WorldSnapshot } from "@asama/shared";
 import { clearLayer, createSpriteFromCandidates, type LoadedAsset } from "./assets";
@@ -43,6 +43,157 @@ interface TerrainChunkBounds {
   readonly maxY: number;
 }
 
+// Perimeter skirt: rings of pseudo-cells beyond the map rim that continue the
+// nearest edge cell's terrain, overlaid with a background-colored gradient so
+// the world dissolves at its borders instead of ending in a razor cut (V-02).
+// Per-ring alpha stepping was tried first and read as terraced bands — the
+// smooth fade must come from one gradient, not per-cell opacity.
+const SKIRT_RING_CELLS = 12;
+
+/** Renderer clear color (GameCanvas app background) the skirt fades into. */
+const SKIRT_FADE_COLOR = { r: 28, g: 34, b: 39 };
+
+/** Mirrors the sim's world-anchored macro field (map.ts connectedTerrainAssetId)
+ *  so skirt tiles continue the interior macro pattern seamlessly across the rim. */
+function macroAssetId(terrain: string, x: number, y: number): string {
+  const bx = x >> 2;
+  const by = y >> 2;
+  let h = (bx * 374761393 + by * 668265263 + 1013904223) >>> 0;
+  h = (h ^ (h >>> 13)) >>> 0;
+  const mx = ((x % 4) + 4) % 4;
+  const my = ((y % 4) + 4) % 4;
+  return `terrain.${terrain}.macro.v${h % 2}.${mx}.${my}`;
+}
+
+// Smooth fade curve for the skirt gradients (offset → alpha, smoothstep-ish).
+const SKIRT_FADE_STOPS: readonly [number, number][] = [
+  [0, 0],
+  [0.25, 0.16],
+  [0.5, 0.5],
+  [0.75, 0.84],
+  [1, 1]
+];
+
+const SKIRT_FADE_TEXTURE_SIZE = 256;
+
+function makeSkirtFadeTexture(radial: boolean): Texture {
+  const size = SKIRT_FADE_TEXTURE_SIZE;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = radial ? size : 1;
+  const context = canvas.getContext("2d");
+  if (context === null) {
+    return Texture.WHITE;
+  }
+  // Radial: quarter circle centered on the canvas origin — the map corner.
+  const gradient = radial
+    ? context.createRadialGradient(0, 0, 0, 0, 0, size)
+    : context.createLinearGradient(0, 0, size, 0);
+  const { r, g, b } = SKIRT_FADE_COLOR;
+  for (const [offset, alpha] of SKIRT_FADE_STOPS) {
+    gradient.addColorStop(offset, `rgba(${r},${g},${b},${alpha})`);
+  }
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  return Texture.from(canvas);
+}
+
+/**
+ * Background-colored fade over the skirt band: 4 edge parallelograms + 4
+ * corner squares, each a sheared sprite of a canvas gradient texture
+ * (pixi's FillGradient mangles diagonal linear gradients in clamp mode and
+ * composites translucent radial stops over an opaque base, so the gradients
+ * are baked into textures and sheared into iso space instead).
+ *
+ * The gradients run in CELL space (linear in ring distance): along the shared
+ * edge/corner boundaries both fade at the same per-cell rate, so the pieces
+ * join continuously, and a corner circle of radius M cells fully covers its
+ * square's far tip.
+ */
+function buildSkirtFadeOverlay(width: number, height: number): Container {
+  const m = SKIRT_RING_CELLS;
+  const gp = (fx: number, fy: number): { x: number; y: number } => ({
+    x: (fx - fy) * (TILE_WIDTH / 2),
+    y: (fx + fy) * (TILE_HEIGHT / 2)
+  });
+  const overlay = new Container();
+  const linearTexture = makeSkirtFadeTexture(false);
+  const radialTexture = makeSkirtFadeTexture(true);
+
+  // U = texture x basis (fade/outward direction), V = texture y basis.
+  const place = (
+    texture: Texture,
+    origin: { x: number; y: number },
+    u: { x: number; y: number },
+    v: { x: number; y: number }
+  ): void => {
+    const sprite = new Sprite(texture);
+    const tw = texture.width;
+    const th = texture.height;
+    sprite.setFromMatrix(new Matrix(u.x / tw, u.y / tw, v.x / th, v.y / th, origin.x, origin.y));
+    overlay.addChild(sprite);
+  };
+  const delta = (from: { x: number; y: number }, to: { x: number; y: number }): { x: number; y: number } => ({
+    x: to.x - from.x,
+    y: to.y - from.y
+  });
+
+  const x0 = -0.5;
+  const x1 = width - 0.5;
+  const y0 = -0.5;
+  const y1 = height - 0.5;
+
+  // Edge bands (map-side extent only; corners are covered by the squares).
+  const bands: [[number, number], [number, number], [number, number]][] = [
+    [[x0, y0], [x0, y0 - m], [x1, y0]], // N: origin, outward fy-, along fx+
+    [[x0, y1], [x0, y1 + m], [x1, y1]], // S
+    [[x0, y0], [x0 - m, y0], [x0, y1]], // W
+    [[x1, y0], [x1 + m, y0], [x1, y1]] // E
+  ];
+  for (const [origin, outward, along] of bands) {
+    const o = gp(...origin);
+    place(linearTexture, o, delta(o, gp(...outward)), delta(o, gp(...along)));
+  }
+
+  const corners: [number, number, number, number][] = [
+    [x0, y0, -1, -1],
+    [x1, y0, 1, -1],
+    [x0, y1, -1, 1],
+    [x1, y1, 1, 1]
+  ];
+  for (const [cx, cy, dx, dy] of corners) {
+    const o = gp(cx, cy);
+    place(radialTexture, o, delta(o, gp(cx + dx * m, cy)), delta(o, gp(cx, cy + dy * m)));
+  }
+  return overlay;
+}
+
+function buildPerimeterSkirtCells(snapshot: WorldSnapshot): TerrainCellSnapshot[] {
+  const { width, height, cells } = snapshot.map;
+  const clamp = (v: number, max: number): number => Math.max(0, Math.min(max - 1, v));
+  const skirt: TerrainCellSnapshot[] = [];
+  for (let y = -SKIRT_RING_CELLS; y < height + SKIRT_RING_CELLS; y++) {
+    for (let x = -SKIRT_RING_CELLS; x < width + SKIRT_RING_CELLS; x++) {
+      const outside = x < 0 || x >= width || y < 0 || y >= height;
+      if (!outside) {
+        continue;
+      }
+      const source = cells[clamp(y, height) * width + clamp(x, width)];
+      if (source === undefined) {
+        continue;
+      }
+      const hasMacroSet = source.terrain === "grass" || source.terrain === "dirt" || source.terrain === "water";
+      skirt.push({
+        ...source,
+        coord: { x, y },
+        assetId: hasMacroSet ? macroAssetId(source.terrain, x, y) : source.assetId,
+        slope: null
+      });
+    }
+  }
+  return skirt;
+}
+
 export function terrainKeyFor(snapshot: WorldSnapshot, assets: ReadonlyMap<string, LoadedAsset>): string {
   const firstCell = snapshot.map.cells[0]?.coord;
   const lastCell = snapshot.map.cells[snapshot.map.cells.length - 1]?.coord;
@@ -69,7 +220,10 @@ export function buildTerrainChunks(
     { cx: number; cy: number; cells: TerrainCellSnapshot[]; bounds: TerrainChunkBounds }
   >();
 
-  for (const cell of snapshot.map.cells) {
+  // Skirt cells join the regular chunk pipeline (own chunks at negative /
+  // beyond-map chunk coords) so they get depth sorting and culling for free.
+  const skirtCells = buildPerimeterSkirtCells(snapshot);
+  for (const cell of [...snapshot.map.cells, ...skirtCells]) {
     const cx = Math.floor(cell.coord.x / TERRAIN_CHUNK_CELLS);
     const cy = Math.floor(cell.coord.y / TERRAIN_CHUNK_CELLS);
     const key = `${cx}:${cy}`;
@@ -100,7 +254,7 @@ export function buildTerrainChunks(
   // inter-chunk edges and therefore no seam.
   const underlayGraphics = new Graphics();
   const waterCells = new Set<string>();
-  for (const cell of snapshot.map.cells) {
+  for (const cell of [...snapshot.map.cells, ...skirtCells]) {
     if (cell.terrain === "water") {
       waterCells.add(`${cell.coord.x}:${cell.coord.y}`);
     }
@@ -144,6 +298,12 @@ export function buildTerrainChunks(
     (container as Container & { __terrainBounds?: TerrainChunkBounds }).__terrainBounds = bounds;
     terrainLayer.addChild(container);
   }
+
+  // Phase 3.5 — skirt fade: background-colored gradient bands over the skirt
+  // rings (transparent at the map rim → opaque at the skirt's outer edge).
+  // Drawn above all terrain sprites; scene objects only exist inside the map,
+  // so nothing pops out of the fade.
+  terrainLayer.addChild(buildSkirtFadeOverlay(snapshot.map.width, snapshot.map.height));
 
   // Phase 4 — upper cap lines: NW and NE edges of elevated cells whose
   // uphill neighbours are lower (or absent). In isometric view these edges
