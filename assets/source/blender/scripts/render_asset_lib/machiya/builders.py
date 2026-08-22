@@ -44,16 +44,20 @@ def machiya_material_set() -> dict[str, bpy.types.Material]:
         "MachiyaItabukiPlank", (0.165, 0.150, 0.120), (0.300, 0.272, 0.220)
     )
     # In packed rows only the roof + gable stay visible (bodies occlude each
-    # other), so v2 gets its own roof family: sun-bleached warm-brown kawara,
-    # clearly lighter than the v1 ibushi dark and coarser in column rhythm.
+    # other), so v2 gets its own roof family: sun-bleached warm-brown kawara.
+    # V-13: the first weathered pass still rendered at roof-band luma ~47 —
+    # within 4 points of the v1 ibushi dark (~51), so 2/3 of a packed row read
+    # as the same near-black roof. Lifted to a clear mid tone (target band
+    # ~66-74, sitting between v1 ~51 and the v3 itabuki ~87) with lighter mud
+    # and less grime so the three-variant rhythm survives at map scale.
     weathered = dict(
         name="MachiyaRoofWeathered",
-        base_dark=(0.112, 0.090, 0.062),
-        base_light=(0.215, 0.172, 0.112),
-        mud=(0.115, 0.090, 0.058),
+        base_dark=(0.295, 0.235, 0.155),
+        base_light=(0.560, 0.450, 0.285),
+        mud=(0.280, 0.220, 0.140),
         columns=7.0,
         seam=(0.50, 0.42, 0.29),
-        grime_strength=0.42,
+        grime_strength=0.24,
     )
     mats["roof_v2"] = make_showcase_roof("x", **weathered)
     weathered["name"] = "MachiyaRoofWeatheredY"
