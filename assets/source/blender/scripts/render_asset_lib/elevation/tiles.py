@@ -115,7 +115,7 @@ def _step_stone_worn_material() -> bpy.types.Material:
 
 def _step_stone_dark_material() -> bpy.types.Material:
     """Damp, shaded slabs along the stair edges."""
-    return make_noise_material("StepStoneDark", (0.128, 0.122, 0.106), (0.225, 0.215, 0.192), scale=7.0)
+    return make_noise_material("StepStoneDark", (0.160, 0.152, 0.132), (0.262, 0.250, 0.222), scale=7.0)
 
 
 def _quoin_material() -> bpy.types.Material:
@@ -301,18 +301,35 @@ KIRI_BED = 0.015           # horizontal bed joint width (~1 screen px)
 KIRI_LIP = 0.012           # stones sit this far proud of the joint backing
 
 
-def _kirikomi_stone_materials() -> list[bpy.types.Material]:
+def _kirikomi_stone_materials(face: str = "s") -> list[bpy.types.Material]:
     """Dressed-granite palette in five close value steps (low chroma, faintly
     warm, after the tenshu mound). Stones pick one each so the wall carries
-    the subtle per-block colour drift of fitted masonry."""
+    the subtle per-block colour drift of fitted masonry.
+
+    The light stops sit noticeably above the wall/yagura kawara tones so a
+    revetment reads as sunlit stone, not a continuation of the buildings
+    above it (patrol V-03: terrain and architecture fused into one mass).
+    East faces get a compensating boost: the fixed painterly light leaves
+    them a hard step darker than south faces, which used to snap a vertical
+    seam at every convex corner."""
     specs = [
-        ("KiriStone0", (0.140, 0.128, 0.106), (0.240, 0.222, 0.186)),
-        ("KiriStone1", (0.162, 0.148, 0.122), (0.270, 0.250, 0.208)),
-        ("KiriStone2", (0.178, 0.160, 0.130), (0.294, 0.268, 0.220)),
-        ("KiriStone3", (0.194, 0.178, 0.150), (0.318, 0.296, 0.248)),
-        ("KiriStone4", (0.156, 0.150, 0.134), (0.260, 0.250, 0.222)),
+        ("KiriStone0", (0.150, 0.136, 0.110), (0.282, 0.258, 0.212)),
+        ("KiriStone1", (0.172, 0.156, 0.126), (0.315, 0.288, 0.235)),
+        ("KiriStone2", (0.190, 0.170, 0.136), (0.342, 0.308, 0.248)),
+        ("KiriStone3", (0.206, 0.188, 0.156), (0.368, 0.338, 0.280)),
+        ("KiriStone4", (0.166, 0.158, 0.140), (0.300, 0.286, 0.250)),
     ]
-    return [make_noise_material(name, dark, light, scale=9.0) for name, dark, light in specs]
+    boost = 1.30 if face == "e" else 1.0
+    suffix = "E" if face == "e" else ""
+    return [
+        make_noise_material(
+            f"{name}{suffix}",
+            tuple(min(1.0, c * boost) for c in dark),
+            tuple(min(1.0, c * boost) for c in light),
+            scale=9.0,
+        )
+        for name, dark, light in specs
+    ]
 
 
 def _kirikomi_weathered_materials() -> tuple[bpy.types.Material, bpy.types.Material]:
@@ -370,10 +387,18 @@ def _ishigaki_strip(scene, name: str, face: str, h: int, stone,
 
 
 def _ishigaki_base_moss(scene, face: str, h: int, a0: float, a1: float) -> None:
-    """Damp moss line where the wall meets the lower ground (aging)."""
+    """Damp moss line where the wall meets the lower ground (aging), plus a
+    ragged second row of clumps so the contact line is not ruled (V-03: the
+    old 2px line was too thin to ground the wall on the lower terrain)."""
     height = h * LEVEL
     moss = _moss_material()
-    _face_box(scene, f"Moss{face}", face, a0, a1, -0.008, 0.0, -height, -height + 0.06, moss)
+    _face_box(scene, f"Moss{face}", face, a0, a1, -0.010, 0.0, -height, -height + 0.10, moss)
+    for index in range(6):
+        a = -0.42 + 0.84 * index / 5.0 + 0.05 * (_hash01(19.0 + h, index, 1.0) - 0.5)
+        width = 0.06 + 0.06 * _hash01(19.0 + h, index, 2.0)
+        rise = 0.10 + 0.09 * _hash01(19.0 + h, index, 3.0)
+        _face_box(scene, f"MossClump{face}{index}", face, a - width / 2.0, a + width / 2.0,
+                  -0.012, 0.0, -height, -height + rise, moss)
 
 
 def _ishigaki_fringe_anchor(h: int) -> tuple[float, float]:
@@ -422,7 +447,7 @@ def _kirikomi_wall(scene, face: str, h: int, a_end_fn=None, backing=None) -> Non
     near-black joint backing (the tall corner's taper collapses past the
     tile edge, so its exposed backing must read as stone, not mortar)."""
     height = h * LEVEL
-    stones = _kirikomi_stone_materials()
+    stones = _kirikomi_stone_materials(face)
     damp, mossy = _kirikomi_weathered_materials()
     joint = backing if backing is not None else _kirikomi_joint_material()
     seed = 5.0 if face == "s" else 6.0
@@ -449,14 +474,21 @@ def _kirikomi_wall(scene, face: str, h: int, a_end_fn=None, backing=None) -> Non
             a1 = min(a_stop, a + width - KIRI_GAP)
             if a1 - a0 > 0.03:
                 roll = _hash01(seed, j, 60.0 + 5.0 * k)
-                material = stones[int(roll * 5.0) % 5]
+                if j == 0:
+                    # Top course: sunlit coping — bias to the light end of the
+                    # palette so the wall head does not read as a dark frame
+                    # around the terrace grass (patrol V-03).
+                    material = stones[(2, 3, 3, 2, 1)[int(roll * 5.0) % 5]]
+                else:
+                    material = stones[int(roll * 5.0) % 5]
                 # Aging gradient: damp then mossy blocks thicken toward the
-                # foot of the wall where rain and ground moisture linger.
+                # foot of the wall where rain and ground moisture linger —
+                # thick enough to ground the wall on the lower terrain.
                 depth = j / max(1, n_courses - 1)
                 age = _hash01(seed, j, 70.0 + 3.0 * k)
-                if depth > 0.75 and age < 0.12 + 0.30 * (depth - 0.75) / 0.25:
+                if depth > 0.72 and age < 0.18 + 0.40 * (depth - 0.72) / 0.28:
                     material = mossy
-                elif depth > 0.5 and age > 0.85 - 0.40 * (depth - 0.5) / 0.5:
+                elif depth > 0.5 and age > 0.80 - 0.45 * (depth - 0.5) / 0.5:
                     material = damp
                 _kirikomi_stone(scene, f"Stone{face}{j}_{k}", face, a0, a1,
                                 z0, z1, height, material, seed, float(j), float(k))
@@ -472,7 +504,14 @@ def build_ishigaki_face(scene: bpy.types.Scene, face: str, h: int) -> None:
     _ishigaki_base_moss(scene, face, h, -0.5 - BLEED, 0.5 + BLEED)
     seed = (5.0 if face == "s" else 6.0) + 10.0 * h
     o_base, z_base = _ishigaki_fringe_anchor(h)
-    _grass_overhang(scene, face, seed, count=5, heavy=False, o_base=o_base, z_base=z_base)
+    # Continuous sod lip: the terrace grass visibly folds over the coping, so
+    # the top edge reads as ground meeting the wall — not a dark stone frame
+    # around the terrace (patrol V-03). Tufts alone were too sparse to break
+    # the line.
+    grass_dark, _ = _grass_lip_materials()
+    _face_box(scene, f"SodLip{face}", face, -0.5 - BLEED, 0.5 + BLEED,
+              o_base, o_base + 0.026, z_base - 0.045, z_base + 0.02, grass_dark)
+    _grass_overhang(scene, face, seed, count=9, heavy=False, o_base=o_base, z_base=z_base)
 
 
 def build_ishigaki_corner(scene: bpy.types.Scene, h: int) -> None:
@@ -512,8 +551,12 @@ def build_ishigaki_corner(scene: bpy.types.Scene, h: int) -> None:
         add_box(scene, f"Quoin{j}", *map_box(low, high), quoin)
 
     o_base, z_base = _ishigaki_fringe_anchor(h)
-    _grass_overhang(scene, "s", 8.0 + h, count=3, heavy=False, o_base=o_base, z_base=z_base)
-    _grass_overhang(scene, "e", 9.0 + h, count=3, heavy=False, o_base=o_base, z_base=z_base)
+    grass_dark, _ = _grass_lip_materials()
+    for face in ("s", "e"):
+        _face_box(scene, f"SodLip{face}", face, -0.5 - BLEED, 0.30,
+                  o_base, o_base + 0.026, z_base - 0.045, z_base + 0.02, grass_dark)
+    _grass_overhang(scene, "s", 8.0 + h, count=5, heavy=False, o_base=o_base, z_base=z_base)
+    _grass_overhang(scene, "e", 9.0 + h, count=5, heavy=False, o_base=o_base, z_base=z_base)
 
 
 # --- slopes ------------------------------------------------------------------
@@ -766,7 +809,7 @@ def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
                 material = worn if _hash01(seed, k, 9.0) > 0.25 else stone
             else:
                 roll = _hash01(seed, k, 10.0 + slab)
-                material = dark if roll > 0.65 else stone
+                material = dark if roll > 0.82 else stone
             x0, y0 = pt(u0 + du, v0)
             x1, y1 = pt(u1 + du, v1)
             low = (min(x0, x1), min(y0, y1), 0.0)
