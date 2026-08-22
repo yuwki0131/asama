@@ -52,18 +52,32 @@ function fmt(point: Point): string {
   return `${point.x.toFixed(1)},${point.y.toFixed(1)}`;
 }
 
-function curbStrip(edge: [Point, Point]): string {
+// Individual stone quads (uneven inner silhouette + varied fills) instead of a
+// flat strip: the patrol L2 review read the old uniform band as a thin dark
+// outline, not masonry. Inner contact shadow grounds the curb against the sand.
+function curbStrip(edge: [Point, Point], j: (index: number, range: number) => number, edgeIndex: number): string {
   const [p1, p2] = edge;
-  const inner1 = lerp(p1, CENTER, 0.24);
-  const inner2 = lerp(p2, CENTER, 0.24);
-  const joint1 = lerp(lerp(p1, p2, 0.34), CENTER, 0.02);
-  const joint1Inner = lerp(lerp(p1, p2, 0.34), CENTER, 0.2);
-  const joint2 = lerp(lerp(p1, p2, 0.67), CENTER, 0.02);
-  const joint2Inner = lerp(lerp(p1, p2, 0.67), CENTER, 0.2);
-  return `<polygon points="${fmt(p1)} ${fmt(p2)} ${fmt(inner2)} ${fmt(inner1)}" fill="#96907e" stroke="#4d4335" stroke-width="1.1"/>
-<line x1="${joint1.x.toFixed(1)}" y1="${joint1.y.toFixed(1)}" x2="${joint1Inner.x.toFixed(1)}" y2="${joint1Inner.y.toFixed(1)}" stroke="#4d4335" stroke-width="1"/>
-<line x1="${joint2.x.toFixed(1)}" y1="${joint2.y.toFixed(1)}" x2="${joint2Inner.x.toFixed(1)}" y2="${joint2Inner.y.toFixed(1)}" stroke="#4d4335" stroke-width="1"/>
-<polyline points="${fmt(lerp(p1, CENTER, 0.06))} ${fmt(lerp(p2, CENTER, 0.06))}" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>`;
+  const cuts = [0, 0.34 + j(edgeIndex * 2, 0.05), 0.67 + j(edgeIndex * 2 + 1, 0.05), 1];
+  const fills = ["#9a927c", "#8b8370", "#a39b84"];
+  const parts: string[] = [];
+  for (let s = 0; s < 3; s += 1) {
+    const a = lerp(p1, p2, cuts[s] ?? 0);
+    const b = lerp(p1, p2, cuts[s + 1] ?? 1);
+    const innerA = lerp(a, CENTER, 0.21 + Math.abs(j(edgeIndex + s, 0.06)));
+    const innerB = lerp(b, CENTER, 0.21 + Math.abs(j(edgeIndex + s + 5, 0.06)));
+    parts.push(
+      `<polygon points="${fmt(a)} ${fmt(b)} ${fmt(innerB)} ${fmt(innerA)}" fill="${fills[(edgeIndex + s) % 3]}" stroke="#4d4335" stroke-width="1"/>`
+    );
+  }
+  const shadow1 = lerp(p1, CENTER, 0.27);
+  const shadow2 = lerp(p2, CENTER, 0.27);
+  parts.push(
+    `<polyline points="${fmt(shadow1)} ${fmt(shadow2)}" fill="none" stroke="rgba(61,49,32,0.30)" stroke-width="1.6"/>`
+  );
+  parts.push(
+    `<polyline points="${fmt(lerp(p1, CENTER, 0.06))} ${fmt(lerp(p2, CENTER, 0.06))}" fill="none" stroke="rgba(255,255,255,0.20)" stroke-width="1"/>`
+  );
+  return parts.join("\n");
 }
 
 // SVG rasterization anti-aliases the diamond outline into semi-transparent
@@ -71,7 +85,7 @@ function curbStrip(edge: [Point, Point]): string {
 // lines. Post-process to a hard mask: pixel-center membership in the iso
 // diamond via half-open intervals partitions the plane exactly (no gaps, no
 // double edges), and partial-alpha pixels are flattened onto the sand base.
-const BASE_FILL = { r: 0xc2, g: 0xa4, b: 0x6e };
+const BASE_FILL = { r: 0xab, g: 0x8f, b: 0x5e };
 
 function hardMaskDiamond(data: Buffer, width: number, height: number): void {
   for (let y = 0; y < height; y += 1) {
@@ -110,27 +124,46 @@ function jitterFor(mask: string): (index: number, range: number) => number {
   return (index, range) => (samples[index % samples.length] ?? 0) * 2 * range;
 }
 
+// Raked-sand streaks (箒目): shallow parallel waves, alternating warm light
+// and shadow strokes, per-mask phase jitter. Low opacity so clipping at the
+// diamond edge does not produce visible seam discontinuities.
+function rakeStreaks(j: (index: number, range: number) => number): string {
+  const rows: string[] = [];
+  for (let r = 0; r < 4; r += 1) {
+    const x0 = 3 + j(r + 8, 5);
+    const yBase = 8.5 + r * 4 + j(r, 2.2);
+    const amp1 = (1.6 + j(r + 4, 0.8)) * (j(r + 2, 1) >= 0 ? 1 : -1);
+    const amp2 = (1.6 + j(r + 6, 0.8)) * (j(r + 5, 1) >= 0 ? -1 : 1);
+    const stroke = r % 2 === 0 ? "rgba(224,204,158,0.18)" : "rgba(96,74,42,0.16)";
+    rows.push(
+      `<path d="M${x0.toFixed(1)} ${yBase.toFixed(1)} q14.5 ${amp1.toFixed(1)} 29 0 q14.5 ${amp2.toFixed(1)} 29 0" fill="none" stroke="${stroke}" stroke-width="0.9"/>`
+    );
+  }
+  return rows.join("\n");
+}
+
 function honmaruTileSvg(mask: string): string {
   const open = mask.split("").map((bit) => bit === "1");
-  const curbs = EDGES.filter((_, index) => !open[index])
-    .map((edge) => curbStrip(edge))
-    .join("\n");
   const j = jitterFor(mask);
+  const curbs = EDGES.map((edge, index) => (open[index] ? "" : curbStrip(edge, j, index)))
+    .filter((strip) => strip !== "")
+    .join("\n");
   const mirror = parseInt(mask, 2) % 2 === 1 ? ' transform="translate(64,0) scale(-1,1)"' : "";
   return `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="32" viewBox="0 0 64 32">
 <defs><clipPath id="cell"><polygon points="${DIAMOND}"/></clipPath></defs>
-<polygon points="${DIAMOND}" fill="#c2a46e"/>
+<polygon points="${DIAMOND}" fill="#ab8f5e"/>
 <g clip-path="url(#cell)">
 <g${mirror}>
 <ellipse cx="${(22 + j(0, 7)).toFixed(1)}" cy="${(13 + j(1, 2.5)).toFixed(1)}" rx="12" ry="5" fill="rgba(139,110,64,0.30)"/>
-<ellipse cx="${(43 + j(2, 7)).toFixed(1)}" cy="${(20 + j(3, 2.5)).toFixed(1)}" rx="13" ry="5.5" fill="rgba(216,190,133,0.42)"/>
-<ellipse cx="${(36 + j(4, 6)).toFixed(1)}" cy="${(10 + j(5, 2)).toFixed(1)}" rx="8" ry="3.4" fill="rgba(171,140,84,0.34)"/>
-<ellipse cx="${(17 + j(6, 5)).toFixed(1)}" cy="${(21 + j(7, 2)).toFixed(1)}" rx="8" ry="3.2" fill="rgba(216,190,133,0.30)"/>
+<ellipse cx="${(43 + j(2, 7)).toFixed(1)}" cy="${(20 + j(3, 2.5)).toFixed(1)}" rx="13" ry="5.5" fill="rgba(198,174,122,0.40)"/>
+<ellipse cx="${(36 + j(4, 6)).toFixed(1)}" cy="${(10 + j(5, 2)).toFixed(1)}" rx="8" ry="3.4" fill="rgba(154,126,76,0.34)"/>
+<ellipse cx="${(17 + j(6, 5)).toFixed(1)}" cy="${(21 + j(7, 2)).toFixed(1)}" rx="8" ry="3.2" fill="rgba(198,174,122,0.28)"/>
+${rakeStreaks(j)}
 <path d="M${(12 + j(8, 4)).toFixed(1)} ${(16 + j(9, 1.5)).toFixed(1)} C20 12.5, 27 18.5, 36 15 S50 13, 55 16.5" fill="none" stroke="rgba(107,83,48,0.35)" stroke-width="1.2"/>
-<path d="M${(16 + j(10, 4)).toFixed(1)} ${(20.5 + j(11, 1.5)).toFixed(1)} C25 17.5, 33 22.5, 44 19" fill="none" stroke="rgba(240,222,178,0.38)" stroke-width="1"/>
-<circle cx="${(26 + j(5, 8)).toFixed(1)}" cy="${(17.5 + j(2, 2)).toFixed(1)}" r="1.3" fill="rgba(122,111,92,0.6)"/>
-<circle cx="${(40 + j(7, 8)).toFixed(1)}" cy="${(13.5 + j(0, 2)).toFixed(1)}" r="1.1" fill="rgba(122,111,92,0.55)"/>
-<circle cx="${(33 + j(9, 8)).toFixed(1)}" cy="${(22.5 + j(4, 2)).toFixed(1)}" r="1.2" fill="rgba(122,111,92,0.5)"/>
+<path d="M${(16 + j(10, 4)).toFixed(1)} ${(20.5 + j(11, 1.5)).toFixed(1)} C25 17.5, 33 22.5, 44 19" fill="none" stroke="rgba(216,197,150,0.34)" stroke-width="1"/>
+<circle cx="${(26 + j(5, 8)).toFixed(1)}" cy="${(17.5 + j(2, 2)).toFixed(1)}" r="${(1.3 + j(8, 0.4)).toFixed(1)}" fill="rgba(122,111,92,0.6)"/>
+<circle cx="${(40 + j(7, 8)).toFixed(1)}" cy="${(13.5 + j(0, 2)).toFixed(1)}" r="${(1.1 + j(3, 0.35)).toFixed(1)}" fill="rgba(122,111,92,0.55)"/>
+<circle cx="${(33 + j(9, 8)).toFixed(1)}" cy="${(22.5 + j(4, 2)).toFixed(1)}" r="${(1.2 + j(6, 0.35)).toFixed(1)}" fill="rgba(122,111,92,0.5)"/>
 </g>
 ${curbs}
 </g>

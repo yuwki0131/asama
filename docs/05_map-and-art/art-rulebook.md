@@ -196,3 +196,4 @@ VAR-01、暗部はLUM-01の網でカバー)— 狙い撃ちビュー+別コン�
 | PROC-01 | ユーザー不合格が出たら、機械化可能なら L1 ルール、審美なら本書のカードに**必ず1行追加**してからサイクルをクローズ |
 | PROC-02 | L2レビューは**作成者と別コンテキストのエージェント**が実施。合否はルールIDを引用し、スクリーンショットを根拠に記入 |
 | PROC-03 | アート反復ループは1ラウンド1変数。反復が続く領域は統括が直接スクリプトを修正し都度目視ゲート |
+| PROC-04 | `public/assets/generated/manifest.json` は複数パイプライン(placeholder/production/honmaru/animation)の共有出力。書き込むツールは**必ず既存manifestとマージ**し(自前ID以外のassetsとanimations節を保持)、全書き換え禁止。違反はサイレントなエントリ欠落→フォールバック描画(V-09根因)として現れる。generateGeneratedAssets.test.ts で担保 |
