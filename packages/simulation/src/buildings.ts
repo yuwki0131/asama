@@ -476,6 +476,22 @@ export function connectedBuildingAssetId(world: WorldState, building: BuildingSt
     return pick === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.v1`;
   }
 
+  // Straight wall/road pieces cycle the same coordinate-phased p1..p3 pool
+  // as moats: the sōbori walls and main roads run 40-60 cells straight, and
+  // a single sprite tiled that far reads as a conveyor belt (V-05). Corner
+  // and junction masks stay single-sprite — they never chain.
+  if (building.type === "wall" || building.type === "road") {
+    if (mask === "0101") {
+      const phase = ((building.position.x % 4) + 4) % 4;
+      return phase === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.p${phase}`;
+    }
+    if (mask === "1010") {
+      const phase = ((building.position.y % 4) + 4) % 4;
+      return phase === 0 ? `${family}.connected.${mask}` : `${family}.connected.${mask}.p${phase}`;
+    }
+    return `${family}.connected.${mask}`;
+  }
+
   return `${family}.connected.${mask}`;
 }
 
