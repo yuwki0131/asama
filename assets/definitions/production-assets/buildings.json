@@ -1713,6 +1713,90 @@
       }
     },
     {
+      "assetId": "building.wall.plaster.connected.0101.p1",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0101-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-plaster-connected-0101-p1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0101.p2",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0101-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-plaster-connected-0101-p2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0101.p3",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-0101-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-plaster-connected-0101-p3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
       "assetId": "building.wall.plaster.connected.0110",
       "kind": "building",
       "output": "building-wall-plaster-connected-0110.png",
@@ -1829,6 +1913,90 @@
         "model": "wall-plaster-connected-1010",
         "renderSpec": "painterly",
         "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010.p1",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1010-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-plaster-connected-1010-p1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010.p2",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1010-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-plaster-connected-1010-p2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 96,
+        "anchorX": 32,
+        "anchorY": 80
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010.p3",
+      "kind": "building",
+      "output": "building-wall-plaster-connected-1010-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "wall-plaster-connected-1010-p3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -3888,6 +4056,90 @@
       }
     },
     {
+      "assetId": "building.road.connected.0101.p1",
+      "kind": "building",
+      "output": "building-road-connected-0101-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "road-connected-0101-p1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0101.p2",
+      "kind": "building",
+      "output": "building-road-connected-0101-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "road-connected-0101-p2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.0101.p3",
+      "kind": "building",
+      "output": "building-road-connected-0101-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "road-connected-0101-p3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
       "assetId": "building.road.connected.0110",
       "kind": "building",
       "output": "building-road-connected-0110.png",
@@ -4004,6 +4256,90 @@
         "model": "road-connected-1010",
         "renderSpec": "painterly",
         "supersample": 2
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010.p1",
+      "kind": "building",
+      "output": "building-road-connected-1010-p1.png",
+      "source": {
+        "type": "blender",
+        "model": "road-connected-1010-p1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010.p2",
+      "kind": "building",
+      "output": "building-road-connected-1010-p2.png",
+      "source": {
+        "type": "blender",
+        "model": "road-connected-1010-p2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010.p3",
+      "kind": "building",
+      "output": "building-road-connected-1010-p3.png",
+      "source": {
+        "type": "blender",
+        "model": "road-connected-1010-p3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "wallroad"
       },
       "geometry": {
         "footprintWidth": 1,

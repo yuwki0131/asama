@@ -81,7 +81,7 @@ describe("connected building asset masks", () => {
     place(world, "wall", { x: 30, y: 30 });
     place(world, "wall", { x: 31, y: 30 });
     place(world, "wall", { x: 29, y: 30 });
-    expect(buildingAt(world, { x: 30, y: 30 }).assetId).toBe("building.wall.plaster.connected.0101");
+    expect(buildingAt(world, { x: 30, y: 30 }).assetId).toBe("building.wall.plaster.connected.0101.p2");
 
     demolish(world, { x: 31, y: 30 });
     expect(buildingAt(world, { x: 30, y: 30 }).assetId).toBe("building.wall.plaster.connected.0001");
@@ -622,6 +622,23 @@ describe("river family", () => {
     expect(buildingAt(world, { x: 21, y: 30 }).assetId).toBe("building.river.connected.0101.p1");
     expect(buildingAt(world, { x: 22, y: 30 }).assetId).toBe("building.river.connected.0101.p2");
     expect(buildingAt(world, { x: 23, y: 30 }).assetId).toBe("building.river.connected.0101.p3");
+  });
+
+  it("phases straight-run wall and road interiors like the moat family", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    for (let x = 20; x <= 24; x += 1) place(world, "wall", { x, y: 30 });
+    for (let y = 40; y <= 44; y += 1) place(world, "road", { x: 20, y });
+
+    expect(buildingAt(world, { x: 21, y: 30 }).assetId).toBe("building.wall.plaster.connected.0101.p1");
+    expect(buildingAt(world, { x: 22, y: 30 }).assetId).toBe("building.wall.plaster.connected.0101.p2");
+    expect(buildingAt(world, { x: 23, y: 30 }).assetId).toBe("building.wall.plaster.connected.0101.p3");
+    expect(buildingAt(world, { x: 24, y: 30 }).assetId).toBe("building.wall.plaster.connected.0001");
+
+    expect(buildingAt(world, { x: 20, y: 41 }).assetId).toBe("building.road.connected.1010.p1");
+    expect(buildingAt(world, { x: 20, y: 42 }).assetId).toBe("building.road.connected.1010.p2");
+    expect(buildingAt(world, { x: 20, y: 43 }).assetId).toBe("building.road.connected.1010.p3");
   });
 
   it("opens a straight river end toward an adjacent diagonal river piece", () => {

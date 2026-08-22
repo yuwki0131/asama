@@ -971,6 +971,39 @@
       }
     },
     {
+      "assetId": "building.wall.plaster.connected.0101.p1",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0101-p1.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0101.p2",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0101-p2.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.0101.p3",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-0101-p3.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
       "assetId": "building.wall.plaster.connected.0110",
       "kind": "building",
       "file": "generated/building-wall-plaster-connected-0110.png",
@@ -1018,6 +1051,39 @@
       "assetId": "building.wall.plaster.connected.1010",
       "kind": "building",
       "file": "generated/building-wall-plaster-connected-1010.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010.p1",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1010-p1.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010.p2",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1010-p2.png",
+      "width": 64,
+      "height": 96,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8333333333333334
+      }
+    },
+    {
+      "assetId": "building.wall.plaster.connected.1010.p3",
+      "kind": "building",
+      "file": "generated/building-wall-plaster-connected-1010-p3.png",
       "width": 64,
       "height": 96,
       "anchor": {
@@ -1840,6 +1906,39 @@
       }
     },
     {
+      "assetId": "building.road.connected.0101.p1",
+      "kind": "building",
+      "file": "generated/building-road-connected-0101-p1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0101.p2",
+      "kind": "building",
+      "file": "generated/building-road-connected-0101-p2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.0101.p3",
+      "kind": "building",
+      "file": "generated/building-road-connected-0101-p3.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
       "assetId": "building.road.connected.0110",
       "kind": "building",
       "file": "generated/building-road-connected-0110.png",
@@ -1887,6 +1986,39 @@
       "assetId": "building.road.connected.1010",
       "kind": "building",
       "file": "generated/building-road-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010.p1",
+      "kind": "building",
+      "file": "generated/building-road-connected-1010-p1.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010.p2",
+      "kind": "building",
+      "file": "generated/building-road-connected-1010-p2.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.road.connected.1010.p3",
+      "kind": "building",
+      "file": "generated/building-road-connected-1010-p3.png",
       "width": 64,
       "height": 32,
       "anchor": {

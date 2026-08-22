@@ -63,7 +63,7 @@ const REP_FAMILIES = [
 ];
 // Families that HAVE a variant pool today (violations are fixable bugs; the
 // rest are reported as info so missing pools surface as design debt).
-const REP_VARIANT_FAMILIES = new Set(["water_moat", "dry_moat", "river", "machiya"]);
+const REP_VARIANT_FAMILIES = new Set(["water_moat", "dry_moat", "river", "machiya", "wall", "road"]);
 // EDGE-01: rays are cast from a rim cell outward over the DIFF of two
 // screenshots (terrain layer shown vs hidden), which isolates the terrain
 // contribution — the perimeter skirt — from everything composited above
