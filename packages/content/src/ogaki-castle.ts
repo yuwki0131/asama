@@ -64,9 +64,11 @@ const outerWall = [
   at("arc_wall_r4_se", 114, 109),
   ...hLine("wall", 18, 110, 12, [34, 35, 88, 89]),
   ...hLine("wall", 18, 110, 112, [62, 63]),
-  // The procedural river itself closes the short gaps at both banks.
-  ...vLine("wall", 14, 16, 108, [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 60, 61, 62]),
-  ...vLine("wall", 114, 16, 108, [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 60, 61, 62, 88, 89]),
+  // Wall openings hug the actual procedural river span at each bank column
+  // (west x=14: rows 40-43, east x=114: rows 37-39 plus the 45° corner tile
+  // at y=40) so the runs terminate at the waterline, not in open grass.
+  ...vLine("wall", 14, 16, 108, [34, 35, 40, 41, 42, 43, 60, 61, 62]),
+  ...vLine("wall", 114, 16, 108, [37, 38, 39, 40, 60, 61, 62, 88, 89]),
   ...outerGates,
 ];
 
@@ -108,12 +110,17 @@ const proceduralRiverCells = new Set([
   "11,40", "11,41", "11,42", "11,43", "11,44", "12,40", "12,41", "12,42", "12,43",
   "13,40", "13,41", "13,42", "13,43", "115,38", "115,39", "115,40",
   "116,39", "116,40", "116,41", "117,39", "117,40", "117,41",
+  // 45° outer-corner transition cells of the river staircase: grass by the
+  // course function but rendered (and treated by placement) as water.
+  "10,40", "12,44", "115,37", "115,41", "116,38", "117,42",
 ]);
+// proceduralRiverCells is the exact procedural-river footprint at both bank
+// columns, so removing only those cells leaves the placed water flush against
+// the river: the moat/river reaches connect as one surface instead of ending
+// in open grass several cells short of the water (patrol V-10 端面露出).
 for (let index = outerMoat.length - 1; index >= 0; index -= 1) {
   const placement = outerMoat[index]!;
-  const riverBankGap = (placement.position.x <= 13 || placement.position.x >= 115)
-    && placement.position.y >= 35 && placement.position.y <= 47;
-  if (riverBankGap || proceduralRiverCells.has(`${placement.position.x},${placement.position.y}`)) outerMoat.splice(index, 1);
+  if (proceduralRiverCells.has(`${placement.position.x},${placement.position.y}`)) outerMoat.splice(index, 1);
 }
 
 const townBlocks: ScenarioBuildingPlacement[] = [];
