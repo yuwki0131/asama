@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
 import { readPlaceholderConfig } from "./config";
+import { readManifest } from "./manifest";
 import { generatedConfigPath, generatedManifestPath, generatedOutputDir } from "./paths";
 import { renderPlaceholderSvg } from "./templates";
 import type { AssetManifest, GeneratedAsset, PlaceholderAssetSpec } from "./types";
@@ -27,15 +28,33 @@ export async function generateGeneratedAssets(): Promise<AssetManifest> {
     assets.push(await writeGeneratedAsset(asset));
   }
 
-  const manifest: AssetManifest = {
+  const manifest = buildMergedGeneratedManifest(assets, await readExistingGeneratedManifest());
+  await writeFile(generatedManifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  return manifest;
+}
+
+// Merge with the existing manifest (production/honmaru/animation entries are
+// owned by other pipelines); a full rewrite here silently dropped them.
+export function buildMergedGeneratedManifest(
+  ownAssets: readonly GeneratedAsset[],
+  existing: Pick<AssetManifest, "assets" | "animations">
+): AssetManifest {
+  const ownIds = new Set(ownAssets.map((asset) => asset.assetId));
+  return {
     version: 1,
     generatedBy: "img-agent",
     generatedAt: new Date().toISOString(),
-    assets
+    assets: [...ownAssets, ...existing.assets.filter((asset) => !ownIds.has(asset.assetId))],
+    ...(existing.animations === undefined ? {} : { animations: existing.animations })
   };
+}
 
-  await writeFile(generatedManifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
-  return manifest;
+async function readExistingGeneratedManifest(): Promise<Pick<AssetManifest, "assets" | "animations">> {
+  try {
+    return await readManifest(generatedManifestPath);
+  } catch {
+    return { assets: [] };
+  }
 }
 
 function connectedConstructionAssets(): PlaceholderAssetSpec[] {
