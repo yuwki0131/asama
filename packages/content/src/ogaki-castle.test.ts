@@ -125,10 +125,45 @@ describe("ogakiCastleScenario", () => {
     const occupied = new Set(
       ogakiCastleScenario.initialBuildings.flatMap((building) => occupiedCells(building).map((cell) => `${cell.x},${cell.y}`))
     );
+    // 路地(木戸)で4〜7棟のクラスタに分節される(V-14: 最大36棟の等ピッチ連続
+    // ランが屋根の単一色の帯に読めた対策)。路地セルは町屋が空き、土道が敷かれる。
+    const machiyaOccupied = new Set(
+      machiya.flatMap((building) => occupiedCells(building).map((cell) => `${cell.x},${cell.y}`))
+    );
+    const roadOccupied = new Set(
+      ogakiCastleScenario.initialBuildings
+        .filter((building) => building.type === "road")
+        .flatMap((building) => occupiedCells(building).map((cell) => `${cell.x},${cell.y}`))
+    );
+    const sewariAlleys = new Set([70, 77, 85, 92]);
     for (let y = 64; y <= 99; y += 1) {
-      expect(occupied.has(`34,${y}`), `terrace 34,${y}`).toBe(true);
-      expect(occupied.has(`37,${y}`), `terrace 37,${y}`).toBe(true);
+      const isAlley = sewariAlleys.has(y);
+      expect(machiyaOccupied.has(`34,${y}`), `terrace 34,${y}`).toBe(!isAlley);
+      expect(machiyaOccupied.has(`37,${y}`), `terrace 37,${y}`).toBe(!isAlley);
       expect(occupied.has(`36,${y}`), `back alley 36,${y}`).toBe(false);
+      if (isAlley) {
+        expect(roadOccupied.has(`34,${y}`), `alley pavement 34,${y}`).toBe(true);
+        expect(roadOccupied.has(`37,${y}`), `alley pavement 37,${y}`).toBe(true);
+      }
+    }
+
+    // どの町屋列も同種同向きの連続ランが8棟を超えない。
+    const runs = new Map<string, number[]>();
+    for (const building of machiya) {
+      const horizontal = building.type === "machiya_ne_sw";
+      const key = horizontal ? `y${building.position.y}` : `x${building.position.x}`;
+      const along = horizontal ? building.position.x : building.position.y;
+      const list = runs.get(key) ?? [];
+      list.push(along);
+      runs.set(key, list);
+    }
+    for (const [key, positions] of runs) {
+      positions.sort((a, b) => a - b);
+      let run = 1;
+      for (let i = 1; i < positions.length; i += 1) {
+        run = positions[i]! - positions[i - 1]! === 1 ? run + 1 : 1;
+        expect(run, `machiya run along ${key}`).toBeLessThanOrEqual(8);
+      }
     }
   });
 });

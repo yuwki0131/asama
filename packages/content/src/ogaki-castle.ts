@@ -135,24 +135,38 @@ for (const [x, y] of [
 // 短冊型町割り: 間口が狭く奥行きの深い町屋が街路に軒を連ねる帯。town_blockの
 // 面的な町区画はそのまま残し、通り沿いだけを町屋列に差し替えて粒度を出す。
 const machiyaRows: ScenarioBuildingPlacement[] = [];
+// 路地(木戸)セル: 町屋列を4〜7棟のクラスタに分節する通り抜け路地。等ピッチの
+// 連続ラン(最大36棟)が屋根の単一色の帯・格子状コピペ感に読めた V-14 対応。
+// 向かい合う帯・背割りペアでは同じ位置に路地を通す(史実の木戸・横町の抜け)。
+const minojiAlleys = new Set([20, 26]);
+const sewariAlleys = new Set([70, 77, 85, 92]);
+const yokochoAlleys = new Set([48, 55, 70, 76, 86]);
 // 美濃路(y=61)両側町: 間口1セルの町屋が街道を挟んで向かい合う。
 for (let x = 16; x <= 31; x += 1) {
+  if (minojiAlleys.has(x)) continue;
   machiyaRows.push(at("machiya_ne_sw", x, 59), at("machiya_ne_sw", x, 62));
 }
 // 背割り長屋列: 南北通り(x=33 / x=39)に面する奥行き2セルの町屋。x=36 が背割り(裏路地)。
 for (let y = 64; y <= 99; y += 1) {
+  if (sewariAlleys.has(y)) continue;
   machiyaRows.push(at("machiya", 34, y), at("machiya", 37, y));
 }
 // 南横町(y=102)沿いの町屋テラス。南大手道(x=62..63)は通行帯として空け、
 // 石尾根(道路と同じ x≈84+cos(y/11)*5 の帯、建設不能地形)も避ける。
 for (let x = 42; x <= 89; x += 1) {
-  if (x === 62 || x === 63) continue;
+  if (x === 62 || x === 63 || yokochoAlleys.has(x)) continue;
   const onStoneRidge = [103, 104].some((y) => Math.abs(x - 84 - Math.round(Math.cos(y / 11) * 5)) <= 1);
   if (onStoneRidge) continue;
   machiyaRows.push(at("machiya_ne_sw", x, 103));
 }
 
 const roads: ScenarioBuildingPlacement[] = [];
+// 路地の床: 木戸間の抜けを土道で舗装し、素の草地の「虫食い空き地」ではなく
+// 意図された路地として読ませる(V-14 L2指摘)。x=36 の背割りは閉じた裏路地
+// なので舗装しない。
+for (const x of minojiAlleys) roads.push(at("road", x, 59), at("road", x, 60), at("road", x, 62), at("road", x, 63));
+for (const y of sewariAlleys) roads.push(at("road", 34, y), at("road", 35, y), at("road", 37, y), at("road", 38, y));
+for (const x of yokochoAlleys) roads.push(at("road", x, 103), at("road", x, 104));
 // Minoji: west/east moat approaches turn at both banks instead of forming one line.
 roads.push(...hLine("road", 15, 39, 61), ...vLine("road", 39, 62, 102), ...hLine("road", 39, 91, 102), ...vLine("road", 91, 60, 101), ...hLine("road", 91, 113, 60));
 // Sparse orthogonal town grid in reserved corridors.
