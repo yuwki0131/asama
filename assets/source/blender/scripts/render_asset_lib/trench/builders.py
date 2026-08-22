@@ -96,12 +96,80 @@ def make_trench_bank_material(offset: tuple[float, float] = (0.0, 0.0), seed: fl
     return material
 
 
+def _object_noise_ramp_material(
+    name: str,
+    stops: list[tuple[float, tuple[float, float, float]]],
+    scale: float,
+    offset: tuple[float, float],
+    seed: float,
+    detail: float = 3.0,
+) -> bpy.types.Material:
+    """Map-anchored (object coords + phase offset) noise through a multi-stop
+    ramp, so the pattern continues across tile borders like the water field."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    coords = nodes.new("ShaderNodeTexCoord")
+    shift = nodes.new("ShaderNodeMapping")
+    shift.inputs["Location"].default_value = (offset[0], -offset[1], 0.0)
+    links.new(coords.outputs["Object"], shift.inputs["Vector"])
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.noise_dimensions = "4D"
+    noise.inputs["W"].default_value = seed * 5.13
+    noise.inputs["Scale"].default_value = scale
+    noise.inputs["Detail"].default_value = detail
+    links.new(shift.outputs["Vector"], noise.inputs["Vector"])
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = stops[0][0]
+    ramp.color_ramp.elements[0].color = (*stops[0][1], 1.0)
+    ramp.color_ramp.elements[1].position = stops[-1][0]
+    ramp.color_ramp.elements[1].color = (*stops[-1][1], 1.0)
+    for position, color in stops[1:-1]:
+        element = ramp.color_ramp.elements.new(position)
+        element.color = (*color, 1.0)
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    finish_material(material, ramp.outputs["Color"])
+    return material
+
+
+def make_trench_rim_material(offset: tuple[float, float] = (0.0, 0.0), seed: float = 0.0) -> bpy.types.Material:
+    """Moat rim strip (V-06): the old flat chocolate (0.150,0.124,0.088) drew a
+    uniform dark band the whole run and read as a black stripe at map zoom.
+    Noise-broken dry earth with an olive high end feathers the outer edge
+    toward the neighbouring grass so the silhouette reads organic."""
+    return _object_noise_ramp_material(
+        "MoatRim",
+        [
+            (0.30, (0.118, 0.095, 0.064)),
+            (0.56, (0.205, 0.168, 0.110)),
+            (0.82, (0.128, 0.152, 0.076)),
+        ],
+        scale=7.5, offset=offset, seed=seed + 0.71,
+    )
+
+
+def make_waterline_material(offset: tuple[float, float] = (0.0, 0.0), seed: float = 0.0) -> bpy.types.Material:
+    """Broken bright lapping line where a bank meets standing water (V-06):
+    the low end matches the water field so the highlight appears as
+    intermittent dashes, not a hard contour."""
+    return _object_noise_ramp_material(
+        "TrenchWaterline",
+        [
+            (0.40, (0.070, 0.118, 0.145)),
+            (0.68, (0.190, 0.238, 0.236)),
+        ],
+        scale=13.0, offset=offset, seed=seed + 0.29, detail=2.0,
+    )
+
+
 def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool, phase: tuple[float, float] = (0.0, 0.0), seed: float = 0.0) -> None:
     """Moat as a real excavated trench: the full tile is sunk MOAT_DEPTH."""
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
     earth = make_trench_bank_material(offset=phase, seed=seed)
-    rim = make_material("MoatRim", (0.150, 0.124, 0.088, 1.0))
+    rim = make_trench_rim_material(offset=phase, seed=seed)
     lip = make_material("MoatGrassLip", (0.105, 0.150, 0.070, 1.0))
+    waterline = make_waterline_material(offset=phase, seed=seed) if water else None
 
     surface = make_trench_surface_material(water, phase, seed)
     surface_z = (-MOAT_DEPTH + 0.08) if water else -DRY_MOAT_DEPTH
@@ -147,6 +215,13 @@ def build_trench_moat(scene: bpy.types.Scene, mask: str, water: bool, phase: tup
         add_mesh(scene, f"Lip{name}",
             [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), -0.035), (*map_xy(*p0), -0.035)],
             [(0, 1, 2, 3)], lip)
+        if waterline is not None:
+            w0 = (q0[0] + ix * 0.055, q0[1] + iy * 0.055)
+            w1 = (q1[0] + ix * 0.055, q1[1] + iy * 0.055)
+            add_mesh(scene, f"Waterline{name}",
+                [(*map_xy(*q0), surface_z + 0.004), (*map_xy(*q1), surface_z + 0.004),
+                 (*map_xy(*w1), surface_z + 0.004), (*map_xy(*w0), surface_z + 0.004)],
+                [(0, 1, 2, 3)], waterline)
 
     holdout = make_holdout_material()
     for name, low, high in (
@@ -177,8 +252,9 @@ def build_trench_moat_diagonal(scene: bpy.types.Scene, water: bool, orientation:
     """
     import math
     earth = make_trench_bank_material()
-    rim_mat = make_material("MoatRim", (0.150, 0.124, 0.088, 1.0))
+    rim_mat = make_trench_rim_material()
     lip_mat = make_material("MoatGrassLip", (0.105, 0.150, 0.070, 1.0))
+    waterline = make_waterline_material() if water else None
     surface = make_trench_surface_material(water, (0.0, 0.0), 0.0)
     surface_z = (-MOAT_DEPTH + 0.08) if water else -DRY_MOAT_DEPTH
 
@@ -220,6 +296,13 @@ def build_trench_moat_diagonal(scene: bpy.types.Scene, water: bool, orientation:
         add_mesh(scene, f"DiagLip{side}",
             [(*map_xy(*top0), 0.0), (*map_xy(*top1), 0.0), (*map_xy(*top1), -0.035), (*map_xy(*top0), -0.035)],
             [(0, 1, 2, 3)], lip_mat)
+        if waterline is not None:
+            in0 = offset(a, side, half_top - slope - 0.055)
+            in1 = offset(b, side, half_top - slope - 0.055)
+            add_mesh(scene, f"DiagWaterline{side}",
+                [(*map_xy(*bot0), surface_z + 0.004), (*map_xy(*bot1), surface_z + 0.004),
+                 (*map_xy(*in1), surface_z + 0.004), (*map_xy(*in0), surface_z + 0.004)],
+                [(0, 1, 2, 3)], waterline)
 
     # Holdout skirts clip band bleed into edge neighbors and off-diagonal
     # corners. On-diagonal corners stay open so chained tiles bleed into each
@@ -343,6 +426,7 @@ def _river_materials(phase: tuple[float, float] = (0.0, 0.0), seed: float = 0.0)
         "reed_head": make_material("RiverReedHead", (0.240, 0.195, 0.105, 1.0)),
         "rock": make_noise_material("RiverRock", (0.100, 0.100, 0.098), (0.185, 0.182, 0.172), scale=7.0),
         "tuft": make_material("RiverGrassTuft", (0.096, 0.150, 0.056, 1.0)),
+        "waterline": make_waterline_material(offset=phase, seed=seed),
     }
 
 
@@ -445,6 +529,12 @@ def build_river(scene: bpy.types.Scene, mask: str, phase: tuple[float, float] = 
         add_mesh(scene, f"RiverLip{name}",
             [(*map_xy(*p0), 0.0), (*map_xy(*p1), 0.0), (*map_xy(*p1), -0.03), (*map_xy(*p0), -0.03)],
             [(0, 1, 2, 3)], mats["lip"])
+        w0 = (q0[0] + ix * 0.055, q0[1] + iy * 0.055)
+        w1 = (q1[0] + ix * 0.055, q1[1] + iy * 0.055)
+        add_mesh(scene, f"RiverWaterline{name}",
+            [(*map_xy(*q0), surface_z + 0.004), (*map_xy(*q1), surface_z + 0.004),
+             (*map_xy(*w1), surface_z + 0.004), (*map_xy(*w0), surface_z + 0.004)],
+            [(0, 1, 2, 3)], mats["waterline"])
 
         # Waterside detail. The painter order overdraws this tile with the
         # E/S neighbor's extended floor (0.45), so props stay in the half of
@@ -540,6 +630,12 @@ def build_river_diagonal(scene: bpy.types.Scene, orientation: str) -> None:
         add_mesh(scene, f"RiverDiagLip{side}",
             [(*map_xy(*top0), 0.0), (*map_xy(*top1), 0.0), (*map_xy(*top1), -0.03), (*map_xy(*top0), -0.03)],
             [(0, 1, 2, 3)], mats["lip"])
+        in0 = offset(a, side, half_top - slope - 0.055)
+        in1 = offset(b, side, half_top - slope - 0.055)
+        add_mesh(scene, f"RiverDiagWaterline{side}",
+            [(*map_xy(*bot0), surface_z + 0.004), (*map_xy(*bot1), surface_z + 0.004),
+             (*map_xy(*in1), surface_z + 0.004), (*map_xy(*in0), surface_z + 0.004)],
+            [(0, 1, 2, 3)], mats["waterline"])
 
         # Waterside detail on the rim, kept away from both corners so chained
         # diagonal tiles do not double up props at the shared corner.
