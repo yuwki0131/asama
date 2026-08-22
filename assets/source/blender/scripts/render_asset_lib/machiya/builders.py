@@ -4,7 +4,9 @@ Duplicated rather than imported: the isolated cache key hashes only this
 package plus core.py/materials.py, so importing geometry from buildings.py or
 vegetation.py would let those files change without invalidating machiya
 renders. Divergence from the source copy is intentional only in the material
-set (weathered, sun-bleached planks for the v2 body and v3 itabuki roof).
+set (weathered, sun-bleached planks for the v2 body and v3 itabuki roof, and
+the v2-only weathered kawara roof + wood verge that keep packed rows from
+reading as one repeated unit — in rows only roofs/gables stay visible).
 """
 from __future__ import annotations
 
@@ -19,6 +21,7 @@ from ..materials import (
     make_fringed_pad_material,
     make_material,
     make_plank_material,
+    make_showcase_roof,
     prop_materials,
 )
 
@@ -40,6 +43,21 @@ def machiya_material_set() -> dict[str, bpy.types.Material]:
     mats["itabuki_plank"] = make_plank_material(
         "MachiyaItabukiPlank", (0.165, 0.150, 0.120), (0.300, 0.272, 0.220)
     )
+    # In packed rows only the roof + gable stay visible (bodies occlude each
+    # other), so v2 gets its own roof family: sun-bleached warm-brown kawara,
+    # clearly lighter than the v1 ibushi dark and coarser in column rhythm.
+    weathered = dict(
+        name="MachiyaRoofWeathered",
+        base_dark=(0.112, 0.090, 0.062),
+        base_light=(0.215, 0.172, 0.112),
+        mud=(0.115, 0.090, 0.058),
+        columns=7.0,
+        seam=(0.50, 0.42, 0.29),
+        grime_strength=0.42,
+    )
+    mats["roof_v2"] = make_showcase_roof("x", **weathered)
+    weathered["name"] = "MachiyaRoofWeatheredY"
+    mats["roof_v2_y"] = make_showcase_roof("y", **weathered)
     return mats
 
 
@@ -221,7 +239,7 @@ def build_machiya(scene: bpy.types.Scene, variant: int = 1, orientation: str = "
                 bar += 0.095
         add_kawara_roof(
             scene, "MachiyaRoof", *rect((-2.0, -1.0), (0.0, 0.0)), wall_top, ridge_top, axis,
-            mats["roof"] if axis == "x" else mats["roof_y"], mats["trim"], verge_material=mats["plaster"],
+            mats["roof_v2"] if axis == "x" else mats["roof_v2_y"], mats["trim"], verge_material=mats["trim"],
         )
     else:
         # Itabuki cottage: low plank walls under a stone-weighted board roof.

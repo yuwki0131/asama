@@ -168,6 +168,28 @@
       }
     },
     {
+      "assetId": "building.samurai_residence.v2",
+      "kind": "building",
+      "file": "generated/building-samurai-residence-v2.png",
+      "width": 288,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
+      "assetId": "building.samurai_residence.v3",
+      "kind": "building",
+      "file": "generated/building-samurai-residence-v3.png",
+      "width": 288,
+      "height": 224,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.8571428571428571
+      }
+    },
+    {
       "assetId": "building.town_block",
       "kind": "building",
       "file": "generated/building-town-block.png",

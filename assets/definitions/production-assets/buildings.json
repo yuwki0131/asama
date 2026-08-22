@@ -127,6 +127,56 @@
       }
     },
     {
+      "assetId": "building.samurai_residence.v2",
+      "kind": "building",
+      "output": "building-samurai-residence-v2.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/building-samurai-residence-v2.png"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 288,
+        "canvasHeight": 224,
+        "anchorX": 144,
+        "anchorY": 192
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.samurai_residence.v3",
+      "kind": "building",
+      "output": "building-samurai-residence-v3.png",
+      "source": {
+        "type": "raster",
+        "file": "assets/source/raster/building-samurai-residence-v3.png"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 288,
+        "canvasHeight": 224,
+        "anchorX": 144,
+        "anchorY": 192
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
       "assetId": "building.town_block",
       "kind": "building",
       "output": "building-town-block.png",
