@@ -35,6 +35,20 @@ cd apps/game && node qa/visual-patrol.mjs --scenario ogaki-castle --count 12 --s
   既知ルールへの誘導は新種の違和感を殺す)
 - 出力様式: 箇所(画像内位置)+ 何が変か + 深刻度(高/中/低)を1行ずつ
 
+**異種レビュアー(GPT-6 Astra)を必ず1系統混ぜる**: Claude系のみだと同族の盲点を
+共有する(2026-09-20: Claude3並列が高0件とした収束判定ビューから、Astraが本物の
+高4件=V-15を検出した実績)。実行:
+
+```bash
+cd apps/game && node qa/astra-review.mjs --run-dir <artifacts run dir>
+# ローカルcodex CLI(ChatGPTログイン)経由。出力: run dir内 astra-review.md/.json
+```
+
+注意: Astraの深刻度較正はClaudeよりかなり辛口(既知watchの反復系も高と出がち)。
+高判定は鵜呑みにせず、必ず該当箇所をクロップ+セル座標換算で裏取りしてから採番する。
+座標換算: デフォルトfirstビューはセル(64,64)中心・zoom1、TILE=64x32、
+cell = ((sy/16)±(sx/32))/2。
+
 ## 3. 台帳化(triage)
 
 `docs/05_map-and-art/visual-patrol-ledger.md` に V-nn 採番で記録:

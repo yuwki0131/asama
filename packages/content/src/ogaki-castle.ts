@@ -249,10 +249,15 @@ export const ogakiCastleScenario: ContentScenarioDefinition = {
     at("yagura", 56, 38), at("yagura", 68, 38), at("yagura", 56, 50), at("yagura", 68, 50),
     at("tenshu_large", 58, 40), at("honmaru", 64, 42),
     ...filledBorder("water_moat", 52, 34, 73, 54, 3, honmaruBridge),
-    ...cells("diagonal_water_moat_nesw", [[52, 34], [53, 34], [52, 35]]),
-    ...cells("diagonal_water_moat_nwse", [[72, 34], [73, 34], [73, 35]]),
-    ...cells("diagonal_water_moat_nwse", [[52, 53], [52, 54], [53, 54]]),
-    ...cells("diagonal_water_moat_nesw", [[72, 54], [73, 53], [73, 54]]),
+    // 旧・コーナー面取り(diagonal_water_moat_*)は45°斜め水路の走行用ピースで、
+    // 矩形リングの角を欠く用途には使えない(nesw=画面水平の護岸帯/nwse=画面垂直の
+    // 水路スプライト)。角に置くと護岸帯が開水面に浮き、水路断片が陸へはみ出す
+    // (V-15)。角は二之丸堀と同じ正方形アウターコーナー(素の水堀セル)にする。
+    // 南側2コーナーは二之丸堀北帯(y55/シフト後75)と直接合流するため全水面になる。
+    ...cells("water_moat", [
+      [52, 34], [53, 34], [52, 35], [72, 34], [73, 34], [73, 35],
+      [52, 53], [52, 54], [53, 54], [72, 54], [73, 53], [73, 54],
+    ]),
     ...cells("wood_bridge", [[63, 52], [63, 53], [63, 54]]),
 
     // Ninomaru and its independent moat, north wooden approach and south earthwork.
