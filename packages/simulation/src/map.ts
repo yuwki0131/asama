@@ -45,7 +45,6 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
       }
       const neighbors = [terrainAtCell(x + 1, y), terrainAtCell(x - 1, y), terrainAtCell(x, y + 1), terrainAtCell(x, y - 1)];
       const nearWater = neighbors.includes("water");
-      const nearStone = neighbors.includes("stone");
 
       if (nearWater) {
         const r = hash(x, y, 1);
@@ -54,13 +53,6 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
         } else if (r < 0.38) {
           // Bamboo clusters along waterways
           decorations.push({ assetId: "deco.bamboo.1", position: { x, y } });
-        }
-        continue;
-      }
-
-      if (nearStone) {
-        if (hash(x, y, 2) < 0.22) {
-          decorations.push({ assetId: "deco.rock.1", position: { x, y } });
         }
         continue;
       }
@@ -295,10 +287,9 @@ function terrainAt(coord: CellCoord): TerrainType {
     return "water";
   }
 
-  const ridgeDistance = Math.abs(coord.x - 84 - Math.round(Math.cos(coord.y / 11) * 5));
-  if (ridgeDistance <= 1 && coord.y > 20 && coord.y < 104) {
-    return "stone";
-  }
+  // (旧: x≈84+cos蛇行の手続き岩尾根(stone帯)がここにあったが、2026-09-20に撤去。
+  //  史実の城郭平野に存在しない地形で、V-12(遠景白ジグザグ)や中堀との衝突の
+  //  原因だった。戦術的障害の代替は湿地(marsh)地形として別途実装する。)
 
   // Dirt appears as coherent zones only; the old regular per-cell sprinkle
   // read as polka dots on the painterly terrain.
