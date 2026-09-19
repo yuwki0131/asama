@@ -668,6 +668,38 @@ describe("river family", () => {
   });
 });
 
+describe("terrain-water junctions (V-15)", () => {
+  it("opens a water moat toward adjacent terrain water (手続き川との合流)", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 61, y: 50 });
+    place(world, "water_moat", { x: 60, y: 50 });
+
+    expect(buildingAt(world, { x: 60, y: 50 }).assetId).toMatch(/^building\.water_moat\.connected\.0100/);
+  });
+
+  it("opens a river building toward adjacent terrain water", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 60, y: 49 });
+    place(world, "river", { x: 60, y: 50 });
+
+    expect(buildingAt(world, { x: 60, y: 50 }).assetId).toMatch(/^building\.river\.connected\.1000/);
+  });
+
+  it("keeps a dry moat capped against terrain water (no water surface to join)", () => {
+    const world = createInitialWorld();
+    resetBuildings(world);
+    normalizeMap(world);
+    setWaterCell(world, { x: 61, y: 50 });
+    place(world, "dry_moat", { x: 60, y: 50 });
+
+    expect(buildingAt(world, { x: 60, y: 50 }).assetId).toMatch(/^building\.dry_moat\.connected\.0000/);
+  });
+});
+
 describe("arc walls", () => {
   it("occupies the staircase footprint cells and nothing else (r3 se)", () => {
     const world = createInitialWorld();

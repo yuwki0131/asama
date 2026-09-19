@@ -646,16 +646,32 @@ function connectedAssetFamily(type: BuildingType): string | null {
 
 function connectionMask(world: WorldState, building: BuildingState): string {
   return cardinalDirections
-    .map((direction) =>
-      connectsTo(building, getBuildingAt(world, { x: building.position.x + direction.x, y: building.position.y + direction.y }))
+    .map((direction) => {
+      const target = { x: building.position.x + direction.x, y: building.position.y + direction.y };
+      return connectsTo(building, getBuildingAt(world, target))
         ? "1"
         : connectsToAdjacentGateFootprint(world, building, direction)
         ? "1"
         : connectsToAdjacentArcEndpoint(world, building, direction)
         ? "1"
-        : "0"
-    )
+        : connectsToTerrainWater(world, building, target)
+        ? "1"
+        : "0";
+    })
     .join("");
+}
+
+/** 水面をもつ堀/川建物は隣接セルの地形水(手続き川)とも同一水面として接続する。
+ *  建物同士の判定しか無いと、堀が手続き川に合流する接合部で川側のビットが0になり、
+ *  護岸キャップが開水面の中に浮いて描かれる(V-15)。空堀は水面が無いので対象外。 */
+function connectsToTerrainWater(world: WorldState, building: BuildingState, target: CellCoord): boolean {
+  if (building.type !== "water_moat" && building.type !== "river") {
+    return false;
+  }
+  if (target.x < 0 || target.y < 0 || target.x >= world.map.width || target.y >= world.map.height) {
+    return false;
+  }
+  return getCell(world, target).terrain === "water";
 }
 
 function connectsToAdjacentGateFootprint(world: WorldState, building: BuildingState, direction: CellCoord): boolean {
