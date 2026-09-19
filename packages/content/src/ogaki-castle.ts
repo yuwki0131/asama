@@ -140,7 +140,9 @@ const machiyaRows: ScenarioBuildingPlacement[] = [];
 // 向かい合う帯・背割りペアでは同じ位置に路地を通す(史実の木戸・横町の抜け)。
 const minojiAlleys = new Set([20, 26]);
 const sewariAlleys = new Set([70, 77, 85, 92]);
-const yokochoAlleys = new Set([48, 55, 70, 76, 86]);
+// x=81 は旧・石尾根撤去(2026-09-20)で生まれた x77..85 の9連ランを COMP-04
+// (連続ラン≤8棟)に収めるための追加木戸。
+const yokochoAlleys = new Set([48, 55, 70, 76, 81, 86]);
 // 美濃路(y=61)両側町: 間口1セルの町屋が街道を挟んで向かい合う。
 for (let x = 16; x <= 31; x += 1) {
   if (minojiAlleys.has(x)) continue;
@@ -151,12 +153,9 @@ for (let y = 64; y <= 99; y += 1) {
   if (sewariAlleys.has(y)) continue;
   machiyaRows.push(at("machiya", 34, y), at("machiya", 37, y));
 }
-// 南横町(y=102)沿いの町屋テラス。南大手道(x=62..63)は通行帯として空け、
-// 石尾根(道路と同じ x≈84+cos(y/11)*5 の帯、建設不能地形)も避ける。
+// 南横町(y=102)沿いの町屋テラス。南大手道(x=62..63)は通行帯として空ける。
 for (let x = 42; x <= 89; x += 1) {
   if (x === 62 || x === 63 || yokochoAlleys.has(x)) continue;
-  const onStoneRidge = [103, 104].some((y) => Math.abs(x - 84 - Math.round(Math.cos(y / 11) * 5)) <= 1);
-  if (onStoneRidge) continue;
   machiyaRows.push(at("machiya_ne_sw", x, 103));
 }
 
@@ -175,10 +174,8 @@ const seenRoads = new Set<string>();
 for (let index = roads.length - 1; index >= 0; index -= 1) {
   const road = roads[index]!;
   const key = `${road.position.x},${road.position.y}`;
-  const onStoneRidge = road.position.y > 20 && road.position.y < 104
-    && Math.abs(road.position.x - 84 - Math.round(Math.cos(road.position.y / 11) * 5)) <= 1;
   const inRiverReserve = road.position.y >= 35 && road.position.y <= 46;
-  if (seenRoads.has(key) || onStoneRidge || inRiverReserve) roads.splice(index, 1);
+  if (seenRoads.has(key) || inRiverReserve) roads.splice(index, 1);
   else seenRoads.add(key);
 }
 
@@ -269,16 +266,18 @@ export const ogakiCastleScenario: ContentScenarioDefinition = {
     ...cells("earth_bridge", [[63, 71], [63, 72], [63, 73]]),
 
     // Sannomaru enclosing both central compounds; its single south gate continues the depth axis.
-    ...ring("wall", 40, 28, 86, 81, ["79,28", "80,28", "81,28", "82,28", "83,28", "84,28", ...[33,34,35,36,37,38,39,40,58,59,60,61,62,63,64,65].map((y) => `86,${y}`), "62,81", "63,81", "64,81", "76,81", "77,81", "78,81", "79,81", "80,81", "81,81"]),
+    // (旧・石尾根の貫通部として北x79-84/東x86のy33-40,58-65/南x76-81に開口が
+    //  あったが、尾根撤去(2026-09-20)に伴い門以外を閉鎖 — 開口が草原に唐突な
+    //  塀端部として露出していた(L2指摘)。)
+    ...ring("wall", 40, 28, 86, 81, ["62,81", "63,81", "64,81"]),
     at("gate_wide_3", 62, 81),
     ...ring("fence", 43, 42, 50, 52, ["46,52", "47,52"]), at("gate_wide_2", 46, 52),
     ...ring("fence", 76, 43, 83, 53, ["79,53", "80,53"]), at("gate_wide_2", 79, 53),
 
     // Only the east has an extra middle moat and samurai quarter.
-    ...filledBorder("water_moat", 88, 29, 90, 78, 1).filter((placement) => {
-      const y = placement.position.y + 20;
-      return Math.abs(placement.position.x - 84 - Math.round(Math.cos(y / 11) * 5)) > 1;
-    }),
+    // (旧・石尾根との衝突回避フィルタは尾根撤去(2026-09-20)に伴い削除 —
+    //  中堀は欠けのない完全なリングになった)
+    ...filledBorder("water_moat", 88, 29, 90, 78, 1),
     at("samurai_residence", 94, 34), at("samurai_residence", 101, 34),
     at("samurai_residence", 94, 42), at("samurai_residence", 101, 42),
     at("samurai_residence", 94, 50), at("samurai_residence", 101, 50),
