@@ -42,9 +42,9 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     ],
     slopes: [
       // 大手道 0→1 (幅2の大手坂。城下の大手門跡から三の丸南帯曲輪へ)
-      { position: { x: 56, y: 86 }, toward: "N", width: 2 },
+      { position: { x: 56, y: 86 }, toward: "N", width: 2, skin: "ishigaki" },
       // 搦手道 0→1 (南東面の細い裏坂。東の廊下から三の丸東縁へ)
-      { position: { x: 74, y: 79 }, toward: "W" },
+      { position: { x: 74, y: 79 }, toward: "W", skin: "ishigaki" },
       // 大手道 1→2 (三の丸帯曲輪を西へ横断させてから登らせる幅2の坂)
       { position: { x: 52, y: 72 }, toward: "N", width: 2 },
       // 搦手道 1→2 (二の丸南東角への幅1の坂)

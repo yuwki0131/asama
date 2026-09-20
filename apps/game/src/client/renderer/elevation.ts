@@ -180,6 +180,18 @@ export function cliffInfoFor(map: ElevationMapLike, cell: TerrainCellSnapshot): 
     // 2-cell halves). The two lifted diamond corners are the ones on the
     // uphill edge, so the side wall's top is high at the corner shared with
     // the uphill edge and low at the corner shared with the downhill edge.
+    //
+    // Same-ramp neighbour: a width>1 slope is N parallel columns whose
+    // surfaces are flush — drawing a cheek wall between them slices the
+    // ramp into railed strips (V-16 「3連コピペ階段」の内部頬壁).
+    if (
+      neighbour !== null &&
+      neighbour.slope === cell.slope &&
+      neighbour.elevation === cell.elevation &&
+      neighbour.slopeHalf === cell.slopeHalf
+    ) {
+      continue;
+    }
     const slope = cell.slope as SlopeDirection;
     const rise = slopeRise(cell);
     const low = cell.elevation + rise.down;

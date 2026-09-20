@@ -4480,6 +4480,138 @@
       }
     },
     {
+      "assetId": "terrain.slope.ishigaki.n.mid",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-n-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.n.cvn",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-n-cvn.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.n.cvp",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-n-cvp.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.e.mid",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-e-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.e.cvn",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-e-cvn.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.e.cvp",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-e-cvp.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.s.mid",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-s-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.s.cvn",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-s-cvn.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.s.cvp",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-s-cvp.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.w.mid",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-w-mid.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.w.cvn",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-w-cvn.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope.ishigaki.w.cvp",
+      "kind": "terrain",
+      "file": "generated/terrain-slope-ishigaki-w-cvp.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
       "assetId": "terrain.slope2.dirt.n.lower",
       "kind": "terrain",
       "file": "generated/terrain-slope2-dirt-n-lower.png",

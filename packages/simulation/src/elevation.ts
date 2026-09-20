@@ -194,7 +194,14 @@ export function applyScenarioElevation(map: WorldState["map"], definition: Scena
       if (cell.elevation >= MAX_ELEVATION) {
         throw new Error(`Slope at ${coord.x},${coord.y} cannot rise above MAX_ELEVATION`);
       }
-      map.cells[index] = { ...cell, slope: slope.toward, ...(half !== undefined ? { slopeHalf: half } : {}) };
+      map.cells[index] = {
+        ...cell,
+        slope: slope.toward,
+        ...(half !== undefined ? { slopeHalf: half } : {}),
+        // スロープセルは低い側に立つため段丘パッチのskinを継がない。明示skinで
+        // 石垣城の登城路が黒土の坂になる語彙混在を防ぐ(V-16)。
+        ...(slope.skin !== undefined ? { elevationSkin: slope.skin } : {})
+      };
     }
   }
 

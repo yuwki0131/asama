@@ -228,7 +228,7 @@ export const ogakiCastleScenario: ContentScenarioDefinition = {
     slopes: [
       // 虎口スロープ: L1→L2、L0→L1(いずれも北へ上がる)
       { position: { x: 62, y: 67 }, toward: "N", width: 3 },
-      { position: { x: 62, y: 69 }, toward: "N", width: 3 },
+      { position: { x: 62, y: 69 }, toward: "N", width: 3, skin: "ishigaki" },
     ],
   },
   initialBuildings: [

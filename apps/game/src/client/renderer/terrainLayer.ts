@@ -739,7 +739,34 @@ export function addSlopeCellSprites(
       : `terrain.slope2.${slopeAssetSkin(cell.elevationSkin)}.${slope.toLowerCase()}.${cell.slopeHalf}`;
   const asset = assets.get(slopeAssetId);
   if (asset !== undefined) {
-    const sprite = createSpriteFromCandidates([slopeAssetId], assets);
+    // Width>1 slopes tile this sprite per column; a per-column pair of curb
+    // rails read as parallel fenced flights (V-16). Interior columns use the
+    // curbless mid variant and edge columns keep only their outer curb
+    // (cvn/cvp), so the flight reads as ONE wide stairway. Base sprite stays
+    // the fallback for missing variants.
+    const variantIds: string[] = [];
+    if (cell.slopeHalf === undefined && slopeAssetSkin(cell.elevationSkin) === "ishigaki") {
+      const alongX = slope === "N" || slope === "S";
+      const sameRamp = (dx: number, dy: number): boolean => {
+        const neighbour = cellAt(map, cell.coord.x + dx, cell.coord.y + dy);
+        return (
+          neighbour !== null &&
+          neighbour.slope === cell.slope &&
+          neighbour.elevation === cell.elevation &&
+          neighbour.slopeHalf === cell.slopeHalf
+        );
+      };
+      const neg = alongX ? sameRamp(-1, 0) : sameRamp(0, -1);
+      const pos = alongX ? sameRamp(1, 0) : sameRamp(0, 1);
+      if (neg && pos) {
+        variantIds.push(`${slopeAssetId}.mid`);
+      } else if (neg) {
+        variantIds.push(`${slopeAssetId}.cvp`);
+      } else if (pos) {
+        variantIds.push(`${slopeAssetId}.cvn`);
+      }
+    }
+    const sprite = createSpriteFromCandidates([...variantIds, slopeAssetId], assets);
     sprite.position.set(point.x, point.y + offsetY);
     layer.addChild(sprite);
     return;

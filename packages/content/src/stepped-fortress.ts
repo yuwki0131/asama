@@ -25,7 +25,7 @@ export const steppedFortressScenario: ContentScenarioDefinition = {
     ],
     slopes: [
       // 三の丸大手 0→1 (幅3)
-      { position: { x: 71, y: 60 }, toward: "W", width: 3 },
+      { position: { x: 71, y: 60 }, toward: "W", width: 3, skin: "ishigaki" },
       // 二の丸 1→2 (幅2)
       { position: { x: 55, y: 60 }, toward: "W", width: 2 },
       // 本丸 2→3 (幅1の虎口)

@@ -239,6 +239,10 @@ export interface ScenarioSlope {
   readonly toward: SlopeDirection;
   readonly width?: number;
   readonly length?: 1 | 2;
+  /** 見た目スキンの明示指定。スロープセルは低い側に立つため、段丘パッチの
+   *  外側に置かれると自動ではdirt(土道)になる — 石垣の城で登城階段だけ
+   *  黒土の坂になる語彙混在(V-16)を防ぐ時に "ishigaki" を指定する。 */
+  readonly skin?: "ishigaki" | "cliff";
 }
 
 export interface ScenarioElevationDefinition {
