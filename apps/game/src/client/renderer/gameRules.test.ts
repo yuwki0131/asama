@@ -123,6 +123,26 @@ describe("bridgeCellAssetCandidates segment auto-tiling", () => {
     expect(bridgeCellAssetCandidates(bridge, { x: 61, y: 45 })[0]).toBe("building.earth_bridge.y.end");
   });
 
+  it("meets a barrier-family neighbor flush (mid segment, no onshore ramp) at the abutting end only", () => {
+    const footprint: CellCoord[] = [52, 53, 54].map((y) => ({ x: 63, y }));
+    const bridge = mockBridge("wood_bridge", "building.wood_bridge.y3", footprint);
+    const gate = mockBuilding({
+      id: "g1",
+      type: "gate_yagura_3",
+      position: { x: 63, y: 51 },
+      footprint: [{ x: 62, y: 51 }, { x: 63, y: 51 }, { x: 64, y: 51 }],
+      passable: false,
+      assetId: "building.gate.yagura.closed.nw_se.narrow3.connected.0101"
+    });
+    const snapshot = { buildings: [bridge, gate] } as unknown as WorldSnapshot;
+    // north end abuts the gate sill: flush deck instead of the earthen ramp.
+    expect(bridgeCellAssetCandidates(bridge, { x: 63, y: 52 }, snapshot)[0]).toBe("building.wood_bridge.y.mid");
+    // south end faces open ground: the approach ramp stays.
+    expect(bridgeCellAssetCandidates(bridge, { x: 63, y: 54 }, snapshot)[0]).toBe("building.wood_bridge.y.end");
+    // without a snapshot the legacy start/end tiling is unchanged.
+    expect(bridgeCellAssetCandidates(bridge, { x: 63, y: 52 })[0]).toBe("building.wood_bridge.y.start");
+  });
+
   it("uses the isolated single-tile asset for legacy 1-cell bridges", () => {
     const bridge = mockBridge("wood_bridge", "building.wood_bridge.y3", [{ x: 62, y: 45 }]);
     expect(bridgeCellAssetCandidates(bridge, { x: 62, y: 45 })).toEqual([

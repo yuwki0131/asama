@@ -829,7 +829,7 @@ function addBuildingSprite(
   snapshot: WorldSnapshot
 ): void {
   if (isBridgeBuildingType(building.type)) {
-    addBridgeSprites(layer, building, assets, zoom);
+    addBridgeSprites(layer, building, assets, zoom, snapshot);
     return;
   }
 
@@ -873,9 +873,6 @@ function addBuildingSprite(
       cap.anchor.set(capAsset.anchor.x, capAsset.anchor.y);
       const corner = gridCornerToWorld(key);
       cap.position.set(roundWorldPixel(corner.x, zoom), roundWorldPixel(corner.y + offsetY, zoom));
-      if (building.owner === "enemy") {
-        cap.tint = 0xffaaa0;
-      }
       layer.addChild(cap);
     }
   }
@@ -915,9 +912,6 @@ function addHonmaruTileSprites(
     const y = roundWorldPixel(point.y + offsetY, zoom);
     backing.poly([x, y - 16, x + 32, y, x, y + 16, x - 32, y]).fill({ color: 0xc2a46e });
   }
-  if (building.owner === "enemy") {
-    backing.tint = 0xffaaa0;
-  }
   layer.addChild(backing);
   for (const cell of cells) {
     const candidates = honmaruCellAssetCandidates(building, cell);
@@ -928,9 +922,6 @@ function addHonmaruTileSprites(
     // pattern doesn't read as a mechanical per-cell repeat.
     if (candidates[0]?.endsWith(".1111") === true && (cell.x + cell.y) % 2 !== 0) {
       sprite.scale.x *= -1;
-    }
-    if (building.owner === "enemy") {
-      sprite.tint = 0xffaaa0;
     }
     layer.addChild(sprite);
   }
@@ -946,17 +937,29 @@ function addBridgeSprites(
   layer: Container,
   building: BuildingSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
-  zoom: number
+  zoom: number,
+  snapshot: WorldSnapshot
 ): void {
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   const cells = building.footprint.length > 0 ? building.footprint : [building.position];
+  // V-27: the deck casts a soft contact shadow onto the water/ground under
+  // the span — without it the bridge reads as a floating sticker. The shadow
+  // is a shrunk cell diamond nudged down-right (light is fixed top-left,
+  // TONE-03), drawn before the deck sprites so the deck overlaps it.
+  const shadow = new Graphics();
   for (const cell of cells) {
-    const sprite = createSpriteFromCandidates(bridgeCellAssetCandidates(building, cell), assets);
+    const point = cellToWorld(cell);
+    const x = roundWorldPixel(point.x + 5, zoom);
+    const y = roundWorldPixel(point.y + offsetY + 4, zoom);
+    const w = 32 * 0.85;
+    const h = 16 * 0.85;
+    shadow.poly([x, y - h, x + w, y, x, y + h, x - w, y]).fill({ color: 0x141c26, alpha: 0.26 });
+  }
+  layer.addChild(shadow);
+  for (const cell of cells) {
+    const sprite = createSpriteFromCandidates(bridgeCellAssetCandidates(building, cell, snapshot), assets);
     const point = cellToWorld(cell);
     sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
-    if (building.owner === "enemy") {
-      sprite.tint = 0xffaaa0;
-    }
     layer.addChild(sprite);
   }
 }
