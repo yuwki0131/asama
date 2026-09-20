@@ -367,11 +367,17 @@ export class RetainedScene {
       } else if (entry.kind === "building") {
         addBuildingSprite(this.staticLayer, entry.item, assets, zoom, snapshot.economy.season, snapshot);
         // Flag pennant for castle buildings on intact structures only.
+        // Enemy-held key buildings (camp gates, barracks, storehouses) also
+        // fly their red nobori: ownership used to be a full-sprite salmon
+        // tint, which read as broken/placeholder art (V-21) — the banner is
+        // the diegetic marker instead.
         const building = entry.item;
-        if (
-          building.lifecycleState === "intact" &&
-          (building.type === "yagura" || building.type === "tenshu" || building.type === "tenshu_large" || building.type === "honmaru")
-        ) {
+        const castleFlagType =
+          building.type === "yagura" || building.type === "tenshu" || building.type === "tenshu_large" || building.type === "honmaru";
+        const enemyCampFlagType =
+          building.owner === "enemy" &&
+          (building.type.startsWith("gate_") || building.type === "barracks" || building.type === "storehouse" || building.type === "market");
+        if (building.lifecycleState === "intact" && (castleFlagType || enemyCampFlagType)) {
           const flagGraphics = createFlagGraphics(building, zoom);
           this.staticLayer.addChild(flagGraphics);
           this.flagVisuals.push({
@@ -818,9 +824,8 @@ function addBuildingSprite(
   // the anchor cell's elevation lifts the whole sprite.
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
-  if (building.owner === "enemy") {
-    sprite.tint = 0xffaaa0;
-  }
+  // 敵所有はスプライトのサーモンタントではなく赤い幟で示す(V-21)。全面
+  // multiplyの桃色化は「テクスチャ欠落/未完成アセット」に誤読された。
 
   // Junction arms bridging straight walls to adjacent diagonal walls. All
   // arms draw behind the wall sprite: the wall band then hides each arm's
@@ -835,9 +840,6 @@ function addBuildingSprite(
     const arm = new Sprite(asset.texture);
     arm.anchor.set(asset.anchor.x, asset.anchor.y);
     arm.position.set(sprite.position.x, sprite.position.y);
-    if (building.owner === "enemy") {
-      arm.tint = 0xffaaa0;
-    }
     layer.addChild(arm);
   }
   layer.addChild(sprite);
