@@ -954,11 +954,18 @@ def build_slope_half(scene: bpy.types.Scene, skin: str, toward: str, half: str) 
 
 # --- slope side wedges -------------------------------------------------------
 
-def build_slope_side(scene: bpy.types.Scene, skin: str, toward: str, side: str) -> None:
+def build_slope_side(
+    scene: bpy.types.Scene, skin: str, toward: str, side: str, half: str | None = None
+) -> None:
     """Triangular cheek wall under a slope's open flank (drawn when the cell
     beside the ramp sits at the slope's base level). side "e" = wall on the
     ramp's map x=+0.5 boundary, side "s" = map y=+0.5 boundary.
-    Canvas 64x72, anchor (32,56)."""
+    Canvas 64x72, anchor (32,56).
+
+    half "lower"/"upper" produces the cheek for a gentle 2-cell ramp half
+    (V-16第2弾): the height profile covers only that half's span of the rise
+    (lower 0→LEVEL/2 wedge, upper LEVEL/2→LEVEL trapezoid), so the two cells'
+    cheeks join at exactly LEVEL/2 with no step."""
     # Height profile along the boundary, in the boundary's own coordinate t.
     if side == "e":
         edge_point = lambda t, o, z: (0.5 - o, t, z)
@@ -968,8 +975,12 @@ def build_slope_side(scene: bpy.types.Scene, skin: str, toward: str, side: str) 
         rising = toward == "e"
 
     def z_top(t: float) -> float:
-        s = (t + 0.5) if rising else (0.5 - t)
-        return LEVEL * max(0.0, min(1.0, s))
+        s = max(0.0, min(1.0, (t + 0.5) if rising else (0.5 - t)))
+        if half == "lower":
+            s = 0.5 * s
+        elif half == "upper":
+            s = 0.5 + 0.5 * s
+        return LEVEL * s
 
     grass_dark, grass_light = _grass_lip_materials()
     if skin == "dirt":
