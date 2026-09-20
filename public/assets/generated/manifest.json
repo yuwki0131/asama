@@ -4788,6 +4788,94 @@
       }
     },
     {
+      "assetId": "terrain.slope2.dirt.n.lower.side.e",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-n-lower-side-e.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.n.upper.side.e",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-n-upper-side-e.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.e.lower.side.s",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-e-lower-side-s.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.e.upper.side.s",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-e-upper-side-s.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.s.lower.side.e",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-s-lower-side-e.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.s.upper.side.e",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-s-upper-side-e.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.w.lower.side.s",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-w-lower-side-s.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "terrain.slope2.dirt.w.upper.side.s",
+      "kind": "terrain",
+      "file": "generated/terrain-slope2-dirt-w-upper-side-s.png",
+      "width": 64,
+      "height": 72,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7777777777777778
+      }
+    },
+    {
       "assetId": "terrain.grass.base",
       "kind": "terrain",
       "file": "generated/terrain-grass-base.png",

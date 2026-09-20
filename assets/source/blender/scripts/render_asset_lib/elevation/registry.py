@@ -29,6 +29,7 @@ ELEVATION_MODEL_PATTERNS = (
     "elev-slope-ishigaki-[nesw]-(mid|cvn|cvp)",
     "elev-slope-(dirt|ishigaki)-[nesw]-side-(s|e)",
     "elev-slope2-dirt-[nesw]-(lower|upper)",
+    "elev-slope2-dirt-[nesw]-(lower|upper)-side-(s|e)",
 )
 
 
@@ -65,6 +66,16 @@ def resolve_model(name: str):
         toward, kind = slope_variant.group(1), slope_variant.group(2)
         curbs = {"mid": (False, False), "cvn": (True, False), "cvp": (False, True)}[kind]
         return lambda scene: build_slope(scene, "ishigaki", toward, 0, curbs)
+
+    slope2_side = re.fullmatch(r"elev-slope2-(dirt)-([nesw])-(lower|upper)-side-([se])", name)
+    if slope2_side is not None:
+        skin, toward, half, edge = (
+            slope2_side.group(1),
+            slope2_side.group(2),
+            slope2_side.group(3),
+            slope2_side.group(4),
+        )
+        return lambda scene: build_slope_side(scene, skin, toward, edge, half)
 
     slope_half = re.fullmatch(r"elev-slope2-(dirt)-([nesw])-(lower|upper)", name)
     if slope_half is not None:

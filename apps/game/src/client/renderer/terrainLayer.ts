@@ -1073,7 +1073,11 @@ function drawFallbackFace(
     bottomExtra = bleed;
   }
 
-  const color = CLIFF_FALLBACK_COLORS[skin][face.edge];
+  // Slanted faces (topA !== topB) are slope CHEEKS, not cliff walls: back
+  // them with the skin's slope tone (lightened earth / ramp stone). The dark
+  // s/e wall colors under a cheek dominate the small wedge sprites and the
+  // whole flank reads as a flat dark slab (V-16第2弾).
+  const color = CLIFF_FALLBACK_COLORS[skin][face.topA === face.topB ? face.edge : "slope"];
   graphics
     .poly([
       vertexA.x, vertexA.y - face.topA * px,
