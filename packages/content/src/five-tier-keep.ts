@@ -68,7 +68,10 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
     { type: "yagura", position: { x: 60, y: 78 } },
 
     // === 城下 (L0, 南麓) ===
-    ...vLine("road", 57, 84, 97),
+    // 大手木戸 — 大手坂 (57..58,83) の坂下を塞ぐ幅2の木戸。大手道の北端アンカー。
+    { type: "gate_wide_2", position: { x: 57, y: 84 } },
+    // 大手道 — 木戸から敵集結地の街道口 (56..58,105) の手前まで通す。
+    ...vLine("road", 57, 85, 104),
     { type: "town_block", position: { x: 48, y: 86 } },
     { type: "town_block", position: { x: 60, y: 86 } },
     { type: "samurai_residence", position: { x: 48, y: 93 } },

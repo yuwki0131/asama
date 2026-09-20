@@ -53,7 +53,10 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
     { type: "yagura", position: { x: 55, y: 88 } },
 
     // === 城下 (L0, 南麓) ===
-    ...vLine("road", 44, 105, 112),
+    // 大手木戸 — 切通し坂口 (43..44,103..104) の直下を塞ぐ幅2の木戸。大手道の北端アンカー。
+    { type: "gate_wide_2", position: { x: 43, y: 105 } },
+    // 大手道 — 木戸から敵集結地の街道口 (43..45,116) の手前まで通す。
+    ...vLine("road", 44, 106, 115),
     { type: "town_block", position: { x: 47, y: 105 } },
     { type: "market", position: { x: 33, y: 105 } },
     { type: "samurai_residence", position: { x: 37, y: 109 } },

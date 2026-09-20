@@ -11,7 +11,6 @@ import type { ContentScenarioDefinition } from "./index";
  *                     enclosed by a stone wall ring with 4 corner yagura.
  *   Outer enclosure — fence ring with 4 corner yagura.
  *   Castle-town     — two town_blocks connected to the main road, 4 farms.
- *   Moat demo       — dry_moat and water_moat strips east of the castle.
  *   Elevation demo  — small ishigaki terrace in the NW corner (x 20-37, y 20-31)
  *                     with a slope at (28, 32) for trying high-ground mechanics.
  *
@@ -125,18 +124,6 @@ export const freePlayScenario: ContentScenarioDefinition = {
     { type: "storehouse", position: { x: 66, y: 68 } },
     // 南門からの大手道 (内郭内→中郭)
     { type: "road", position: { x: 63, y: 63 } },
-
-    // ===================================================================
-    // 堀 (デモ用)
-    // ===================================================================
-    // 空堀 (西)
-    { type: "dry_moat", position: { x: 76, y: 64 } },
-    { type: "dry_moat", position: { x: 76, y: 65 } },
-    { type: "dry_moat", position: { x: 76, y: 66 } },
-    // 水堀 (東)
-    { type: "water_moat", position: { x: 80, y: 64 } },
-    { type: "water_moat", position: { x: 80, y: 65 } },
-    { type: "water_moat", position: { x: 80, y: 66 } },
 
     // ===================================================================
     // 外郭 柵 (x=44..74, y=47..87)
