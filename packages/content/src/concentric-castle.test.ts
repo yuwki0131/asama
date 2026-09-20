@@ -169,11 +169,23 @@ describe("concentricCastleScenario", () => {
     expect(diagonals.length).toBe(10);
   });
 
-  it("has diagonal water-moat chamfers on all four moat corners", () => {
+  it("uses plain water-moat cells (not diagonal channel pieces) at moat corners", () => {
+    // MOAT-03 (V-15/V-20): diagonal_water_moat_* は45°走行水路専用。矩形リング
+    // の角の面取りに使うとスクリーン軸ストリップの護岸/水路が露出する。
     const diagonals = concentricCastleScenario.initialBuildings.filter((b) =>
       b.type.startsWith("diagonal_water_moat_")
     );
-    expect(diagonals.length).toBe(8);
+    expect(diagonals).toEqual([]);
+    const corners = [
+      [55, 64], [54, 65], [71, 64], [72, 65],
+      [54, 82], [55, 83], [72, 82], [71, 83],
+    ];
+    for (const [x, y] of corners) {
+      const found = concentricCastleScenario.initialBuildings.find(
+        (b) => b.type === "water_moat" && b.position.x === x && b.position.y === y
+      );
+      expect(found, `corner water_moat at ${x},${y}`).toBeDefined();
+    }
   });
 
   it("has no two buildings occupying the same cell", () => {
