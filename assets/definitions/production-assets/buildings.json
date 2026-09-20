@@ -356,8 +356,11 @@
       "kind": "building",
       "output": "building-farm-spring.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/building-farm-spring.png"
+        "type": "blender",
+        "model": "farm-paddy-spring",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -381,8 +384,11 @@
       "kind": "building",
       "output": "building-farm-summer.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/building-farm-summer.png"
+        "type": "blender",
+        "model": "farm-paddy-summer",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -406,8 +412,11 @@
       "kind": "building",
       "output": "building-farm-autumn.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/building-farm-autumn.png"
+        "type": "blender",
+        "model": "farm-paddy-autumn",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
       },
       "geometry": {
         "footprintWidth": 4,
@@ -431,8 +440,235 @@
       "kind": "building",
       "output": "building-farm-winter.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/building-farm-winter.png"
+        "type": "blender",
+        "model": "farm-paddy-winter",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.spring.v2",
+      "kind": "building",
+      "output": "building-farm-spring-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-spring-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.summer.v2",
+      "kind": "building",
+      "output": "building-farm-summer-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-summer-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.autumn.v2",
+      "kind": "building",
+      "output": "building-farm-autumn-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-autumn-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.winter.v2",
+      "kind": "building",
+      "output": "building-farm-winter-v2.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-winter-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.spring.v3",
+      "kind": "building",
+      "output": "building-farm-spring-v3.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-spring-v3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.summer.v3",
+      "kind": "building",
+      "output": "building-farm-summer-v3.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-summer-v3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.autumn.v3",
+      "kind": "building",
+      "output": "building-farm-autumn-v3.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-autumn-v3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
+      },
+      "geometry": {
+        "footprintWidth": 4,
+        "footprintHeight": 4,
+        "canvasWidth": 256,
+        "canvasHeight": 128,
+        "anchorX": 128,
+        "anchorY": 64
+      },
+      "category": "building",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.4
+        }
+      }
+    },
+    {
+      "assetId": "building.farm.winter.v3",
+      "kind": "building",
+      "output": "building-farm-winter-v3.png",
+      "source": {
+        "type": "blender",
+        "model": "farm-paddy-winter-v3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "farm"
       },
       "geometry": {
         "footprintWidth": 4,

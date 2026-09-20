@@ -67,10 +67,17 @@ export function buildingAssetCandidates(building: BuildingSnapshot, season?: Sea
   // Farms swap texture with the season (spring=flooded, summer=green,
   // autumn=golden, winter=bare soil). The seasonal id leads the candidate
   // list so a missing manifest entry still falls back to the season-less
-  // building.farm asset.
+  // building.farm asset. Adjacent paddies alternate a v2 planting-phase
+  // variant by anchor hash so 2x2 farm groups stop being pixel-identical
+  // copies (patrol I族).
   if (building.type === "farm" && season !== undefined) {
+    let h = (building.position.x * 374761393 + building.position.y * 668265263 + 20260920) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    const seasonId = `building.farm.${season}`;
+    const variantId = h % 2 === 0 ? seasonId : `${seasonId}.v2`;
     return [
-      `building.farm.${season}`,
+      variantId,
+      seasonId,
       building.assetId,
       baseBuildingAssetId(building),
       finalBuildingFallbackAssetId(building)

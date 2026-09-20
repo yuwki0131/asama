@@ -443,50 +443,6 @@
       }
     },
     {
-      "assetId": "building.farm.spring",
-      "kind": "building",
-      "file": "generated/building-farm-spring.png",
-      "width": 256,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.farm.summer",
-      "kind": "building",
-      "file": "generated/building-farm-summer.png",
-      "width": 256,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.farm.autumn",
-      "kind": "building",
-      "file": "generated/building-farm-autumn.png",
-      "width": 256,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
-      "assetId": "building.farm.winter",
-      "kind": "building",
-      "file": "generated/building-farm-winter.png",
-      "width": 256,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    {
       "assetId": "unit.spear_ashigaru.idle.south",
       "kind": "unit",
       "file": "generated/unit-spear-ashigaru-idle-south.png",
@@ -638,6 +594,138 @@
       "anchor": {
         "x": 0.5,
         "y": 0.6666666666666666
+      }
+    },
+    {
+      "assetId": "building.farm.spring",
+      "kind": "building",
+      "file": "generated/building-farm-spring.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.summer",
+      "kind": "building",
+      "file": "generated/building-farm-summer.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.autumn",
+      "kind": "building",
+      "file": "generated/building-farm-autumn.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.winter",
+      "kind": "building",
+      "file": "generated/building-farm-winter.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.spring.v2",
+      "kind": "building",
+      "file": "generated/building-farm-spring-v2.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.summer.v2",
+      "kind": "building",
+      "file": "generated/building-farm-summer-v2.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.autumn.v2",
+      "kind": "building",
+      "file": "generated/building-farm-autumn-v2.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.winter.v2",
+      "kind": "building",
+      "file": "generated/building-farm-winter-v2.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.spring.v3",
+      "kind": "building",
+      "file": "generated/building-farm-spring-v3.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.summer.v3",
+      "kind": "building",
+      "file": "generated/building-farm-summer-v3.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.autumn.v3",
+      "kind": "building",
+      "file": "generated/building-farm-autumn-v3.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "building.farm.winter.v3",
+      "kind": "building",
+      "file": "generated/building-farm-winter-v3.png",
+      "width": 256,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
       }
     },
     {

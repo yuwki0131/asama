@@ -29,19 +29,21 @@ function mockBuilding(overrides: Partial<BuildingSnapshot> = {}): BuildingSnapsh
 describe("buildingAssetCandidates seasonal farm resolution", () => {
   const seasons: readonly Season[] = ["spring", "summer", "autumn", "winter"];
 
-  it.each(seasons)("resolves farm to building.farm.%s first", (season) => {
+  it.each(seasons)("resolves farm to a building.farm.%s variant first", (season) => {
+    // 先頭は座標ハッシュで選ばれた植え位相バリアント(素の季節IDのことも
+    // .v2/.v3のこともある)。素の季節IDは必ず1番目か2番目に入る(フォール
+    // バック保証)。
     const candidates = buildingAssetCandidates(mockBuilding(), season);
-    expect(candidates[0]).toBe(`building.farm.${season}`);
+    expect(candidates[0]).toMatch(new RegExp(`^building\\.farm\\.${season}(\\.v[23])?$`));
+    expect(candidates.slice(0, 2)).toContain(`building.farm.${season}`);
   });
 
-  it("falls back to the season-less farm asset after the seasonal id", () => {
+  it("falls back to the season-less farm asset after the seasonal ids", () => {
     const candidates = buildingAssetCandidates(mockBuilding(), "summer");
-    expect(candidates).toEqual([
-      "building.farm.summer",
-      "building.farm",
-      "building.farm",
-      "overlay.cell.blocked"
-    ]);
+    expect(candidates[0]).toMatch(/^building\.farm\.summer(\.v[23])?$/);
+    expect(candidates).toContain("building.farm.summer");
+    expect(candidates).toContain("building.farm");
+    expect(candidates[candidates.length - 1]).toBe("overlay.cell.blocked");
   });
 
   it("keeps the season-less candidate list when no season is given", () => {
