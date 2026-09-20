@@ -119,7 +119,13 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
   const terrain = corner !== null ? "water" : terrainAt(coord);
   const passable = terrain !== "water" && terrain !== "stone";
   // 湿地は通行可能だが深田の泥濘で大幅減速(土3に対し4)。
-  const movementCost = terrain === "dirt" ? 3 : terrain === "marsh" ? 4 : 1;
+  // Dirt slows movement only inside the original rectangular core: the wavy
+  // rim lobes (V-25) are cosmetic bare ground at grass cost. Charging cost 3
+  // on the reshaped rim changed unit routing and flipped the mountain-castle
+  // scripted playthrough (honmaru_fallen) — pathing must stay identical to
+  // the pre-V-25 rectangle.
+  const movementCost =
+    terrain === "dirt" ? (isDirtZoneCore(coord.x, coord.y) ? 3 : 1) : terrain === "marsh" ? 4 : 1;
 
   return {
     coord,
@@ -385,14 +391,25 @@ function terrainAt(coord: CellCoord): TerrainType {
 }
 
 // The dirt zone rim is modulated by two-frequency waves per edge so worn bare
-// ground doesn't read as a surveyed rectangle (V-25: 定規線の土面境界). The two
-// incommensurate periods keep lobes from repeating along an edge; amplitudes
-// stay under 3.7 cells so the zone never reaches the river or marsh belts.
+// ground doesn't read as a surveyed rectangle (V-25: 定規線の土面境界, rulebook
+// ZONE-01). The two incommensurate periods keep lobes from repeating along an
+// edge. Lobes grow OUTWARD only (each offset >= 0, the old 46/72/72/86 rect
+// stays fully inside): shrinking the zone turns dirt (cost 3) back into grass
+// and speeds up enemy paths, which flipped the mountain-castle scripted
+// playthrough to honmaru_fallen. Amplitudes stay <= 4 cells so the zone never
+// reaches the river or marsh belts.
+/** The pre-V-25 rectangular dirt core — the only region where dirt charges
+ *  movement cost 3 (see createTerrainCell). Must never change: scripted
+ *  playthrough balance depends on this exact cost field. */
+function isDirtZoneCore(x: number, y: number): boolean {
+  return x > 46 && x < 72 && y > 72 && y < 86;
+}
+
 function isDirtZone(x: number, y: number): boolean {
-  const west = 46 + 2.2 * Math.sin(y / 3.7 + 1.3) + 1.4 * Math.sin(y / 1.9 + 4.1);
-  const east = 72 - 2.2 * Math.sin(y / 4.3 + 0.6) - 1.4 * Math.sin(y / 2.2 + 2.8);
-  const north = 72 + 1.8 * Math.sin(x / 4.1 + 2.4) + 1.1 * Math.sin(x / 2.1 + 0.9);
-  const south = 86 - 1.8 * Math.sin(x / 3.5 + 5.0) - 1.1 * Math.sin(x / 2.3 + 3.6);
+  const west = 46 - (2.0 + 1.2 * Math.sin(y / 3.7 + 1.3) + 0.8 * Math.sin(y / 1.9 + 4.1));
+  const east = 72 + (2.0 + 1.2 * Math.sin(y / 4.3 + 0.6) + 0.8 * Math.sin(y / 2.2 + 2.8));
+  const north = 72 - (2.0 + 1.2 * Math.sin(x / 4.1 + 2.4) + 0.8 * Math.sin(x / 2.1 + 0.9));
+  const south = 86 + (2.0 + 1.2 * Math.sin(x / 3.5 + 5.0) + 0.8 * Math.sin(x / 2.3 + 3.6));
   return x > west && x < east && y > north && y < south;
 }
 
