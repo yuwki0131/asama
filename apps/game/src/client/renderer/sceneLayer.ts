@@ -23,11 +23,14 @@ import {
 } from "./camera";
 import { ELEVATION_PIXELS_PER_LEVEL, surfaceOffsetYAt, tileOffsetYAt, type ElevationMapLike } from "./elevation";
 import {
+  bridgeAxis,
   bridgeCellAssetCandidates,
   bridgeDeckLiftAt,
   buildingAssetCandidates,
   diagonalArmAssetFamily,
   diagonalJunctionArms,
+  findBuildingAtCell,
+  getSnapshotCell,
   honmaruCellAssetCandidates,
   isBridgeBuildingType,
   junctionCornerCaps
@@ -829,7 +832,7 @@ function addBuildingSprite(
   snapshot: WorldSnapshot
 ): void {
   if (isBridgeBuildingType(building.type)) {
-    addBridgeSprites(layer, building, assets, zoom);
+    addBridgeSprites(layer, building, assets, zoom, snapshot);
     return;
   }
 
@@ -873,9 +876,6 @@ function addBuildingSprite(
       cap.anchor.set(capAsset.anchor.x, capAsset.anchor.y);
       const corner = gridCornerToWorld(key);
       cap.position.set(roundWorldPixel(corner.x, zoom), roundWorldPixel(corner.y + offsetY, zoom));
-      if (building.owner === "enemy") {
-        cap.tint = 0xffaaa0;
-      }
       layer.addChild(cap);
     }
   }
@@ -915,9 +915,6 @@ function addHonmaruTileSprites(
     const y = roundWorldPixel(point.y + offsetY, zoom);
     backing.poly([x, y - 16, x + 32, y, x, y + 16, x - 32, y]).fill({ color: 0xc2a46e });
   }
-  if (building.owner === "enemy") {
-    backing.tint = 0xffaaa0;
-  }
   layer.addChild(backing);
   for (const cell of cells) {
     const candidates = honmaruCellAssetCandidates(building, cell);
@@ -928,9 +925,6 @@ function addHonmaruTileSprites(
     // pattern doesn't read as a mechanical per-cell repeat.
     if (candidates[0]?.endsWith(".1111") === true && (cell.x + cell.y) % 2 !== 0) {
       sprite.scale.x *= -1;
-    }
-    if (building.owner === "enemy") {
-      sprite.tint = 0xffaaa0;
     }
     layer.addChild(sprite);
   }
@@ -946,17 +940,89 @@ function addBridgeSprites(
   layer: Container,
   building: BuildingSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
-  zoom: number
+  zoom: number,
+  snapshot: WorldSnapshot
 ): void {
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   const cells = building.footprint.length > 0 ? building.footprint : [building.position];
+  // V-27: a wood bridge does not dam the channel — the water passes under
+  // the planks. Deck cells whose both across-axis neighbours are open water
+  // (moat/river building or terrain water) get a water-toned diamond under
+  // the deck so the channel reads continuous through the crossing (the sim
+  // side stops drawing bank caps toward wood_bridge for the same reason).
+  // Earth bridges are causeways: the banks and the water cut are correct.
+  if (building.type === "wood_bridge") {
+    const axis = bridgeAxis(building);
+    const across: readonly CellCoord[] =
+      axis === "x" ? [{ x: 0, y: -1 }, { x: 0, y: 1 }] : [{ x: -1, y: 0 }, { x: 1, y: 0 }];
+    const isWaterCell = (target: CellCoord): boolean => {
+      const neighbor = findBuildingAtCell(target, snapshot);
+      if (
+        neighbor !== null &&
+        (neighbor.type === "water_moat" ||
+          neighbor.type === "river" ||
+          neighbor.type.startsWith("diagonal_water_moat_") ||
+          neighbor.type.startsWith("diagonal_river_"))
+      ) {
+        return true;
+      }
+      return getSnapshotCell(snapshot, target)?.terrain === "water";
+    };
+    // Ground-level water only exists where the pool reads as an OPEN surface:
+    // terrain water, or a moat at least 2 cells wide along the deck axis.
+    // A single-file moat renders a trench cross-section whose water strip
+    // sits at the excavation bottom — a full-cell water diamond there floats
+    // over the grass shoulders as a teal tint plate (L2差し戻し).
+    const isOpenWater = (target: CellCoord): boolean => {
+      if (getSnapshotCell(snapshot, target)?.terrain === "water") {
+        return true;
+      }
+      if (!isWaterCell(target)) {
+        return false;
+      }
+      const alongDirs: readonly CellCoord[] =
+        axis === "x" ? [{ x: -1, y: 0 }, { x: 1, y: 0 }] : [{ x: 0, y: -1 }, { x: 0, y: 1 }];
+      return alongDirs.some((d) => isWaterCell({ x: target.x + d.x, y: target.y + d.y }));
+    };
+    const water = new Graphics();
+    let hasWater = false;
+    for (const cell of cells) {
+      const submerged = across.every((d) => isOpenWater({ x: cell.x + d.x, y: cell.y + d.y }));
+      if (!submerged) {
+        continue;
+      }
+      hasWater = true;
+      const point = cellToWorld(cell);
+      const x = roundWorldPixel(point.x, zoom);
+      const y = roundWorldPixel(point.y + offsetY, zoom);
+      // Slightly darker than the moat surface mean (0x56665a): shaded water
+      // in the deck's occlusion.
+      water.poly([x, y - 16, x + 32, y, x, y + 16, x - 32, y]).fill({ color: 0x49564d });
+    }
+    if (hasWater) {
+      layer.addChild(water);
+    }
+  }
+  // V-27: the deck casts a soft contact shadow onto the water/ground under
+  // the span — without it the bridge reads as a floating sticker. Light is
+  // fixed top-left (TONE-03), so only the BOTTOM half-diamond is shaded: a
+  // full shrunk diamond spilled shadow above thin plank decks and read as a
+  // tint plate against the light direction (L2 watch). Bottom halves of the
+  // cell diamonds tile without overlap, so adjacent cells join seamlessly.
+  const shadow = new Graphics();
   for (const cell of cells) {
-    const sprite = createSpriteFromCandidates(bridgeCellAssetCandidates(building, cell), assets);
+    const point = cellToWorld(cell);
+    const x = roundWorldPixel(point.x + 4, zoom);
+    const y = roundWorldPixel(point.y + offsetY + 3, zoom);
+    shadow
+      .poly([x - 32 * 0.88, y, x + 32 * 0.88, y, x, y + 16 * 0.92])
+      .fill({ color: 0x141c26, alpha: 0.26 });
+  }
+  layer.addChild(shadow);
+  for (const cell of cells) {
+    const sprite = createSpriteFromCandidates(bridgeCellAssetCandidates(building, cell, snapshot), assets);
     const point = cellToWorld(cell);
     sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
-    if (building.owner === "enemy") {
-      sprite.tint = 0xffaaa0;
-    }
     layer.addChild(sprite);
   }
 }

@@ -860,6 +860,12 @@ function connectsTo(building: BuildingState, neighbor: BuildingState | null): bo
     // ため対象外。
     const waterFamilies = ["water_moat", "river"];
     if (waterFamilies.includes(building.type)) {
+      // 木橋は桁下を水が通る(土橋=土手と違い水面を堰き止めない)。橋セルへ
+      // 向く辺を開水面として扱わないと、桁下の護岸キャップが水路を塞いで
+      // 「水路が橋の手前で角張って途切れる」読みになる(V-27)。
+      if (neighbor.type === "wood_bridge") {
+        return true;
+      }
       return waterFamilies.some(
         (family) => neighbor.type === family || neighbor.type.startsWith(`diagonal_${family}_`)
       );

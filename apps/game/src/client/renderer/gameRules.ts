@@ -341,7 +341,27 @@ export function bridgeAxis(building: BuildingSnapshot): BridgeAxis {
  * a seamless "mid" water crossing. Single-cell bridges use the isolated
  * one-tile asset with abutments on both ends.
  */
-export function bridgeCellAssetCandidates(building: BuildingSnapshot, cell: CellCoord): readonly string[] {
+/** Barrier-family structures a bridge deck should meet FLUSH (no onshore
+ *  approach ramp): the start/end segment's earthen ramp art otherwise rides
+ *  up onto the adjacent wall coping / gate sill (V-27: ogaki木橋が本丸櫓門の
+ *  笠木に乗り上げ). Roads and open ground keep the ramp — that is its job. */
+function isBridgeFlushNeighbor(type: BuildingType): boolean {
+  return (
+    type === "wall" ||
+    type === "hazama_wall" ||
+    type === "fence" ||
+    type === "yagura" ||
+    type.startsWith("diagonal_wall_") ||
+    type.startsWith("arc_wall_") ||
+    isGateType(type)
+  );
+}
+
+export function bridgeCellAssetCandidates(
+  building: BuildingSnapshot,
+  cell: CellCoord,
+  snapshot?: WorldSnapshot | null
+): readonly string[] {
   const base = building.type === "earth_bridge" ? "building.earth_bridge" : "building.wood_bridge";
   const axis = bridgeAxis(building);
   const single = axis === "y" ? `${base}.y` : base;
@@ -359,7 +379,17 @@ export function bridgeCellAssetCandidates(building: BuildingSnapshot, cell: Cell
     max = Math.max(max, value);
   }
   const value = along(cell);
-  const segment = value === min ? "start" : value === max ? "end" : "mid";
+  let segment = value === min ? "start" : value === max ? "end" : "mid";
+  if (segment !== "mid" && snapshot != null) {
+    const beyond: CellCoord =
+      axis === "x"
+        ? { x: value === min ? cell.x - 1 : cell.x + 1, y: cell.y }
+        : { x: cell.x, y: value === min ? cell.y - 1 : cell.y + 1 };
+    const neighbor = findBuildingAtCell(beyond, snapshot);
+    if (neighbor !== null && neighbor.type !== building.type && isBridgeFlushNeighbor(neighbor.type)) {
+      segment = "mid";
+    }
+  }
   return [`${base}.${axis}.${segment}`, single, finalBuildingFallbackAssetId(building)];
 }
 
