@@ -46,7 +46,8 @@ export const waterCastleScenario: ContentScenarioDefinition = {
     { type: "yagura", position: { x: 49, y: 73 } },
 
     // === 城下 — 南の大手道と町 ===
-    ...vLine("road", 40, 78, 96),
+    // 大手道は南の敵集結地の門 (39..41,104) まで続く (V-26: 野原での唐突終端を回避)。
+    ...vLine("road", 40, 78, 103),
     ...hLine("road", 37, 39, 82),
     ...hLine("road", 41, 42, 82),
     { type: "town_block", position: { x: 31, y: 80 } },

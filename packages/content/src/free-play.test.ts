@@ -101,8 +101,8 @@ describe("freePlayScenario: definition shape", () => {
     expect(types.has("storehouse")).toBe(true);
     expect(types.has("town_block")).toBe(true);
     expect(types.has("farm")).toBe(true);
-    expect(types.has("dry_moat")).toBe(true);
-    expect(types.has("water_moat")).toBe(true);
+    // 旧・堀デモ (dry_moat/water_moat の3セル断片) は「草原に浮く黒穴」に
+    // 見えるため撤去 (V-26)。堀はプレイヤーが自分で掘って試せる。
     expect(types.has("road")).toBe(true);
   });
 

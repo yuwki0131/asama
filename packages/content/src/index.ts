@@ -8,6 +8,7 @@ import { castleTownGateScenario } from "./castle-town-gate";
 import { steppedFortressScenario } from "./stepped-fortress";
 import { takaishigakiShowcaseScenario } from "./takaishigaki-showcase";
 import { ogakiCastleScenario } from "./ogaki-castle";
+import { hLine, vLine } from "./scenario-parts";
 
 // --- Building and unit content definitions ---------------------------------
 //
@@ -956,6 +957,9 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
     { type: "road", position: { x: 63, y: 106 } },
     { type: "road", position: { x: 63, y: 107 } },
     { type: "road", position: { x: 63, y: 108 } },
+    // 大手道は南のマップ端まで続き、城下の先の街道として読ませる
+    // (V-26: 野原での唐突終端の解消)
+    ...vLine("road", 63, 109, 126),
     // 町区画 (道路の東西)
     { type: "town_block", position: { x: 54, y: 98 } },
     { type: "town_block", position: { x: 65, y: 98 } },
@@ -1228,15 +1232,11 @@ export const linearFortressScenario: ContentScenarioDefinition = {
     { type: "storehouse", position: { x: 36, y: 64 } },
 
     // === Road system (east exit road + south turn) ===
-    { type: "road", position: { x: 55, y: 62 } },
-    { type: "road", position: { x: 57, y: 62 } },
-    { type: "road", position: { x: 59, y: 62 } },
-    { type: "road", position: { x: 61, y: 62 } },
-    { type: "road", position: { x: 63, y: 62 } },
-    { type: "road", position: { x: 63, y: 65 } },
-    { type: "road", position: { x: 63, y: 70 } },
-    { type: "road", position: { x: 63, y: 78 } },
-    { type: "road", position: { x: 63, y: 86 } },
+    // V-26: the old every-other-cell stubs read as isolated dirt patches.
+    // One continuous run: east gate (54,62) → east, then south to the enemy
+    // staging gate at (62..64,100).
+    ...hLine("road", 55, 63, 62),
+    ...vLine("road", 63, 63, 99),
 
     // === Town (SE of castle) ===
     { type: "town_block", position: { x: 56, y: 74 } },
@@ -1383,15 +1383,14 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 24, y: 56 } },
 
     // === Outer fence line (north perimeter) ===
-    { type: "fence", position: { x: 28, y: 43 } },
-    { type: "fence", position: { x: 30, y: 43 } },
-    { type: "fence", position: { x: 32, y: 43 } },
-    { type: "fence", position: { x: 34, y: 43 } },
-    { type: "fence", position: { x: 36, y: 43 } },
-    { type: "fence", position: { x: 38, y: 43 } },
-    { type: "fence", position: { x: 40, y: 43 } },
-    { type: "fence", position: { x: 42, y: 43 } },
-    { type: "fence", position: { x: 44, y: 43 } },
+    // Continuous run with anchored ends (V-26: the old every-other-cell
+    // dotted row read as unfinished pickets). West end stops at the river
+    // water (26,42); gaps only at the NE yagura (x=46-47) and the marsh belt
+    // (x=49-50, the fence stops at the bog); east end meets the castle wall
+    // top at (52,43) and continues to the riverbank at (57,43).
+    ...hLine("fence", 27, 45, 43),
+    { type: "fence", position: { x: 48, y: 43 } },
+    ...hLine("fence", 51, 57, 43),
 
     // === East wall (castle perimeter facing the river) ===
     // Continuous wall y=44-55, then 3-wide vertical gate, then y=59-70
@@ -1421,43 +1420,43 @@ export const riversideDefenseScenario: ContentScenarioDefinition = {
     { type: "wall", position: { x: 52, y: 68 } },
     { type: "wall", position: { x: 52, y: 69 } },
     { type: "wall", position: { x: 52, y: 70 } },
+    // South wall end drops one more cell so it meets the moat's south arm
+    // (V-26: the wall no longer stops dead in open grass).
+    { type: "wall", position: { x: 52, y: 71 } },
 
     // === Bridge approach gates (west shore — choke the exits) ===
     { type: "gate_narrow_3_ne_sw", position: { x: 56, y: 49 } },
     { type: "gate_narrow_3_ne_sw", position: { x: 56, y: 65 } },
 
-    // Roads connecting castle gate to bridge approach gates
-    { type: "road", position: { x: 54, y: 57 } },
-    { type: "road", position: { x: 55, y: 50 } },
-    { type: "road", position: { x: 55, y: 66 } },
+    // Roads connecting castle gate to both bridge approach gates (V-26: the
+    // old 3 isolated 1-cell stubs never joined anything). One north-south
+    // spine along x=55 links both bridge gates; a short spur joins the
+    // castle gate mouth at (52,57).
+    ...vLine("road", 55, 50, 66),
+    ...hLine("road", 53, 54, 57),
 
     // === River (water moat at x=58 — natural barrier) ===
-    // North section: above north bridge
-    { type: "water_moat", position: { x: 58, y: 44 } },
-    { type: "water_moat", position: { x: 58, y: 46 } },
-    { type: "water_moat", position: { x: 58, y: 48 } },
+    // Continuous channel fed from the procedural river at (58,43); the old
+    // every-other-cell pits read as a dotted line of isolated holes (V-26).
+    // Gaps only at the two bridge crossings (wood y=50, earth y=66).
+    ...vLine("water_moat", 58, 44, 72, [50, 66]),
     // North bridge crossing (wood — less durable)
     { type: "wood_bridge", position: { x: 58, y: 50 } },
-    // Middle section: between the two bridges
-    { type: "water_moat", position: { x: 58, y: 52 } },
-    { type: "water_moat", position: { x: 58, y: 54 } },
-    { type: "water_moat", position: { x: 58, y: 56 } },
-    { type: "water_moat", position: { x: 58, y: 58 } },
-    { type: "water_moat", position: { x: 58, y: 60 } },
-    { type: "water_moat", position: { x: 58, y: 62 } },
-    { type: "water_moat", position: { x: 58, y: 64 } },
     // South bridge crossing (earth — more durable)
     { type: "earth_bridge", position: { x: 58, y: 66 } },
-    // South section: below south bridge
-    { type: "water_moat", position: { x: 58, y: 68 } },
-    { type: "water_moat", position: { x: 58, y: 70 } },
-    { type: "water_moat", position: { x: 58, y: 72 } },
+    // South arm bends west so the channel ends against the town block lot
+    // instead of starting in open grass; it also closes the castle's south
+    // flank between the wall foot and the river.
+    ...hLine("water_moat", 44, 57, 72),
 
     // === East bank (enemy approach roads) ===
-    { type: "road", position: { x: 60, y: 50 } },
-    { type: "road", position: { x: 62, y: 50 } },
-    { type: "road", position: { x: 60, y: 66 } },
-    { type: "road", position: { x: 62, y: 66 } },
+    // Both bridgehead roads run east and merge into one highway arriving at
+    // the enemy staging gate (80,57) — the old four 1-cell stubs floated in
+    // grass (V-26).
+    ...hLine("road", 60, 72, 50),
+    ...hLine("road", 60, 72, 66),
+    ...vLine("road", 72, 51, 65),
+    ...hLine("road", 73, 79, 57),
 
     // Enemy staging area
     { type: "gate_narrow_3_ne_sw", position: { x: 80, y: 57 }, owner: "enemy" },

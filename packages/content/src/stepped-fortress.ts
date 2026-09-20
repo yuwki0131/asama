@@ -55,8 +55,11 @@ export const steppedFortressScenario: ContentScenarioDefinition = {
     { type: "yagura", position: { x: 67, y: 65 } },
 
     // === 東麓 (L0) — 大手道と町 ===
-    ...hLine("road", 72, 76, 61),
-    ...vLine("road", 74, 62, 72),
+    // 外木戸 — 大手坂 (71,60..62) の坂下を塞ぐ縦3の木戸。大手道の西端アンカー。
+    { type: "gate_wide_3_ne_sw", position: { x: 72, y: 60 } },
+    // 大手道 — 外木戸から東はマップ端へ抜け、南は敵集結地の街道口 (74..76,95) の手前まで。
+    ...hLine("road", 73, 126, 61),
+    ...vLine("road", 74, 62, 94),
     { type: "town_block", position: { x: 44, y: 75 } },
     { type: "town_block", position: { x: 56, y: 74 } },
     { type: "farm", position: { x: 36, y: 74 } },

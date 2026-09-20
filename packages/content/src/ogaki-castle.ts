@@ -168,8 +168,10 @@ for (const y of sewariAlleys) roads.push(at("road", 34, y), at("road", 35, y), a
 for (const x of yokochoAlleys) roads.push(at("road", x, 103), at("road", x, 104));
 // Minoji: west/east moat approaches turn at both banks instead of forming one line.
 roads.push(...hLine("road", 15, 39, 61), ...vLine("road", 39, 62, 102), ...hLine("road", 39, 91, 102), ...vLine("road", 91, 60, 101), ...hLine("road", 91, 113, 60));
-// Sparse orthogonal town grid in reserved corridors.
-roads.push(...vLine("road", 33, 16, 108), ...vLine("road", 107, 16, 102));
+// Sparse orthogonal town grid in reserved corridors. Both streets run from the
+// foot of the north outer wall (x=33 lands beside 柳口 gate) down the whole
+// town; x=107 arrives at the south farm belt (V-26 端部アンカー).
+roads.push(...vLine("road", 33, 13, 108), ...vLine("road", 107, 13, 103));
 const seenRoads = new Set<string>();
 for (let index = roads.length - 1; index >= 0; index -= 1) {
   const road = roads[index]!;
@@ -178,6 +180,11 @@ for (let index = roads.length - 1; index >= 0; index -= 1) {
   if (seenRoads.has(key) || inRiverReserve) roads.splice(index, 1);
   else seenRoads.add(key);
 }
+// 河岸アプローチ: 川予約帯 (y35..46) の一括除去で南北町筋 (x=33 / x=107) が
+// 川の数セル手前の草地で途切れて見えるため、手続き河道の実際の岸まで舗装を
+// 戻し、街路が水際に到達して終わる読みにする (V-26)。x=33 は北岸 y37 /
+// 南岸 y42、x=107 は南岸 y38 が水面 (y37 以北) に接する。
+roads.push(...vLine("road", 33, 35, 37), ...vLine("road", 33, 42, 46), ...vLine("road", 107, 38, 46));
 
 const playerUnits: ScenarioUnitSpawn[] = [
   // 本丸: 天守台マウンド周縁の崖セル(南列・東列)を避けて配置

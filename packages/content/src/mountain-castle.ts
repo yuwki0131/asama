@@ -93,6 +93,10 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     { type: "farm", position: { x: 61, y: 100 } },
 
     // 大手道 (城下の目抜き通り。x=56 を南北に貫く)
+    // 坂下の踊り場 — 幅2の大手坂 (56..57,86) の麓で道幅を坂に合わせて広げ、
+    // 街道が坂へそのまま続いて見えるようにする (V-26)。
+    { type: "road", position: { x: 56, y: 87 } },
+    { type: "road", position: { x: 57, y: 87 } },
     { type: "road", position: { x: 56, y: 88 } },
     { type: "road", position: { x: 56, y: 89 } },
     { type: "road", position: { x: 56, y: 90 } },
@@ -115,8 +119,15 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
     { type: "road", position: { x: 56, y: 108 } },
     { type: "road", position: { x: 56, y: 109 } },
     { type: "road", position: { x: 56, y: 110 } },
+    // 街道末端際の畑 — 惣構門前の街道は城下外縁の農地に取り付いて終わる (V-26)。
+    // farm は通行可 (コスト2) なので敵の進軍導線は塞がない (道 x=56 上は不変)。
+    { type: "farm", position: { x: 57, y: 108 } },
 
     // === 惣構 (城下南端の柵列 y=107。門は大手道上) ===
+    // 両端際の畑 — 柵列が野原で途切れず城下外縁の農地に取り付いて終わる (V-26)。
+    // farm は通行可 (コスト2) なので搦手の東廊下 (x74..77) の敵導線は塞がない。
+    { type: "farm", position: { x: 40, y: 104 } },
+    { type: "farm", position: { x: 74, y: 104 } },
     { type: "fence", position: { x: 44, y: 107 } },
     { type: "fence", position: { x: 45, y: 107 } },
     { type: "fence", position: { x: 46, y: 107 } },

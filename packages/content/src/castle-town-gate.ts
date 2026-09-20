@@ -32,7 +32,8 @@ export const castleTownGateScenario: ContentScenarioDefinition = {
     ...vLine("road", 51, 65, 99),
     ...hLine("road", 42, 48, 79),
     ...hLine("road", 52, 58, 79),
-    ...vLine("road", 50, 101, 106),
+    // 惣構外の街道は南の敵集結地の門 (49..51,110) まで続く (V-26)。
+    ...vLine("road", 50, 101, 109),
 
     // === 城下町 — 大手筋の東西に町区画8面 ===
     { type: "town_block", position: { x: 42, y: 66 } },
@@ -57,6 +58,10 @@ export const castleTownGateScenario: ContentScenarioDefinition = {
     { type: "gate_wide_3", position: { x: 49, y: 100 } },
     { type: "yagura", position: { x: 46, y: 97 } },
     { type: "yagura", position: { x: 52, y: 97 } },
+    // 柵列両端の隅櫓 — 柵が野原で途切れず櫓に取り付いて終わる (V-26)。
+    // 騎馬の迂回路 (x<34 / x>66) はそのまま残る。
+    { type: "yagura", position: { x: 34, y: 99 } },
+    { type: "yagura", position: { x: 65, y: 99 } },
 
     // 敵の集結地 (南の街道口)
     { type: "gate_narrow_3", position: { x: 49, y: 110 }, owner: "enemy" },

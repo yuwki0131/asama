@@ -63,8 +63,10 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
     { type: "storehouse", position: { x: 27, y: 52 } },
     { type: "gate_wide_2", position: { x: 32, y: 65 } },
     { type: "yagura", position: { x: 16, y: 66 } },
-    // 東縁の土塀 (h5東面の天端)
+    // 東縁の土塀 (h5東面の天端) — 両端は櫓台の隅櫓で納める (V-26)
+    { type: "yagura", position: { x: 34, y: 50 } },
     ...vLine("wall", 35, 52, 57),
+    { type: "yagura", position: { x: 34, y: 58 } },
 
     // === 二の丸 (L4) — 兵舎・蔵・門・隅櫓 ===
     { type: "barracks", position: { x: 37, y: 61 } },
@@ -72,17 +74,20 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
     { type: "gate_wide_2", position: { x: 46, y: 77 } },
     { type: "yagura", position: { x: 49, y: 60 } },
     { type: "yagura", position: { x: 30, y: 78 } },
-    // 南縁・東縁の土塀 (h4面の天端)
-    ...hLine("wall", 38, 43, 77),
-    ...vLine("wall", 51, 63, 69),
+    // 南縁・東縁の土塀 (h4面の天端) — 南塀は南西櫓台の隅櫓から虎口門まで、
+    // 東塀は北の隅櫓から南東隅の隅櫓まで通し、端部を櫓・門で納める (V-26)
+    ...hLine("wall", 32, 45, 77),
+    ...vLine("wall", 51, 62, 75),
+    { type: "yagura", position: { x: 50, y: 76 } },
 
     // === 三の丸 (L3) — 侍屋敷・舟入見張り櫓・隅櫓・門 ===
     { type: "samurai_residence", position: { x: 64, y: 75 } },
     { type: "gate_wide_2", position: { x: 58, y: 72 } },
     { type: "yagura", position: { x: 57, y: 87 } },
     { type: "yagura", position: { x: 69, y: 93 } },
-    // 東縁の土塀 (h3東面の天端)
-    ...vLine("wall", 71, 74, 79),
+    // 東縁の土塀 (h3東面の天端) — 北東隅の隅櫓から南の舟入見張り櫓まで通す (V-26)
+    { type: "yagura", position: { x: 70, y: 72 } },
+    ...vLine("wall", 71, 74, 92),
 
     // === 大手裏階段 (L1/L2) — 段ごとの門と見張り櫓 ===
     { type: "gate_wide_2", position: { x: 58, y: 64 } },
@@ -105,13 +110,19 @@ export const takaishigakiShowcaseScenario: ContentScenarioDefinition = {
     // === 城下 (L0) — 南西の町と北東の大手口 ===
     { type: "market", position: { x: 29, y: 84 } },
     { type: "samurai_residence", position: { x: 36, y: 83 } },
+    // 二の丸南面の石垣裾に軒を寄せる屋敷 — 町筋北端の受け (V-26)
+    { type: "samurai_residence", position: { x: 38, y: 79 } },
     { type: "town_block", position: { x: 30, y: 90 } },
     { type: "farm", position: { x: 38, y: 90 } },
+    // 東の町筋: 北は侍屋敷の門前から南は堀端まで
     ...vLine("road", 42, 80, 96),
     { type: "town_block", position: { x: 66, y: 58 } },
     { type: "farm", position: { x: 66, y: 66 } },
+    // 大手街道: 東は惣門をくぐり、南は番所櫓の脇で裏階段の坂に取り付く (V-26)
     ...hLine("road", 59, 74, 50),
+    { type: "road", position: { x: 74, y: 49 } },
     ...vLine("road", 58, 51, 54),
+    { type: "yagura", position: { x: 56, y: 53 } },
 
     // 敵の集結地 (北東の街道口)
     { type: "gate_narrow_3", position: { x: 74, y: 48 }, owner: "enemy" },
