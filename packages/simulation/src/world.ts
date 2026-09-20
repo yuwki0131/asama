@@ -2,7 +2,7 @@ import { mvpDefenseScenario } from "@asama/content";
 import { MAX_ELEVATION } from "@asama/shared";
 import type { CellCoord, EconomySnapshot, FoodSnapshot, PlayerCommand, WorldSnapshot } from "@asama/shared";
 import type { ScenarioDefinition, ScenarioWave } from "@asama/shared";
-import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, bridgeAbsoluteFootprint, canPlaceBuilding, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
+import { buildingDefinitions, absoluteFootprint, applyLotCourtyard, bridgeAbsoluteFootprint, canPlaceBuilding, clearDecorationsUnder, clearUnitPathsThrough, isLotBuilding, restoreLotCourtyard, seedInitialBuildings, snapshotBuilding, snapshotCell, getBuildingAt } from "./buildings";
 import { getAttackTarget, areEnemies, updateAttackMoveBehavior, updateCombat } from "./combat";
 import { updateEconomy, applyMarketTrade, applyRecruitCommand, populationCapacity, currentApproval, maxRecruitPool } from "./economy";
 import { applyScenarioElevation, elevationAt, slopeVector, stepTicksFor } from "./elevation";
@@ -447,6 +447,7 @@ export function applyCommand(world: WorldState, command: PlayerCommand): string 
     world.nextBuildingId += 1;
     world.invalidMoveTarget = null;
     clearUnitPathsThrough(world, footprint);
+    clearDecorationsUnder(world, footprint);
     if (isLotBuilding(command.buildingType)) {
       applyLotCourtyard(world, footprint);
     }
