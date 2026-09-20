@@ -10,7 +10,7 @@ export type OwnerId = "player" | "enemy" | "neutral";
 export type UnitType = "spear_ashigaru" | "sword_ashigaru" | "archer" | "engineer" | "musketeer" | "cavalry" | "supply_cart";
 
 export type EngineerTaskKind = "ladder" | "fillMoat";
-export type TerrainType = "grass" | "dirt" | "water" | "stone" | "cliff";
+export type TerrainType = "grass" | "dirt" | "water" | "stone" | "marsh" | "cliff";
 
 // --- Elevation (docs/10_development/elevation-contract.md) ------------------
 

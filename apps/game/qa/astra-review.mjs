@@ -134,7 +134,7 @@ async function main() {
   const metaByShot = new Map((index.views ?? []).map((view) => [view.file, view]));
 
   const files = (await readdir(options.runDir))
-    .filter((name) => /^(first|p\d+).*\.png$/.test(name))
+    .filter((name) => /^(first|[pc]\d+).*\.png$/.test(name))
     .filter((name) => !options.shots || options.shots.some((s) => name.startsWith(s)))
     .sort();
   if (files.length === 0) throw new Error(`No p*.png shots found in ${options.runDir}`);

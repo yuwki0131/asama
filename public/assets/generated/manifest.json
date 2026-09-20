@@ -5338,6 +5338,193 @@
       }
     },
     {
+      "assetId": "terrain.marsh.base",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-base.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0000",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0001",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0010",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0011",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0100",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0101",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0110",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0111",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-0111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1000",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1000.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1001",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1001.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1010",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1010.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1011",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1011.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1100",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1100.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1101",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1101.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1110",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1110.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1111",
+      "kind": "terrain",
+      "file": "generated/terrain-marsh-connected-1111.png",
+      "width": 64,
+      "height": 32,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
       "assetId": "terrain.grass.macro.v0.0.0",
       "kind": "terrain",
       "file": "generated/terrain-grass-macro-v0-0-0.png",

@@ -13,8 +13,8 @@ describe("connected terrain asset masks", () => {
 
     // Border cells carry NESW connection masks (water shores also carry a
     // wavy-bank variant suffix); interior cells sample the world-anchored
-    // macro field except for stone, which has no macro set.
-    const connected = /^terrain\.(grass|dirt|stone|water)\.connected\.[01]{4}(\.v[12])?$/;
+    // macro field except for stone and marsh, which have no macro set.
+    const connected = /^terrain\.(grass|dirt|stone|water|marsh)\.connected\.[01]{4}(\.v[12])?$/;
     const macro = /^terrain\.(grass|dirt|water)\.macro\.v[01]\.[0-3]\.[0-3]$/;
     // River corners carry diagonal shore transition tiles (outer grass
     // corners and inner water-corner chamfers).
