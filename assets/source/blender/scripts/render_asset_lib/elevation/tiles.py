@@ -753,7 +753,7 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str, half: str | None = Non
     margin = make_material("SlopeMargin", (0.082, 0.062, 0.040, 1.0))
     rib = make_material("SlopeRib", (0.088, 0.066, 0.042, 1.0))
     stone = make_noise_material("SlopeStone", (0.108, 0.100, 0.090), (0.172, 0.162, 0.146), scale=6.0)
-    flank = make_noise_material("SlopeFlank", (0.105, 0.085, 0.060), (0.205, 0.172, 0.126), scale=7.0)
+    flank = make_noise_material("SlopeFlank", (0.135, 0.105, 0.068), (0.315, 0.255, 0.165), scale=9.0)
     # Macro-family grass so slope caps/tongues tonally match the map tiles.
     grass = make_macro_terrain_material("grass", 0, 0, 0)
     grass_dark, grass_light = _grass_lip_materials()
@@ -986,7 +986,7 @@ def build_slope_side(
     if skin == "dirt":
         # Same lightened earth as the ramp's built-in flank (the old
         # bank material rendered near-black under the painterly ramp).
-        material = make_noise_material("SlopeFlank", (0.105, 0.085, 0.060), (0.205, 0.172, 0.126), scale=7.0)
+        material = make_noise_material("SlopeFlank", (0.135, 0.105, 0.068), (0.315, 0.255, 0.165), scale=9.0)
         batter = 0.0
     else:
         material = _elev_ishigaki_material()
