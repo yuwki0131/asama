@@ -26,6 +26,7 @@ ELEVATION_MODEL_PATTERNS = (
     "elev-(cliff|ishigaki)-face-(s|e)-h[12345]",
     "elev-(cliff|ishigaki)-corner-se-h[12345]",
     "elev-slope-(dirt|ishigaki)-[nesw]",
+    "elev-slope-ishigaki-[nesw]-(mid|cvn|cvp)",
     "elev-slope-(dirt|ishigaki)-[nesw]-side-(s|e)",
     "elev-slope2-dirt-[nesw]-(lower|upper)",
 )
@@ -53,6 +54,17 @@ def resolve_model(name: str):
     if slope is not None:
         skin, toward = slope.group(1), slope.group(2)
         return lambda scene: build_slope(scene, skin, toward)
+
+    # Wide-ramp column variants (V-16): mid = no curbs (interior column),
+    # cvn/cvp = curb only on the v-neg / v-pos flank (edge columns). Phase
+    # variants were tried and removed: seed-jitter alone measured
+    # meanAbsDiff 1-12 (< VAR-01's 12), i.e. 実質同一 — and with mid/cvn/cvp
+    # no two columns of a width≤3 ramp share a sprite anyway.
+    slope_variant = re.fullmatch(r"elev-slope-ishigaki-([nesw])-(mid|cvn|cvp)", name)
+    if slope_variant is not None:
+        toward, kind = slope_variant.group(1), slope_variant.group(2)
+        curbs = {"mid": (False, False), "cvn": (True, False), "cvp": (False, True)}[kind]
+        return lambda scene: build_slope(scene, "ishigaki", toward, 0, curbs)
 
     slope_half = re.fullmatch(r"elev-slope2-(dirt)-([nesw])-(lower|upper)", name)
     if slope_half is not None:

@@ -29,7 +29,7 @@ export const fiveTierKeepScenario: ContentScenarioDefinition = {
     ],
     slopes: [
       // 大手 0→1 (幅2)
-      { position: { x: 57, y: 83 }, toward: "N", width: 2 },
+      { position: { x: 57, y: 83 }, toward: "N", width: 2, skin: "ishigaki" },
       // 1→2 (西へ振る幅2の坂)
       { position: { x: 49, y: 77 }, toward: "N", width: 2 },
       // 2→3 (東へ折り返す幅2の坂)

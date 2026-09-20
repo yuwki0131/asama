@@ -123,6 +123,48 @@ def _quoin_material() -> bpy.types.Material:
     return make_noise_material("QuoinStone", (0.150, 0.140, 0.118), (0.252, 0.238, 0.205), scale=3.0)
 
 
+def _curb_masonry_material(name: str = "CurbMasonry") -> bpy.types.Material:
+    """Jointed slab masonry for the stairway curb (袖石) flanks. The old
+    quoin noise had no seams, so the exposed outer flank of a stair read as
+    a single flat gray triangle at game scale (V-16: のっぺり無地側面).
+    Voronoi seams at slab scale give the flank visible coursework."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    coords = nodes.new("ShaderNodeTexCoord")
+
+    voronoi = nodes.new("ShaderNodeTexVoronoi")
+    voronoi.feature = "DISTANCE_TO_EDGE"
+    voronoi.inputs["Scale"].default_value = 5.6
+    links.new(coords.outputs["Object"], voronoi.inputs["Vector"])
+    seam_ramp = nodes.new("ShaderNodeValToRGB")
+    seam_ramp.color_ramp.elements[0].position = 0.0
+    seam_ramp.color_ramp.elements[0].color = (0.30, 0.28, 0.24, 1.0)
+    seam_ramp.color_ramp.elements[1].position = 0.10
+    seam_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+    links.new(voronoi.outputs["Distance"], seam_ramp.inputs["Fac"])
+
+    stone_noise = nodes.new("ShaderNodeTexNoise")
+    stone_noise.inputs["Scale"].default_value = 3.2
+    links.new(coords.outputs["Object"], stone_noise.inputs["Vector"])
+    stone_ramp = nodes.new("ShaderNodeValToRGB")
+    stone_ramp.color_ramp.elements[0].position = 0.30
+    stone_ramp.color_ramp.elements[0].color = (0.152, 0.142, 0.120, 1.0)
+    stone_ramp.color_ramp.elements[1].position = 0.80
+    stone_ramp.color_ramp.elements[1].color = (0.258, 0.244, 0.210, 1.0)
+    links.new(stone_noise.outputs["Fac"], stone_ramp.inputs["Fac"])
+
+    mix = nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    mix.inputs["Factor"].default_value = 1.0
+    links.new(stone_ramp.outputs["Color"], mix.inputs["A"])
+    links.new(seam_ramp.outputs["Color"], mix.inputs["B"])
+    finish_material(material, mix.outputs["Result"])
+    return material
+
+
 def _moss_material() -> bpy.types.Material:
     return make_material("BaseMoss", (0.078, 0.098, 0.062, 1.0))
 
@@ -773,31 +815,49 @@ def build_slope_dirt(scene: bpy.types.Scene, toward: str, half: str | None = Non
                             grass_dark if (side_index + tuft) % 2 == 0 else grass_light, z_of=z_of)
 
 
-def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
+def build_slope_ishigaki(
+    scene: bpy.types.Scene,
+    toward: str,
+    phase: int = 0,
+    curbs: tuple[bool, bool] = (True, True),
+) -> None:
     """Stone stairway (登城路の石段) climbing one step toward `toward`.
     Canvas 64x72, anchor (32,56).
 
     Eight slab courses of 5px rise between flanking curb stones (袖石), with
     foot-polished light treads on the walking line, damp dark slabs at the
     edges, moss in the riser joints and a landing slab that bleeds onto the
-    high tile so the stairhead visibly grips the upper ground."""
+    high tile so the stairhead visibly grips the upper ground.
+
+    `phase` (0/1/2) shifts every jitter seed: width>1 slopes tile this sprite
+    per column, and identical columns read as copy-paste flights with a hard
+    seam (V-16). The renderer cycles phases along the cross axis.
+
+    `curbs` = (v-neg flank, v-pos flank): width>1 ramps drop the curbs on the
+    interior column boundaries so the flight reads as ONE wide stairway with
+    rails only on the outside — a per-column pair of rails read as three
+    parallel fenced flights (V-16)."""
     pt = _slope_axes(toward)
-    seed = {"n": 111.0, "e": 112.0, "s": 113.0, "w": 114.0}[toward]
+    seed = {"n": 111.0, "e": 112.0, "s": 113.0, "w": 114.0}[toward] + phase * 57.31
     stone = _step_stone_material()
     worn = _step_stone_worn_material()
     dark = _step_stone_dark_material()
-    curb = _quoin_material()
+    curb = _curb_masonry_material()
     moss = _moss_material()
 
     n_steps = 8
     curb_v = 0.40  # treads run between the two curb lines
+    # Treads run to the tile edge on curbless flanks so adjacent columns of a
+    # wide ramp meet flush (BLEED past the edge, same as terrain tiles).
+    v_lo = -curb_v if curbs[0] else -0.5 - BLEED
+    v_hi = curb_v if curbs[1] else 0.5 + BLEED
     for k in range(n_steps):
         u0 = k / n_steps - (BLEED if k == 0 else 0.02)
         u1 = (k + 1) / n_steps + (BLEED if k == n_steps - 1 else 0.0)
         z_top = LEVEL * (k + 1) / n_steps
         # Each course is 3 slabs with jittered joints (aged, hand-fit).
-        cuts = [-curb_v, -curb_v + 0.26 + 0.10 * _hash01(seed, k, 1.0),
-                curb_v - 0.24 - 0.10 * _hash01(seed, k, 2.0), curb_v]
+        cuts = [v_lo, v_lo + 0.26 + 0.10 * _hash01(seed, k, 1.0),
+                v_hi - 0.24 - 0.10 * _hash01(seed, k, 2.0), v_hi]
         for slab in range(3):
             v0, v1 = cuts[slab], cuts[slab + 1]
             if v1 - v0 < 0.05:
@@ -827,8 +887,8 @@ def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
 
     # Landing slab: overlaps the high tile's near edge so the stairhead is
     # welded onto the upper ground instead of stopping at the boundary line.
-    lx0, ly0 = pt(1.0 - 0.01, -curb_v)
-    lx1, ly1 = pt(1.0 + 0.06, curb_v)
+    lx0, ly0 = pt(1.0 - 0.01, v_lo)
+    lx1, ly1 = pt(1.0 + 0.06, v_hi)
     add_box(scene, "Landing",
             *map_box((min(lx0, lx1), min(ly0, ly1), LEVEL - 0.05),
                      (max(lx0, lx1), max(ly0, ly1), LEVEL + 0.004)), worn)
@@ -839,6 +899,8 @@ def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
     # follows the slope a small lip above the treads; the outer face drops
     # vertically to the ground so an exposed flank shows masonry.
     for side_index, (v_out, v_in) in enumerate(((-0.5 - BLEED, -curb_v), (0.5 + BLEED, curb_v))):
+        if not curbs[side_index]:
+            continue
         segments = 6
         vertices: list[tuple[float, float, float]] = []
         faces: list[tuple[int, ...]] = []
@@ -859,18 +921,25 @@ def build_slope_ishigaki(scene: bpy.types.Scene, toward: str) -> None:
         faces.append((b + 3, b + 2, b + 1, b + 0))
         add_mesh(scene, f"Curb{side_index}", vertices, faces, curb)
     # Moss at the curb foot on the shaded side.
-    mx0, my0 = pt(0.02, -curb_v - 0.06)
-    mx1, my1 = pt(0.30, -curb_v - 0.02)
-    add_box(scene, "CurbMoss",
-            *map_box((min(mx0, mx1), min(my0, my1), 0.001),
-                     (max(mx0, mx1), max(my0, my1), 0.05)), moss)
+    if curbs[0]:
+        mx0, my0 = pt(0.02, -curb_v - 0.06)
+        mx1, my1 = pt(0.30, -curb_v - 0.02)
+        add_box(scene, "CurbMoss",
+                *map_box((min(mx0, mx1), min(my0, my1), 0.001),
+                         (max(mx0, mx1), max(my0, my1), 0.05)), moss)
 
 
-def build_slope(scene: bpy.types.Scene, skin: str, toward: str) -> None:
+def build_slope(
+    scene: bpy.types.Scene,
+    skin: str,
+    toward: str,
+    phase: int = 0,
+    curbs: tuple[bool, bool] = (True, True),
+) -> None:
     if skin == "dirt":
         build_slope_dirt(scene, toward)
     else:
-        build_slope_ishigaki(scene, toward)
+        build_slope_ishigaki(scene, toward, phase, curbs)
 
 
 def build_slope_half(scene: bpy.types.Scene, skin: str, toward: str, half: str) -> None:
