@@ -57,6 +57,10 @@ interface AnimState {
   readonly phaseOffset: number;
 }
 
+/** 被弾後にHPバーを表示し続ける時間。戦闘の熱が冷めたらバーは消え、
+ *  遮蔽されたユニットのバーが構造物上に浮き続けるのを防ぐ(V-23)。 */
+const HP_BAR_LINGER_MS = 5000;
+
 interface UnitVisual {
   readonly container: Container;
   readonly ring: Sprite;
@@ -68,6 +72,10 @@ interface UnitVisual {
   displayPosition: WorldPoint | null;
   /** `${hp}/${maxHp}` — the health bar is only redrawn when this changes. */
   hpKey: string;
+  /** performance.now() of the last hp change: the bar shows only while the
+   *  unit is in active combat (V-23: 常時表示だと遮蔽されたユニットのバー
+   *  だけが塀や屋根の上に浮いて見える). */
+  lastHpChangeAtMs: number;
   assetId: string;
   /** Per-unit animation state machine; null when no sheets available. */
   animState: AnimState | null;
@@ -198,6 +206,12 @@ export class RetainedScene {
       // Depth sort stays cell-based: elevation lifts the drawing but must not
       // change the painter's order (elevation-contract.md §5).
       visual.container.zIndex = target.sortY + UNIT_GROUND_OFFSET_Y;
+
+      // Expire lingering health bars once combat heat cools (V-23).
+      if (visual.healthBar.visible && !visual.unit.selected &&
+          performance.now() - visual.lastHpChangeAtMs >= HP_BAR_LINGER_MS) {
+        visual.healthBar.visible = false;
+      }
 
       // Advance animation for living units
       if (visual.animState !== null) {
@@ -462,8 +476,13 @@ export class RetainedScene {
       if (hpKey !== visual.hpKey) {
         redrawHealthBar(visual.healthBar, unit);
         visual.hpKey = hpKey;
+        visual.lastHpChangeAtMs = performance.now();
       }
-      visual.healthBar.visible = unit.hp < unit.maxHp;
+      // V-23: 負傷「かつ」直近の被弾(5秒)または選択中のみ表示。常時表示だと
+      // 建物・塀に遮蔽されたユニットのバーだけが構造物の上に浮いて見える。
+      visual.healthBar.visible =
+        unit.hp < unit.maxHp &&
+        (unit.selected || performance.now() - visual.lastHpChangeAtMs < HP_BAR_LINGER_MS);
 
       // Update animation state transitions
       if (visual.animState !== null) {
@@ -744,6 +763,7 @@ function createUnitVisual(
     unit,
     displayPosition: null,
     hpKey: `${unit.hp}/${unit.maxHp}`,
+    lastHpChangeAtMs: unit.hp < unit.maxHp ? performance.now() : -Infinity,
     assetId: unit.assetId,
     animState: null  // initialized after sheets are available
   };
