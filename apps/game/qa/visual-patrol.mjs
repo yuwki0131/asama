@@ -41,7 +41,10 @@ function parseArgs(argv) {
     settleMs: 12000,
     /** Fixed views ("x,y@zoom;..."): targeted shots (map edges, terraces)
      *  instead of building-biased random sampling. */
-    cells: null
+    cells: null,
+    /** QA visual season override (?season=autumn, dev builds only): the
+     *  renderer swaps seasonal farm art without advancing the sim. */
+    season: null
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -57,6 +60,7 @@ function parseArgs(argv) {
     else if (arg === "--base-url") options.baseUrl = next().replace(/\/$/, "");
     else if (arg === "--out-dir") options.outDir = resolve(next());
     else if (arg === "--settle") options.settleMs = Number(next());
+    else if (arg === "--season") options.season = next();
     else if (arg === "--cells")
       options.cells = next().split(";").map((spec) => {
         const [xy, zoom = "1"] = spec.split("@");
@@ -96,7 +100,8 @@ async function main() {
   const browser = await chromium.launch({ executablePath: CHROMIUM_PATH, args: LAUNCH_ARGS, headless: true });
   const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
   const page = await context.newPage();
-  await page.goto(`${options.baseUrl}/?scenario=${options.scenario}`, { waitUntil: "domcontentloaded" });
+  const seasonQuery = options.season === null ? "" : `&season=${options.season}`;
+  await page.goto(`${options.baseUrl}/?scenario=${options.scenario}${seasonQuery}`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__asamaTest?.getSnapshot?.() != null, null, { timeout: 60000 });
   // Sim-ready ≠ client-ready: the asset loader keeps the loading splash
   // (「ワーカー準備中...」) up for ~30s on a cold browser. Shots taken before it
