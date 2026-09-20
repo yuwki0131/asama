@@ -119,6 +119,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   const terrainLayerRef = useRef<Container | null>(null);
   const overlayLayerRef = useRef<Container | null>(null);
   const debugLayerRef = useRef<Container | null>(null);
+  const skirtFadeLayerRef = useRef<Container | null>(null);
   const toneFilterRef = useRef<ColorMatrixFilter | null>(null);
   const aerialOverlayRef = useRef<Sprite | null>(null);
   const toneEnabledRef = useRef(true);
@@ -321,7 +322,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       const app = appRef.current;
       const terrainLayer = terrainLayerRef.current;
       if (app === null || terrainLayer === null) return;
-      app.renderer.background.color = enabled ? 0xff00ff : 0x1c2227;
+      app.renderer.background.color = enabled ? 0xff00ff : 0x9aa3ad;
       for (const child of terrainLayer.children) {
         if ((child as Container & { __isTerrainUnderlay?: boolean }).__isTerrainUnderlay === true) {
           child.visible = !enabled;
@@ -399,7 +400,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
     void app
       .init({
         resizeTo: host,
-        background: "#1c2227",
+        background: "#9aa3ad",
         antialias: true
       })
       .then(() => {
@@ -420,6 +421,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         const effectsLayer = new EffectsLayer();
         effectsLayerRef.current = effectsLayer;
         const debugLayer = new Container();
+        const skirtFadeLayer = new Container();
         // Layer order (bottom → top):
         //   1. terrainLayer     — ground tiles (incl. cliff-cell floors, slope walls)
         //   2. overlayLayer     — path dots, hover rings, build previews
@@ -428,8 +430,11 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         //                          in front of a cliff paint over the face while
         //                          terrace-top building bases stay covered by it)
         //   4. effectsLayer     — combat VFX (arrows, smoke, …)
-        //   5. debugLayer       — dev alignment overlay
-        world.addChild(terrainLayer, overlayLayer, retainedScene.root, effectsLayer.root, debugLayer);
+        //   5. skirtFadeLayer   — perimeter mist over the skirt band; above the
+        //                         scene so tall rim structures dissolve into the
+        //                         haze instead of poking dark streaks out of it
+        //   6. debugLayer       — dev alignment overlay
+        world.addChild(terrainLayer, overlayLayer, retainedScene.root, effectsLayer.root, skirtFadeLayer, debugLayer);
         app.stage.addChild(world);
 
         // Grade C "大河ドラマ" color matrix over the whole world (terrain,
@@ -458,6 +463,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         terrainLayerRef.current = terrainLayer;
         overlayLayerRef.current = overlayLayer;
         debugLayerRef.current = debugLayer;
+        skirtFadeLayerRef.current = skirtFadeLayer;
         retainedSceneRef.current = retainedScene;
         centerCameraOnCell({ x: 64, y: 64 }, host, cameraRef.current);
         snapCamera(cameraRef.current);
@@ -508,6 +514,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       terrainLayerRef.current = null;
       overlayLayerRef.current = null;
       debugLayerRef.current = null;
+      skirtFadeLayerRef.current = null;
       toneFilterRef.current = null;
       aerialOverlayRef.current = null;
       retainedSceneRef.current = null;
@@ -550,6 +557,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
       terrainLayerRef.current,
       overlayLayerRef.current,
       debugLayerRef.current,
+      skirtFadeLayerRef.current,
       lastTerrainKeyRef,
       snapshot,
       assets,
