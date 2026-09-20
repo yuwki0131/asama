@@ -33,17 +33,21 @@ export const TONE_MATRIX_C: readonly number[] = [
   0,        0,        0,        1,  0
 ];
 
-/** Renderer clear color 0x1c2227 (GameCanvas app background / the void). */
-export const BACKGROUND_RGB: Rgb = { r: 0x1c, g: 0x22, b: 0x27 };
+/** Renderer clear color 0x9aa3ad (GameCanvas app background / the void).
+ *  V-17: the old near-black slate 0x1c2227 made the perimeter fade read as a
+ *  giant shadow / scorched ground / unloaded region against daylight terrain
+ *  (multiple independent reviewers). Daylight mist — lighter than the grass
+ *  field — reads as atmospheric distance instead. */
+export const BACKGROUND_RGB: Rgb = { r: 0x9a, g: 0xa3, b: 0xad };
 
 /**
  * Pre-grade color that the grade-C matrix maps onto BACKGROUND_RGB. Overlays
  * that live inside the tone-graded world container but must visually match
  * the ungraded renderer background (e.g. the perimeter skirt fade) have to
- * use this color: painting 0x1c2227 directly renders noticeably darker after
- * the grade and leaves a tonal step against the void (V-11).
+ * use this color: painting the background color directly renders shifted
+ * after the grade and leaves a tonal step against the void (V-11).
  */
-export const PRE_GRADE_BACKGROUND_RGB: Rgb = { r: 36, g: 44, b: 48 };
+export const PRE_GRADE_BACKGROUND_RGB: Rgb = { r: 145, g: 162, b: 181 };
 
 /** Aerial haze color #c7cdd6 (cool ivory, same family as the shadow blue-ink). */
 export const AERIAL_HAZE_RGB: Rgb = { r: 0xc7, g: 0xcd, b: 0xd6 };

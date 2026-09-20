@@ -92,26 +92,92 @@ const SKIRT_FADE_SPAN_RATIO =
 
 const SKIRT_FADE_TEXTURE_SIZE = 256;
 
+/** Piecewise-linear alpha of the base fade curve at `offset` (0=rim, 1=outer
+ *  overlay edge): the SKIRT_FADE_STOPS curve compressed into the fade span,
+ *  holding at 1 through the opaque tail and overscan (V-11 contract). */
+function skirtFadeBaseAlpha(offset: number): number {
+  const t = offset / SKIRT_FADE_SPAN_RATIO;
+  if (t >= 1) {
+    return 1;
+  }
+  for (let i = 1; i < SKIRT_FADE_STOPS.length; i += 1) {
+    const [o1, a1] = SKIRT_FADE_STOPS[i]!;
+    const [o0, a0] = SKIRT_FADE_STOPS[i - 1]!;
+    if (t <= o1) {
+      return a0 + ((t - o0) / (o1 - o0)) * (a1 - a0);
+    }
+  }
+  return 1;
+}
+
+/** Cheap 2-octave value noise in [0,1] for the fade mottling (deterministic). */
+function skirtFadeNoise(x: number, y: number): number {
+  const hash = (ix: number, iy: number): number => {
+    let h = (ix * 374761393 + iy * 668265263 + 1442695040) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    h = Math.imul(h, 1274126177) >>> 0;
+    return ((h ^ (h >>> 16)) >>> 0) / 0x100000000;
+  };
+  const smooth = (t: number): number => t * t * (3 - 2 * t);
+  const sample = (fx: number, fy: number): number => {
+    const ix = Math.floor(fx);
+    const iy = Math.floor(fy);
+    const tx = smooth(fx - ix);
+    const ty = smooth(fy - iy);
+    const a = hash(ix, iy) * (1 - tx) + hash(ix + 1, iy) * tx;
+    const b = hash(ix, iy + 1) * (1 - tx) + hash(ix + 1, iy + 1) * tx;
+    return a * (1 - ty) + b * ty;
+  };
+  return 0.65 * sample(x / 52, y / 52) + 0.35 * sample(x / 19 + 57, y / 19 + 91);
+}
+
+/** Mottling weight at `offset`: zero at the rim (the fade must still start
+ *  exactly on the map edge) and zero again before the opaque tail (EDGE-02:
+ *  the outer band must stay ≥84% opaque with ≤14-luma jumps). */
+function skirtFadeNoiseWeight(offset: number): number {
+  const t = offset / SKIRT_FADE_SPAN_RATIO;
+  if (t <= 0 || t >= 0.92) {
+    return 0;
+  }
+  return 0.30 * Math.sin(Math.PI * Math.min(t / 0.92, 1)) ** 1.2;
+}
+
+/** Fade textures: base gradient in ring distance, modulated by soft value
+ *  noise so the dissolve reads as patchy atmospheric distance instead of a
+ *  ruler-straight burnt gradient (V-17: 台帳watch「フェード形状のオーガニック化」).
+ *  Bands are full 2D textures so the mottle varies along the edge too. */
 function makeSkirtFadeTexture(radial: boolean): Texture {
   const size = SKIRT_FADE_TEXTURE_SIZE;
   const canvas = document.createElement("canvas");
   canvas.width = size;
-  canvas.height = radial ? size : 1;
+  canvas.height = size;
   const context = canvas.getContext("2d");
   if (context === null) {
     return Texture.WHITE;
   }
-  // Radial: quarter circle centered on the canvas origin — the map corner.
-  const gradient = radial
-    ? context.createRadialGradient(0, 0, 0, 0, 0, size)
-    : context.createLinearGradient(0, 0, size, 0);
+  const image = context.createImageData(size, size);
   const { r, g, b } = SKIRT_FADE_COLOR;
-  for (const [offset, alpha] of SKIRT_FADE_STOPS) {
-    gradient.addColorStop(offset * SKIRT_FADE_SPAN_RATIO, `rgba(${r},${g},${b},${alpha})`);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const offset = radial ? Math.min(1, Math.hypot(x, y) / (size - 1)) : x / (size - 1);
+      const noise = (skirtFadeNoise(radial ? x : x * 0.35, y) - 0.5) * 2;
+      // Domain warp: the fade curve advances/retreats per along-edge position
+      // so the dissolve onset is a wavy cloud line, not a ruler-straight
+      // gradient. Zero at the rim (offset 0) and inert past the opaque span.
+      const t = Math.min(1, offset / SKIRT_FADE_SPAN_RATIO);
+      const warpEnvelope = Math.sin(Math.PI * t);
+      const warped = Math.max(0, offset * (1 + noise * 0.28 * warpEnvelope));
+      const base = skirtFadeBaseAlpha(warped);
+      const weight = skirtFadeNoiseWeight(offset);
+      const alpha = Math.max(0, Math.min(1, base + noise * weight));
+      const index = (y * size + x) * 4;
+      image.data[index] = r;
+      image.data[index + 1] = g;
+      image.data[index + 2] = b;
+      image.data[index + 3] = Math.round(alpha * 255);
+    }
   }
-  gradient.addColorStop(1, `rgba(${r},${g},${b},1)`);
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.putImageData(image, 0, 0);
   return Texture.from(canvas);
 }
 
@@ -224,7 +290,8 @@ export function terrainKeyFor(snapshot: WorldSnapshot, assets: ReadonlyMap<strin
 export function buildTerrainChunks(
   terrainLayer: Container,
   snapshot: WorldSnapshot,
-  assets: ReadonlyMap<string, LoadedAsset>
+  assets: ReadonlyMap<string, LoadedAsset>,
+  skirtFadeLayer?: Container
 ): void {
   clearLayer(terrainLayer);
 
@@ -318,9 +385,17 @@ export function buildTerrainChunks(
 
   // Phase 3.5 — skirt fade: background-colored gradient bands over the skirt
   // rings (transparent at the map rim → opaque at the skirt's outer edge).
-  // Drawn above all terrain sprites; scene objects only exist inside the map,
-  // so nothing pops out of the fade.
-  terrainLayer.addChild(buildSkirtFadeOverlay(snapshot.map.width, snapshot.map.height));
+  // Preferably drawn on the dedicated layer ABOVE the retained scene: tall
+  // rim structures (塀・櫓) extend their sprites into the skirt band, and
+  // with the daylight-mist void they read as dark streaks poking out of the
+  // haze unless the fade covers them too (V-17 L2指摘).
+  const overlay = buildSkirtFadeOverlay(snapshot.map.width, snapshot.map.height);
+  if (skirtFadeLayer !== undefined) {
+    clearLayer(skirtFadeLayer);
+    skirtFadeLayer.addChild(overlay);
+  } else {
+    terrainLayer.addChild(overlay);
+  }
 
   // Phase 4 — upper cap lines: NW and NE edges of elevated cells whose
   // uphill neighbours are lower (or absent). In isometric view these edges

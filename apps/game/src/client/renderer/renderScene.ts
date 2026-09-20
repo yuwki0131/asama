@@ -19,6 +19,7 @@ export function renderScene(
   terrainLayer: Container | null,
   overlayLayer: Container | null,
   debugLayer: Container | null,
+  skirtFadeLayer: Container | null,
   lastTerrainKeyRef: { current: string | null },
   snapshot: WorldSnapshot,
   assets: ReadonlyMap<string, LoadedAsset>,
@@ -43,7 +44,7 @@ export function renderScene(
   // when many cells were visible.
   const terrainKey = terrainKeyFor(snapshot, assets);
   if (lastTerrainKeyRef.current !== terrainKey) {
-    buildTerrainChunks(terrainLayer, snapshot, assets);
+    buildTerrainChunks(terrainLayer, snapshot, assets, skirtFadeLayer ?? undefined);
     lastTerrainKeyRef.current = terrainKey;
   }
   updateTerrainChunkVisibility(terrainLayer, camera, app.screen.width, app.screen.height);
