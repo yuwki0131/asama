@@ -402,6 +402,32 @@ export function buildTerrainChunks(
     terrainLayer.addChild(overlay);
   }
 
+  // Phase 3.6 — terrace daylight lift (V-28): elevated ground gets a subtle
+  // warm-light overlay per level. Without it the upper and lower plates share
+  // the exact same grass tone and terraces read as paper-thin walls standing
+  // on a flat plain (4 scenarios flagged independently: 「石垣の内外が同じ
+  // 高さに見える/薄い板・書き割り」). The value step at the rim is the cue
+  // that sells the height difference — the ELEV-01 額縁 ban concerns dark
+  // banding, not a full-plate lighten.
+  const terraceLift = new Graphics();
+  for (const cell of snapshot.map.cells) {
+    if (cell.elevation <= 0 || cell.slope !== null || cell.terrain === "water") {
+      continue;
+    }
+    const point = cellToWorld(cell.coord);
+    const offsetY = tileOffsetY(cell);
+    const alpha = Math.min(0.045 + 0.028 * (cell.elevation - 1), 0.13);
+    terraceLift
+      .poly([
+        point.x, point.y + offsetY - TILE_HEIGHT / 2,
+        point.x + TILE_WIDTH / 2, point.y + offsetY,
+        point.x, point.y + offsetY + TILE_HEIGHT / 2,
+        point.x - TILE_WIDTH / 2, point.y + offsetY
+      ])
+      .fill({ color: 0xfff2d2, alpha });
+  }
+  terrainLayer.addChild(terraceLift);
+
   // Phase 4 — upper cap lines: NW and NE edges of elevated cells whose
   // uphill neighbours are lower (or absent). In isometric view these edges
   // form the top rim of a terrace; without a visible line they blend into
