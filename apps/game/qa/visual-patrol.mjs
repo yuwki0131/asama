@@ -98,12 +98,27 @@ async function main() {
   const page = await context.newPage();
   await page.goto(`${options.baseUrl}/?scenario=${options.scenario}`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__asamaTest?.getSnapshot?.() != null, null, { timeout: 60000 });
-  await page.evaluate(() => {
-    const button = [...document.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Debug");
-    if (button != null && button.classList.contains("active")) button.click();
-  });
+  // Sim-ready ≠ client-ready: the asset loader keeps the loading splash
+  // (「ワーカー準備中...」) up for ~30s on a cold browser. Shots taken before it
+  // unmounts are black loading screens (inventory 2026-09-20 incident).
+  await page.waitForFunction(() => document.querySelector(".loading-screen") == null, null, { timeout: 120000 });
   await page.evaluate(() => window.__asamaTest.setSpeed(0));
   await page.waitForTimeout(options.settleMs);
+
+  // The Debug overlay boots active; a single early click can race the UI
+  // mount and silently miss (same incident: grid + status panel baked into
+  // shots). Re-verify right before every screenshot instead.
+  const ensureDebugOff = async () => {
+    await page.evaluate(() => {
+      const button = [...document.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Debug");
+      if (button != null && button.classList.contains("active")) button.click();
+    });
+    await page.waitForFunction(() => {
+      const button = [...document.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Debug");
+      return button == null || !button.classList.contains("active");
+    }, null, { timeout: 10000 });
+  };
+  await ensureDebugOff();
 
   const world = await page.evaluate(() => {
     const s = window.__asamaTest.getSnapshot();
@@ -147,6 +162,7 @@ async function main() {
       await page.waitForTimeout(1200);
     }
     const file = `${view.name}.png`;
+    await ensureDebugOff();
     await page.screenshot({ path: join(runDir, file) });
     index.views.push({ name: view.name, cell: view.cell, zoom: view.zoom, file });
     console.log(`captured ${view.name}${view.cell ? ` cell=(${view.cell.x},${view.cell.y}) zoom=${view.zoom}` : " (initial view)"}`);
