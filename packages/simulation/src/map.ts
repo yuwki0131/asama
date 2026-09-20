@@ -40,6 +40,13 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
   for (let y = 0; y < MAP_HEIGHT; y += 1) {
     for (let x = 0; x < MAP_WIDTH; x += 1) {
       const terrain = terrainAtCell(x, y);
+      // 湿地セルには葦を疎らに立てる(湿地であることの図像的な合図)。
+      if (terrain === "marsh") {
+        if (hash(x, y, 7) < 0.2) {
+          decorations.push({ assetId: "deco.reeds.1", position: { x, y } });
+        }
+        continue;
+      }
       if (terrain !== "grass") {
         continue;
       }
@@ -111,7 +118,8 @@ export function createTerrainCell(coord: CellCoord): TerrainCellState {
   const innerCorner = corner === null ? riverInnerTransitionCorner(coord) : null;
   const terrain = corner !== null ? "water" : terrainAt(coord);
   const passable = terrain !== "water" && terrain !== "stone";
-  const movementCost = terrain === "dirt" ? 3 : 1;
+  // 湿地は通行可能だが深田の泥濘で大幅減速(土3に対し4)。
+  const movementCost = terrain === "dirt" ? 3 : terrain === "marsh" ? 4 : 1;
 
   return {
     coord,
@@ -193,6 +201,79 @@ function isRiverWater(x: number, y: number): boolean {
   // off-map water continuation (no spurious bank corners at x=0 / x=127).
   const { center, halfWidth } = riverCourse(x);
   return Math.abs(y - center) <= halfWidth;
+}
+
+/** 川沿いの低湿地帯(輪中の深田・湿地)。撤去した手続き岩尾根に代わる自然な
+ *  戦術的障害で、河川平野の城下として史実的に妥当な地形。sinローブで
+ *  途切れ途切れの帯にし、一様なベルトの人工感を避ける。
+ *  水面の直隣セルは川の斜め遷移タイル(riverTransitionCorner)の候補なので、
+ *  必ず岸から2セル以上離してgrassのまま残す。 */
+/** 川の外側斜め遷移タイル(riverTransitionCorner)が立つセルか。terrainAtを
+ *  経由しない純判定(isRiverWaterのみ)で、marshガードから再帰なしに使える。 */
+function isRiverTransitionSite(x: number, y: number): boolean {
+  if (isRiverWater(x, y)) {
+    return false;
+  }
+  const n = isRiverWater(x, y - 1);
+  const e = isRiverWater(x + 1, y);
+  const s = isRiverWater(x, y + 1);
+  const w = isRiverWater(x - 1, y);
+  return (n && e && !s && !w) || (e && s && !w && !n) || (s && w && !n && !e) || (w && n && !e && !s);
+}
+
+function rawMarshLowland(x: number, y: number): boolean {
+  // 水面(と斜め遷移タイルになるセル)の直交隣接には置かない: 遷移タイルは
+  // grass前提で成立しており、隣が水扱いセルだとmarshの水際保証も崩れる。
+  for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+    if (isRiverWater(x + dx, y + dy) || isRiverTransitionSite(x + dx, y + dy)) {
+      return false;
+    }
+  }
+  const { center, halfWidth } = riverCourse(x);
+  // 岸からのオフセットと帯幅を別位相のsinで揺らし、川と平行な等幅ストリップ
+  // (雁行パターン)や15セル級の直線縁に見えないようにする(L2/Astra指摘)。
+  const offset = 1.0 + 0.9 * (0.5 + 0.5 * Math.sin(x / 5.3 + 2.0));
+  const south = y - (center + halfWidth);
+  const southExtent =
+    (3.6 + 1.2 * Math.sin(x / 3.1 + 0.7)) * Math.max(0, Math.sin(x / 6.7 + 0.8));
+  if (south >= offset && south < offset + southExtent) {
+    return true;
+  }
+  const north = (center - halfWidth) - y;
+  const northExtent =
+    (2.4 + 1.0 * Math.sin(x / 3.7 + 1.9)) * Math.max(0, Math.sin(x / 9.3 + 2.9));
+  return north >= offset && north < offset + northExtent;
+}
+
+const MARSH_NEIGHBORHOOD = [
+  [1, 0], [-1, 0], [0, 1], [0, -1],
+  [1, 1], [1, -1], [-1, 1], [-1, -1],
+] as const;
+
+function erodeMarsh(x: number, y: number, member: (x: number, y: number) => boolean): boolean {
+  if (!member(x, y)) {
+    return false;
+  }
+  let orthogonal = 0;
+  let all = 0;
+  for (const [dx, dy] of MARSH_NEIGHBORHOOD) {
+    if (member(x + dx, y + dy)) {
+      all += 1;
+      if (dx === 0 || dy === 0) orthogonal += 1;
+    }
+  }
+  return orthogonal >= 2 && all >= 4;
+}
+
+function marshPass1(x: number, y: number): boolean {
+  return erodeMarsh(x, y, rawMarshLowland);
+}
+
+function isMarshLowland(x: number, y: number): boolean {
+  // 浸食2パス: ローブ先端の1セル孤立(草地に浮くシミ状)・1タイル幅の尾部・
+  // 2x2級の孤立小パッチを落とす(L2 watch)。1パスだと「隣接セル自身が浸食で
+  // 消えた」取り残しが出るため、浸食後の集合に対してもう一度同じ規則を適用。
+  return erodeMarsh(x, y, marshPass1);
 }
 
 export type RiverTransitionCorner = "ne" | "es" | "sw" | "wn";
@@ -289,7 +370,10 @@ function terrainAt(coord: CellCoord): TerrainType {
 
   // (旧: x≈84+cos蛇行の手続き岩尾根(stone帯)がここにあったが、2026-09-20に撤去。
   //  史実の城郭平野に存在しない地形で、V-12(遠景白ジグザグ)や中堀との衝突の
-  //  原因だった。戦術的障害の代替は湿地(marsh)地形として別途実装する。)
+  //  原因だった。代替の戦術的障害は川沿いの湿地帯。)
+  if (isMarshLowland(coord.x, coord.y)) {
+    return "marsh";
+  }
 
   // Dirt appears as coherent zones only; the old regular per-cell sprinkle
   // read as polka dots on the painterly terrain.
@@ -341,8 +425,9 @@ export function connectedTerrainAssetId(
 
   // Interior tiles use the world-anchored macro field (continuous noise
   // across tiles) so large surfaces stop reading as a 64px lattice. Stone
-  // keeps the connected sprites (no macro set rendered for it).
-  if (mask === "1111" && cell.terrain !== "stone") {
+  // and marsh keep the connected sprites (no macro set rendered for them;
+  // marsh interiors are ≤3 cells wide so a macro field would never show).
+  if (mask === "1111" && cell.terrain !== "stone" && cell.terrain !== "marsh") {
     const bx = cell.coord.x >> 2;
     const by = cell.coord.y >> 2;
     let h = (bx * 374761393 + by * 668265263 + 1013904223) >>> 0;

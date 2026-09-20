@@ -11,7 +11,8 @@ const MINIMAP_TERRAIN_COLORS: Record<string, string> = {
   grass: "#7d9c60",
   dirt: "#8a7a58",
   water: "#33566b",
-  stone: "#6f7278"
+  stone: "#6f7278",
+  marsh: "#55604a"
 };
 
 export function drawMinimap(

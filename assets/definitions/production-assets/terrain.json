@@ -1925,6 +1925,482 @@
       }
     },
     {
+      "assetId": "terrain.marsh.base",
+      "kind": "terrain",
+      "output": "terrain-marsh-base.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-base",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0000",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0000.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0000",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0001",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0001.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0001",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0010",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0010.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0010",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0011",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0011.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0011",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0100",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0100.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0100",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0101",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0101.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0101",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0110",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0110.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0110",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.0111",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-0111.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-0111",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1000",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1000.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1000",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1001",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1001.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1001",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1010",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1010.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1010",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1011",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1011.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1011",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1100",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1100.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1100",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1101",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1101.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1101",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1110",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1110.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1110",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
+      "assetId": "terrain.marsh.connected.1111",
+      "kind": "terrain",
+      "output": "terrain-marsh-connected-1111.png",
+      "source": {
+        "type": "blender",
+        "model": "terrain-marsh-connected-1111",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "marsh"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 32,
+        "anchorX": 32,
+        "anchorY": 16
+      },
+      "category": "terrain",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact",
+        "sharpen": {
+          "sigma": 0.3
+        }
+      }
+    },
+    {
       "assetId": "terrain.grass.macro.v0.0.0",
       "kind": "terrain",
       "output": "terrain-grass-macro-v0-0-0.png",
