@@ -411,7 +411,45 @@ export function buildTerrainChunks(
   //   Top/N corner = (screenX,        screenY - TILE_HEIGHT/2)
   //   Left/W corner = (screenX - TILE_WIDTH/2, screenY)
   //   Right/E corner = (screenX + TILE_WIDTH/2, screenY)
+  // V-22: the back (N/W) rim of a terrace has no visible cliff face in iso,
+  // so ANY decorated line alone reads as an overlay scratched onto flat
+  // grass (L2: 主因は「面が無いこと」). Instead of a line, shade a soft
+  // drop-off gradient on the LOWER ground behind the edge (stacked
+  // translucent green-shadow strokes) plus a faint sunlit lip on the upper
+  // plate — the value difference between the two sides is what sells the
+  // step; the brow line itself stays subtle.
   const capGraphics = new Graphics();
+  const capJitter = (x: number, y: number, salt: number): number => {
+    let h = (x * 374761393 + y * 668265263 + salt * 2246822519) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0;
+    return ((Math.imul(h, 1274126177) >>> 0) >>> 16) / 0x10000;
+  };
+  const capEdge = (
+    x0: number, y0: number, x1: number, y1: number, cx: number, cy: number, salt: number
+  ): void => {
+    const j = capJitter(cx, cy, salt);
+    // Soft shade band on the lower ground (screen-up side): darkened grass,
+    // widest and faintest furthest from the edge.
+    const shadeSteps: readonly [number, number, number][] = [
+      [-1.5, 3, 0.16], [-4, 3.5, 0.10], [-6.5, 3.5, 0.055]
+    ];
+    for (const [dy, width, alpha] of shadeSteps) {
+      capGraphics
+        .moveTo(x0, y0 + dy)
+        .lineTo(x1, y1 + dy)
+        .stroke({ color: 0x252b1d, width, alpha: alpha * (0.85 + 0.3 * j), cap: "round" });
+    }
+    // Faint earthen brow on the edge itself.
+    capGraphics
+      .moveTo(x0, y0)
+      .lineTo(x1, y1)
+      .stroke({ color: 0x4f4433, width: 1.5, alpha: 0.22 + 0.10 * j, cap: "round" });
+    // Sunlit grass lip on the upper plate.
+    capGraphics
+      .moveTo(x0, y0 + 2)
+      .lineTo(x1, y1 + 2)
+      .stroke({ color: 0xa8ad74, width: 2.5, alpha: 0.10 + 0.06 * (1 - j), cap: "round" });
+  };
   for (const cell of snapshot.map.cells) {
     if (cell.elevation <= 0) {
       continue;
@@ -424,19 +462,13 @@ export function buildTerrainChunks(
     // NW cap line: top → left diamond vertex.
     const nwNeighbour = cellAt(snapshot.map, cell.coord.x - 1, cell.coord.y);
     if ((nwNeighbour?.elevation ?? 0) < cell.elevation) {
-      capGraphics
-        .moveTo(screenX, screenY - TILE_HEIGHT / 2)
-        .lineTo(screenX - TILE_WIDTH / 2, screenY)
-        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7, cap: "round" });
+      capEdge(screenX, screenY - TILE_HEIGHT / 2, screenX - TILE_WIDTH / 2, screenY, cell.coord.x, cell.coord.y, 3);
     }
 
     // NE cap line: top → right diamond vertex.
     const neNeighbour = cellAt(snapshot.map, cell.coord.x, cell.coord.y - 1);
     if ((neNeighbour?.elevation ?? 0) < cell.elevation) {
-      capGraphics
-        .moveTo(screenX, screenY - TILE_HEIGHT / 2)
-        .lineTo(screenX + TILE_WIDTH / 2, screenY)
-        .stroke({ color: 0x6b5a42, width: 3, alpha: 0.7, cap: "round" });
+      capEdge(screenX, screenY - TILE_HEIGHT / 2, screenX + TILE_WIDTH / 2, screenY, cell.coord.x, cell.coord.y, 7);
     }
   }
   terrainLayer.addChild(capGraphics);
