@@ -719,14 +719,14 @@ export const concentricCastleScenario: ContentScenarioDefinition = {
 
     // === 水堀リング x=54-72, y=64-83。四隅は斜め水堀2枚の面取り ===
     // 斜め水堀コーナー (nesw="/", nwse="\")
-    { type: "diagonal_water_moat_nesw", position: { x: 55, y: 64 } },
-    { type: "diagonal_water_moat_nesw", position: { x: 54, y: 65 } },
-    { type: "diagonal_water_moat_nwse", position: { x: 71, y: 64 } },
-    { type: "diagonal_water_moat_nwse", position: { x: 72, y: 65 } },
-    { type: "diagonal_water_moat_nwse", position: { x: 54, y: 82 } },
-    { type: "diagonal_water_moat_nwse", position: { x: 55, y: 83 } },
-    { type: "diagonal_water_moat_nesw", position: { x: 72, y: 82 } },
-    { type: "diagonal_water_moat_nesw", position: { x: 71, y: 83 } },
+    { type: "water_moat", position: { x: 55, y: 64 } },
+    { type: "water_moat", position: { x: 54, y: 65 } },
+    { type: "water_moat", position: { x: 71, y: 64 } },
+    { type: "water_moat", position: { x: 72, y: 65 } },
+    { type: "water_moat", position: { x: 54, y: 82 } },
+    { type: "water_moat", position: { x: 55, y: 83 } },
+    { type: "water_moat", position: { x: 72, y: 82 } },
+    { type: "water_moat", position: { x: 71, y: 83 } },
     // 北堀 (x=56-70)
     { type: "water_moat", position: { x: 56, y: 64 } },
     { type: "water_moat", position: { x: 57, y: 64 } },
