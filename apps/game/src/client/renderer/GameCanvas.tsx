@@ -3,12 +3,13 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent
 } from "react";
 import { Application, ColorMatrixFilter, Container, type ColorMatrix, type Sprite, type Ticker } from "pixi.js";
-import type { BuildingType, CellCoord, EntityId, UnitId, WorldSnapshot } from "@asama/shared";
+import type { BuildingType, CellCoord, EntityId, Season, UnitId, WorldSnapshot } from "@asama/shared";
 import { createAerialOverlay, resizeAerialOverlay } from "./aerialOverlay";
 import { loadAnimationSheets, loadGeneratedAssets, type AnimationSheetAsset, type LoadedAsset } from "./assets";
 import { cellToWorld, centerCameraOnCell, roundScreenPixel, snapCamera, worldToScreen, type CameraState } from "./camera";
@@ -90,8 +91,22 @@ export const DEBUG_OVERLAY_DEFAULT_ENABLED =
   import.meta.env.VITE_DEBUG_ALIGNMENT === "true" ||
   (import.meta.env.DEV && import.meta.env.VITE_DEBUG_ALIGNMENT !== "false");
 
+/** QA-only VISUAL season override (`?season=autumn`, dev builds): lets the
+ *  patrol photograph seasonal farm art without running the sim a season's
+ *  worth of ticks. Rendering-only — the sim's economy/season is untouched,
+ *  so the HUD year/season label intentionally keeps showing the sim value. */
+const QA_SEASON_OVERRIDE: Season | null = (() => {
+  if (!import.meta.env.DEV || typeof window === "undefined") {
+    return null;
+  }
+  const value = new URLSearchParams(window.location.search).get("season");
+  return value === "spring" || value === "summer" || value === "autumn" || value === "winter"
+    ? value
+    : null;
+})();
+
 export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function GameCanvas({
-  snapshot,
+  snapshot: rawSnapshot,
   speed,
   buildTool,
   debugOverlayVisible,
@@ -113,6 +128,15 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   onPlaceSlope,
   onRemoveSlope
 }: GameCanvasProps, ref) {
+  // Memoized per incoming snapshot: the retained scene caches by snapshot
+  // identity, so the override must not allocate a fresh object per render.
+  const snapshot = useMemo(
+    () =>
+      QA_SEASON_OVERRIDE === null || rawSnapshot === null
+        ? rawSnapshot
+        : { ...rawSnapshot, economy: { ...rawSnapshot.economy, season: QA_SEASON_OVERRIDE } },
+    [rawSnapshot]
+  );
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
   const worldRef = useRef<Container | null>(null);
