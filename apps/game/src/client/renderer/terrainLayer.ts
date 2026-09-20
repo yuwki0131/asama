@@ -29,7 +29,12 @@ const TERRAIN_CHUNK_CELLS = 16;
 // than the S face so terraces keep a readable light direction.
 const CLIFF_FALLBACK_COLORS: Record<ElevationSkin, { s: number; e: number; slope: number }> = {
   cliff: { s: 0x4f4a43, e: 0x3f3b36, slope: 0x77694c },
-  ishigaki: { s: 0x7e7566, e: 0x685f52, slope: 0x8d8578 }
+  // V-24: the ishigaki backdrop must sit DARKER than the face art (mean
+  // ~(65,65,69)) — the old warm tan (126,117,102) showed through wherever the
+  // battered/sori face art recedes (inner corners, wall-end joints) as a
+  // blank pale wedge "石積みの貼り忘れ". A cool shadow tone reads as the
+  // occluded joint instead.
+  ishigaki: { s: 0x34343a, e: 0x2c2c32, slope: 0x46464c }
 };
 
 /** Sideways/downward bleed (px) of the opaque backdrop behind cliff face
