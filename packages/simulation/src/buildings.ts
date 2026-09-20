@@ -153,6 +153,76 @@ function resolvePlacementDefinition(placement: ScenarioBuildingPlacement): Build
   };
 }
 
+/** 建物フットプリント下の散布デコレーション(木・低木・草叢等)を除去する。
+ *  除去しないと、草地に散布済みの木がフットプリントセルに残り、深度順で
+ *  建物の後に描かれて「屋根の上に木・井戸が生える」(V-18)。 */
+export function clearDecorationsUnder(world: WorldState, footprint: readonly CellCoord[]): void {
+  if (world.map.decorations.length === 0) {
+    return;
+  }
+  const occupied = new Set(footprint.map((cell) => `${cell.x},${cell.y}`));
+  world.map.decorations = world.map.decorations.filter(
+    (decoration) => !occupied.has(`${decoration.position.x},${decoration.position.y}`)
+  );
+}
+
+/** 高層建物(天守・櫓・櫓門・本丸)の真背後の樹木デコを落とす(V-18)。
+ *  2系統の「屋根から木が生える」読み:
+ *  (a) 直背後1セルがより高い段丘 — 持ち上げられた根元が棟に重なる。
+ *  (b) 同一スクリーン列(x-k,y-k)の1〜3セル背後・同高以上 — 塔のスプライト高
+ *      と整列し、根元の土タフトがちょうど棟の上に載って見える(mountain事案:
+ *      (63,66)の杉 × (66,69)の櫓)。列がずれた木はシルエットが分離して
+ *      自然に読めるため対象外。 */
+function isTallBackdropBlocker(type: BuildingType): boolean {
+  return (
+    type === "yagura" ||
+    type === "honmaru" ||
+    type.startsWith("tenshu") ||
+    type.startsWith("gate_yagura")
+  );
+}
+
+export function clearRoofBackdropDecorations(world: WorldState): void {
+  if (world.map.decorations.length === 0) {
+    return;
+  }
+  const doomed = new Set<string>();
+  for (const building of world.buildings) {
+    const tall = isTallBackdropBlocker(building.type);
+    for (const cell of building.footprint) {
+      const base = getCell(world, cell).elevation;
+      for (const [dx, dy] of [[1, 0], [0, 1], [1, 1]] as const) {
+        const bx = cell.x - dx;
+        const by = cell.y - dy;
+        if (bx < 0 || by < 0) continue;
+        if (getCell(world, { x: bx, y: by }).elevation > base) {
+          doomed.add(`${bx},${by}`);
+        }
+      }
+      if (tall) {
+        for (let k = 1; k <= 3; k += 1) {
+          const bx = cell.x - k;
+          const by = cell.y - k;
+          if (bx < 0 || by < 0) continue;
+          if (getCell(world, { x: bx, y: by }).elevation >= base) {
+            doomed.add(`${bx},${by}`);
+          }
+        }
+      }
+    }
+  }
+  if (doomed.size === 0) {
+    return;
+  }
+  world.map.decorations = world.map.decorations.filter(
+    (decoration) =>
+      !(
+        (decoration.assetId.startsWith("deco.tree.") || decoration.assetId.startsWith("deco.bush")) &&
+        doomed.has(`${decoration.position.x},${decoration.position.y}`)
+      )
+  );
+}
+
 export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefinition): void {
   // Pre-collect all bridge positions so auto-span does not extend into a cell
   // that is reserved for an adjacent bridge (e.g. two-wide moat crossings).
@@ -197,18 +267,22 @@ export function seedInitialBuildings(world: WorldState, scenario: ScenarioDefini
         ladderHp: null,
         fillProgress: 0
       });
+      clearDecorationsUnder(world, footprint);
     } else {
       if (!canPlaceBuilding(world, placement.position, definition)) {
         throw new Error(`Cannot place initial building ${placement.type} at ${placement.position.x},${placement.position.y}`);
       }
       const building = createBuildingState(world, placement.type, placement.position, definition, placement.owner ?? "player");
       world.buildings.push(building);
+      clearDecorationsUnder(world, building.footprint);
       if (isLotBuilding(building.type)) {
         applyLotCourtyard(world, building.footprint);
       }
     }
     world.nextBuildingId += 1;
   }
+
+  clearRoofBackdropDecorations(world);
 }
 
 function seedBridgeFootprint(
