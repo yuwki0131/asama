@@ -377,11 +377,23 @@ function terrainAt(coord: CellCoord): TerrainType {
 
   // Dirt appears as coherent zones only; the old regular per-cell sprinkle
   // read as polka dots on the painterly terrain.
-  if (coord.x > 46 && coord.x < 72 && coord.y > 72 && coord.y < 86) {
+  if (isDirtZone(coord.x, coord.y)) {
     return "dirt";
   }
 
   return "grass";
+}
+
+// The dirt zone rim is modulated by two-frequency waves per edge so worn bare
+// ground doesn't read as a surveyed rectangle (V-25: 定規線の土面境界). The two
+// incommensurate periods keep lobes from repeating along an edge; amplitudes
+// stay under 3.7 cells so the zone never reaches the river or marsh belts.
+function isDirtZone(x: number, y: number): boolean {
+  const west = 46 + 2.2 * Math.sin(y / 3.7 + 1.3) + 1.4 * Math.sin(y / 1.9 + 4.1);
+  const east = 72 - 2.2 * Math.sin(y / 4.3 + 0.6) - 1.4 * Math.sin(y / 2.2 + 2.8);
+  const north = 72 + 1.8 * Math.sin(x / 4.1 + 2.4) + 1.1 * Math.sin(x / 2.1 + 0.9);
+  const south = 86 - 1.8 * Math.sin(x / 3.5 + 5.0) - 1.1 * Math.sin(x / 2.3 + 3.6);
+  return x > west && x < east && y > north && y < south;
 }
 
 function terrainAssetId(terrain: TerrainType, coord: CellCoord): string {

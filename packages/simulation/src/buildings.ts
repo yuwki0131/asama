@@ -67,7 +67,14 @@ function dirtAssetIdForCell(world: WorldState, coord: CellCoord, footprintSet: S
     return `terrain.dirt.macro.v${h % 2}.${coord.x % 4}.${coord.y % 4}`;
   }
 
-  return `terrain.dirt.connected.${mask}`;
+  // Lot fringes pick the same wavy v1/v2 variants (same hash and salt) as
+  // terrain-side region borders (map.ts connectedTerrainAssetId): the base
+  // tile alone repeats one fringe silhouette every 64px along straight lot
+  // edges and reads as a decorative frame (V-25).
+  let h = (coord.x * 374761393 + coord.y * 668265263 + 40503) >>> 0;
+  h = (h ^ (h >>> 13)) >>> 0;
+  const pick = h % 3;
+  return pick === 0 ? `terrain.dirt.connected.${mask}` : `terrain.dirt.connected.${mask}.v${pick}`;
 }
 
 function rectangularFootprint(width: number, height: number): readonly CellCoord[] {
