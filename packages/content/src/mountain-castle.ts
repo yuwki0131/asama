@@ -32,7 +32,12 @@ export const mountainCastleScenario: ContentScenarioDefinition = {
   elevation: {
     patches: [
       // 自然の山体(岩肌)。北・西面は急峻な死角として使う。
-      { area: { kind: "ellipse", cx: 58, cy: 66, rx: 21, ry: 17 }, level: 1 },
+      // (旧: 楕円1枚。ラスタライズ境界が1セル階段になり、S/E向きの崖面だけが
+      //  飛び石状に孤立して「草原に浮く石垣片」に見えた(V-19)。矩形3枚の
+      //  合成マウンドに置換 — 段の踏み幅が3セル以上になり崖面ランが連続する。)
+      { area: { kind: "rect", x: 44, y: 49, width: 26, height: 34 }, level: 1 },
+      { area: { kind: "rect", x: 40, y: 52, width: 36, height: 26 }, level: 1 },
+      { area: { kind: "rect", x: 37, y: 58, width: 40, height: 16 }, level: 1 },
       // 三の丸(帯曲輪)。南・東の縁は石垣、山側の縁は岩肌のまま残る。
       { area: { kind: "rect", x: 44, y: 52, width: 30, height: 34 }, level: 1, skin: "ishigaki" },
       // 二の丸段丘。
