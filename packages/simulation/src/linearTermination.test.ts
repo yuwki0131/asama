@@ -122,7 +122,9 @@ function auditScenario(world: WorldState, scenarioId: string): Violation[] {
         return true;
       }
       const terrain = terrainAt(nx, ny);
-      if (terrain === "water" || terrain === "marsh") {
+      // cliff: a run ending against a terrace boundary reads as the wall
+      // meeting the hillside (stepped鉢巻塀の西端納まり).
+      if (terrain === "water" || terrain === "marsh" || terrain === "cliff") {
         return true;
       }
     }
