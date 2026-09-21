@@ -851,13 +851,26 @@ function addBuildingSprite(
   // V-29: road tiles are a narrow-strip vocabulary; on boulevards 2+ cells
   // wide, the transparent corners of every cell expose the grass beneath in
   // a regular lattice that reads as a checkered/perforated pavement (Astra
-  // sweep high, castle-town main street). Cells whose connection mask has 3+
-  // road neighbours are boulevard interiors (or junction plazas): back them
-  // with a full packed-earth diamond so the strip art sits on continuous
-  // ground instead of grass holes.
+  // sweep high, castle-town main street). Back BOULEVARD cells — an adjacent
+  // orthogonal road pair whose shared diagonal is also road, i.e. the cell
+  // belongs to a 2x2 road mass — with a full packed-earth diamond so the
+  // strip art sits on continuous ground instead of grass holes. A plain
+  // "3+ neighbours" test also fired on T-junctions of 1-wide paths, where
+  // the strips cover far less than the diamond and the backing corners poked
+  // into the grass as bare geometry (V-27第2弾L2の指摘).
   if (building.type === "road") {
-    const mask = /\.connected\.([01]{4})/.exec(building.assetId)?.[1];
-    if (mask !== undefined && (mask.match(/1/g)?.length ?? 0) >= 3) {
+    const roadAt = (dx: number, dy: number): boolean =>
+      findBuildingAtCell({ x: building.position.x + dx, y: building.position.y + dy }, snapshot)?.type === "road";
+    const n = roadAt(0, -1);
+    const e = roadAt(1, 0);
+    const s = roadAt(0, 1);
+    const w = roadAt(-1, 0);
+    const inRoadMass =
+      (n && e && roadAt(1, -1)) ||
+      (e && s && roadAt(1, 1)) ||
+      (s && w && roadAt(-1, 1)) ||
+      (w && n && roadAt(-1, -1));
+    if (inRoadMass) {
       const backing = new Graphics();
       const x = sprite.position.x;
       const y = sprite.position.y;
@@ -1021,6 +1034,46 @@ function addBridgeSprites(
     }
     if (hasWater) {
       layer.addChild(water);
+    }
+  }
+  // V-27第2弾: the start/end segment's abutment art does not fill the whole
+  // cell diamond, so where a bridge meets a ROAD a sliver of grass shows
+  // between the deck end and the road strip (Astra高「橋端と道の間の草地」).
+  // Back those end cells with the same packed-earth diamond as the V-29
+  // boulevard backing (0x4a3f30): the apron ties the ramp into the road
+  // surface. Ends facing open grass keep the bare ramp-to-field look.
+  {
+    const axis = bridgeAxis(building);
+    const along = (c: CellCoord): number => (axis === "x" ? c.x : c.y);
+    let min = along(cells[0]!);
+    let max = min;
+    for (const cell of cells) {
+      const value = along(cell);
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+    }
+    const apron = new Graphics();
+    let hasApron = false;
+    for (const cell of cells) {
+      const value = along(cell);
+      if (value !== min && value !== max) {
+        continue;
+      }
+      const beyond: CellCoord =
+        axis === "x"
+          ? { x: value === min ? cell.x - 1 : cell.x + 1, y: cell.y }
+          : { x: cell.x, y: value === min ? cell.y - 1 : cell.y + 1 };
+      if (findBuildingAtCell(beyond, snapshot)?.type !== "road") {
+        continue;
+      }
+      hasApron = true;
+      const point = cellToWorld(cell);
+      const x = roundWorldPixel(point.x, zoom);
+      const y = roundWorldPixel(point.y + offsetY, zoom);
+      apron.poly([x, y - 16, x + 32, y, x, y + 16, x - 32, y]).fill({ color: 0x4a3f30 });
+    }
+    if (hasApron) {
+      layer.addChild(apron);
     }
   }
   // V-27: the deck casts a soft contact shadow onto the water/ground under
