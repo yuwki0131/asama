@@ -847,6 +847,26 @@ function addBuildingSprite(
   // the anchor cell's elevation lifts the whole sprite.
   const offsetY = -(building.elevation ?? 0) * ELEVATION_PIXELS_PER_LEVEL;
   sprite.position.set(roundWorldPixel(point.x, zoom), roundWorldPixel(point.y + offsetY, zoom));
+
+  // V-29: road tiles are a narrow-strip vocabulary; on boulevards 2+ cells
+  // wide, the transparent corners of every cell expose the grass beneath in
+  // a regular lattice that reads as a checkered/perforated pavement (Astra
+  // sweep high, castle-town main street). Cells whose connection mask has 3+
+  // road neighbours are boulevard interiors (or junction plazas): back them
+  // with a full packed-earth diamond so the strip art sits on continuous
+  // ground instead of grass holes.
+  if (building.type === "road") {
+    const mask = /\.connected\.([01]{4})/.exec(building.assetId)?.[1];
+    if (mask !== undefined && (mask.match(/1/g)?.length ?? 0) >= 3) {
+      const backing = new Graphics();
+      const x = sprite.position.x;
+      const y = sprite.position.y;
+      backing
+        .poly([x, y - 16, x + 32, y, x, y + 16, x - 32, y])
+        .fill({ color: 0x4a3f30 });
+      layer.addChild(backing);
+    }
+  }
   // 敵所有はスプライトのサーモンタントではなく赤い幟で示す(V-21)。全面
   // multiplyの桃色化は「テクスチャ欠落/未完成アセット」に誤読された。
 
