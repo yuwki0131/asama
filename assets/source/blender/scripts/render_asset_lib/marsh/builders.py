@@ -23,6 +23,7 @@ import math
 import bpy
 
 from ..core import add_flat_quad, add_mesh, map_xy, finish_material
+from ..materials import make_macro_terrain_material
 
 TERRAIN_BLEED = 0.03
 # Wide dark fringe: the wet ground bleeds into the grass so the diamond tile
@@ -178,16 +179,78 @@ def _add_fringe_run(
             [(0, 1, 2, 3)], material)
 
 
+#: Outer-corner masks (exactly two ADJACENT connected sides): the marsh
+#: surface is cut to the diagonal half toward the connected sides, with one
+#: wavy fringe along the hypotenuse. A full square on these tiles is what
+#: builds the 1-cell staircase silhouette along patch edges (ZONE-03: 台帳
+#: marsh watch「階段状輪郭・平行帯感」— 水のtransition cornerの語彙を
+#: 通行semantics不要な純アセット版として移植)。
+#: Each entry: (triangle vertices in map xy, hypotenuse start, hypotenuse
+#: end, inward normal of the hypotenuse).
+_CORNER_CUTS = {
+    # N+E connected -> NE half, hypotenuse NW corner -> SE corner.
+    "1100": (((-0.5, -0.5), (0.5, -0.5), (0.5, 0.5)), (-0.5, -0.5), (0.5, 0.5), (0.5, -0.5)),
+    # E+S connected -> SE half, hypotenuse NE -> SW.
+    "0110": (((0.5, -0.5), (0.5, 0.5), (-0.5, 0.5)), (0.5, -0.5), (-0.5, 0.5), (0.5, 0.5)),
+    # S+W connected -> SW half, hypotenuse NW -> SE.
+    "0011": (((-0.5, -0.5), (0.5, 0.5), (-0.5, 0.5)), (-0.5, -0.5), (0.5, 0.5), (-0.5, 0.5)),
+    # W+N connected -> NW half, hypotenuse NE -> SW.
+    "1001": (((-0.5, -0.5), (0.5, -0.5), (-0.5, 0.5)), (0.5, -0.5), (-0.5, 0.5), (-0.5, -0.5)),
+}
+
+
 def build_marsh_tile(scene: bpy.types.Scene, mask: str) -> None:
     same = {name: mask[index] == "1" for index, name in enumerate(("N", "E", "S", "W"))}
+    seed = 1.0 + (int(mask, 2) % 16) * 0.61
+    edge_material = make_marsh_edge_material("MarshEdge", seed)
+
+    corner = _CORNER_CUTS.get(mask)
+    if corner is not None:
+        triangle, hyp_start, hyp_end, toward = corner
+        # The open half is filled with the macro grass field so the diamond
+        # stays fully covered (the water transition corners do the same) —
+        # an empty half would expose the flat underlay diamond.
+        grass_corner = (-toward[0], -toward[1])
+        # The grass half must BLEED past the open edges like every terrain
+        # quad: a mesh edge sitting exactly on the canvas border renders as a
+        # semi-transparent AA hairline that reads in-game as a ghost outline
+        # of the old square boundary on the grass (L2差し戻し事由).
+        def bleed_open(vx: float, vy: float) -> tuple[float, float]:
+            bx = vx - TERRAIN_BLEED if (vx < 0 and not same["W"]) else vx + TERRAIN_BLEED if (vx > 0 and not same["E"]) else vx
+            by = vy - TERRAIN_BLEED if (vy < 0 and not same["N"]) else vy + TERRAIN_BLEED if (vy > 0 and not same["S"]) else vy
+            return bx, by
+        add_mesh(scene, "GrassHalf",
+                 [(*map_xy(*bleed_open(hyp_start[0], hyp_start[1])), -0.001),
+                  (*map_xy(*bleed_open(hyp_end[0], hyp_end[1])), -0.001),
+                  (*map_xy(*bleed_open(grass_corner[0], grass_corner[1])), -0.001)],
+                 [(0, 1, 2)], make_macro_terrain_material("grass", 0, 0, 0))
+        # Extend the two connected edges into the bleed zone by pushing the
+        # triangle vertices outward along the connected directions.
+        bled = []
+        for vx, vy in triangle:
+            bx = vx + (TERRAIN_BLEED if (vx > 0 and same["E"]) else -TERRAIN_BLEED if (vx < 0 and same["W"]) else 0.0)
+            by = vy + (TERRAIN_BLEED if (vy > 0 and same["S"]) else -TERRAIN_BLEED if (vy < 0 and same["N"]) else 0.0)
+            bled.append((bx, by))
+        add_mesh(scene, "Surface",
+                 [(*map_xy(vx, vy), 0.0) for vx, vy in bled],
+                 [(0, 1, 2)], make_marsh_material("MarshSurface", seed))
+        # Inward normal of the hypotenuse: unit vector from the hypotenuse
+        # midpoint toward the right-angle corner (the marsh side).
+        mx, my = (hyp_start[0] + hyp_end[0]) / 2.0, (hyp_start[1] + hyp_end[1]) / 2.0
+        nx, ny = toward[0] - mx, toward[1] - my
+        length = math.hypot(nx, ny)
+        normal = (nx / length, ny / length)
+        run_seed = 11.3 + (int(mask, 2) % 13) * 0.53
+        _add_fringe_run(scene, "FDiag", hyp_start, hyp_end, normal, 8, run_seed,
+                        edge_material, 0.002)
+        return
+
     y0 = -0.5 - (TERRAIN_BLEED if same["N"] else 0.0)
     x1 = 0.5 + (TERRAIN_BLEED if same["E"] else 0.0)
     y1 = 0.5 + (TERRAIN_BLEED if same["S"] else 0.0)
     x0 = -0.5 - (TERRAIN_BLEED if same["W"] else 0.0)
-    seed = 1.0 + (int(mask, 2) % 16) * 0.61
     add_flat_quad(scene, "Surface", (x0, y0), (x1, y1), 0.0, make_marsh_material("MarshSurface", seed))
 
-    edge_material = make_marsh_edge_material("MarshEdge", seed)
     runs = {
         "N": ((-0.5, -0.5), (0.5, -0.5), (0.0, 1.0)),
         "E": ((0.5, -0.5), (0.5, 0.5), (-1.0, 0.0)),

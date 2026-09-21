@@ -41,8 +41,16 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
     for (let x = 0; x < MAP_WIDTH; x += 1) {
       const terrain = terrainAtCell(x, y);
       // 湿地セルには葦を疎らに立てる(湿地であることの図像的な合図)。
+      // ZONE-03: 外側コーナーセルは45°対角タイルで半分が草地アートのため、
+      // セル中心に立つ葦が草の上に浮いて見える — コーナーでは立てない。
       if (terrain === "marsh") {
-        if (hash(x, y, 7) < 0.2) {
+        const n = terrainAtCell(x, y - 1) === "marsh";
+        const e = terrainAtCell(x + 1, y) === "marsh";
+        const s = terrainAtCell(x, y + 1) === "marsh";
+        const w = terrainAtCell(x - 1, y) === "marsh";
+        const isOuterCorner =
+          (n && e && !s && !w) || (e && s && !w && !n) || (s && w && !n && !e) || (w && n && !e && !s);
+        if (!isOuterCorner && hash(x, y, 7) < 0.2) {
           decorations.push({ assetId: "deco.reeds.1", position: { x, y } });
         }
         continue;
@@ -437,6 +445,30 @@ export function connectedTerrainAssetId(
     return cell.assetId;
   }
 
+  // ZONE-03: marsh outer-corner cells carry a 45° diagonal tile whose open
+  // half is GRASS art. A grass neighbour on one of the corner's open sides
+  // must NOT draw its marsh-facing fringe there — the tan fringe would float
+  // on the corner tile's grass half as a ghost outline of the old square
+  // boundary (L2差し戻し事由).
+  const isMarshCornerOpenFace = (marshX: number, marshY: number, towardDx: number, towardDy: number): boolean => {
+    const marshAt = (x: number, y: number): boolean =>
+      x >= 0 && y >= 0 && x < width && y < height && cells[y * width + x]?.terrain === "marsh";
+    const n = marshAt(marshX, marshY - 1);
+    const e = marshAt(marshX + 1, marshY);
+    const s = marshAt(marshX, marshY + 1);
+    const w = marshAt(marshX - 1, marshY);
+    const corner =
+      (n && e && !s && !w) || (e && s && !w && !n) || (s && w && !n && !e) || (w && n && !e && !s);
+    if (!corner) {
+      return false;
+    }
+    // The face toward the asking grass cell must be one of the OPEN sides.
+    if (towardDy === -1) return !n;
+    if (towardDx === 1) return !e;
+    if (towardDy === 1) return !s;
+    return !w;
+  };
+
   const mask = cardinalDirections
     .map((direction) => {
       const x = cell.coord.x + direction.x;
@@ -448,7 +480,18 @@ export function connectedTerrainAssetId(
         return "1";
       }
 
-      return cells[y * width + x]?.terrain === cell.terrain ? "1" : "0";
+      const neighbor = cells[y * width + x];
+      if (neighbor?.terrain === cell.terrain) {
+        return "1";
+      }
+      if (
+        cell.terrain === "grass" &&
+        neighbor?.terrain === "marsh" &&
+        isMarshCornerOpenFace(x, y, -direction.x, -direction.y)
+      ) {
+        return "1";
+      }
+      return "0";
     })
     .join("");
 
