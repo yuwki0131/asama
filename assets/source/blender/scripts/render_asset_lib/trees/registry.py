@@ -12,10 +12,13 @@ import re
 
 from .builders import (
     build_akamatsu,
+    build_bush,
     build_keyaki,
     build_kuromatsu,
     build_kusunoki,
+    build_reeds,
     build_sugi,
+    build_weeds,
     build_yabutsubaki,
 )
 
@@ -26,20 +29,26 @@ TREES_MODEL_PATTERNS = (
     "tree-kusunoki-v[12]",
     "tree-keyaki-v[12]",
     "tree-tsubaki-v[12]",
+    "shrub-bush-v[12]",
+    "shrub-weeds-v[12]",
+    "shrub-reeds-v[12]",
 )
 
 _SPECIES_BUILDERS = {
-    "kuromatsu": (build_kuromatsu, (1, 2, 3)),
-    "akamatsu": (build_akamatsu, (1, 2)),
-    "sugi": (build_sugi, (1, 2)),
-    "kusunoki": (build_kusunoki, (1, 2)),
-    "keyaki": (build_keyaki, (1, 2)),
-    "tsubaki": (build_yabutsubaki, (1, 2)),
+    "tree-kuromatsu": (build_kuromatsu, (1, 2, 3)),
+    "tree-akamatsu": (build_akamatsu, (1, 2)),
+    "tree-sugi": (build_sugi, (1, 2)),
+    "tree-kusunoki": (build_kusunoki, (1, 2)),
+    "tree-keyaki": (build_keyaki, (1, 2)),
+    "tree-tsubaki": (build_yabutsubaki, (1, 2)),
+    "shrub-bush": (build_bush, (1, 2)),
+    "shrub-weeds": (build_weeds, (1, 2)),
+    "shrub-reeds": (build_reeds, (1, 2)),
 }
 
 
 def resolve_model(name: str):
-    match = re.fullmatch(r"tree-([a-z]+)-v(\d)", name)
+    match = re.fullmatch(r"((?:tree|shrub)-[a-z]+)-v(\d)", name)
     if match is None:
         return None
     species, variant = match.group(1), int(match.group(2))

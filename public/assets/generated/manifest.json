@@ -520,39 +520,6 @@
       }
     },
     {
-      "assetId": "deco.reeds.1",
-      "kind": "building",
-      "file": "generated/deco-reeds-1.png",
-      "width": 64,
-      "height": 56,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7142857142857143
-      }
-    },
-    {
-      "assetId": "deco.bush.1",
-      "kind": "building",
-      "file": "generated/deco-bush-1.png",
-      "width": 64,
-      "height": 56,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.7142857142857143
-      }
-    },
-    {
-      "assetId": "deco.weeds.1",
-      "kind": "building",
-      "file": "generated/deco-weeds-1.png",
-      "width": 64,
-      "height": 48,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.6666666666666666
-      }
-    },
-    {
       "assetId": "building.farm.spring",
       "kind": "building",
       "file": "generated/building-farm-spring.png",
@@ -8231,17 +8198,6 @@
       }
     },
     {
-      "assetId": "deco.bamboo.1",
-      "kind": "building",
-      "file": "generated/deco-bamboo-1.png",
-      "width": 64,
-      "height": 128,
-      "anchor": {
-        "x": 0.5,
-        "y": 0.875
-      }
-    },
-    {
       "assetId": "deco.tree.tsubaki.1",
       "kind": "building",
       "file": "generated/deco-tree-tsubaki-1.png",
@@ -8261,6 +8217,83 @@
       "anchor": {
         "x": 0.5,
         "y": 0.7777777777777778
+      }
+    },
+    {
+      "assetId": "deco.bush.1",
+      "kind": "building",
+      "file": "generated/deco-bush-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.bush.2",
+      "kind": "building",
+      "file": "generated/deco-bush-2.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.weeds.1",
+      "kind": "building",
+      "file": "generated/deco-weeds-1.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6666666666666666
+      }
+    },
+    {
+      "assetId": "deco.weeds.2",
+      "kind": "building",
+      "file": "generated/deco-weeds-2.png",
+      "width": 64,
+      "height": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.6666666666666666
+      }
+    },
+    {
+      "assetId": "deco.reeds.1",
+      "kind": "building",
+      "file": "generated/deco-reeds-1.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.reeds.2",
+      "kind": "building",
+      "file": "generated/deco-reeds-2.png",
+      "width": 64,
+      "height": 56,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7142857142857143
+      }
+    },
+    {
+      "assetId": "deco.bamboo.1",
+      "kind": "building",
+      "file": "generated/deco-bamboo-1.png",
+      "width": 64,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
       }
     }
   ],

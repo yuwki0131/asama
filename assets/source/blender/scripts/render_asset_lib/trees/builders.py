@@ -955,3 +955,225 @@ def build_yabutsubaki(scene: bpy.types.Scene, variant: int) -> None:
                        seed=seed + index * 13.7,
                        count=30, droop=0.24, length_scale=0.68, width_scale=1.50,
                        core_scale=0.72)
+
+
+# --- 下層植生 (undergrowth: bush / weeds / reeds) -----------------------------
+# The AI-raster ground clumps (deco-bush/weeds/reeds) predate the V-07 roster
+# and clash with its painterly sprig vocabulary. Same method as the trees:
+# leaf-clump cards for the bush dome, tapered blade quads for grass/reeds,
+# both with the two-sided emission floor so nothing collapses to black.
+
+def make_blade_material(name: str, dark: tuple[float, float, float],
+                        light: tuple[float, float, float],
+                        floor: float = 0.32) -> bpy.types.Material:
+    """Grass-blade material: V-ramp colour (dark base -> light tip), object
+    noise patchiness, and the sprig vocabulary's two-sided emission floor.
+    Opaque — the blade silhouette comes from the tapered geometry."""
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes["Principled BSDF"]
+    bsdf.inputs["Roughness"].default_value = 0.95
+    output = nodes["Material Output"]
+
+    uv = nodes.new("ShaderNodeUVMap")
+    sep = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(uv.outputs["UV"], sep.inputs["Vector"])
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "EASE"
+    ramp.color_ramp.elements[0].position = 0.05
+    ramp.color_ramp.elements[0].color = (*dark, 1.0)
+    ramp.color_ramp.elements[1].position = 0.85
+    ramp.color_ramp.elements[1].color = (*light, 1.0)
+    links.new(sep.outputs["Y"], ramp.inputs["Fac"])
+    coords = nodes.new("ShaderNodeTexCoord")
+    patch = nodes.new("ShaderNodeTexNoise")
+    patch.inputs["Scale"].default_value = 3.2
+    links.new(coords.outputs["Object"], patch.inputs["Vector"])
+    patch_map = nodes.new("ShaderNodeMapRange")
+    patch_map.inputs["From Min"].default_value = 0.0
+    patch_map.inputs["From Max"].default_value = 1.0
+    patch_map.inputs["To Min"].default_value = 0.70
+    patch_map.inputs["To Max"].default_value = 1.10
+    links.new(patch.outputs["Fac"], patch_map.inputs["Value"])
+    tint = nodes.new("ShaderNodeMixRGB")
+    tint.blend_type = "MULTIPLY"
+    tint.inputs["Fac"].default_value = 1.0
+    links.new(ramp.outputs["Color"], tint.inputs["Color1"])
+    links.new(patch_map.outputs["Result"], tint.inputs["Color2"])
+    links.new(tint.outputs["Color"], bsdf.inputs["Base Color"])
+    front_floor = nodes.new("ShaderNodeMixRGB")
+    front_floor.blend_type = "MULTIPLY"
+    front_floor.inputs["Fac"].default_value = 1.0
+    front_floor.inputs["Color2"].default_value = (floor, floor, floor, 1.0)
+    links.new(tint.outputs["Color"], front_floor.inputs["Color1"])
+    links.new(front_floor.outputs["Color"], bsdf.inputs["Emission Color"])
+    bsdf.inputs["Emission Strength"].default_value = 1.0
+
+    translucent = nodes.new("ShaderNodeBsdfTranslucent")
+    links.new(tint.outputs["Color"], translucent.inputs["Color"])
+    back_floor = nodes.new("ShaderNodeMixRGB")
+    back_floor.blend_type = "MULTIPLY"
+    back_floor.inputs["Fac"].default_value = 1.0
+    back_floor.inputs["Color2"].default_value = (floor, floor, floor, 1.0)
+    links.new(tint.outputs["Color"], back_floor.inputs["Color1"])
+    back_emit = nodes.new("ShaderNodeEmission")
+    links.new(back_floor.outputs["Color"], back_emit.inputs["Color"])
+    back_add = nodes.new("ShaderNodeAddShader")
+    links.new(translucent.outputs["BSDF"], back_add.inputs[0])
+    links.new(back_emit.outputs["Emission"], back_add.inputs[1])
+    geometry = nodes.new("ShaderNodeNewGeometry")
+    both = nodes.new("ShaderNodeMixShader")
+    links.new(geometry.outputs["Backfacing"], both.inputs["Fac"])
+    links.new(bsdf.outputs["BSDF"], both.inputs[1])
+    links.new(back_add.outputs["Shader"], both.inputs[2])
+    links.new(both.outputs["Shader"], output.inputs["Surface"])
+    return material
+
+
+def add_grass_blades(
+    scene: bpy.types.Scene,
+    name: str,
+    cx: float,
+    cy: float,
+    count: int,
+    height_range: tuple[float, float],
+    spread: float,
+    material: bpy.types.Material,
+    seed: float,
+    lean: tuple[float, float] = (0.0, 0.0),
+    width: float = 0.020,
+    curl: float = 0.35,
+) -> list[tuple[float, float, float]]:
+    """A tuft of tapered two-segment blade quads bending outward (sharp linear
+    grass per the farm-rice lesson: 鋭い線的質感, never round lumps).
+    Returns each blade's tip position (for seed heads on reeds)."""
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    uvs: list[tuple[float, float]] = []
+    tips: list[tuple[float, float, float]] = []
+    for i in range(count):
+        angle = _rand(seed, i * 3.7) * 2.0 * math.pi
+        dist = spread * math.sqrt(_rand(seed, i * 5.3))
+        bx = cx + dist * math.cos(angle)
+        by = cy + dist * math.sin(angle)
+        h = height_range[0] + (height_range[1] - height_range[0]) * _rand(seed, i * 7.1)
+        bend_x = math.cos(angle) * curl * h + lean[0] * h
+        bend_y = math.sin(angle) * curl * h + lean[1] * h
+        side_x, side_y = -math.sin(angle), math.cos(angle)
+        w0 = width * (0.8 + 0.4 * _rand(seed, i * 9.7))
+        mid = (bx + bend_x * 0.35, by + bend_y * 0.35, h * 0.60)
+        tip = (bx + bend_x, by + bend_y, h)
+        tips.append(tip)
+        base = len(vertices)
+        vertices.append((*map_xy(bx - side_x * w0, by - side_y * w0), 0.0))
+        vertices.append((*map_xy(bx + side_x * w0, by + side_y * w0), 0.0))
+        vertices.append((*map_xy(mid[0] + side_x * w0 * 0.55, mid[1] + side_y * w0 * 0.55), mid[2]))
+        vertices.append((*map_xy(mid[0] - side_x * w0 * 0.55, mid[1] - side_y * w0 * 0.55), mid[2]))
+        vertices.append((*map_xy(tip[0], tip[1]), tip[2]))
+        vertices.append((*map_xy(tip[0] + side_x * 0.002, tip[1] + side_y * 0.002), tip[2]))
+        faces.append((base, base + 1, base + 2, base + 3))
+        faces.append((base + 3, base + 2, base + 4, base + 5))
+        uvs += [(0.0, 0.0), (1.0, 0.0), (1.0, 0.6), (0.0, 0.6)]
+        uvs += [(0.0, 0.6), (1.0, 0.6), (1.0, 1.0), (0.0, 1.0)]
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
+    uv_layer = mesh.uv_layers.new()
+    for loop_index, uv_co in enumerate(uvs):
+        uv_layer.data[loop_index].uv = uv_co
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    obj.data.materials.append(material)
+    obj.visible_shadow = False
+    scene.collection.objects.link(obj)
+    return tips
+
+
+_BUSH_VARIANTS = {
+    # v1: round single dome.
+    1: {"pads": (((0.0, 0.0, 0.17), 0.30), ((0.18, 0.10, 0.11), 0.21),
+                 ((-0.18, -0.10, 0.12), 0.22), ((0.0, -0.16, 0.09), 0.18))},
+    # v2: asymmetric double lobe.
+    2: {"pads": (((-0.10, -0.06, 0.16), 0.27), ((0.17, 0.09, 0.12), 0.23),
+                 ((0.03, 0.14, 0.08), 0.17))},
+}
+
+
+def build_bush(scene: bpy.types.Scene, variant: int) -> None:
+    """叢/灌木. Canvas 64x56, anchor 32,40. Low leaf-clump dome in the roster's
+    mid-green — replaces the AI-raster bush that clashed with V-07."""
+    spec = _BUSH_VARIANTS[variant]
+    seed = 1319.0 + variant * 113.0
+    bark = make_textured_material("BushBark", (0.110, 0.080, 0.055), (0.180, 0.140, 0.100),
+                                  scale=(16.0, 16.0, 4.4))
+    core = make_core_material("BushCore", (0.030, 0.058, 0.034), (0.050, 0.090, 0.052))
+    leaf = make_leaf_sprig_material("BushLeaf", (0.030, 0.066, 0.036), (0.092, 0.162, 0.086),
+                                    clump_scale=6.0)
+    for index in range(2):
+        angle = _rand(seed, index * 4.3) * 2.0 * math.pi
+        sx = 0.06 * math.cos(angle)
+        sy = 0.06 * math.sin(angle)
+        add_beam(scene, f"Stem{index}", (sx, sy, 0.0), (sx * 2.2, sy * 2.2, 0.14),
+                 0.022, bark, tip_thickness=0.012)
+    for index, (center, radius) in enumerate(spec["pads"]):
+        add_needle_pad(scene, f"Pad{index}", center, radius, core, leaf,
+                       seed=seed + index * 13.7,
+                       count=26, droop=0.26, length_scale=0.70, width_scale=1.50,
+                       core_scale=0.72)
+
+
+_WEEDS_VARIANTS = {
+    # v1: fuller upright tuft.
+    1: {"count": 14, "heights": (0.13, 0.30), "spread": 0.24, "lean": (0.0, 0.0)},
+    # v2: sparser, wind-leaning.
+    2: {"count": 9, "heights": (0.11, 0.26), "spread": 0.28, "lean": (0.14, 0.07)},
+}
+
+
+def build_weeds(scene: bpy.types.Scene, variant: int) -> None:
+    """草叢. Canvas 64x48, anchor 32,32. Sharp dry-green blade tuft."""
+    spec = _WEEDS_VARIANTS[variant]
+    seed = 1531.0 + variant * 127.0
+    dry = make_blade_material("WeedsDry", (0.088, 0.098, 0.038), (0.205, 0.215, 0.098))
+    green = make_blade_material("WeedsGreen", (0.052, 0.092, 0.044), (0.120, 0.185, 0.078))
+    add_grass_blades(scene, "Blades", 0.0, 0.0, spec["count"], spec["heights"],
+                     spec["spread"], dry, seed=seed, lean=spec["lean"])
+    add_grass_blades(scene, "BladesGreen", 0.02, -0.02, max(3, spec["count"] // 3),
+                     (spec["heights"][0] * 0.8, spec["heights"][1] * 0.85),
+                     spec["spread"] * 0.8, green, seed=seed + 77.0, lean=spec["lean"])
+
+
+_REEDS_VARIANTS = {
+    # v1: upright cluster, most stalks headed. A satellite clump makes the
+    # tile read as 葦叢 (L2: single thin clumps read as dark ticks at z1).
+    1: {"count": 9, "heights": (0.44, 0.66), "spread": 0.14, "lean": (0.0, 0.0),
+        "heads": 5, "satellite": ((0.20, -0.11), 4)},
+    # v2: wind-leaning, fewer heads, base tuft.
+    2: {"count": 7, "heights": (0.40, 0.60), "spread": 0.15, "lean": (0.15, 0.08),
+        "heads": 4, "satellite": ((-0.18, 0.12), 3)},
+}
+
+
+def build_reeds(scene: bpy.types.Scene, variant: int) -> None:
+    """葦. Canvas 64x56, anchor 32,40. Tall straw-green stalks with brown
+    cattail heads (蒲の穂), water-edge signature."""
+    spec = _REEDS_VARIANTS[variant]
+    seed = 1747.0 + variant * 131.0
+    stalk = make_blade_material("ReedStalk", (0.102, 0.118, 0.050), (0.215, 0.230, 0.108))
+    head = make_textured_material("ReedHead", (0.150, 0.088, 0.046), (0.225, 0.145, 0.082),
+                                  scale=(12.0, 12.0, 6.0))
+    tips = add_grass_blades(scene, "Stalks", 0.0, 0.0, spec["count"], spec["heights"],
+                            spec["spread"], stalk, seed=seed, lean=spec["lean"],
+                            width=0.018, curl=0.16)
+    (sat_dx, sat_dy), sat_count = spec["satellite"]
+    sat_tips = add_grass_blades(scene, "StalksSat", sat_dx, sat_dy, sat_count,
+                                (spec["heights"][0] * 0.85, spec["heights"][1] * 0.9),
+                                spec["spread"] * 0.7, stalk, seed=seed + 31.0,
+                                lean=spec["lean"], width=0.017, curl=0.16)
+    for index, tip in enumerate(tips[: spec["heads"]] + sat_tips[:2]):
+        add_beam(scene, f"Head{index}", (tip[0], tip[1], tip[2] - 0.015),
+                 (tip[0] + spec["lean"][0] * 0.05, tip[1] + spec["lean"][1] * 0.05, tip[2] + 0.085),
+                 0.019, head, tip_thickness=0.013)
+    add_grass_blades(scene, "BaseTuft", 0.0, 0.0, 6, (0.10, 0.18), 0.22, stalk,
+                     seed=seed + 53.0, lean=spec["lean"])

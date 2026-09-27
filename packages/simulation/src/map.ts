@@ -97,7 +97,10 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
         const isOuterCorner =
           (n && e && !s && !w) || (e && s && !w && !n) || (s && w && !n && !e) || (w && n && !e && !s);
         if (!isOuterCorner && hash(x, y, 7) < 0.2) {
-          decorations.push({ assetId: "deco.reeds.1", position: { x, y } });
+          decorations.push({
+            assetId: hash(x, y, 9) < 0.5 ? "deco.reeds.1" : "deco.reeds.2",
+            position: { x, y }
+          });
         }
         continue;
       }
@@ -109,10 +112,15 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
 
       if (nearWater) {
         const r = hash(x, y, 1);
-        if (r < 0.3) {
-          decorations.push({ assetId: "deco.reeds.1", position: { x, y } });
-        } else if (r < 0.38) {
-          // Bamboo clusters along waterways
+        // 0.3→0.42(2026-09-27): 葦が岸に1株ずつ「点置き」に見える(Astra中)。
+        // 群落として連なる確率を上げ、水際植生の連続感を出す。
+        if (r < 0.42) {
+          decorations.push({
+            assetId: hash(x, y, 9) < 0.5 ? "deco.reeds.1" : "deco.reeds.2",
+            position: { x, y }
+          });
+        } else if (r < 0.5) {
+          // Bamboo clusters along waterways (band width kept at 0.08)
           decorations.push({ assetId: "deco.bamboo.1", position: { x, y } });
         }
         continue;
@@ -137,7 +145,7 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
           // 下層はヤブツバキ主体(松江の城山椿群)、時々在来のブッシュ。
           const understory = hash(x, y, 6) < 0.7
             ? (hash(x, y, 8) < 0.5 ? "deco.tree.tsubaki.1" : "deco.tree.tsubaki.2")
-            : "deco.bush.1";
+            : (hash(x, y, 9) < 0.5 ? "deco.bush.1" : "deco.bush.2");
           decorations.push({ assetId: understory, position: { x, y } });
         }
       } else {
@@ -148,10 +156,13 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
         } else if (roll < 0.032) {
           const shrub = hash(x, y, 6) < 0.3
             ? (hash(x, y, 8) < 0.5 ? "deco.tree.tsubaki.1" : "deco.tree.tsubaki.2")
-            : "deco.bush.1";
+            : (hash(x, y, 9) < 0.5 ? "deco.bush.1" : "deco.bush.2");
           decorations.push({ assetId: shrub, position: { x, y } });
         } else if (roll < 0.068) {
-          decorations.push({ assetId: "deco.weeds.1", position: { x, y } });
+          decorations.push({
+            assetId: hash(x, y, 9) < 0.5 ? "deco.weeds.1" : "deco.weeds.2",
+            position: { x, y }
+          });
         }
       }
     }
