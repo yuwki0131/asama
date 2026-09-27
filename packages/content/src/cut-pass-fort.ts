@@ -71,8 +71,8 @@ export const cutPassFortScenario: ContentScenarioDefinition = {
     { assetId: "deco.rock.1", position: { x: 42, y: 104 } },
     { assetId: "deco.rock.1", position: { x: 45, y: 104 } },
     { assetId: "deco.rock.1", position: { x: 60, y: 88 } },
-    { assetId: "deco.tree.pine.1", position: { x: 34, y: 97 } },
-    { assetId: "deco.tree.pine.1", position: { x: 56, y: 84 } },
+    { assetId: "deco.tree.kuromatsu.1", position: { x: 34, y: 97 } },
+    { assetId: "deco.tree.kuromatsu.2", position: { x: 56, y: 84 } },
   ],
   initialUnits: [
     // 本曲輪 (L2) — 刀は本丸マーカー上。門裏の (43..44,95) は補給路のため空ける。

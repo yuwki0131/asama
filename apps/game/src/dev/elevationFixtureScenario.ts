@@ -84,11 +84,11 @@ export const elevationFixtureScenario: ScenarioDefinition = {
   // swallowed by it (cliff render-order regression check).
   decorations: [
     // In front of the h2 rock outcrop faces (cliff cells at y=57).
-    { assetId: "deco.tree.cedar.1", position: { x: 46, y: 58 } },
-    { assetId: "deco.tree.pine.1", position: { x: 47, y: 58 } },
+    { assetId: "deco.tree.sugi.1", position: { x: 46, y: 58 } },
+    { assetId: "deco.tree.kuromatsu.1", position: { x: 47, y: 58 } },
     // In front of the level-2 ishigaki terrace S rim (cliff cells at y=63).
-    { assetId: "deco.tree.pine.1", position: { x: 37, y: 64 } },
-    { assetId: "deco.tree.broadleaf.1", position: { x: 43, y: 64 } }
+    { assetId: "deco.tree.kuromatsu.2", position: { x: 37, y: 64 } },
+    { assetId: "deco.tree.keyaki.1", position: { x: 43, y: 64 } }
   ],
   victory: { holdTicks: null }
 };
