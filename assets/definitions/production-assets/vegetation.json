@@ -2,12 +2,90 @@
   "version": 1,
   "assets": [
     {
-      "assetId": "deco.tree.pine.1",
+      "assetId": "deco.tree.kuromatsu.1",
       "kind": "building",
-      "output": "deco-tree-pine-1.png",
+      "output": "deco-tree-kuromatsu-1.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/deco-tree-pine-1.png"
+        "type": "blender",
+        "model": "tree-kuromatsu-v1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 120,
+        "anchorX": 32,
+        "anchorY": 104
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.kuromatsu.2",
+      "kind": "building",
+      "output": "deco-tree-kuromatsu-2.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-kuromatsu-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 120,
+        "anchorX": 32,
+        "anchorY": 104
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.kuromatsu.3",
+      "kind": "building",
+      "output": "deco-tree-kuromatsu-3.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-kuromatsu-v3",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 120,
+        "anchorX": 32,
+        "anchorY": 104
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.akamatsu.1",
+      "kind": "building",
+      "output": "deco-tree-akamatsu-1.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-akamatsu-v1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -24,12 +102,15 @@
       }
     },
     {
-      "assetId": "deco.tree.pine.2",
+      "assetId": "deco.tree.akamatsu.2",
       "kind": "building",
-      "output": "deco-tree-pine-2.png",
+      "output": "deco-tree-akamatsu-2.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/deco-tree-pine-2.png"
+        "type": "blender",
+        "model": "tree-akamatsu-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -46,12 +127,15 @@
       }
     },
     {
-      "assetId": "deco.tree.cedar.1",
+      "assetId": "deco.tree.sugi.1",
       "kind": "building",
-      "output": "deco-tree-cedar-1.png",
+      "output": "deco-tree-sugi-1.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/deco-tree-cedar-1.png"
+        "type": "blender",
+        "model": "tree-sugi-v1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -68,12 +152,90 @@
       }
     },
     {
-      "assetId": "deco.tree.broadleaf.1",
+      "assetId": "deco.tree.sugi.2",
       "kind": "building",
-      "output": "deco-tree-broadleaf-1.png",
+      "output": "deco-tree-sugi-2.png",
       "source": {
-        "type": "raster",
-        "file": "assets/source/raster/deco-tree-broadleaf-1.png"
+        "type": "blender",
+        "model": "tree-sugi-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.kusunoki.1",
+      "kind": "building",
+      "output": "deco-tree-kusunoki-1.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-kusunoki-v1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 128,
+        "anchorX": 48,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.kusunoki.2",
+      "kind": "building",
+      "output": "deco-tree-kusunoki-2.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-kusunoki-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 96,
+        "canvasHeight": 128,
+        "anchorX": 48,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.keyaki.1",
+      "kind": "building",
+      "output": "deco-tree-keyaki-1.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-keyaki-v1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
       },
       "geometry": {
         "footprintWidth": 1,
@@ -82,6 +244,81 @@
         "canvasHeight": 112,
         "anchorX": 32,
         "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.keyaki.2",
+      "kind": "building",
+      "output": "deco-tree-keyaki-2.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-keyaki-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 112,
+        "anchorX": 32,
+        "anchorY": 96
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.tsubaki.1",
+      "kind": "building",
+      "output": "deco-tree-tsubaki-1.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-tsubaki-v1",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.tree.tsubaki.2",
+      "kind": "building",
+      "output": "deco-tree-tsubaki-2.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-tsubaki-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 72,
+        "anchorX": 32,
+        "anchorY": 56
       },
       "category": "vegetation",
       "postprocess": {

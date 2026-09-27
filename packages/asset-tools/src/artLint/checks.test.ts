@@ -109,7 +109,7 @@ describe("GEO-01 checkBuildingGeometry", () => {
       checkBuildingGeometry({ assetId: "building.road.connected.1111", kind: "building", width: 64, height: 32, anchor: { x: 0.5, y: 0.5 } })
     ).toBeNull();
     expect(
-      checkBuildingGeometry({ assetId: "deco.tree.pine.1", kind: "building", width: 64, height: 112, anchor: { x: 0.5, y: 96 / 112 } })
+      checkBuildingGeometry({ assetId: "deco.tree.kuromatsu.1", kind: "building", width: 64, height: 120, anchor: { x: 0.5, y: 104 / 120 } })
     ).toBeNull();
   });
 

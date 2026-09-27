@@ -253,9 +253,9 @@ async function buildKuruwaMock(index: ManifestIndex, outputPath: string): Promis
   }
 
   // Entity pass: y-sorted, Y offset only (tenshu on the kuruwa, pines below).
-  await place("deco.tree.pine.1", 3, 14, map[14]?.[3]?.elevation ?? 0);
+  await place("deco.tree.kuromatsu.1", 3, 14, map[14]?.[3]?.elevation ?? 0);
   await place("building.tenshu.main", 11.5, 11.5, 2);
-  await place("deco.tree.pine.2", 2, 17, 0);
+  await place("deco.tree.kuromatsu.2", 2, 17, 0);
 
   await sharp({
     create: { width, height, channels: 4, background: { r: 46, g: 50, b: 58, alpha: 255 } }

@@ -59,7 +59,7 @@ describe("decorations under buildings (V-18)", () => {
     );
     expect(free).toBeDefined();
     const position = free!.coord;
-    world.map.decorations.push({ assetId: "deco.tree.pine.1", position });
+    world.map.decorations.push({ assetId: "deco.tree.kuromatsu.1", position });
     const error = applyCommand(world, {
       type: "placeBuilding",
       buildingType: "fence",

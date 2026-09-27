@@ -22,6 +22,27 @@ export function createInitialMap(): WorldState["map"] {
   };
 }
 
+// V-07 松江城基準ロスター(vegetation-design.md)。林分の種バイアスは
+// 実在の城郭植生に従う: 松林(クロマツ/アカマツ)・杉林・広葉樹林(ケヤキ+
+// クスノキ点在)。ヤブツバキは松江の個性として下層の主力(bush系の置換)。
+const PINE_GROVE_TREES = [
+  "deco.tree.kuromatsu.1", "deco.tree.kuromatsu.2", "deco.tree.kuromatsu.3",
+  "deco.tree.kuromatsu.1", "deco.tree.kuromatsu.2",
+  "deco.tree.akamatsu.1", "deco.tree.akamatsu.2"
+] as const;
+const CEDAR_GROVE_TREES = [
+  "deco.tree.sugi.1", "deco.tree.sugi.2", "deco.tree.sugi.1", "deco.tree.sugi.2",
+  "deco.tree.akamatsu.1", "deco.tree.keyaki.1"
+] as const;
+const BROADLEAF_GROVE_TREES = [
+  "deco.tree.keyaki.1", "deco.tree.keyaki.2", "deco.tree.keyaki.1", "deco.tree.keyaki.2",
+  "deco.tree.kusunoki.1", "deco.tree.kusunoki.2", "deco.tree.sugi.1"
+] as const;
+const OPEN_FIELD_TREES = [
+  "deco.tree.akamatsu.1", "deco.tree.akamatsu.2", "deco.tree.kuromatsu.1",
+  "deco.tree.keyaki.1", "deco.tree.keyaki.2", "deco.tree.kusunoki.1"
+] as const;
+
 export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecoration[] {
   const decorations: MapDecoration[] = [];
   const terrainAtCell = (x: number, y: number): TerrainType | null => {
@@ -35,6 +56,31 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
     value = (value ^ (value >>> 13)) >>> 0;
     value = Math.imul(value, 1274126177) >>> 0;
     return ((value ^ (value >>> 16)) >>> 0) / 0x100000000;
+  };
+  // アンチクラスタ選択: 同一バリアントの近接反復を避ける(クローン感の抑制)。
+  // 林分の実密度では同一バリアントが2セル間隔で並んだだけで「同じ木の連鎖」に
+  // 読める(L2指摘: スギ同一バリアントの斜め3連鎖)ため、チェビシェフ距離2
+  // 以内の既配置と同じバリアントを引いたら振り直す。
+  const placedTrees = new Map<string, string>();
+  const pickTree = (x: number, y: number, candidates: readonly string[]): string => {
+    let assetId = candidates[Math.floor(hash(x, y, 4) * candidates.length) % candidates.length]!;
+    for (let attempt = 1; attempt <= 4; attempt += 1) {
+      let clash = false;
+      for (let dy = -2; dy <= 2 && !clash; dy += 1) {
+        for (let dx = -2; dx <= 2; dx += 1) {
+          if ((dx !== 0 || dy !== 0) && placedTrees.get(`${x + dx},${y + dy}`) === assetId) {
+            clash = true;
+            break;
+          }
+        }
+      }
+      if (!clash) {
+        break;
+      }
+      assetId = candidates[Math.floor(hash(x, y, 4 + attempt * 17) * candidates.length) % candidates.length]!;
+    }
+    placedTrees.set(`${x},${y}`, assetId);
+    return assetId;
   };
 
   for (let y = 0; y < MAP_HEIGHT; y += 1) {
@@ -83,31 +129,27 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
         const patchSpecies = hash(px, py, 11);
         const roll = hash(x, y, 3);
         if (roll < 0.13) {
-          const pick = hash(x, y, 4);
-          let assetId: string;
-          if (patchSpecies < 0.33) {
-            // Pine grove (松林)
-            assetId = pick < 0.75 ? "deco.tree.pine.1" : "deco.tree.pine.2";
-          } else if (patchSpecies < 0.66) {
-            // Cedar grove (杉林)
-            assetId = pick < 0.8 ? "deco.tree.cedar.1" : pick < 0.95 ? "deco.tree.pine.1" : "deco.tree.broadleaf.1";
-          } else {
-            // Broadleaf grove (広葉樹林)
-            assetId = pick < 0.7 ? "deco.tree.broadleaf.1" : pick < 0.9 ? "deco.tree.cedar.1" : "deco.tree.pine.1";
-          }
-          decorations.push({ assetId, position: { x, y } });
+          const grove =
+            patchSpecies < 0.33 ? PINE_GROVE_TREES :
+            patchSpecies < 0.66 ? CEDAR_GROVE_TREES : BROADLEAF_GROVE_TREES;
+          decorations.push({ assetId: pickTree(x, y, grove), position: { x, y } });
         } else if (roll < 0.15) {
-          decorations.push({ assetId: "deco.bush.1", position: { x, y } });
+          // 下層はヤブツバキ主体(松江の城山椿群)、時々在来のブッシュ。
+          const understory = hash(x, y, 6) < 0.7
+            ? (hash(x, y, 8) < 0.5 ? "deco.tree.tsubaki.1" : "deco.tree.tsubaki.2")
+            : "deco.bush.1";
+          decorations.push({ assetId: understory, position: { x, y } });
         }
       } else {
         // Sparse scatter outside forest patches
         const roll = hash(x, y, 3);
         if (roll < 0.018) {
-          const pick = hash(x, y, 4);
-          const assetId = pick < 0.35 ? "deco.tree.pine.1" : pick < 0.6 ? "deco.tree.cedar.1" : "deco.tree.broadleaf.1";
-          decorations.push({ assetId, position: { x, y } });
+          decorations.push({ assetId: pickTree(x, y, OPEN_FIELD_TREES), position: { x, y } });
         } else if (roll < 0.032) {
-          decorations.push({ assetId: "deco.bush.1", position: { x, y } });
+          const shrub = hash(x, y, 6) < 0.3
+            ? (hash(x, y, 8) < 0.5 ? "deco.tree.tsubaki.1" : "deco.tree.tsubaki.2")
+            : "deco.bush.1";
+          decorations.push({ assetId: shrub, position: { x, y } });
         } else if (roll < 0.068) {
           decorations.push({ assetId: "deco.weeds.1", position: { x, y } });
         }
