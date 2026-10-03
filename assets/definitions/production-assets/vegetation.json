@@ -482,9 +482,35 @@
       "output": "deco-bamboo-1.png",
       "source": {
         "type": "blender",
-        "model": "bamboo-cluster",
+        "model": "tree-bamboo-v1",
         "renderSpec": "painterly",
-        "supersample": 2
+        "supersample": 2,
+        "registry": "trees"
+      },
+      "geometry": {
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "canvasWidth": 64,
+        "canvasHeight": 128,
+        "anchorX": 32,
+        "anchorY": 112
+      },
+      "category": "vegetation",
+      "postprocess": {
+        "trim": false,
+        "resizeMode": "exact"
+      }
+    },
+    {
+      "assetId": "deco.bamboo.2",
+      "kind": "building",
+      "output": "deco-bamboo-2.png",
+      "source": {
+        "type": "blender",
+        "model": "tree-bamboo-v2",
+        "renderSpec": "painterly",
+        "supersample": 2,
+        "registry": "trees"
       },
       "geometry": {
         "footprintWidth": 1,

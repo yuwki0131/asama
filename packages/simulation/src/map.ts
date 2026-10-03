@@ -62,6 +62,8 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
   // 読める(L2指摘: スギ同一バリアントの斜め3連鎖)ため、チェビシェフ距離2
   // 以内の既配置と同じバリアントを引いたら振り直す。
   const placedTrees = new Map<string, string>();
+  // 竹帯の候補(2パス目で孤立株を間引く — L2: 孤高の一本竹は帯に読めない)。
+  const bambooCandidates: { x: number; y: number }[] = [];
   const pickTree = (x: number, y: number, candidates: readonly string[]): string => {
     let assetId = candidates[Math.floor(hash(x, y, 4) * candidates.length) % candidates.length]!;
     for (let attempt = 1; attempt <= 4; attempt += 1) {
@@ -112,6 +114,11 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
 
       if (nearWater) {
         const r = hash(x, y, 1);
+        // 竹は「水辺の竹帯」として群落で読ませる(サイクル14 L2中指摘:
+        // 一様8%の点在では孤立クランプにしか見えない)。低周波の竹ゾーン
+        // (6x6ブロックの30%)内の岸セルだけ高確率で竹を立て、岸線に沿った
+        // ひとまとまりの竹林帯を作る。ゾーン外は葦のみ。
+        const bambooZone = hash(Math.floor(x / 6), Math.floor(y / 6), 13) < 0.3;
         // 0.3→0.42(2026-09-27): 葦が岸に1株ずつ「点置き」に見える(Astra中)。
         // 群落として連なる確率を上げ、水際植生の連続感を出す。
         if (r < 0.42) {
@@ -119,9 +126,8 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
             assetId: hash(x, y, 9) < 0.5 ? "deco.reeds.1" : "deco.reeds.2",
             position: { x, y }
           });
-        } else if (r < 0.5) {
-          // Bamboo clusters along waterways (band width kept at 0.08)
-          decorations.push({ assetId: "deco.bamboo.1", position: { x, y } });
+        } else if (bambooZone && r < 0.74) {
+          bambooCandidates.push({ x, y });
         }
         continue;
       }
@@ -165,6 +171,21 @@ export function scatterDecorations(cells: readonly TerrainCellState[]): MapDecor
           });
         }
       }
+    }
+  }
+  // 竹帯の2パス目: チェビシェフ距離2以内に仲間のいない孤立候補を棄却し、
+  // 残った群落だけを立てる(岸線に沿った竹林帯として読む最小単位=2株)。
+  for (const candidate of bambooCandidates) {
+    const hasNeighbor = bambooCandidates.some(
+      (other) =>
+        other !== candidate &&
+        Math.max(Math.abs(other.x - candidate.x), Math.abs(other.y - candidate.y)) <= 2
+    );
+    if (hasNeighbor) {
+      decorations.push({
+        assetId: hash(candidate.x, candidate.y, 12) < 0.5 ? "deco.bamboo.1" : "deco.bamboo.2",
+        position: { x: candidate.x, y: candidate.y }
+      });
     }
   }
   return decorations;
