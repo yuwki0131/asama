@@ -183,17 +183,24 @@ def add_tree_base(scene: bpy.types.Scene, cx: float, cy: float, trunk_r: float,
     s = base_scale
     grass_dark = make_material("BaseGrassD", (0.130, 0.165, 0.062, 1.0))
     grass_light = make_material("BaseGrassL", (0.215, 0.255, 0.100, 1.0))
-    litter = make_foliage_material("BaseLitter", (0.072, 0.076, 0.040), (0.115, 0.118, 0.060))
-    pebble = make_noise_material("BasePebble", (0.105, 0.102, 0.095), (0.180, 0.175, 0.160), scale=7.0)
+    # W-V07a/f(サイクル15): painterly finishの影面が紫に振れるため、基部の
+    # 点景はフロア付きコア材質に統一。リターは草地に寄せた緑褐でデカール感を
+    # 殺し、ペブルは無彩の暖灰(青紫斑点の根絶)。
+    litter = make_core_material("BaseLitter", (0.085, 0.092, 0.045), (0.128, 0.142, 0.068),
+                                floor=0.30)
+    pebble = make_core_material("BasePebble", (0.100, 0.095, 0.085), (0.175, 0.168, 0.150),
+                                floor=0.25)
 
-    for index in range(5):
-        angle = index / 5 * 2 * math.pi + _rand(seed, index * 1.7) * 0.9
-        dist = (0.13 + 0.09 * _rand(seed, index * 2.9)) * s
+    # サイクル15(Astra中指摘): 太い5本の根ビームは直線縁+尖り角が
+    # 「多角形の土台」に読める。細く短い7本に割って角を散らす。
+    for index in range(7):
+        angle = index / 7 * 2 * math.pi + _rand(seed, index * 1.7) * 0.9
+        dist = (0.10 + 0.07 * _rand(seed, index * 2.9)) * s
         rx = dist * math.cos(angle)
         ry = dist * math.sin(angle)
         add_beam(scene, f"Root{index}", (cx + rx, cy + ry, -0.01),
-                 (cx + rx * 0.2, cy + ry * 0.2, 0.11 * s), trunk_r * 0.5, bark,
-                 tip_thickness=trunk_r * 0.95)
+                 (cx + rx * 0.2, cy + ry * 0.2, 0.09 * s), trunk_r * 0.34, bark,
+                 tip_thickness=trunk_r * 0.62)
     for index in range(7):
         angle = (index + 0.5) / 7 * 2 * math.pi + _rand(seed, index * 3.3)
         dist = (0.22 + 0.09 * _rand(seed, index * 4.1)) * s
@@ -203,8 +210,9 @@ def add_tree_base(scene: bpy.types.Scene, cx: float, cy: float, trunk_r: float,
         material = grass_light if index % 2 else grass_dark
         add_beam(scene, f"BaseTuft{index}", (tx, ty, 0.0), (tx + 0.025, ty - 0.02, height),
                  0.02, material, tip_thickness=0.006)
-    add_foliage_blob(scene, "BaseLitterPad", cx + 0.04 * s, cy - 0.02 * s, 0.0, 0.30 * s,
-                     0.035 * s, litter, squash=0.6, jitter_amp=0.22)
+    # 台座読み対策: 小さめ・平たく・輪郭ジッタ強めで「置いた菱形」を崩す。
+    add_foliage_blob(scene, "BaseLitterPad", cx + 0.04 * s, cy - 0.02 * s, 0.0, 0.27 * s,
+                     0.030 * s, litter, squash=0.42, jitter_amp=0.34)
     for index in range(2):
         angle = _rand(seed, index * 6.7) * 2 * math.pi
         bx = cx + 0.28 * s * math.cos(angle)
