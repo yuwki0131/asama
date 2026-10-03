@@ -9,6 +9,7 @@ import {
   checkInteriorHoles,
   checkMarkerColors,
   checkMatteFringe,
+  checkDarkShare,
   checkMeanLuma,
   checkMeanLumaCeiling,
   checkSpeckles,
@@ -124,6 +125,12 @@ export async function collectArtLintViolations(): Promise<{
       const lum01 = checkMeanLuma(asset.assetId, image);
       if (lum01 !== null) {
         violations.push(lum01);
+      }
+      if (asset.assetId.startsWith("deco.")) {
+        const veg01 = checkDarkShare(asset.assetId, image);
+        if (veg01 !== null) {
+          violations.push(veg01);
+        }
       }
     }
     if (asset.kind === "terrain") {

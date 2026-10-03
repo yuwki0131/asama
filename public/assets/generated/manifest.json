@@ -8295,6 +8295,17 @@
         "x": 0.5,
         "y": 0.875
       }
+    },
+    {
+      "assetId": "deco.bamboo.2",
+      "kind": "building",
+      "file": "generated/deco-bamboo-2.png",
+      "width": 64,
+      "height": 128,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.875
+      }
     }
   ],
   "animations": [

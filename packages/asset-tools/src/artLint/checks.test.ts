@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  checkDarkShare,
   checkBuildingGeometry,
   checkFaceDrift,
   checkInteriorHoles,
@@ -473,5 +474,35 @@ describe("VAR-01 checkVariantDiff", () => {
     fillRect(base, 0, 0, 15, 15, WOOD);
     expect(checkVariantDiff("base", "base.p1", base, makeImage(8, 8))).toBeNull();
     expect(checkVariantDiff("base", "base.p1", base, makeImage(16, 16))).toBeNull();
+  });
+});
+
+describe("VEG-03 checkDarkShare", () => {
+  const makeFilled = (width: number, height: number, fill: [number, number, number, number]) => {
+    const data = Buffer.alloc(width * height * 4);
+    for (let p = 0; p < width * height; p += 1) {
+      data.set(fill, p * 4);
+    }
+    return { data, width, height };
+  };
+
+  it("passes a healthy green crown", () => {
+    const image = makeFilled(16, 16, [70, 90, 60, 255]);
+    expect(checkDarkShare("deco.tree.sugi.1", image)).toBeNull();
+  });
+
+  it("flags a crown with a hard near-black cluster", () => {
+    const image = makeFilled(16, 16, [70, 90, 60, 255]);
+    // 8 of 256 opaque pixels (3.1%) near-black
+    for (let p = 0; p < 8; p += 1) {
+      image.data.set([5, 10, 6, 255], p * 4);
+    }
+    const violation = checkDarkShare("deco.tree.sugi.1", image);
+    expect(violation?.ruleId).toBe("VEG-03");
+  });
+
+  it("ignores transparent pixels", () => {
+    const image = makeFilled(16, 16, [0, 0, 0, 0]);
+    expect(checkDarkShare("deco.bush.1", image)).toBeNull();
   });
 });

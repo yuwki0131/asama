@@ -12,6 +12,7 @@ import re
 
 from .builders import (
     build_akamatsu,
+    build_bamboo,
     build_bush,
     build_keyaki,
     build_kuromatsu,
@@ -29,6 +30,7 @@ TREES_MODEL_PATTERNS = (
     "tree-kusunoki-v[12]",
     "tree-keyaki-v[12]",
     "tree-tsubaki-v[12]",
+    "tree-bamboo-v[12]",
     "shrub-bush-v[12]",
     "shrub-weeds-v[12]",
     "shrub-reeds-v[12]",
@@ -41,6 +43,7 @@ _SPECIES_BUILDERS = {
     "tree-kusunoki": (build_kusunoki, (1, 2)),
     "tree-keyaki": (build_keyaki, (1, 2)),
     "tree-tsubaki": (build_yabutsubaki, (1, 2)),
+    "tree-bamboo": (build_bamboo, (1, 2)),
     "shrub-bush": (build_bush, (1, 2)),
     "shrub-weeds": (build_weeds, (1, 2)),
     "shrub-reeds": (build_reeds, (1, 2)),

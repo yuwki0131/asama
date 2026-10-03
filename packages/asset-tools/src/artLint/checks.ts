@@ -23,7 +23,8 @@ export type ArtLintRuleId =
   | "NOISE-04"
   | "LUM-01"
   | "LUM-02"
-  | "VAR-01";
+  | "VAR-01"
+  | "VEG-03";
 
 export interface ArtLintViolation {
   readonly assetId: string;
@@ -591,6 +592,52 @@ export function variantBaseId(assetId: string): string | null {
  * three channel deltas over mutually-opaque pixels; sub-visible legacy pairs
  * live in the art-lint baseline, not in a rule exemption.
  */
+/**
+ * VEG-03: near-black cluster share for vegetation decorations (deco.*).
+ * W-V07c: shadow-side sprig cards / core blobs can collapse into hard black
+ * wedges inside a crown (perceivable at z1.5 even when the opaque MEAN is
+ * healthy, so LUM-01 never fires). Guard: opaque pixels with luma<20 must
+ * stay under 1.5% of the opaque area. Calibration (2026-10-04, post
+ * emission-floor lift): worst shipping asset is deco.bush.2 at 0.88%; the
+ * regression this guards against (unfloored vertical culms/blades) sits an
+ * order of magnitude above the threshold.
+ */
+export function checkDarkShare(
+  assetId: string,
+  image: RawImage,
+  maxShare = 0.015,
+  lumaMax = 20
+): ArtLintViolation | null {
+  const { data, width, height } = image;
+  let dark = 0;
+  let count = 0;
+  for (let p = 0; p < width * height; p += 1) {
+    const i = p * 4;
+    if ((data[i + 3] ?? 0) < OPAQUE_ALPHA) {
+      continue;
+    }
+    const luma = 0.2126 * (data[i] ?? 0) + 0.7152 * (data[i + 1] ?? 0) + 0.0722 * (data[i + 2] ?? 0);
+    if (luma < lumaMax) {
+      dark += 1;
+    }
+    count += 1;
+  }
+  if (count === 0) {
+    return null;
+  }
+  const share = dark / count;
+  if (share <= maxShare) {
+    return null;
+  }
+  return {
+    assetId,
+    ruleId: "VEG-03",
+    measured: `near-black share=${(share * 100).toFixed(2)}% (luma<${lumaMax}, ${dark}/${count}px)`,
+    threshold: `<=${(maxShare * 100).toFixed(1)}%`,
+    message: "植生デコの樹冠内近黒クラスタ検知(未フロアのカード/稈の黒落ち回帰ガード)"
+  };
+}
+
 export function checkVariantDiff(
   baseAssetId: string,
   variantAssetId: string,

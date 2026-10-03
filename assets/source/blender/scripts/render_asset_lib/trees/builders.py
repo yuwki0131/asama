@@ -442,8 +442,8 @@ def make_leaf_sprig_material(name: str, dark: tuple[float, float, float],
                              light: tuple[float, float, float],
                              clump_scale: float = 5.0,
                              roughness: float = 0.92,
-                             front_floor: float = 0.10,
-                             translucent_floor: float = 0.10) -> bpy.types.Material:
+                             front_floor: float = 0.18,
+                             translucent_floor: float = 0.18) -> bpy.types.Material:
     """Broadleaf twin of make_needle_sprig_material: the card carries clumpy
     leaf masses (noise threshold) instead of needle stripes, everything else
     (V-ramp colour, patch noise, emission floor, backfacing translucency)
@@ -556,7 +556,8 @@ def make_leaf_sprig_material(name: str, dark: tuple[float, float, float],
 
 
 def make_core_material(name: str, dark: tuple[float, float, float],
-                       light: tuple[float, float, float]) -> bpy.types.Material:
+                       light: tuple[float, float, float],
+                       floor: float = 0.09) -> bpy.types.Material:
     """Pad-backing blob material with the sprig vocabulary's emission floor.
     The painterly finish (make_foliage_material) drops a sphere's shade side
     to near-black; where droopy/sparse sprays expose the core (sugi tiers,
@@ -578,12 +579,12 @@ def make_core_material(name: str, dark: tuple[float, float, float],
     ramp.color_ramp.elements[1].color = (*light, 1.0)
     links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
     links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
-    floor = nodes.new("ShaderNodeMixRGB")
-    floor.blend_type = "MULTIPLY"
-    floor.inputs["Fac"].default_value = 1.0
-    floor.inputs["Color2"].default_value = (0.09, 0.09, 0.09, 1.0)
-    links.new(ramp.outputs["Color"], floor.inputs["Color1"])
-    links.new(floor.outputs["Color"], bsdf.inputs["Emission Color"])
+    floor_mix = nodes.new("ShaderNodeMixRGB")
+    floor_mix.blend_type = "MULTIPLY"
+    floor_mix.inputs["Fac"].default_value = 1.0
+    floor_mix.inputs["Color2"].default_value = (floor, floor, floor, 1.0)
+    links.new(ramp.outputs["Color"], floor_mix.inputs["Color1"])
+    links.new(floor_mix.outputs["Color"], bsdf.inputs["Emission Color"])
     bsdf.inputs["Emission Strength"].default_value = 1.0
     return material
 
@@ -737,7 +738,7 @@ def build_akamatsu(scene: bpy.types.Scene, variant: int) -> None:
                                   scale=(16.0, 16.0, 3.4))
     core = make_core_material("AkamatsuCore", (0.040, 0.074, 0.048), (0.068, 0.112, 0.072))
     sprig = make_needle_sprig_material("AkamatsuSprig", (0.034, 0.080, 0.052), (0.100, 0.188, 0.108),
-                                       front_floor=0.10, translucent_floor=0.10)
+                                       front_floor=0.18, translucent_floor=0.18)
 
     add_tree_base(scene, 0.0, 0.0, 0.11, bark, seed=seed)
     _build_trunk(scene, "Trunk", spec["trunk"], bark, 0.088)
@@ -787,7 +788,7 @@ def build_sugi(scene: bpy.types.Scene, variant: int) -> None:
                                   scale=(14.0, 14.0, 4.2))
     core = make_core_material("SugiCore", (0.042, 0.080, 0.050), (0.064, 0.114, 0.068))
     sprig = make_needle_sprig_material("SugiSprig", (0.028, 0.066, 0.040), (0.076, 0.152, 0.084),
-                                       front_floor=0.10, translucent_floor=0.10)
+                                       front_floor=0.18, translucent_floor=0.18)
 
     add_tree_base(scene, 0.0, 0.0, 0.12, bark, seed=seed)
     lx, ly = spec["lean"]
@@ -1161,7 +1162,9 @@ def build_reeds(scene: bpy.types.Scene, variant: int) -> None:
     spec = _REEDS_VARIANTS[variant]
     seed = 1747.0 + variant * 131.0
     stalk = make_blade_material("ReedStalk", (0.102, 0.118, 0.050), (0.215, 0.230, 0.108))
-    head = make_textured_material("ReedHead", (0.150, 0.088, 0.046), (0.225, 0.145, 0.082),
+    # W-V07e: heads must stay readable on the dark marsh ground — brighter
+    # brown than the bank-side minimum would need.
+    head = make_textured_material("ReedHead", (0.190, 0.112, 0.056), (0.275, 0.180, 0.098),
                                   scale=(12.0, 12.0, 6.0))
     tips = add_grass_blades(scene, "Stalks", 0.0, 0.0, spec["count"], spec["heights"],
                             spec["spread"], stalk, seed=seed, lean=spec["lean"],
@@ -1174,6 +1177,77 @@ def build_reeds(scene: bpy.types.Scene, variant: int) -> None:
     for index, tip in enumerate(tips[: spec["heads"]] + sat_tips[:2]):
         add_beam(scene, f"Head{index}", (tip[0], tip[1], tip[2] - 0.015),
                  (tip[0] + spec["lean"][0] * 0.05, tip[1] + spec["lean"][1] * 0.05, tip[2] + 0.085),
-                 0.019, head, tip_thickness=0.013)
+                 0.021, head, tip_thickness=0.014)
     add_grass_blades(scene, "BaseTuft", 0.0, 0.0, 6, (0.10, 0.18), 0.22, stalk,
                      seed=seed + 53.0, lean=spec["lean"])
+
+
+# --- 竹 (bamboo) --------------------------------------------------------------
+# Last vegetation still on the default registry (bamboo-cluster, 1 variant —
+# W-V07d twin adjacency). Rebuilt here per the art-direction 様式シート:
+# 節リングのある稈3〜5本 + 三日月形の笹の房を上部に疎らに(下向きに垂れる)
+# + 房の間の空の抜け。楕円の樹冠(塊化)・密な葉は描かない。
+
+_BAMBOO_VARIANTS = {
+    # v1: four culms, near-upright, staggered heights.
+    1: {"culms": ((-0.14, -0.05, 1.95, 0.08, 0.04), (0.02, -0.14, 2.05, -0.02, -0.05),
+                  (0.13, 0.03, 1.80, -0.09, 0.05), (-0.04, 0.13, 1.65, 0.10, 0.08)),
+        "lean": (0.0, 0.0)},
+    # v2: three culms bending together in the wind, one juvenile.
+    2: {"culms": ((-0.10, -0.06, 1.90, 0.06, 0.03), (0.08, 0.02, 2.00, -0.04, -0.04),
+                  (0.00, 0.12, 1.30, 0.05, 0.09)),
+        "lean": (0.16, 0.08)},
+}
+
+
+def build_bamboo(scene: bpy.types.Scene, variant: int) -> None:
+    """竹. Canvas 64x128, anchor 32,112."""
+    spec = _BAMBOO_VARIANTS[variant]
+    seed = 1973.0 + variant * 139.0
+    culm = make_core_material("BambooCulm", (0.062, 0.110, 0.045), (0.150, 0.225, 0.090),
+                              floor=0.38)
+    ring = make_core_material("BambooRing", (0.120, 0.185, 0.070), (0.200, 0.280, 0.115),
+                              floor=0.40)
+    sasa = make_needle_sprig_material("BambooSasa", (0.042, 0.092, 0.038), (0.135, 0.215, 0.085),
+                                      front_floor=0.18, translucent_floor=0.18)
+    bark = make_textured_material("BambooBase", (0.075, 0.055, 0.034), (0.135, 0.100, 0.062),
+                                  scale=(14.0, 14.0, 3.0))
+    add_tree_base(scene, 0.0, 0.0, 0.05, bark, seed=seed, base_scale=0.8)
+    lean_x, lean_y = spec["lean"]
+    for index, (sx, sy, height, drift_x, drift_y) in enumerate(spec["culms"]):
+        total_dx = drift_x + lean_x * height * 0.55
+        total_dy = drift_y + lean_y * height * 0.55
+        # Segmented culm: node rings every ~0.34 units, slimmer per segment.
+        node_z = 0.0
+        step = 0.34
+        thick = 0.034
+        while node_z < height - 0.02:
+            top_z = min(node_z + step, height)
+            f0 = node_z / height
+            f1 = top_z / height
+            p0 = (sx + total_dx * f0 * f0, sy + total_dy * f0 * f0, node_z)
+            p1 = (sx + total_dx * f1 * f1, sy + total_dy * f1 * f1, top_z)
+            taper = 1.0 - 0.35 * f1
+            add_beam(scene, f"Culm{index}S{node_z:.2f}", p0, p1,
+                     max(0.016, thick * taper), culm,
+                     tip_thickness=max(0.014, thick * taper * 0.92))
+            if top_z < height - 0.05:
+                add_frustum(scene, f"Ring{index}S{top_z:.2f}",
+                            (p1[0] - 0.030, p1[1] - 0.030), (p1[0] + 0.030, p1[1] + 0.030),
+                            top_z - 0.012, top_z + 0.012, 0.004, ring)
+            node_z = top_z
+        # Sasa tufts: sparse, upper third only, drooping crescents with air
+        # between them (no core blob — the gaps are the point).
+        tuft_count = 3 if height > 1.5 else 2
+        for t in range(tuft_count):
+            tf = 1.0 - 0.16 * t - 0.06 * _rand(seed, index * 11.3 + t)
+            tz = height * tf
+            f2 = tf * tf
+            tx = sx + total_dx * f2
+            ty = sy + total_dy * f2
+            off_a = _rand(seed, index * 7.9 + t * 3.1) * 2.0 * math.pi
+            off_r = 0.05 + 0.06 * _rand(seed, index * 5.7 + t * 2.3)
+            add_sprig_spray(scene, f"Sasa{index}T{t}",
+                            (tx + off_r * math.cos(off_a), ty + off_r * math.sin(off_a), tz),
+                            0.155, 11, sasa, seed=seed + index * 17.0 + t * 7.0,
+                            droop=0.78, length_scale=1.35, width_scale=0.62)
